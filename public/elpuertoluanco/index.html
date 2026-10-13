@@ -141,19 +141,19 @@
 <script>
   // Cabecera con dos capas: blanca (base) y oscura (clonada). La oscura solo se ve
   // en los píxeles que coinciden con una sección clara (.light), vía clip-path.
-  const top = document.getElementById('top');
+  const cab = document.getElementById('top');
   const alt = document.createElement('div');
   alt.className = 'alt';
   alt.setAttribute('aria-hidden', 'true');
   alt.inert = true;
-  alt.innerHTML = top.innerHTML;
+  alt.innerHTML = cab.innerHTML;
   alt.querySelectorAll('a').forEach(a => a.tabIndex = -1);
-  top.appendChild(alt);
+  cab.appendChild(alt);
   const claras = [...document.querySelectorAll('.light')];
   let pendiente = false;
   function pintarCabecera() {
     pendiente = false;
-    const H = top.offsetHeight, W = innerWidth;
+    const H = cab.offsetHeight, W = innerWidth;
     let d = '';
     for (const s of claras) {
       const r = s.getBoundingClientRect();

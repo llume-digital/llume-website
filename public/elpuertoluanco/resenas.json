@@ -1,5 +1,5 @@
 {
-  "_nota": "Reseñas reales de Google Maps (valoración 4 o 5 estrellas), copiadas el 13/10/2026. Algunas recortadas a las frases iniciales. Fechas aproximadas a partir de 'hace X'. Para añadir más, copiar el mismo formato (puntuacion sobre 10: 5 estrellas = 10, 4 = 8). No inventar reseñas.",
+  "_nota": "Reseñas reales de Google (solo valoraciones de 4 o 5 estrellas). Las más recientes, de Google Maps (13/10/2026); las de 2022-2023, de la ficha de Sluurpy, que las recoge de Google. Algunas recortadas a las frases iniciales. Fechas aproximadas. Para añadir más, copiar el mismo formato (puntuacion sobre 10: 5 estrellas = 10, 4 = 8). No inventar reseñas.",
   "puntuacion_media": "4,1",
   "total": "2.084",
   "resenas": [
@@ -10,10 +10,22 @@
       "texto": "Pedimos ensaladilla rusa de primero y, de segundo, los lomos de bonito guisados, que son el plato estrella de la casa y, sinceramente, estaban brutales. El trato fue muy bueno y el servicio rápido y atento."
     },
     {
+      "nombre": "Richard",
+      "puntuacion": 8,
+      "fecha": "febrero 2023",
+      "texto": "Buena comida, cantidad para quedarte lleno, precio justo y buen servicio. Lo mejor sin duda la terraza y las vistas."
+    },
+    {
       "nombre": "Plácido",
       "puntuacion": 10,
       "fecha": "julio 2026",
       "texto": "Lo primero las vistas del restaurante impresionantes, después la comida de diez: la ensalada de bonito espectacular y las zamburiñas exquisitas. Muy buena atención hacia el cliente y muy buen precio."
+    },
+    {
+      "nombre": "Edurne",
+      "puntuacion": 10,
+      "fecha": "abril 2023",
+      "texto": "Comida riquísima, a destacar las croquetas de buey que nos ofrecieron fuera de carta."
     },
     {
       "nombre": "Daniel",
@@ -22,10 +34,22 @@
       "texto": "Muy recomendable. El tataki de atún estaba espectacular y las zamburiñas, una exquisitez. La terraza es muy acogedora a finales de verano y el personal bastante atento y amable."
     },
     {
+      "nombre": "Juan",
+      "puntuacion": 8,
+      "fecha": "octubre 2023",
+      "texto": "Un buen lugar para tomar un café, una tapa, un vino o una copa, según la hora, con muy buenas vistas al mar."
+    },
+    {
       "nombre": "Azucena",
       "puntuacion": 10,
       "fecha": "marzo 2026",
       "texto": "Restaurante con unas vistas increíbles hacia el mar. El servicio fue muy atento y rápido."
+    },
+    {
+      "nombre": "Diana",
+      "puntuacion": 8,
+      "fecha": "agosto 2023",
+      "texto": "El servicio y el lugar muy bien. La comida bien: las croquetas, las zamburiñas y la tortilla de bacalao muy bien."
     },
     {
       "nombre": "Marina",
@@ -34,10 +58,22 @@
       "texto": "Muy, muy bien, y los lomos de bonito espectaculares."
     },
     {
+      "nombre": "Diego",
+      "puntuacion": 8,
+      "fecha": "agosto 2022",
+      "texto": "Estupendo restaurante en Luanco. Sitio privilegiado en la bahía de Luanco y con un servicio y comida estupendos."
+    },
+    {
       "nombre": "Dario",
       "puntuacion": 10,
       "fecha": "febrero 2026",
       "texto": "Tomate algo en esa terraza mirando a la isla del Carmen y al Cantábrico. Luanco es el paraíso."
+    },
+    {
+      "nombre": "José",
+      "puntuacion": 8,
+      "fecha": "junio 2023",
+      "texto": "Ricas las croquetas de cecina y destacar el bonito con pimientos."
     },
     {
       "nombre": "Alberto",
@@ -46,10 +82,22 @@
       "texto": "Una situación inmejorable con buenas vistas al mar. La tortilla muy buena."
     },
     {
+      "nombre": "Adrián",
+      "puntuacion": 8,
+      "fecha": "octubre 2023",
+      "texto": "Desayuno muy bueno a un precio estupendo. Pincho de tortilla y montado de lomo-queso estupendos."
+    },
+    {
       "nombre": "Michelle",
       "puntuacion": 10,
       "fecha": "diciembre 2025",
       "texto": "Buena comida con algunas especialidades como croqueta de puerro y jamón. Buen servicio y buenas vistas."
+    },
+    {
+      "nombre": "Isabel",
+      "puntuacion": 8,
+      "fecha": "julio 2023",
+      "texto": "Repetimos porque nos gustó mucho la primera vez y volvimos para confirmar la valoración."
     },
     {
       "nombre": "Eloy",
