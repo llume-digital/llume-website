@@ -1,6 +1,6 @@
 # llume · documentación técnica de la web
 
-Web corporativa estática, sin paso de compilación. Bilingüe (español en `/`, inglés en `/en/`) y con páginas legales.
+Web corporativa estática, sin paso de compilación. En tres idiomas (español en `/`, inglés en `/en/`, portugués en `/pt/`), con una página por caso y páginas legales.
 
 ## 1. Stack
 
@@ -9,7 +9,7 @@ Web corporativa estática, sin paso de compilación. Bilingüe (español en `/`,
 | Marcado | HTML5 semántico, una página por idioma con navegación por anclas |
 | Estilos | CSS3 puro (variables, Grid, Flexbox, `@media`, `mask-image`, `backdrop-filter`) |
 | Lógica | JavaScript ES modules, sin TypeScript ni bundler |
-| 3D | **three.js 0.160** (alojado en `public/vendor/`) con shaders GLSL propios |
+| 3D | **three.js 0.160** minificado (`public/vendor/three.module.min.js`), cargado cuando la página está inactiva para que el texto aparezca antes |
 | Tipografía | Geist y Geist Mono variables, alojadas en `public/fonts/` (sin Google Fonts) |
 | Hosting | Cloudflare Workers con recursos estáticos, despliegue automático desde GitHub |
 
@@ -22,14 +22,17 @@ llume-web/
 ├── CONTEXTO.md          Contexto de la empresa y decisiones de marca (no se publica)
 ├── TECNICO.md           Este documento (no se publica)
 ├── wrangler.jsonc       Configuración de despliegue en Cloudflare
+├── scripts/build_cases.py  Genera las páginas de cada caso a partir de las portadas
 └── public/              Lo único que se publica
     ├── index.html       Página en español
     ├── en/index.html    Página en inglés (misma estructura)
+    ├── pt/index.html    Página en portugués (misma estructura)
+    ├── casos/, en/cases/, pt/casos/   Una página por caso (generadas, ver abajo)
     ├── aviso-legal.html, privacidad.html, cookies.html
     ├── styles.css       Todo el diseño, incluidas las páginas legales
     ├── ui.js            Interfaz: menú, scroll, pestañas, contadores, casos, formulario
     ├── main.js          Solo la escena 3D (si no hay WebGL, se queda un fondo estático)
-    ├── vendor/three.module.js
+    ├── vendor/three.module.min.js
     ├── fonts/           geist.woff2, geist-mono.woff2
     ├── robots.txt, sitemap.xml
     ├── _headers         Cabeceras de seguridad y caché
@@ -46,12 +49,13 @@ llume-web/
 | `.hero` | Titular, frase rotatoria, llamada a la acción y franja de logos "Han confiado en nosotros" |
 | `.problem` | "Tu empresa ha cambiado. Tus herramientas, no.": 3 problemas y declaración de llume |
 | `#servicios` | 4 soluciones, cada una con ejemplos y enlace a su caso |
-| `#sectores` | Pestañas por sector (accesibles con teclado), cada una enlazada a un caso |
+| `#retos` | "¿Qué te frena?": pestañas por problema (no por sector), cada una con el sector donde ya se resolvió y su caso |
 | `#casos` | 6 casos con problema y solución; al pulsar se abre la ficha completa en un `<dialog>` |
 | `.figures` | Cifras con contador animado |
+| `#calculadora` | Calculadora del coste de las tareas repetitivas |
 | `#proceso` | Método en 4 pasos con su compromiso de plazos |
 | `.integrations` | Cinta con las herramientas con las que nos integramos |
-| `#modelos` | Tres modelos de colaboración |
+| `#modelos` | Diagnóstico digital (primer paso con garantía y nota sobre ayudas) y tres modelos de colaboración |
 | `.commitments` | Compromisos: código del cliente, NDA, RGPD, software libre, precio cerrado, soporte |
 | `#nosotros` | Quiénes somos, principios y misión |
 | `#faq` | Preguntas frecuentes (`<details>`), también como datos estructurados `FAQPage` |
@@ -63,11 +67,13 @@ Cada caso es un `<article class="cx" data-case="…">` con su imagen (`.cx-media
 
 Variantes de imagen: `media-device` (captura real en navegador + móvil), `media-crm` (maqueta del CRM de Clevercar), `media-cam` (cajas de detección), `media-doc` (presupuesto generado) y `media-cloud` (diagrama de migración).
 
-Para añadir un caso: copiar un `<article class="cx">`, cambiar `id`, `data-case` y contenidos, y repetirlo en `/en/`.
+Cada caso incluye un bloque "Antes / Después" (`.ba`) al principio de la ficha.
+
+Para añadir o cambiar un caso: editar el `<article class="cx">` en las tres portadas y ejecutar `python3 scripts/build_cases.py`, que regenera las páginas `/casos/<id>`, `/en/cases/<id>` y `/pt/casos/<id>`. Después, añadirlas a `sitemap.xml` si son nuevas.
 
 ## 4. Formulario
 
-Abre el programa de correo del visitante con el mensaje preparado para `info@llume.net`. Los textos del asunto y del cuerpo salen de los `data-*` del `<form>`, así el mismo `ui.js` sirve para los dos idiomas. Exige aceptar la política de privacidad.
+Pide qué necesita y un teléfono para llamarle (empresa y email opcionales). Abre el programa de correo del visitante con el mensaje preparado para `info@llume.net`. Los textos del asunto y del cuerpo salen de los `data-*` del `<form>`, así el mismo `ui.js` sirve para los dos idiomas. Exige aceptar la política de privacidad.
 
 ## 5. Cómo ejecutar en local
 
@@ -88,6 +94,12 @@ Cloudflare Workers conectado a `llume26/llume-website`: cada push a `main` publi
 - **Correo @llumedigital.com** y cambiarlo en la web cuando funcione.
 - **Equipo con fotos, testimonios reales y cifras de resultados** de cada caso, cuando existan.
 - **Teléfono, LinkedIn y perfil de Google Business**.
-- **Páginas legales en inglés** (ahora el inglés enlaza a las españolas).
-- **Redirección de www a la raíz** (regla en Cloudflare).
+- **Páginas legales en inglés y portugués** (ahora enlazan a las españolas).
+- **Precio del diagnóstico digital** y confirmar que se puede ofrecer la garantía.
+- **Alta como agente digitalizador / asesor** si se quiere afirmar que los proyectos se pueden pagar con el Kit Digital o el Kit Consulting (hoy la web solo ofrece ayudar a comprobarlo).
 - **Logos en mejor calidad**: Universidad de Oviedo (175×125) y Proactive Future a color.
+
+## 8. Configuración de Cloudflare
+
+- **Always Use HTTPS** activado: `http://` redirige a `https://`.
+- **Regla de redirección** `www.llumedigital.com/*` → `llumedigital.com/*` (301).

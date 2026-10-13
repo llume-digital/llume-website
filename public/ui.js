@@ -3,7 +3,10 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ---------- nav ---------- */
 const nav = document.getElementById("nav");
-const onScrollNav = () => nav.classList.toggle("scrolled", scrollY > 20);
+const onScrollNav = () => {
+  nav.classList.toggle("scrolled", scrollY > 20);
+  document.documentElement.classList.toggle("deep", scrollY > innerHeight * 0.7);
+};
 addEventListener("scroll", onScrollNav, { passive: true });
 onScrollNav();
 
@@ -90,6 +93,8 @@ if (dialog) {
     tag.textContent = card.querySelector(".cx-tag").textContent;
     title.textContent = card.querySelector("h3").textContent;
     content.replaceChildren(card.querySelector(".cx-detail").content.cloneNode(true));
+    const page = dialog.querySelector(".cd-page");
+    if (page) page.href = `${page.dataset.base}${card.dataset.case}`;
     dialog.showModal();
     dialog.querySelector(".cd-inner").scrollTop = 0;
     history.replaceState(null, "", `#caso-${card.dataset.case}`);
@@ -122,10 +127,52 @@ form?.addEventListener("submit", (e) => {
   e.preventDefault();
   const d = new FormData(form), f = form.dataset;
   const who = `${d.get("nombre")}${d.get("empresa") ? " (" + d.get("empresa") + ")" : ""}`;
-  const body = `${f.lName}: ${d.get("nombre")}\n${f.lCompany}: ${d.get("empresa") || "-"}\n${f.lEmail}: ${d.get("email")}\n\n${d.get("mensaje")}`;
+  const body = `${d.get("mensaje")}\n\n${f.lName}: ${d.get("nombre")}\n${f.lPhone}: ${d.get("telefono")}\n${f.lCompany}: ${d.get("empresa") || "-"}\n${f.lEmail}: ${d.get("email") || "-"}`;
   location.href = `mailto:${f.to}?subject=${encodeURIComponent(`${f.subject}: ${who}`)}&body=${encodeURIComponent(body)}`;
   form.querySelector("button[type=submit]").textContent = f.sent;
 });
 
 /* ---------- footer year ---------- */
 document.querySelectorAll("[data-year]").forEach((el) => (el.textContent = new Date().getFullYear()));
+
+/* ---------- calculator: cost of repetitive tasks ---------- */
+const calc = document.getElementById("calc");
+if (calc) {
+  const fmt = new Intl.NumberFormat(calc.dataset.locale, { maximumFractionDigits: 0 });
+  const money = new Intl.NumberFormat(calc.dataset.locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+  const WEEKS = 46; // working weeks per year
+  const update = () => {
+    const v = Object.fromEntries([...calc.querySelectorAll("input")].map((i) => [i.name, +i.value]));
+    calc.querySelectorAll("output").forEach((o) => (o.textContent = fmt.format(v[o.dataset.for]) + (o.dataset.suffix || "")));
+    const hoursYear = v.people * v.hours * WEEKS;
+    const out = {
+      hoursYear: fmt.format(hoursYear),
+      costYear: money.format(hoursYear * v.rate),
+      savedHours: fmt.format(hoursYear * v.share / 100),
+      savedCost: money.format(hoursYear * v.rate * v.share / 100),
+    };
+    calc.querySelectorAll("[data-out]").forEach((el) => (el.textContent = out[el.dataset.out]));
+  };
+  calc.addEventListener("input", update);
+  update();
+}
+
+/* ---------- mobile: fixed call-to-action, hidden on the hero and at the contact form ---------- */
+const sticky = document.querySelector(".sticky-cta");
+const contact = document.getElementById("contacto");
+if (sticky && contact) {
+  const onScrollCta = () => {
+    const pastHero = scrollY > innerHeight * 0.8;
+    const atContact = contact.getBoundingClientRect().top < innerHeight;
+    sticky.classList.toggle("show", pastHero && !atContact);
+  };
+  addEventListener("scroll", onScrollCta, { passive: true });
+  onScrollCta();
+}
+
+/* ---------- 3D background: loaded once the page is idle so text appears first ---------- */
+if (document.getElementById("bg")) {
+  const start3D = () => import("/main.js").catch(() => document.documentElement.classList.add("no-webgl"));
+  if ("requestIdleCallback" in window) requestIdleCallback(start3D, { timeout: 1500 });
+  else setTimeout(start3D, 600);
+}

@@ -8,10 +8,12 @@
   <link rel="canonical" href="https://llumedigital.com/">
   <link rel="alternate" hreflang="es" href="https://llumedigital.com/">
   <link rel="alternate" hreflang="en" href="https://llumedigital.com/en/">
+  <link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/">
   <link rel="alternate" hreflang="x-default" href="https://llumedigital.com/">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="es_ES">
   <meta property="og:locale:alternate" content="en_GB">
+  <meta property="og:locale:alternate" content="pt_PT">
   <meta property="og:site_name" content="llume">
   <meta property="og:url" content="https://llumedigital.com/">
   <meta property="og:title" content="llume · Problemas complejos. Soluciones claras.">
@@ -24,7 +26,7 @@
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
-  <script type="importmap">{ "imports": { "three": "/vendor/three.module.js" } }</script>
+  <script type="importmap">{ "imports": { "three": "/vendor/three.module.min.js" } }</script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -52,11 +54,11 @@
     </a>
     <nav class="links" id="menu" aria-label="Principal">
       <a href="#servicios">Soluciones</a>
-      <a href="#sectores">Sectores</a>
+      <a href="#retos">Retos</a>
       <a href="#casos">Casos</a>
       <a href="#proceso">Método</a>
       <a href="#faq">Preguntas</a>
-      <a href="/en/" class="lang" hreflang="en" lang="en">EN</a>
+      <span class="langs"><a href="/en/" class="lang" hreflang="en" lang="en">EN</a><a href="/pt/" class="lang" hreflang="pt" lang="pt">PT</a></span>
     </nav>
     <div class="nav-right">
       <a href="#contacto" class="btn btn-light btn-sm">Reserva 30 min <span aria-hidden="true">→</span></a>
@@ -173,56 +175,62 @@
       </div>
     </section>
 
-    <!-- SECTORES -->
-    <section id="sectores" class="wrap section">
-      <p class="eyebrow reveal">Sectores</p>
-      <h2 class="reveal">Cada sector tiene<br>sus propios retos.</h2>
-      <p class="sub reveal">Hemos resuelto problemas reales en sectores muy distintos. Elige el tuyo.</p>
+    <!-- RETOS -->
+    <section id="retos" class="wrap section">
+      <p class="eyebrow reveal">Retos</p>
+      <h2 class="reveal">¿Qué te frena?</h2>
+      <p class="sub reveal">Da igual tu sector: los problemas se parecen más de lo que crees. Elige el que más te suena.</p>
       <div class="sectors reveal">
-        <div class="sector-tabs" role="tablist" aria-label="Sectores" aria-orientation="vertical">
-          <button class="sector-tab" role="tab" id="tab-auto" aria-controls="panel-auto" aria-selected="true">Automoción y movilidad</button>
-          <button class="sector-tab" role="tab" id="tab-asoc" aria-controls="panel-asoc" aria-selected="false" tabindex="-1">Asociaciones y tercer sector</button>
-          <button class="sector-tab" role="tab" id="tab-edu" aria-controls="panel-edu" aria-selected="false" tabindex="-1">Educación y juventud</button>
-          <button class="sector-tab" role="tab" id="tab-ind" aria-controls="panel-ind" aria-selected="false" tabindex="-1">Construcción e industria</button>
-          <button class="sector-tab" role="tab" id="tab-fin" aria-controls="panel-fin" aria-selected="false" tabindex="-1">Banca y finanzas</button>
-          <button class="sector-tab" role="tab" id="tab-serv" aria-controls="panel-serv" aria-selected="false" tabindex="-1">Servicios profesionales</button>
+        <div class="sector-tabs" role="tablist" aria-label="Retos" aria-orientation="vertical">
+          <button class="sector-tab" role="tab" id="tab-datos" aria-controls="panel-datos" aria-selected="true">Tengo los datos repartidos en mil sitios</button>
+          <button class="sector-tab" role="tab" id="tab-tareas" aria-controls="panel-tareas" aria-selected="false" tabindex="-1">Mi equipo pierde horas en tareas repetitivas</button>
+          <button class="sector-tab" role="tab" id="tab-visibilidad" aria-controls="panel-visibilidad" aria-selected="false" tabindex="-1">No sé en qué punto está cada cliente u operación</button>
+          <button class="sector-tab" role="tab" id="tab-legado" aria-controls="panel-legado" aria-selected="false" tabindex="-1">Mi sistema es antiguo y me da miedo tocarlo</button>
+          <button class="sector-tab" role="tab" id="tab-info" aria-controls="panel-info" aria-selected="false" tabindex="-1">La información caduca y hay que buscarla a mano</button>
+          <button class="sector-tab" role="tab" id="tab-riesgos" aria-controls="panel-riesgos" aria-selected="false" tabindex="-1">Hay riesgos que no puedo vigilar a simple vista</button>
         </div>
         <div class="sector-panels">
-          <div class="sector-panel" role="tabpanel" id="panel-auto" aria-labelledby="tab-auto">
-            <h3>Automoción y movilidad</h3>
-            <p>Concesionarios, importadores y flotas que gestionan clientes, vehículos y trámites que duran semanas.</p>
-            <ul class="card-list"><li>CRM con el estado de cada operación</li><li>Expedientes y documentación digitales</li><li>Alertas de plazos y trámites pendientes</li></ul>
-            <a class="card-link" href="#caso-clevercar" data-open-case="clevercar">Ver caso: Clevercar <span aria-hidden="true">→</span></a>
+          <div class="sector-panel" role="tabpanel" id="panel-datos" aria-labelledby="tab-datos">
+            <h3>Datos repartidos en mil sitios</h3>
+            <p>Hojas de cálculo, correos, mensajes y aplicaciones sueltas. Nadie tiene la foto completa y cada pregunta obliga a buscar.</p>
+            <p class="panel-k">Qué hacemos</p>
+            <ul class="card-list"><li>Centralizamos la información en un único sistema</li><li>Conectamos las herramientas que ya usas</li><li>Paneles con el estado de todo en tiempo real</li></ul>
+            <div class="panel-foot"><span class="solved">Ya lo hemos resuelto en <b>Asociaciones</b></span><a class="card-link" href="#caso-proactive" data-open-case="proactive">Ver caso: Proactive Future <span aria-hidden="true">→</span></a></div>
           </div>
-          <div class="sector-panel" role="tabpanel" id="panel-asoc" aria-labelledby="tab-asoc" hidden>
-            <h3>Asociaciones y tercer sector</h3>
-            <p>Organizaciones que coordinan socios, participantes, voluntarios y pagos con equipos pequeños.</p>
-            <ul class="card-list"><li>Inscripciones y pagos online</li><li>Paneles para coordinadores</li><li>Comunicación automática con participantes</li></ul>
-            <a class="card-link" href="#caso-proactive" data-open-case="proactive">Ver caso: Proactive Future <span aria-hidden="true">→</span></a>
+          <div class="sector-panel" role="tabpanel" id="panel-tareas" aria-labelledby="tab-tareas" hidden>
+            <h3>Horas perdidas en tareas repetitivas</h3>
+            <p>Copiar datos, preparar documentos, revisar y volver a enviar. Trabajo necesario que no aporta valor y que se puede automatizar.</p>
+            <p class="panel-k">Qué hacemos</p>
+            <ul class="card-list"><li>Automatizamos presupuestos, facturas e informes</li><li>Eliminamos la doble introducción de datos</li><li>Avisos y seguimientos que se hacen solos</li></ul>
+            <div class="panel-foot"><span class="solved">Ya lo hemos resuelto en <b>Servicios profesionales</b></span><a class="card-link" href="#caso-presupuestos" data-open-case="presupuestos">Ver caso: presupuestos automáticos <span aria-hidden="true">→</span></a></div>
           </div>
-          <div class="sector-panel" role="tabpanel" id="panel-edu" aria-labelledby="tab-edu" hidden>
-            <h3>Educación y juventud</h3>
-            <p>Centros, universidades y entidades juveniles que necesitan llegar a su público con información siempre al día.</p>
-            <ul class="card-list"><li>Catálogos de convocatorias y oportunidades</li><li>Recogida automática de información de muchas fuentes</li><li>Recomendaciones según el perfil</li></ul>
-            <a class="card-link" href="#caso-corradi" data-open-case="corradi">Ver caso: Corradi <span aria-hidden="true">→</span></a>
+          <div class="sector-panel" role="tabpanel" id="panel-visibilidad" aria-labelledby="tab-visibilidad" hidden>
+            <h3>Sin visibilidad de clientes y operaciones</h3>
+            <p>Cada persona lleva sus clientes a su manera y, para saber cómo va algo, hay que preguntar. Los retrasos se descubren tarde.</p>
+            <p class="panel-k">Qué hacemos</p>
+            <ul class="card-list"><li>Un CRM a medida con el estado de cada operación</li><li>Documentos y plazos asociados a cada expediente</li><li>Alertas antes de que algo se quede parado</li></ul>
+            <div class="panel-foot"><span class="solved">Ya lo hemos resuelto en <b>Automoción</b></span><a class="card-link" href="#caso-clevercar" data-open-case="clevercar">Ver caso: Clevercar <span aria-hidden="true">→</span></a></div>
           </div>
-          <div class="sector-panel" role="tabpanel" id="panel-ind" aria-labelledby="tab-ind" hidden>
-            <h3>Construcción e industria</h3>
-            <p>Obras, naves y centros de trabajo donde la seguridad y el control de la operación no pueden fallar.</p>
-            <ul class="card-list"><li>Videoanálisis para prevención de riesgos</li><li>Partes de trabajo e incidencias digitales</li><li>Alertas en tiempo real</li></ul>
-            <a class="card-link" href="#caso-seguridad" data-open-case="seguridad">Ver caso: seguridad laboral <span aria-hidden="true">→</span></a>
+          <div class="sector-panel" role="tabpanel" id="panel-legado" aria-labelledby="tab-legado" hidden>
+            <h3>Un sistema antiguo que da miedo tocar</h3>
+            <p>Funciona, pero es difícil de mantener, depende de muy pocas personas y cada cambio es un riesgo para el negocio.</p>
+            <p class="panel-k">Qué hacemos</p>
+            <ul class="card-list"><li>Auditoría de datos y procesos</li><li>Migración por fases a la nube, sin parar la actividad</li><li>Copias de seguridad y monitorización</li></ul>
+            <div class="panel-foot"><span class="solved">Ya lo hemos resuelto en <b>Banca</b></span><a class="card-link" href="#caso-nube" data-open-case="nube">Ver caso: migración a la nube <span aria-hidden="true">→</span></a></div>
           </div>
-          <div class="sector-panel" role="tabpanel" id="panel-fin" aria-labelledby="tab-fin" hidden>
-            <h3>Banca y finanzas</h3>
-            <p>Entidades con sistemas críticos y heredados que hay que modernizar sin poner en riesgo la operativa.</p>
-            <ul class="card-list"><li>Migraciones de bases de datos por fases</li><li>Integración de datos entre sistemas</li><li>Monitorización y copias de seguridad</li></ul>
-            <a class="card-link" href="#caso-nube" data-open-case="nube">Ver caso: migración a la nube <span aria-hidden="true">→</span></a>
+          <div class="sector-panel" role="tabpanel" id="panel-info" aria-labelledby="tab-info" hidden>
+            <h3>Información que caduca y se busca a mano</h3>
+            <p>Datos que llegan de muchas fuentes, con formatos distintos, repetidos o desactualizados. Mantenerlos al día a mano no es viable.</p>
+            <p class="panel-k">Qué hacemos</p>
+            <ul class="card-list"><li>Recogida automática desde muchas fuentes</li><li>Limpieza, deduplicación y revisión diaria</li><li>Publicación en un catálogo siempre al día</li></ul>
+            <div class="panel-foot"><span class="solved">Ya lo hemos resuelto en <b>Juventud y Erasmus+</b></span><a class="card-link" href="#caso-corradi" data-open-case="corradi">Ver caso: Corradi <span aria-hidden="true">→</span></a></div>
           </div>
-          <div class="sector-panel" role="tabpanel" id="panel-serv" aria-labelledby="tab-serv" hidden>
-            <h3>Servicios profesionales</h3>
-            <p>Despachos, consultoras y empresas de servicios que pierden horas en presupuestos, facturas y seguimiento.</p>
-            <ul class="card-list"><li>Presupuestos y facturas automáticos</li><li>Seguimiento de clientes y oportunidades</li><li>Informes sin trabajo manual</li></ul>
-            <a class="card-link" href="#caso-presupuestos" data-open-case="presupuestos">Ver caso: presupuestos automáticos <span aria-hidden="true">→</span></a>
+          <div class="sector-panel" role="tabpanel" id="panel-riesgos" aria-labelledby="tab-riesgos" hidden>
+            <h3>Riesgos que no se pueden vigilar a simple vista</h3>
+            <p>Controlar a todas horas la seguridad de un centro de trabajo depende de que alguien esté mirando. Los problemas se descubren tarde.</p>
+            <p class="panel-k">Qué hacemos</p>
+            <ul class="card-list"><li>Videoanálisis sobre las cámaras que ya tienes</li><li>Detección en tiempo real de incumplimientos</li><li>Alertas inmediatas al responsable</li></ul>
+            <div class="panel-foot"><span class="solved">Ya lo hemos resuelto en <b>Construcción e industria</b></span><a class="card-link" href="#caso-seguridad" data-open-case="seguridad">Ver caso: seguridad laboral <span aria-hidden="true">→</span></a></div>
           </div>
         </div>
       </div>
@@ -257,6 +265,7 @@
             <button class="cx-open" type="button">Ver caso completo <span aria-hidden="true">+</span></button>
           </div>
           <template class="cx-detail">
+            <div class="ba"><div><span>Antes</span><p>Cada comercial con su hoja de cálculo; para saber cómo iba una importación había que preguntar.</p></div><div><span>Después</span><p>Un tablero común con el estado, los documentos y los plazos de cada importación.</p></div></div>
             <h4>El contexto</h4>
             <p>Clevercar, con sede en São Mamede de Infesta (Oporto), importa vehículos desde otros países europeos a Portugal y se encarga de todo el proceso: búsqueda personalizada, compra, transporte, legalización y matrícula. Cada operación dura semanas y en ella intervienen el cliente, vendedores, transportistas y la administración.</p>
             <h4>El reto</h4>
@@ -295,6 +304,7 @@
             <button class="cx-open" type="button">Ver caso completo <span aria-hidden="true">+</span></button>
           </div>
           <template class="cx-detail">
+            <div class="ba"><div><span>Antes</span><p>Inscripciones, pagos y listas de participantes cruzados a mano entre varias herramientas.</p></div><div><span>Después</span><p>Los participantes se inscriben y pagan solos, y el equipo ve cada viaje en tiempo real.</p></div></div>
             <h4>El contexto</h4>
             <p>Proactive Future es una asociación que organiza viajes, intercambios y proyectos europeos para jóvenes. Cada salida implica inscripciones, plazas limitadas, pagos por fases y mucha comunicación con participantes y coordinadores.</p>
             <h4>El reto</h4>
@@ -332,6 +342,7 @@
             <button class="cx-open" type="button">Ver caso completo <span aria-hidden="true">+</span></button>
           </div>
           <template class="cx-detail">
+            <div class="ba"><div><span>Antes</span><p>Convocatorias sueltas en webs, redes y grupos, muchas repetidas o caducadas.</p></div><div><span>Después</span><p>Un catálogo único que se revisa solo cada mañana.</p></div></div>
             <h4>El contexto</h4>
             <p>Corradi nace de un proyecto europeo entre organizaciones de España, Rumanía y Grecia para acercar a más jóvenes las oportunidades de movilidad: intercambios, formaciones y voluntariados.</p>
             <h4>El reto</h4>
@@ -368,6 +379,7 @@
             <button class="cx-open" type="button">Ver caso completo <span aria-hidden="true">+</span></button>
           </div>
           <template class="cx-detail">
+            <div class="ba"><div><span>Antes</span><p>Los incumplimientos se descubrían tarde, revisando grabaciones.</p></div><div><span>Después</span><p>Alertas en el momento, con la imagen de lo que ha pasado.</p></div></div>
             <h4>El contexto</h4>
             <p>En obras y naves industriales, el uso de los equipos de protección es obligatorio, pero controlarlo de forma continua depende de que alguien esté mirando.</p>
             <h4>El reto</h4>
@@ -389,7 +401,7 @@
 
         <article class="cx reveal" id="caso-presupuestos" data-case="presupuestos">
           <div class="cx-media media-doc">
-            <img src="/assets/cases/presupuestos.webp" alt="" width="1280" height="800" loading="lazy">
+            <div class="mail" aria-hidden="true"><small>Nuevo correo</small><strong>Solicitud de presupuesto</strong><span>Reforma de oficina · 120 m²</span></div>
             <div class="doc" aria-hidden="true">
               <div class="doc-h"><strong>Presupuesto</strong><small>N.º 2026-0412</small></div>
               <ul>
@@ -411,6 +423,7 @@
             <button class="cx-open" type="button">Ver caso completo <span aria-hidden="true">+</span></button>
           </div>
           <template class="cx-detail">
+            <div class="ba"><div><span>Antes</span><p>Horas por presupuesto, copiando datos y con riesgo de errores.</p></div><div><span>Después</span><p>Presupuestos en minutos, siempre con el mismo formato.</p></div></div>
             <h4>El contexto</h4>
             <p>Una empresa de servicios preparaba cada presupuesto a mano, copiando datos de clientes, tarifas y condiciones entre varios documentos.</p>
             <h4>El reto</h4>
@@ -437,7 +450,7 @@
               <span class="pipe"><i></i></span>
               <span class="node on">Nube</span>
             </div>
-            <span class="chip" aria-hidden="true">✓ Migración validada</span>
+            <div class="cloud-stats" aria-hidden="true"><span>✓ Datos validados</span><span>✓ Copias diarias</span><span>✓ Monitorización</span></div>
           </div>
           <div class="cx-body">
             <p class="cx-tag">Banca</p>
@@ -449,6 +462,7 @@
             <button class="cx-open" type="button">Ver caso completo <span aria-hidden="true">+</span></button>
           </div>
           <template class="cx-detail">
+            <div class="ba"><div><span>Antes</span><p>Una base de datos crítica, difícil de mantener y de escalar.</p></div><div><span>Después</span><p>Datos en la nube, con copias automáticas y monitorización.</p></div></div>
             <h4>El contexto</h4>
             <p>Una entidad bancaria trabajaba sobre una base de datos antigua, crítica para su operativa diaria.</p>
             <h4>El reto</h4>
@@ -472,10 +486,35 @@
 
     <!-- CIFRAS -->
     <section class="wrap figures" aria-label="llume en cifras">
-      <div class="figure reveal"><strong><span data-count="6">6</span></strong><p>sectores con proyectos en marcha</p></div>
+      <div class="figure reveal"><strong><span data-count="30">30</span> min</strong><p>de primera reunión, gratis y sin compromiso</p></div>
       <div class="figure reveal"><strong><span data-count="2">2</span></strong><p>países: España y Portugal</p></div>
       <div class="figure reveal"><strong><span data-count="250">250</span>+</strong><p>oportunidades revisadas cada mañana en Corradi</p></div>
       <div class="figure reveal"><strong><span data-count="100">100</span>%</strong><p>del código, propiedad del cliente</p></div>
+    </section>
+
+
+    <!-- CALCULADORA -->
+    <section id="calculadora" class="wrap section">
+      <p class="eyebrow reveal">Calculadora</p>
+      <h2 class="reveal">¿Cuánto te cuestan<br>las tareas repetitivas?</h2>
+      <p class="sub reveal">Haz la cuenta en diez segundos. Es una estimación, pero suele sorprender.</p>
+      <div class="calc reveal" id="calc" data-locale="es-ES">
+        <div class="calc-in">
+          <label><span>Personas que hacen la tarea <output data-for="people">3</output></span><input type="range" name="people" min="1" max="50" value="3"></label>
+          <label><span>Horas a la semana por persona <output data-for="hours">5</output></span><input type="range" name="hours" min="1" max="40" value="5"></label>
+          <label><span>Coste por hora <output data-for="rate" data-suffix=" €">25 €</output></span><input type="range" name="rate" min="10" max="100" step="5" value="25"></label>
+          <label><span>Parte que se puede automatizar <output data-for="share" data-suffix=" %">50 %</output></span><input type="range" name="share" min="10" max="90" step="5" value="50"></label>
+        </div>
+        <div class="calc-out" aria-live="polite">
+          <p class="calc-k">Hoy dedicáis</p>
+          <p class="calc-now"><b data-out="hoursYear">690</b> horas al año · <b data-out="costYear">17.250 €</b></p>
+          <p class="calc-k">Podrías recuperar</p>
+          <p class="calc-big"><b data-out="savedHours">345</b> horas</p>
+          <p class="calc-money"><b data-out="savedCost">8.625 €</b> al año</p>
+          <a href="#contacto" class="btn btn-light">Quiero recuperar ese tiempo <span aria-hidden="true">→</span></a>
+          <small>Cálculo: personas × horas × 46 semanas laborables × coste por hora × parte automatizable.</small>
+        </div>
+      </div>
     </section>
 
     <!-- MÉTODO -->
@@ -509,6 +548,23 @@
       <p class="eyebrow reveal">Cómo trabajamos</p>
       <h2 class="reveal">Tres formas de<br>trabajar juntos.</h2>
       <p class="sub reveal">Sin letra pequeña. Tras la primera reunión te recomendamos el modelo que encaja y te enviamos una propuesta cerrada por escrito.</p>
+      <div class="offer reveal">
+        <div>
+          <p class="model-k">El primer paso</p>
+          <h3>Diagnóstico digital</h3>
+          <p>Analizamos tus procesos, detectamos dónde se pierde tiempo y dinero y te entregamos por escrito un plan priorizado, con el coste y el impacto de cada mejora.</p>
+          <ul class="card-list">
+            <li>Precio cerrado desde el principio</li>
+            <li>Sin compromiso de seguir con nosotros</li>
+            <li><b>Garantía:</b> si no encontramos mejoras claras, no lo pagas</li>
+          </ul>
+          <a href="#contacto" class="btn btn-light">Pedir diagnóstico <span aria-hidden="true">→</span></a>
+        </div>
+        <aside class="funding">
+          <p class="model-k">¿Puede financiarse?</p>
+          <p>Te ayudamos a comprobar si tu proyecto encaja en ayudas públicas a la digitalización, como el <b>Kit Digital</b> o el <b>Kit Consulting</b>.</p>
+        </aside>
+      </div>
       <div class="models">
         <div class="model reveal">
           <p class="model-k">Proyecto cerrado</p>
@@ -573,6 +629,7 @@
         <details><summary>¿Trabajáis con empresas pequeñas?</summary><p>Sí. Trabajamos con pymes, asociaciones y grandes organizaciones. Adaptamos el alcance a tu tamaño y empezamos por lo que más impacto tiene.</p></details>
         <details><summary>¿Dónde trabajáis?</summary><p>Estamos en Oviedo y trabajamos con clientes de España y Portugal, en remoto o en persona cuando hace falta.</p></details>
         <details><summary>¿Qué pasa cuando termina el proyecto?</summary><p>Formamos a tu equipo y te entregamos la documentación. Después puedes contratar mantenimiento, seguir evolucionando la solución con nosotros o continuar por tu cuenta.</p></details>
+        <details><summary>¿Hay ayudas para financiar el proyecto?</summary><p>Muchas veces sí. Programas como el Kit Digital o el Kit Consulting cubren parte de proyectos de digitalización de pymes y autónomos. Te ayudamos a comprobar si el tuyo encaja antes de empezar.</p></details>
         <details><summary>¿Cómo tratáis nuestros datos?</summary><p>Con confidencialidad y conforme al RGPD. Accedemos solo a la información necesaria y, si lo necesitas, firmamos un acuerdo de confidencialidad antes de empezar.</p></details>
       </div>
     </section>
@@ -582,7 +639,7 @@
       <div>
         <p class="eyebrow reveal">Contacto</p>
         <h2 class="reveal">Hablemos de<br>tu próximo proyecto.</h2>
-        <p class="sub reveal">Reserva una reunión de 30 minutos, sin compromiso. Nos cuentas tu reto y te explicamos cómo lo abordaríamos.</p>
+        <p class="sub reveal">Explícanos qué necesitas, déjanos tu teléfono y te llamamos. En una reunión de 30 minutos, sin compromiso, te decimos cómo lo abordaríamos.</p>
         <ul class="contact-list reveal">
           <li><strong>Reunión de 30 minutos</strong><span>Gratuita y sin compromiso, por videollamada.</span></li>
           <li><strong>Escríbenos</strong><a href="mailto:info@llume.net">info@llume.net</a></li>
@@ -590,16 +647,19 @@
         </ul>
       </div>
       <form class="form reveal" id="contact-form" action="mailto:info@llume.net" method="post"
-        data-to="info@llume.net" data-subject="Solicitud de reunión de 30 minutos" data-l-name="Nombre" data-l-company="Empresa" data-l-email="Email" data-sent="Abriendo tu correo ✓">
-        <p class="form-title">Solicita tu reunión</p>
+        data-to="info@llume.net" data-subject="Solicitud de llamada" data-l-name="Nombre" data-l-phone="Teléfono" data-l-company="Empresa" data-l-email="Email" data-sent="Abriendo tu correo ✓">
+        <p class="form-title">Te llamamos nosotros</p>
+        <label>¿Qué necesitas?<textarea name="mensaje" rows="4" placeholder="Explícanos tu reto o tu idea en un par de líneas…" required></textarea></label>
         <div class="form-row">
           <label>Nombre<input name="nombre" placeholder="Tu nombre" autocomplete="name" required></label>
-          <label>Empresa<input name="empresa" placeholder="Tu empresa" autocomplete="organization"></label>
+          <label>Teléfono<input name="telefono" type="tel" placeholder="600 000 000" autocomplete="tel" inputmode="tel" required></label>
         </div>
-        <label>Email<input name="email" type="email" placeholder="tu@empresa.com" autocomplete="email" required></label>
-        <label>¿Qué te gustaría resolver?<textarea name="mensaje" rows="4" placeholder="Cuéntanos tu reto en un par de líneas…" required></textarea></label>
+        <div class="form-row">
+          <label>Empresa <i>(opcional)</i><input name="empresa" placeholder="Tu empresa" autocomplete="organization"></label>
+          <label>Email <i>(opcional)</i><input name="email" type="email" placeholder="tu@empresa.com" autocomplete="email"></label>
+        </div>
         <label class="check"><input type="checkbox" name="privacidad" required><span>He leído la <a href="/privacidad">política de privacidad</a>.</span></label>
-        <button class="btn btn-light" type="submit">Solicitar reunión <span aria-hidden="true">→</span></button>
+        <button class="btn btn-light" type="submit">Solicitar llamada <span aria-hidden="true">→</span></button>
         <small class="form-note">Al enviar se abrirá tu correo con el mensaje preparado para info@llume.net.</small>
       </form>
     </section>
@@ -618,12 +678,14 @@
       </div>
       <nav class="foot-cols" aria-label="Pie">
         <div><h4>Soluciones</h4><a href="#servicios">Automatización</a><a href="#servicios">Migración a la nube</a><a href="#servicios">Software a medida</a><a href="#servicios">Videoanálisis</a></div>
-        <div><h4>Empresa</h4><a href="#casos">Casos de éxito</a><a href="#modelos">Cómo trabajamos</a><a href="#nosotros">Nosotros</a><a href="#faq">Preguntas</a></div>
+        <div><h4>Empresa</h4><a href="#calculadora">Calculadora</a><a href="#casos">Casos de éxito</a><a href="#modelos">Cómo trabajamos</a><a href="#nosotros">Nosotros</a><a href="#faq">Preguntas</a></div>
         <div><h4>Legal</h4><a href="/aviso-legal">Aviso legal</a><a href="/privacidad">Privacidad</a><a href="/cookies">Cookies</a></div>
       </nav>
     </div>
-    <div class="wrap foot-bottom"><span>© <span data-year>2026</span> llume · Oviedo, Asturias · Sin cookies de seguimiento.</span><span><a href="mailto:info@llume.net">info@llume.net</a> · <a href="/en/" hreflang="en" lang="en">English</a></span></div>
+    <div class="wrap foot-bottom"><span>© <span data-year>2026</span> llume · Oviedo, Asturias · Sin cookies de seguimiento.</span><span><a href="mailto:info@llume.net">info@llume.net</a> · <a href="/en/" hreflang="en" lang="en">English</a> · <a href="/pt/" hreflang="pt" lang="pt">Português</a></span></div>
   </footer>
+
+  <a class="sticky-cta" href="#contacto">Te llamamos · reunión de 30 min gratis <span aria-hidden="true">→</span></a>
 
   <dialog class="case-dialog" id="case-dialog" aria-labelledby="case-dialog-title">
     <div class="cd-inner">
@@ -633,7 +695,7 @@
         <p class="cx-tag cd-tag"></p>
         <h3 id="case-dialog-title" class="cd-title"></h3>
         <div class="cd-content"></div>
-        <a href="#contacto" class="btn btn-light cd-cta">¿Tienes un reto parecido? Hablemos <span aria-hidden="true">→</span></a>
+        <div class="cd-actions"><a href="#contacto" class="btn btn-light cd-cta">¿Tienes un reto parecido? Hablemos <span aria-hidden="true">→</span></a><a class="btn btn-ghost cd-page" href="#" data-base="/casos/">Abrir la página del caso</a></div>
       </div>
     </div>
   </dialog>
@@ -652,6 +714,5 @@
   }
   </script>
   <script type="module" src="/ui.js"></script>
-  <script type="module" src="/main.js"></script>
 </body>
 </html>
