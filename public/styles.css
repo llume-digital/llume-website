@@ -596,3 +596,17 @@ input::placeholder, textarea::placeholder { color: #5f5b55; }
 
 @media (max-width: 1000px) { .solutions.compact { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 560px) { .solutions.compact { grid-template-columns: 1fr; } }
+
+/* testimonial */
+.quote { margin: 40px 0 0; padding: clamp(28px, 4vw, 48px); border-radius: var(--radius); border: 1px solid var(--line);
+  background: radial-gradient(ellipse at 100% 0%, rgba(242,192,138,.12), transparent 55%), var(--panel); backdrop-filter: blur(12px); }
+.quote-k { font: 400 11px var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--amber); }
+.quote blockquote { margin-top: 18px; font-size: clamp(18px, 2.1vw, 24px); font-weight: 300; line-height: 1.45; letter-spacing: -.01em; color: #ece7de; max-width: 900px; }
+.quote figcaption { display: flex; align-items: center; gap: 14px; margin-top: 26px; }
+.quote figcaption img { height: 26px; width: auto; filter: brightness(0) invert(1); opacity: .8; }
+.quote figcaption span { display: grid; font-size: 14px; color: var(--muted); line-height: 1.35; }
+.quote figcaption b { color: var(--text); font-weight: 500; }
+.quote.in-case { margin-top: 28px; padding: 22px 24px; }
+.quote.in-case blockquote { margin-top: 0; font-size: 16.5px; }
+.quote.in-case figcaption { margin-top: 14px; }
+.cx-list + .quote { margin-top: 16px; }
