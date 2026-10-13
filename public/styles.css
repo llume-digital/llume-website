@@ -81,7 +81,7 @@ h3 { font-weight: 500; font-size: 17px; line-height: 1.3; }
 .cta-row { display: flex; gap: 12px; margin-top: 36px; flex-wrap: wrap; }
 
 /* SECTIONS */
-.section { padding: clamp(36px, 4.5vw, 64px) 0; }
+.section { padding: clamp(28px, 2.8vw, 40px) 0; }
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 40px; }
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 56px; }
 .card, .mini, .form {
@@ -683,7 +683,7 @@ input::placeholder, textarea::placeholder { color: #5f5b55; }
 .post-card > p:not(.cx-tag) { color: var(--muted); margin-top: 8px; font-size: 15px; }
 .post-card .card-link { display: inline-block; margin-top: 16px; border: 0; padding: 0; }
 
-.quote-band { padding: clamp(16px, 2vw, 28px) 0 0; }
+.quote-band { padding: 8px 0 0; }
 .quote.short { margin: 0; padding: clamp(22px, 3vw, 34px); }
 .quote.short blockquote { margin-top: 0; font-size: clamp(18px, 2vw, 22px); }
 .quote.short figcaption { margin-top: 18px; }
