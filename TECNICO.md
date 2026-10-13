@@ -56,7 +56,7 @@ La portada se ha recortado a 9 bloques:
 | `#casos` | 3 casos destacados; el botón "Ver los otros 3 casos" despliega el resto (`.cx-extra`) |
 | `#calculadora` | Calculadora del coste de las tareas repetitivas |
 | `#proceso` | Método en 4 pasos, compromisos (`.badges.compact`) y, debajo, las dos filas de logos de integraciones |
-| `#modelos` | Diagnóstico digital (con garantía y nota sobre ayudas) y tres modelos de colaboración |
+| `#modelos` | Camino en 3 pasos (`.journey`): 1 diagnóstico (siempre), 2 proyecto cerrado o acompañamiento continuo, 3 mantenimiento opcional; cada tarjeta dice cómo se paga. Debajo, la nota de ayudas |
 | `#faq` | Preguntas frecuentes (`<details>`), también como datos estructurados `FAQPage` |
 | `#contacto` | Formulario de llamada y primera capa de protección de datos |
 
