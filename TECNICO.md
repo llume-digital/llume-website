@@ -51,10 +51,9 @@ llume-web/
 | `#servicios` | 4 soluciones, cada una con ejemplos y enlace a su caso |
 | `#retos` | "¿Qué te frena?": pestañas por problema (no por sector), cada una con el sector donde ya se resolvió y su caso |
 | `#casos` | 6 casos con problema y solución; al pulsar se abre la ficha completa en un `<dialog>` |
-| `.figures` | Cifras con contador animado |
 | `#calculadora` | Calculadora del coste de las tareas repetitivas |
 | `#proceso` | Método en 4 pasos con su compromiso de plazos |
-| `.integrations` | Cinta con las herramientas con las que nos integramos |
+| `.integrations` | Dos filas de logos (sprite `assets/tools.svg`, iconos de Simple Icons + Microsoft dibujado a mano) que se mueven en sentidos opuestos; al pasar el ratón cada logo toma su color de marca |
 | `#modelos` | Diagnóstico digital (primer paso con garantía y nota sobre ayudas) y tres modelos de colaboración |
 | `.commitments` | Compromisos: código del cliente, NDA, RGPD, software libre, precio cerrado, soporte |
 | `#nosotros` | Quiénes somos, principios y misión |
@@ -73,7 +72,7 @@ Para añadir o cambiar un caso: editar el `<article class="cx">` en las tres por
 
 ## 4. Formulario
 
-Pide qué necesita y un teléfono para llamarle (empresa y email opcionales). Abre el programa de correo del visitante con el mensaje preparado para `info@llume.net`. Los textos del asunto y del cuerpo salen de los `data-*` del `<form>`, así el mismo `ui.js` sirve para los dos idiomas. Exige aceptar la política de privacidad.
+Debajo lleva la primera capa de información de protección de datos (responsable, finalidad, legitimación, destinatarios y derechos). Pide qué necesita y un teléfono para llamarle (empresa y email opcionales). Abre el programa de correo del visitante con el mensaje preparado para `info@llume.net`. Los textos del asunto y del cuerpo salen de los `data-*` del `<form>`, así el mismo `ui.js` sirve para los dos idiomas. Exige aceptar la política de privacidad.
 
 ## 5. Cómo ejecutar en local
 

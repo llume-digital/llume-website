@@ -216,7 +216,7 @@
             <p>It works, but it is hard to maintain, depends on very few people and every change is a business risk.</p>
             <p class="panel-k">What we do</p>
             <ul class="card-list"><li>Audit of data and processes</li><li>Phased cloud migration without stopping operations</li><li>Backups and monitoring</li></ul>
-            <div class="panel-foot"><span class="solved">Already solved in <b>banking</b></span><a class="card-link" href="#caso-nube" data-open-case="nube">Case study: cloud migration <span aria-hidden="true">→</span></a></div>
+            <div class="panel-foot"><span class="solved">Works for <b>any industry</b></span><a class="card-link" href="#caso-nube" data-open-case="nube">Case study: cloud migration <span aria-hidden="true">→</span></a></div>
           </div>
           <div class="sector-panel" role="tabpanel" id="panel-info" aria-labelledby="tab-info" hidden>
             <h3>Information that expires and is searched by hand</h3>
@@ -306,21 +306,25 @@
           <template class="cx-detail">
             <div class="ba"><div><span>Before</span><p>Registrations, payments and participant lists cross-checked by hand across several tools.</p></div><div><span>After</span><p>Participants sign up and pay on their own, and the team sees every trip in real time.</p></div></div>
             <h4>Context</h4>
-            <p>Proactive Future is an association that organises trips, exchanges and European projects for young people. Every trip involves registrations, limited places, staged payments and a lot of communication with participants and coordinators.</p>
+            <p>Proactive Future is a youth association that runs weekend getaways around Spain (Wild Weekend), small-group trips around the world (Wild Trip) and Erasmus+ projects. Everything is coordinated by a team of volunteers, and every trip involves applications, limited places, staged payments and a lot of communication.</p>
             <h4>The challenge</h4>
-            <p>Information was spread across spreadsheets, forms, emails and different payment gateways. Knowing who had paid, how many places were left or what was still pending meant cross-checking data by hand, with the risk of errors and duplicates.</p>
+            <p>Information was spread across spreadsheets, forms, emails and different payment gateways. Knowing who had paid, how many places were left or what was still pending meant cross-checking data by hand, and every coordinator worked their own way.</p>
             <h4>What we did</h4>
             <ul>
-              <li>A public website in Spanish and English with the catalogue of trips and open opportunities.</li>
-              <li>Online registration with user accounts and card payments in stages: deposit and balance.</li>
-              <li>A management dashboard for the team and coordinators, with participants, places, payments and documents for each trip.</li>
-              <li>Automatic notifications: payment reminders, departure countdowns and availability alerts.</li>
-              <li>Participant reviews after each trip, to measure and improve every edition.</li>
+              <li>A public website in Spanish and English with the catalogue of trips and projects, ready for search engines and AI assistants.</li>
+              <li>Registration with user accounts (Google sign-in), application review by the coordinator and card payments in stages, deposit and balance, with membership included automatically.</li>
+              <li>A single dashboard for the team and coordinators: participants, places, payments, documents and figures for each trip, with role-based permissions.</li>
+              <li>A notification centre with tasks and news: payment reminders, departure countdowns and last-places alerts, each linked to its action.</li>
+              <li>A meet-up calendar with invitations to add to your phone.</li>
+              <li>Post-trip reviews, with more than 200 historical responses recovered, to measure and improve every edition.</li>
+              <li>Impact statistics on the home page, calculated live from real data.</li>
+              <li>A web app for treasure hunts and group activities: player sign-up, QR-code challenges and a control panel for coordinators.</li>
+              <li>Trip stories and social media pieces generated from what participants themselves say.</li>
             </ul>
             <h4>Technology</h4>
-            <ul class="chips"><li>React</li><li>TypeScript</li><li>Node.js</li><li>PostgreSQL</li><li>Stripe</li><li>Cloudflare</li></ul>
+            <ul class="chips"><li>React</li><li>TypeScript</li><li>Node.js</li><li>PostgreSQL</li><li>Supabase</li><li>Stripe</li><li>Cloudflare</li></ul>
             <h4>The result</h4>
-            <p>The association's entire operation lives in a single system. Participants sign up and pay on their own, and the team sees the status of every trip in real time without cross-checking spreadsheets.</p>
+            <p>The association's entire operation lives in a single system. Participants sign up, pay and get reminders on their own, coordinators manage their trips from their phones, and the team sees places, payments and figures in real time without cross-checking spreadsheets.</p>
           </template>
         </article>
 
@@ -344,21 +348,23 @@
           <template class="cx-detail">
             <div class="ba"><div><span>Before</span><p>Calls scattered across websites, social media and groups, many duplicated or expired.</p></div><div><span>After</span><p>A single catalogue that reviews itself every morning.</p></div></div>
             <h4>Context</h4>
-            <p>Corradi was born from a European project between organisations in Spain, Romania and Greece to bring mobility opportunities (exchanges, training courses and volunteering) to more young people.</p>
+            <p>Corradi is an Erasmus+ project between Proactive Future (Spain), LIFE (Romania) and DreamTeam (Greece) to bring European mobility opportunities (exchanges, training courses and volunteering) to more young people.</p>
             <h4>The challenge</h4>
-            <p>Every call arrives in a different format, many are repeated across channels and others expire without notice. Keeping an up-to-date list by hand was not viable.</p>
+            <p>Calls were scattered across portals, Instagram and WhatsApp groups, each in a different format. Many were repeated across channels and others expired without notice. Keeping a reliable list by hand was not viable.</p>
             <h4>What we did</h4>
             <ul>
-              <li>A Telegram assistant to which any coordinator can forward a call as it is, without filling in forms.</li>
-              <li>Automatic extraction of the key data (country, dates, age, topic and deadline) and duplicate detection.</li>
+              <li>Automatic daily collection from the European Youth Portal and the SALTO-YOUTH databases.</li>
+              <li>A Telegram assistant to which any coordinator forwards a call as it is: the system classifies it, extracts country, dates, ages, topic and deadline, and shows a preview before publishing.</li>
+              <li>Meaning-based duplicate detection, even when the same call arrives worded differently.</li>
               <li>A web catalogue with search, map and filters, plus a compatibility test that recommends opportunities for each young person.</li>
-              <li>Automatic daily review: expired calls are removed on their own.</li>
-              <li>Automatic publishing to a Telegram channel.</li>
+              <li>Automatic publishing: Telegram channel, Instagram cards and messages ready for WhatsApp.</li>
+              <li>Daily and weekly summaries, and automatic removal of expired calls.</li>
+              <li>Reproducible cloud infrastructure and abuse protection.</li>
             </ul>
             <h4>Technology</h4>
-            <ul class="chips"><li>Python</li><li>FastAPI</li><li>PostgreSQL</li><li>Semantic search</li><li>Docker</li><li>AWS</li></ul>
+            <ul class="chips"><li>Python</li><li>FastAPI</li><li>PostgreSQL + pgvector</li><li>Telegram</li><li>Docker</li><li>AWS</li><li>Terraform</li></ul>
             <h4>The result</h4>
-            <p>A living catalogue with more than 250 open opportunities reviewed every morning, maintained with almost no manual work.</p>
+            <p>A living catalogue with more than 250 open opportunities reviewed every morning, which feeds and publishes itself almost on its own. Coordinators no longer copy calls by hand: they forward them and the system does the rest.</p>
           </template>
         </article>
 
@@ -453,10 +459,10 @@
             <div class="cloud-stats" aria-hidden="true"><span>✓ Data validated</span><span>✓ Daily backups</span><span>✓ Monitoring</span></div>
           </div>
           <div class="cx-body">
-            <p class="cx-tag">Banking</p>
+            <p class="cx-tag">Data and systems</p>
             <h3>From a legacy database to the cloud</h3>
             <div class="cx-ps">
-              <div><h4>The problem</h4><p>A bank depended on a database that was hard to maintain and to scale.</p></div>
+              <div><h4>The problem</h4><p>A company depended on an old database that was hard to maintain and to scale.</p></div>
               <div><h4>The solution</h4><p>We migrated its data to a cloud database that is more modern, scalable and easier to maintain.</p></div>
             </div>
             <button class="cx-open" type="button">Read the full case <span aria-hidden="true">+</span></button>
@@ -464,7 +470,7 @@
           <template class="cx-detail">
             <div class="ba"><div><span>Before</span><p>A critical database, hard to maintain and to scale.</p></div><div><span>After</span><p>Data in the cloud, with automatic backups and monitoring.</p></div></div>
             <h4>Context</h4>
-            <p>A bank was running on an old database that was critical to its daily operations.</p>
+            <p>A company was running on an old database that was critical to its day-to-day work.</p>
             <h4>The challenge</h4>
             <p>The system was hard to maintain, expensive to scale and relied on very specific know-how. Any change was a risk to the business.</p>
             <h4>What we did</h4>
@@ -477,20 +483,13 @@
             <h4>Technology</h4>
             <ul class="chips"><li>Cloud databases</li><li>Automated migration</li><li>Monitoring</li></ul>
             <h4>The result</h4>
-            <p>A modern, scalable database that is easier to maintain and ready to grow with the bank.</p>
+            <p>A modern, scalable database that is easier to maintain and ready to grow with the company.</p>
           </template>
         </article>
 
       </div>
     </section>
 
-    <!-- FIGURES -->
-    <section class="wrap figures" aria-label="llume in numbers">
-      <div class="figure reveal"><strong><span data-count="30">30</span> min</strong><p>first meeting, free and with no commitment</p></div>
-      <div class="figure reveal"><strong><span data-count="2">2</span></strong><p>countries: Spain and Portugal</p></div>
-      <div class="figure reveal"><strong><span data-count="250">250</span>+</strong><p>opportunities reviewed every morning at Corradi</p></div>
-      <div class="figure reveal"><strong><span data-count="100">100</span>%</strong><p>of the code owned by the client</p></div>
-    </section>
 
 
     <!-- CALCULATOR -->
@@ -535,12 +534,13 @@
       <div class="wrap">
         <p class="eyebrow reveal" id="int-title">Integrations</p>
         <h2 class="reveal">We work with the tools<br>you already use.</h2>
+        <p class="sub reveal">We connect with the tools you already use, and with any other that has an API.</p>
       </div>
-      <div class="marquee" aria-hidden="true">
-        <ul class="track"><li>Google Workspace</li><li>Microsoft 365</li><li>Salesforce</li><li>HubSpot</li><li>Odoo</li><li>SAP</li><li>Holded</li><li>Stripe</li><li>WhatsApp</li><li>Telegram</li><li>Slack</li><li>PostgreSQL</li><li>AWS</li><li>Cloudflare</li></ul>
-        <ul class="track"><li>Google Workspace</li><li>Microsoft 365</li><li>Salesforce</li><li>HubSpot</li><li>Odoo</li><li>SAP</li><li>Holded</li><li>Stripe</li><li>WhatsApp</li><li>Telegram</li><li>Slack</li><li>PostgreSQL</li><li>AWS</li><li>Cloudflare</li></ul>
+      <div class="int-rows" aria-hidden="true">
+        <div class="marquee "><ul class="track"><li style="--c:#4285F4"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#google"/></svg><span>Google Workspace</span></li><li style="--c:#00A4EF"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#microsoft"/></svg><span>Microsoft 365</span></li><li style="--c:#34A853"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#googlesheets"/></svg><span>Google Sheets</span></li><li style="--c:#00A1E0"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#salesforce"/></svg><span>Salesforce</span></li><li style="--c:#FF7A59"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#hubspot"/></svg><span>HubSpot</span></li><li style="--c:#714B67"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#odoo"/></svg><span>Odoo</span></li><li style="--c:#0FAAFF"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#sap"/></svg><span>SAP</span></li><li style="--c:#7AB55C"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#shopify"/></svg><span>Shopify</span></li><li style="--c:#635BFF"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#stripe"/></svg><span>Stripe</span></li><li style="--c:#f4f1ec"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#paypal"/></svg><span>PayPal</span></li><li style="--c:#25D366"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#whatsapp"/></svg><span>WhatsApp</span></li><li style="--c:#26A5E4"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#telegram"/></svg><span>Telegram</span></li></ul><ul class="track"><li style="--c:#4285F4"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#google"/></svg><span>Google Workspace</span></li><li style="--c:#00A4EF"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#microsoft"/></svg><span>Microsoft 365</span></li><li style="--c:#34A853"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#googlesheets"/></svg><span>Google Sheets</span></li><li style="--c:#00A1E0"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#salesforce"/></svg><span>Salesforce</span></li><li style="--c:#FF7A59"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#hubspot"/></svg><span>HubSpot</span></li><li style="--c:#714B67"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#odoo"/></svg><span>Odoo</span></li><li style="--c:#0FAAFF"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#sap"/></svg><span>SAP</span></li><li style="--c:#7AB55C"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#shopify"/></svg><span>Shopify</span></li><li style="--c:#635BFF"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#stripe"/></svg><span>Stripe</span></li><li style="--c:#f4f1ec"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#paypal"/></svg><span>PayPal</span></li><li style="--c:#25D366"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#whatsapp"/></svg><span>WhatsApp</span></li><li style="--c:#26A5E4"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#telegram"/></svg><span>Telegram</span></li></ul></div>
+        <div class="marquee reverse"><ul class="track"><li style="--c:#f4f1ec"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#slack"/></svg><span>Slack</span></li><li style="--c:#f4f1ec"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#notion"/></svg><span>Notion</span></li><li style="--c:#18BFFF"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#airtable"/></svg><span>Airtable</span></li><li style="--c:#FF4F00"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#zapier"/></svg><span>Zapier</span></li><li style="--c:#f4f1ec"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#make"/></svg><span>Make</span></li><li style="--c:#EA4B71"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#n8n"/></svg><span>n8n</span></li><li style="--c:#4169E1"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#postgresql"/></svg><span>PostgreSQL</span></li><li style="--c:#3FCF8E"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#supabase"/></svg><span>Supabase</span></li><li style="--c:#f4f1ec"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#amazonwebservices"/></svg><span>AWS</span></li><li style="--c:#4285F4"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#googlecloud"/></svg><span>Google Cloud</span></li><li style="--c:#F38020"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#cloudflare"/></svg><span>Cloudflare</span></li><li style="--c:#2496ED"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#docker"/></svg><span>Docker</span></li></ul><ul class="track"><li style="--c:#f4f1ec"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#slack"/></svg><span>Slack</span></li><li style="--c:#f4f1ec"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#notion"/></svg><span>Notion</span></li><li style="--c:#18BFFF"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#airtable"/></svg><span>Airtable</span></li><li style="--c:#FF4F00"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#zapier"/></svg><span>Zapier</span></li><li style="--c:#f4f1ec"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#make"/></svg><span>Make</span></li><li style="--c:#EA4B71"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#n8n"/></svg><span>n8n</span></li><li style="--c:#4169E1"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#postgresql"/></svg><span>PostgreSQL</span></li><li style="--c:#3FCF8E"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#supabase"/></svg><span>Supabase</span></li><li style="--c:#f4f1ec"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#amazonwebservices"/></svg><span>AWS</span></li><li style="--c:#4285F4"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#googlecloud"/></svg><span>Google Cloud</span></li><li style="--c:#F38020"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#cloudflare"/></svg><span>Cloudflare</span></li><li style="--c:#2496ED"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/tools.svg#docker"/></svg><span>Docker</span></li></ul></div>
       </div>
-      <p class="wrap sr-only">We integrate with Google Workspace, Microsoft 365, Salesforce, HubSpot, Odoo, SAP, Holded, Stripe, WhatsApp, Telegram, Slack, PostgreSQL, AWS and Cloudflare, among others.</p>
+      <p class="wrap sr-only">We integrate with Google Workspace, Microsoft 365, Google Sheets, Salesforce, HubSpot, Odoo, SAP, Shopify, Stripe, PayPal, WhatsApp, Telegram, Slack, Notion, Airtable, Zapier, Make, n8n, PostgreSQL, Supabase, AWS, Google Cloud, Cloudflare, Docker, among others.</p>
     </section>
 
     <!-- ENGAGEMENT MODELS -->
@@ -661,6 +661,7 @@
         <label class="check"><input type="checkbox" name="privacidad" required><span>I have read the <a href="/privacidad">privacy policy</a> (in Spanish).</span></label>
         <button class="btn btn-light" type="submit">Request a call <span aria-hidden="true">→</span></button>
         <small class="form-note">Submitting opens your email app with the message ready for info@llume.net.</small>
+        <p class="rgpd"><b>Data protection.</b> Controller: llume. Purpose: to handle your request and call you. Legal basis: your consent. Recipients: we do not share your data with third parties unless required by law. Rights: access, rectification, erasure, objection, restriction and portability at info@llume.net. <a href="/privacidad">More information</a> (in Spanish).</p>
       </form>
     </section>
   </main>

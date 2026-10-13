@@ -44,21 +44,23 @@
     <div class="cd-content">
             <div class="ba"><div><span>Antes</span><p>Candidaturas soltas em sites, redes e grupos, muitas repetidas ou caducadas.</p></div><div><span>Depois</span><p>Um catálogo único que se revê sozinho todas as manhãs.</p></div></div>
             <h4>O contexto</h4>
-            <p>A Corradi nasce de um projeto europeu entre organizações de Espanha, Roménia e Grécia para aproximar de mais jovens as oportunidades de mobilidade: intercâmbios, formações e voluntariado.</p>
+            <p>A Corradi é um projeto Erasmus+ entre a Proactive Future (Espanha), a LIFE (Roménia) e a DreamTeam (Grécia) para aproximar de mais jovens as oportunidades de mobilidade europeia: intercâmbios, formações e voluntariado.</p>
             <h4>O desafio</h4>
-            <p>Cada candidatura chega num formato diferente, muitas repetem-se em vários canais e outras caducam sem aviso. Manter uma lista atualizada à mão não era viável.</p>
+            <p>As candidaturas circulavam soltas por portais, Instagram e grupos de WhatsApp, cada uma num formato diferente. Muitas repetiam-se em vários canais e outras caducavam sem aviso. Manter uma lista fiável à mão não era viável.</p>
             <h4>O que fizemos</h4>
             <ul>
-              <li>Um assistente no Telegram ao qual qualquer coordenador pode reencaminhar uma candidatura tal como está, sem preencher formulários.</li>
-              <li>Extração automática dos dados-chave (país, datas, idade, tema e prazo) e deteção de duplicados.</li>
+              <li>Recolha automática diária a partir do Portal Europeu da Juventude e das bases de dados SALTO-YOUTH.</li>
+              <li>Um assistente no Telegram ao qual qualquer coordenador reencaminha uma candidatura tal como está: o sistema classifica-a, extrai país, datas, idades, tema e prazo, e mostra uma pré-visualização antes de publicar.</li>
+              <li>Deteção de duplicados pelo significado, mesmo quando a mesma candidatura chega escrita de formas diferentes.</li>
               <li>Um catálogo web com pesquisa, mapa e filtros, e um teste de compatibilidade que recomenda oportunidades segundo o perfil de cada jovem.</li>
-              <li>Revisão diária automática: as candidaturas caducadas são retiradas sozinhas.</li>
-              <li>Divulgação automática num canal do Telegram.</li>
+              <li>Divulgação automática: canal de Telegram, cartões para Instagram e mensagens prontas para WhatsApp.</li>
+              <li>Resumos diários e semanais, e remoção automática das candidaturas caducadas.</li>
+              <li>Infraestrutura na cloud reprodutível e proteção contra abusos.</li>
             </ul>
             <h4>Tecnologia</h4>
-            <ul class="chips"><li>Python</li><li>FastAPI</li><li>PostgreSQL</li><li>Pesquisa semântica</li><li>Docker</li><li>AWS</li></ul>
+            <ul class="chips"><li>Python</li><li>FastAPI</li><li>PostgreSQL + pgvector</li><li>Telegram</li><li>Docker</li><li>AWS</li><li>Terraform</li></ul>
             <h4>O resultado</h4>
-            <p>Um catálogo vivo, com mais de 250 oportunidades abertas revistas todas as manhãs, que se mantém praticamente sem trabalho manual.</p>
+            <p>Um catálogo vivo, com mais de 250 oportunidades abertas revistas todas as manhãs, que se alimenta e se divulga praticamente sozinho. Os coordenadores já não copiam candidaturas à mão: reencaminham-nas e o sistema faz o resto.</p>
           </div>
     <div class="offer">
       <div>

@@ -44,21 +44,23 @@
     <div class="cd-content">
             <div class="ba"><div><span>Antes</span><p>Convocatorias sueltas en webs, redes y grupos, muchas repetidas o caducadas.</p></div><div><span>Después</span><p>Un catálogo único que se revisa solo cada mañana.</p></div></div>
             <h4>El contexto</h4>
-            <p>Corradi nace de un proyecto europeo entre organizaciones de España, Rumanía y Grecia para acercar a más jóvenes las oportunidades de movilidad: intercambios, formaciones y voluntariados.</p>
+            <p>Corradi es un proyecto Erasmus+ entre Proactive Future (España), LIFE (Rumanía) y DreamTeam (Grecia) para acercar a más jóvenes las oportunidades de movilidad europea: intercambios, formaciones y voluntariados.</p>
             <h4>El reto</h4>
-            <p>Cada convocatoria llega con un formato distinto, muchas se repiten en varios canales y otras caducan sin que nadie avise. Mantener un listado al día a mano no era viable.</p>
+            <p>Las convocatorias circulaban sueltas por portales, Instagram y grupos de WhatsApp, cada una con un formato distinto. Muchas se repetían en varios canales y otras caducaban sin que nadie avisara. Mantener un listado fiable a mano no era viable.</p>
             <h4>Qué hicimos</h4>
             <ul>
-              <li>Un asistente en Telegram al que cualquier coordinador puede reenviar una convocatoria tal cual, sin rellenar formularios.</li>
-              <li>Extracción automática de los datos clave (país, fechas, edad, temática y plazo) y detección de duplicados.</li>
+              <li>Recogida automática diaria desde el Portal Europeo de la Juventud y las bases de datos de SALTO-YOUTH.</li>
+              <li>Un asistente en Telegram al que cualquier coordinador reenvía una convocatoria tal cual: el sistema la clasifica, extrae país, fechas, edades, temática y plazo, y muestra una vista previa antes de publicar.</li>
+              <li>Detección de duplicados por significado, aunque la misma convocatoria llegue escrita de formas distintas.</li>
               <li>Un catálogo web con buscador, mapa y filtros, y un test de compatibilidad que recomienda oportunidades según el perfil de cada joven.</li>
-              <li>Revisión diaria automática: las convocatorias vencidas se retiran solas.</li>
-              <li>Difusión automática en un canal de Telegram.</li>
+              <li>Difusión automática: canal de Telegram, tarjetas para Instagram y mensajes listos para WhatsApp.</li>
+              <li>Resúmenes diarios y semanales, y retirada automática de las convocatorias vencidas.</li>
+              <li>Infraestructura en la nube reproducible y protección contra abusos.</li>
             </ul>
             <h4>Tecnología</h4>
-            <ul class="chips"><li>Python</li><li>FastAPI</li><li>PostgreSQL</li><li>Búsqueda semántica</li><li>Docker</li><li>AWS</li></ul>
+            <ul class="chips"><li>Python</li><li>FastAPI</li><li>PostgreSQL + pgvector</li><li>Telegram</li><li>Docker</li><li>AWS</li><li>Terraform</li></ul>
             <h4>El resultado</h4>
-            <p>Un catálogo vivo, con más de 250 oportunidades abiertas revisadas cada mañana, que se mantiene prácticamente sin trabajo manual.</p>
+            <p>Un catálogo vivo, con más de 250 oportunidades abiertas revisadas cada mañana, que se alimenta y se difunde prácticamente solo. Los coordinadores ya no copian convocatorias a mano: las reenvían y el sistema hace el resto.</p>
           </div>
     <div class="offer">
       <div>

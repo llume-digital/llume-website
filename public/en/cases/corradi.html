@@ -44,21 +44,23 @@
     <div class="cd-content">
             <div class="ba"><div><span>Before</span><p>Calls scattered across websites, social media and groups, many duplicated or expired.</p></div><div><span>After</span><p>A single catalogue that reviews itself every morning.</p></div></div>
             <h4>Context</h4>
-            <p>Corradi was born from a European project between organisations in Spain, Romania and Greece to bring mobility opportunities (exchanges, training courses and volunteering) to more young people.</p>
+            <p>Corradi is an Erasmus+ project between Proactive Future (Spain), LIFE (Romania) and DreamTeam (Greece) to bring European mobility opportunities (exchanges, training courses and volunteering) to more young people.</p>
             <h4>The challenge</h4>
-            <p>Every call arrives in a different format, many are repeated across channels and others expire without notice. Keeping an up-to-date list by hand was not viable.</p>
+            <p>Calls were scattered across portals, Instagram and WhatsApp groups, each in a different format. Many were repeated across channels and others expired without notice. Keeping a reliable list by hand was not viable.</p>
             <h4>What we did</h4>
             <ul>
-              <li>A Telegram assistant to which any coordinator can forward a call as it is, without filling in forms.</li>
-              <li>Automatic extraction of the key data (country, dates, age, topic and deadline) and duplicate detection.</li>
+              <li>Automatic daily collection from the European Youth Portal and the SALTO-YOUTH databases.</li>
+              <li>A Telegram assistant to which any coordinator forwards a call as it is: the system classifies it, extracts country, dates, ages, topic and deadline, and shows a preview before publishing.</li>
+              <li>Meaning-based duplicate detection, even when the same call arrives worded differently.</li>
               <li>A web catalogue with search, map and filters, plus a compatibility test that recommends opportunities for each young person.</li>
-              <li>Automatic daily review: expired calls are removed on their own.</li>
-              <li>Automatic publishing to a Telegram channel.</li>
+              <li>Automatic publishing: Telegram channel, Instagram cards and messages ready for WhatsApp.</li>
+              <li>Daily and weekly summaries, and automatic removal of expired calls.</li>
+              <li>Reproducible cloud infrastructure and abuse protection.</li>
             </ul>
             <h4>Technology</h4>
-            <ul class="chips"><li>Python</li><li>FastAPI</li><li>PostgreSQL</li><li>Semantic search</li><li>Docker</li><li>AWS</li></ul>
+            <ul class="chips"><li>Python</li><li>FastAPI</li><li>PostgreSQL + pgvector</li><li>Telegram</li><li>Docker</li><li>AWS</li><li>Terraform</li></ul>
             <h4>The result</h4>
-            <p>A living catalogue with more than 250 open opportunities reviewed every morning, maintained with almost no manual work.</p>
+            <p>A living catalogue with more than 250 open opportunities reviewed every morning, which feeds and publishes itself almost on its own. Coordinators no longer copy calls by hand: they forward them and the system does the rest.</p>
           </div>
     <div class="offer">
       <div>
