@@ -251,7 +251,7 @@ form?.addEventListener("submit", (e) => {
   e.preventDefault();
   const d = new FormData(form);
   const body = `Nombre: ${d.get("nombre")}\nEmpresa: ${d.get("empresa") || "-"}\n\n${d.get("mensaje")}`;
-  const subject = `Contacto web llume: ${d.get("nombre")}${d.get("empresa") ? " (" + d.get("empresa") + ")" : ""}`;
+  const subject = `Solicitud de reunión de 30 minutos: ${d.get("nombre")}${d.get("empresa") ? " (" + d.get("empresa") + ")" : ""}`;
   location.href = `mailto:info@llume.net?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   form.querySelector("button").textContent = "Abriendo tu correo ✓";
 });
