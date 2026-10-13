@@ -7,7 +7,7 @@
 - **Automatización de procesos**: presupuestos, facturas, informes, avisos y seguimientos que se generan solos.
 - **Integración y migración a la nube**: conexión entre herramientas (ERP, CRM, correo…) y migración de bases de datos antiguas sin parar la actividad.
 - **Software y plataformas a medida**: CRM, portales, paneles de gestión, pagos online e inscripciones, con frontend y backend propios.
-- **Videoanálisis y seguridad laboral**: detección en tiempo real sobre las cámaras existentes (equipos de protección, zonas restringidas).
+- **Datos y cuadros de mando**: la información del negocio reunida en paneles que se actualizan solos, para decidir con datos.
 
 ## Cómo trabaja
 

@@ -58,7 +58,7 @@ def content(code, kind):
     <p>En cumplimiento de la Ley 34/2002, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE), se informa de los datos del titular de este sitio web:</p>
 {owner_list(code)}
     <h2>2. Objeto</h2>
-    <p>Este sitio web informa sobre los servicios de consultoría tecnológica de llume: automatización de procesos, integración y migración a la nube, desarrollo de software a medida y videoanálisis. Su uso atribuye la condición de usuario e implica la aceptación de este aviso legal.</p>
+    <p>Este sitio web informa sobre los servicios de consultoría tecnológica de llume: automatización de procesos, integración y migración a la nube, desarrollo de software a medida y cuadros de mando. Su uso atribuye la condición de usuario e implica la aceptación de este aviso legal.</p>
     <h2>3. Condiciones de uso</h2>
     <p>El usuario se compromete a hacer un uso adecuado de los contenidos y a no emplearlos para actividades ilícitas o contrarias a la buena fe. llume podrá modificar en cualquier momento los contenidos y la configuración del sitio sin previo aviso.</p>
     <h2>4. Propiedad intelectual e industrial</h2>
@@ -123,7 +123,7 @@ def content(code, kind):
     <p>In accordance with Spanish Law 34/2002 on Information Society Services and Electronic Commerce (LSSI-CE), the owner of this website is:</p>
 {owner_list(code)}
     <h2>2. Purpose</h2>
-    <p>This website provides information about llume's technology consultancy services: process automation, integration and cloud migration, custom software development and video analytics. Using it makes you a user and implies acceptance of this legal notice.</p>
+    <p>This website provides information about llume's technology consultancy services: process automation, integration and cloud migration, custom software development and dashboards. Using it makes you a user and implies acceptance of this legal notice.</p>
     <h2>3. Terms of use</h2>
     <p>Users agree to make appropriate use of the content and not to use it for unlawful purposes or in bad faith. llume may change the content and configuration of the site at any time without notice.</p>
     <h2>4. Intellectual and industrial property</h2>
@@ -188,7 +188,7 @@ def content(code, kind):
     <p>Nos termos da Lei espanhola 34/2002, de Serviços da Sociedade da Informação e de Comércio Eletrónico (LSSI-CE), o titular deste site é:</p>
 {owner_list(code)}
     <h2>2. Objeto</h2>
-    <p>Este site informa sobre os serviços de consultoria tecnológica da llume: automação de processos, integração e migração para a cloud, desenvolvimento de software à medida e videoanálise. A sua utilização atribui a condição de utilizador e implica a aceitação deste aviso legal.</p>
+    <p>Este site informa sobre os serviços de consultoria tecnológica da llume: automação de processos, integração e migração para a cloud, desenvolvimento de software à medida e painéis de gestão. A sua utilização atribui a condição de utilizador e implica a aceitação deste aviso legal.</p>
     <h2>3. Condições de utilização</h2>
     <p>O utilizador compromete-se a fazer um uso adequado dos conteúdos e a não os utilizar para fins ilícitos ou contrários à boa-fé. A llume pode alterar a qualquer momento os conteúdos e a configuração do site sem aviso prévio.</p>
     <h2>4. Propriedade intelectual e industrial</h2>
