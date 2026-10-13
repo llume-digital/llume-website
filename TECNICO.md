@@ -48,7 +48,7 @@ llume-web/
 
 ## 3. Secciones de la página
 
-La portada se ha recortado a 9 bloques:
+La portada tiene 9 bloques:
 
 | id / clase | Sección |
 |---|---|
@@ -57,8 +57,8 @@ La portada se ha recortado a 9 bloques:
 | `#retos` | "¿Qué te frena?": pestañas por problema, cada una con el sector donde ya se resolvió y su caso |
 | `#casos` | 3 casos destacados; el botón "Ver los otros 3 casos" despliega el resto (`.cx-extra`) |
 | `#calculadora` | Calculadora del coste de las tareas repetitivas |
-| `#proceso` | Método en 4 pasos, tabla comparativa (llume vs software genérico vs agencia), compromisos (`.badges.compact`) y las dos filas de logos de integraciones |
-| `#modelos` | Camino en 3 pasos (`.journey`): 1 diagnóstico (siempre), 2 proyecto cerrado o acompañamiento continuo, 3 mantenimiento opcional; cada tarjeta dice cómo se paga. Debajo, la nota de ayudas |
+| `#proceso` | "Cuatro pasos, sin sorpresas": incluye la primera reunión gratis, el diagnóstico con garantía y el acompañamiento posterior; botón "Pedir diagnóstico", tabla comparativa, 3 compromisos y las dos filas de logos de integraciones |
+| `#formacion` | Formación en IA y digitalización para equipos: qué aprenderán, herramientas (Claude, Claude Code…), 4 formatos y modalidades; sin precio |
 | `#faq` | Preguntas frecuentes (`<details>`), también como datos estructurados `FAQPage` |
 | `#contacto` | "¿Qué pasa en la primera llamada?", formulario de llamada y primera capa de protección de datos |
 

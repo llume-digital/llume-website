@@ -600,42 +600,7 @@ input::placeholder, textarea::placeholder { color: #5f5b55; }
 .quote.in-case figcaption { margin-top: 14px; }
 .cx-list + .quote { margin-top: 16px; }
 
-/* ---------- how we work: a 3-step path ---------- */
-.journey { position: relative; display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 16px; margin-top: 30px; counter-reset: none; }
-.journey::before { content: ""; position: absolute; left: 22px; right: 22px; top: 22px; height: 1px; background: linear-gradient(90deg, var(--amber), rgba(242,192,138,.35) 60%, rgba(242,192,138,.15)); }
-.j-step { position: relative; display: flex; flex-direction: column; }
-.j-n { position: relative; z-index: 1; width: 45px; height: 45px; border-radius: 50%; display: grid; place-items: center; font: 500 14px var(--mono); color: var(--amber);
-  background: var(--bg); border: 1px solid rgba(242,192,138,.55); box-shadow: 0 0 18px rgba(242,192,138,.25); }
-.j-k { margin: 18px 0 12px; font: 400 11px var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
-.j-card { flex: 1; padding: 26px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel); backdrop-filter: blur(12px); display: flex; flex-direction: column; }
-.j-card.featured { border-color: rgba(242,192,138,.5); background: radial-gradient(ellipse at 0% 0%, rgba(242,192,138,.16), transparent 60%), var(--panel); }
-.j-ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; border: 1px solid rgba(242,192,138,.35); }
-.j-ico svg { width: 20px; height: 20px; stroke: var(--amber); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.j-card h3 { margin-top: 18px; font-size: 20px; font-weight: 400; letter-spacing: -.01em; }
-.j-card > p { margin-top: 8px; color: var(--muted); font-size: 14.5px; }
-.j-facts { margin-top: auto; padding-top: 18px; display: grid; gap: 10px; }
-.j-facts > div { padding-top: 10px; border-top: 1px solid var(--line); }
-.j-facts dt { font: 400 10.5px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
-.j-facts dd { margin-top: 2px; font-size: 14.5px; color: var(--text); }
-.j-options { flex: 1; display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: stretch; }
-.j-or { align-self: center; font: 400 14px var(--font); font-style: italic; color: var(--amber);
-  width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; border: 1px solid rgba(242,192,138,.35); background: var(--bg); }
-.j-foot { margin-top: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; padding: 20px 24px;
-  border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel); backdrop-filter: blur(12px); }
-.j-foot p { color: var(--muted); font-size: 14.5px; max-width: 720px; }
-.j-foot b { color: var(--text); font-weight: 500; }
-@media (max-width: 1000px) {
-  .journey { grid-template-columns: 1fr; gap: 28px; }
-  .journey::before { left: 22px; right: auto; top: 22px; bottom: 22px; width: 1px; height: auto; background: linear-gradient(var(--amber), rgba(242,192,138,.15)); }
-  .j-step { padding-left: 62px; }
-  .j-n { position: absolute; left: 0; top: 0; }
-  .j-k { margin-top: 12px; }
 }
-@media (max-width: 640px) {
-  .j-options { grid-template-columns: 1fr; }
-  .j-or { justify-self: center; }
-}
-.j-choice .j-options { padding: 10px; border: 1px dashed rgba(242,192,138,.32); border-radius: 22px; }
 
 /* comparison table */
 .compare-wrap { margin-top: 24px; overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel); backdrop-filter: blur(12px); }
@@ -687,3 +652,29 @@ input::placeholder, textarea::placeholder { color: #5f5b55; }
 .quote.short { margin: 0; padding: clamp(22px, 3vw, 34px); }
 .quote.short blockquote { margin-top: 0; font-size: clamp(18px, 2vw, 22px); }
 .quote.short figcaption { margin-top: 18px; }
+
+/* method CTA */
+.steps-cta { margin-top: 4px; }
+
+/* ---------- training ---------- */
+.training { display: grid; grid-template-columns: 1fr 1.15fr; gap: 16px; margin-top: 28px; }
+.t-learn, .t-side { padding: clamp(22px, 3vw, 32px); border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel); backdrop-filter: blur(12px); }
+.t-learn { background: radial-gradient(ellipse at 0% 0%, rgba(242,192,138,.14), transparent 60%), var(--panel); border-color: rgba(242,192,138,.4); }
+.t-learn .card-list { margin: 14px 0 0; gap: 12px; font-size: 15px; }
+.t-tools { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+.t-tools b { color: var(--text); font-weight: 500; }
+.t-fmts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.t-fmt { padding: 18px; border-radius: 12px; border: 1px solid var(--line); background: rgba(0,0,0,.2); }
+.t-fmt .j-ico { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; border: 1px solid rgba(242,192,138,.35); }
+.t-fmt .j-ico svg { width: 18px; height: 18px; stroke: var(--amber); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.t-fmt h4 { margin-top: 12px; font-size: 15.5px; font-weight: 500; }
+.t-fmt p { margin-top: 4px; color: var(--muted); font-size: 13.5px; }
+.t-foot { margin-top: 16px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px 24px; padding: 18px 22px;
+  border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel); backdrop-filter: blur(12px); }
+.t-mods { display: flex; flex-wrap: wrap; gap: 8px; }
+.t-mods li { font: 400 12px var(--mono); color: #d6d0c6; padding: 6px 12px; border-radius: 99px; border: 1px solid var(--line); }
+.t-mods li::before { content: "✓ "; color: var(--ok); }
+.t-foot > div { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.t-foot small { color: var(--muted); font-size: 12.5px; max-width: 260px; }
+@media (max-width: 1000px) { .training { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .t-fmts { grid-template-columns: 1fr; } }

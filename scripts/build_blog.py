@@ -42,7 +42,7 @@ POSTS = [
 <h2>Errores habituales</h2>
 <ul>
 <li><strong>Automatizar el desorden:</strong> si las tarifas no están claras, el sistema solo repetirá el caos más rápido.</li>
-<li><strong>Querer cubrir todos los casos desde el principio:</strong> empieza por el 80&nbsp;% de presupuestos más comunes y deja los especiales para más adelante.</li>
+<li><strong>Querer cubrir todos los casos desde el principio:</strong> empieza por el 80&nbsp;% de los presupuestos, los más habituales y deja los especiales para más adelante.</li>
 <li><strong>Olvidar al equipo:</strong> quien hace hoy los presupuestos sabe dónde están las excepciones; cuenta con esa persona desde el primer día.</li>
 </ul>
 <h2>¿Por dónde empezar?</h2>
@@ -61,22 +61,22 @@ POSTS = [
 <p>Un CRM es la herramienta donde vive la relación con tus clientes: quiénes son, qué te han pedido, en qué punto está cada operación y qué toca hacer después. Hay muchos CRM estándar en el mercado y, para muchas empresas, son la mejor opción. Pero no para todas.</p>
 <h2>Siete señales de que el estándar se te queda corto</h2>
 <ol>
-<li><strong>Tu proceso tiene fases que ningún CRM contempla.</strong> Si vendes algo que pasa por pasos muy concretos (compra en otro país, transporte, trámites administrativos, instalación), las fases genéricas de "lead, oportunidad, cliente" no te sirven.</li>
+<li><strong>Tu proceso tiene fases que ningún CRM contempla.</strong> Si vendes algo que pasa por pasos muy concretos (compra en otro país, transporte, trámites administrativos, instalación), las fases genéricas de «lead, oportunidad, cliente» no te sirven.</li>
 <li><strong>Cada persona del equipo usa el CRM de una forma distinta.</strong> Cuando la herramienta no encaja, cada uno se inventa su sistema y la información deja de ser comparable.</li>
 <li><strong>Sigues necesitando hojas de cálculo al lado.</strong> Si el CRM existe pero los datos importantes siguen en Excel, es que no recoge lo que de verdad necesitas.</li>
 <li><strong>Los documentos están en otro sitio.</strong> Facturas, contratos, certificados o fotos que deberían estar asociados a cada cliente acaban repartidos entre correo y carpetas.</li>
-<li><strong>Pagas licencias por funciones que no usas.</strong> Muchos CRM cobran por usuario y por módulo; a veces pagas mucho por un 20&nbsp;% de la herramienta.</li>
+<li><strong>Pagas licencias por funciones que no usas.</strong> Muchos CRM cobran por usuario y por módulo; a veces pagas mucho por usar un 20&nbsp;% de la herramienta.</li>
 <li><strong>Integrarlo con tus otras herramientas es una pelea.</strong> Si conectar el CRM con tu facturación, tu web o tus formularios requiere parches constantes, el coste oculto crece cada mes.</li>
 <li><strong>Para saber cómo va algo, hay que preguntar.</strong> La señal más clara: si la información está en la cabeza de las personas y no en el sistema.</li>
 </ol>
-<h2>Cuándo NO necesitas un CRM a medida</h2>
+<h2>Cuándo no necesitas un CRM a medida</h2>
 <p>Si tu proceso comercial es sencillo y parecido al de muchas otras empresas, si tu equipo es pequeño y un CRM estándar cubre lo que haces, no tiene sentido construir uno propio. En ese caso, lo que suele faltar no es una herramienta nueva, sino configurar bien la que tienes y conectarla con el resto.</p>
 <h2>Qué ganas con uno a medida</h2>
 <ul>
 <li>Fases, campos y documentos que reflejan exactamente cómo trabajas.</li>
 <li>Alertas pensadas para tus plazos reales, no para un proceso genérico.</li>
 <li>Integración directa con lo que ya usas, sin depender de módulos de pago.</li>
-<li>El código es tuyo: no dependes de las subidas de precio de un proveedor.</li>
+<li>Sin licencias por usuario: no dependes de las subidas de precio de un proveedor.</li>
 </ul>
 <h2>Cómo decidir</h2>
 <p>Haz una lista de las tres cosas que más tiempo os hacen perder en la gestión de clientes. Si un CRM estándar las resuelve, adelante. Si ninguna encaja del todo, merece la pena hablarlo. En nuestro caso de <a href="/casos/clevercar">Clevercar</a> puedes ver cómo un CRM propio ordenó un proceso de importación de vehículos con muchas fases.</p>
@@ -97,7 +97,7 @@ POSTS = [
 <h2>2. Diseña el destino, no solo copies</h2>
 <p>Migrar es una oportunidad para ordenar. Define cómo será la nueva base de datos: qué estructura tendrá, qué datos se limpian o se descartan, quién podrá acceder y cómo se harán las copias de seguridad. Copiar tal cual un sistema desordenado solo traslada el problema.</p>
 <h2>3. Migra por fases</h2>
-<p>En lugar de un "gran apagón" de fin de semana, divide la migración en partes. Empieza por datos menos críticos, comprueba que todo funciona y avanza. Durante un tiempo, ambos sistemas pueden convivir y sincronizarse, de modo que el día del cambio definitivo sea casi un trámite.</p>
+<p>En lugar de un «gran apagón» de fin de semana, divide la migración en partes. Empieza por datos menos críticos, comprueba que todo funciona y avanza. Durante un tiempo, ambos sistemas pueden convivir y sincronizarse, de modo que el día del cambio definitivo sea casi un trámite.</p>
 <h2>4. Valida con datos reales</h2>
 <p>Cada fase necesita una comprobación objetiva: el número de registros coincide, los totales cuadran y los procesos clave dan el mismo resultado en el sistema antiguo y en el nuevo. Automatizar estas comprobaciones permite repetirlas tantas veces como haga falta.</p>
 <h2>5. Ten siempre un plan de vuelta atrás</h2>
@@ -142,7 +142,7 @@ def head(title, desc, url, schema, og_type="website"):
 <body>
   <header class="nav scrolled" id="nav">
     <a href="/" class="logo" aria-label="llume"><img src="/assets/mark.svg" alt="" width="20" height="24"><span>llume.</span></a>
-    <a href="/#contacto" class="btn btn-light btn-sm">Reserva 30 min <span aria-hidden="true">→</span></a>
+    <a href="/#contacto" class="btn btn-light btn-sm">Hablemos <span aria-hidden="true">→</span></a>
   </header>
 """
 

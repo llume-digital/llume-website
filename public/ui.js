@@ -151,7 +151,7 @@ if (calc) {
   const WEEKS = 46; // working weeks per year
   const update = () => {
     const v = Object.fromEntries([...calc.querySelectorAll("input")].map((i) => [i.name, +i.value]));
-    calc.querySelectorAll("output").forEach((o) => (o.textContent = fmt.format(v[o.dataset.for]) + (o.dataset.suffix || "")));
+    calc.querySelectorAll("output").forEach((o) => (o.textContent = (o.dataset.prefix || "") + fmt.format(v[o.dataset.for]) + (o.dataset.suffix || "")));
     const hoursYear = v.people * v.hours * WEEKS;
     const out = {
       hoursYear: fmt.format(hoursYear),
