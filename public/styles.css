@@ -618,7 +618,7 @@ input::placeholder, textarea::placeholder { color: #5f5b55; }
 .j-facts dt { font: 400 10.5px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .j-facts dd { margin-top: 2px; font-size: 14.5px; color: var(--text); }
 .j-options { flex: 1; display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: stretch; }
-.j-or { align-self: center; font: 400 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--amber);
+.j-or { align-self: center; font: 400 14px var(--font); font-style: italic; color: var(--amber);
   width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; border: 1px solid rgba(242,192,138,.35); background: var(--bg); }
 .j-foot { margin-top: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; padding: 20px 24px;
   border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel); backdrop-filter: blur(12px); }
