@@ -102,6 +102,14 @@ if (dialog) {
   const closeCase = () => dialog.close();
   const caseById = (id) => document.querySelector(`.cx[data-case="${id}"]`);
 
+  // Home shows three featured cases; the rest open on demand
+  const more = document.querySelector(".cx-more");
+  more?.addEventListener("click", () => {
+    const open = document.querySelector(".cx-list").classList.toggle("expanded");
+    more.setAttribute("aria-expanded", open);
+    if (open) document.querySelectorAll(".cx-extra").forEach((el) => el.classList.add("in"));
+  });
+
   dialog.addEventListener("close", () => history.replaceState(null, "", location.pathname + location.search));
   // The whole card opens the case; its button keeps it reachable by keyboard
   document.querySelectorAll(".cx").forEach((card) => card.addEventListener("click", () => openCase(card)));

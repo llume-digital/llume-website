@@ -19,18 +19,21 @@ LANGS = {
         "eyebrow": "Caso de éxito", "problem": "El problema", "solution": "La solución",
         "cta_title": "¿Tienes un reto parecido?", "cta_text": "Explícanos qué necesitas y te llamamos. Primera reunión de 30 minutos, gratis y sin compromiso.",
         "cta": "Hablemos", "back": "Volver a la web", "more": "Otros casos", "book": "Reserva 30 min",
+        "legal": ("/aviso-legal", "Aviso legal", "/privacidad", "Privacidad"),
     },
     "en": {
         "src": "en/index.html", "out": "en/cases", "home": "/en/", "html_lang": "en", "og": "en_GB",
         "eyebrow": "Case study", "problem": "The problem", "solution": "The solution",
         "cta_title": "Facing a similar challenge?", "cta_text": "Tell us what you need and we'll call you. Free 30-minute first meeting, no strings attached.",
         "cta": "Let's talk", "back": "Back to the website", "more": "More case studies", "book": "Book 30 min",
+        "legal": ("/en/legal-notice", "Legal notice", "/en/privacy", "Privacy"),
     },
     "pt": {
         "src": "pt/index.html", "out": "pt/casos", "home": "/pt/", "html_lang": "pt-PT", "og": "pt_PT",
         "eyebrow": "Caso de sucesso", "problem": "O problema", "solution": "A solução",
         "cta_title": "Tem um desafio parecido?", "cta_text": "Explique-nos o que precisa e nós ligamos-lhe. Primeira reunião de 30 minutos, gratuita e sem compromisso.",
         "cta": "Vamos falar", "back": "Voltar ao site", "more": "Outros casos", "book": "Marque 30 min",
+        "legal": ("/pt/aviso-legal", "Aviso legal", "/pt/privacidade", "Privacidade"),
     },
 }
 
@@ -114,7 +117,7 @@ def render(c, cases, L, code):
     </nav>
   </main>
   <footer class="footer">
-    <div class="wrap foot-bottom"><span>© 2026 llume · Oviedo, Asturias</span><span><a href="{L['home']}">{L['back']}</a> · <a href="/aviso-legal">Aviso legal</a> · <a href="/privacidad">Privacidad</a></span></div>
+    <div class="wrap foot-bottom"><span>© 2026 llume · Oviedo, Asturias</span><span><a href="{L['home']}">{L['back']}</a> · <a href="{L['legal'][0]}">{L['legal'][1]}</a> · <a href="{L['legal'][2]}">{L['legal'][3]}</a></span></div>
   </footer>
   <script type="module" src="/ui.js"></script>
 </body>

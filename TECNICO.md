@@ -23,12 +23,14 @@ llume-web/
 ├── TECNICO.md           Este documento (no se publica)
 ├── wrangler.jsonc       Configuración de despliegue en Cloudflare
 ├── scripts/build_cases.py  Genera las páginas de cada caso a partir de las portadas
+├── scripts/build_legal.py  Genera las páginas legales en los tres idiomas (datos del titular arriba del todo)
 └── public/              Lo único que se publica
     ├── index.html       Página en español
     ├── en/index.html    Página en inglés (misma estructura)
     ├── pt/index.html    Página en portugués (misma estructura)
     ├── casos/, en/cases/, pt/casos/   Una página por caso (generadas, ver abajo)
-    ├── aviso-legal.html, privacidad.html, cookies.html
+    ├── nosotros.html, en/about.html, pt/sobre-nos.html
+    ├── aviso-legal.html, privacidad.html, cookies.html (y sus versiones en /en/ y /pt/, generadas)
     ├── styles.css       Todo el diseño, incluidas las páginas legales
     ├── ui.js            Interfaz: menú, scroll, pestañas, contadores, casos, formulario
     ├── main.js          Solo la escena 3D (si no hay WebGL, se queda un fondo estático)
@@ -44,21 +46,21 @@ llume-web/
 
 ## 3. Secciones de la página
 
+La portada se ha recortado a 9 bloques:
+
 | id / clase | Sección |
 |---|---|
 | `.hero` | Titular, frase rotatoria, llamada a la acción y franja de logos "Han confiado en nosotros" |
-| `.problem` | "Tu empresa ha cambiado. Tus herramientas, no.": 3 problemas y declaración de llume |
-| `#servicios` | 4 soluciones, cada una con ejemplos y enlace a su caso |
-| `#retos` | "¿Qué te frena?": pestañas por problema (no por sector), cada una con el sector donde ya se resolvió y su caso |
-| `#casos` | 6 casos con problema y solución; al pulsar se abre la ficha completa en un `<dialog>` |
+| `#servicios` | 4 soluciones en tarjetas compactas, con las frases de presentación de llume |
+| `#retos` | "¿Qué te frena?": pestañas por problema, cada una con el sector donde ya se resolvió y su caso |
+| `#casos` | 3 casos destacados; el botón "Ver los otros 3 casos" despliega el resto (`.cx-extra`) |
 | `#calculadora` | Calculadora del coste de las tareas repetitivas |
-| `#proceso` | Método en 4 pasos con su compromiso de plazos |
-| `.integrations` | Dos filas de logos (sprite `assets/tools.svg`, iconos de Simple Icons + Microsoft dibujado a mano) que se mueven en sentidos opuestos; al pasar el ratón cada logo toma su color de marca |
-| `#modelos` | Diagnóstico digital (primer paso con garantía y nota sobre ayudas) y tres modelos de colaboración |
-| `.commitments` | Compromisos: código del cliente, NDA, RGPD, software libre, precio cerrado, soporte |
-| `#nosotros` | Quiénes somos, principios y misión |
+| `#proceso` | Método en 4 pasos, compromisos (`.badges.compact`) y, debajo, las dos filas de logos de integraciones |
+| `#modelos` | Diagnóstico digital (con garantía y nota sobre ayudas) y tres modelos de colaboración |
 | `#faq` | Preguntas frecuentes (`<details>`), también como datos estructurados `FAQPage` |
-| `#contacto` | Reunión de 30 minutos y formulario |
+| `#contacto` | Formulario de llamada y primera capa de protección de datos |
+
+"Nosotros" tiene página propia: `/nosotros`, `/en/about` y `/pt/sobre-nos`.
 
 ### Casos de éxito
 
@@ -88,12 +90,11 @@ Cloudflare Workers conectado a `llume26/llume-website`: cada push a `main` publi
 
 ## 7. Pendiente
 
-- **Datos legales**: NIF y datos registrales en el aviso legal (ahora "en tramitación").
+- **Datos legales**: cuando la empresa esté constituida, rellenar `OWNER` en `scripts/build_legal.py` (NIF, domicilio, registro) y ejecutarlo. Hoy solo figura el nombre y el email.
 - **Envío real del formulario** sin abrir el correo (un Worker con envío de email) y **agenda** para reservar la reunión.
 - **Correo @llumedigital.com** y cambiarlo en la web cuando funcione.
 - **Equipo con fotos, testimonios reales y cifras de resultados** de cada caso, cuando existan.
 - **Teléfono, LinkedIn y perfil de Google Business**.
-- **Páginas legales en inglés y portugués** (ahora enlazan a las españolas).
 - **Precio del diagnóstico digital** y confirmar que se puede ofrecer la garantía.
 - **Alta como agente digitalizador / asesor** si se quiere afirmar que los proyectos se pueden pagar con el Kit Digital o el Kit Consulting (hoy la web solo ofrece ayudar a comprobarlo).
 - **Logos en mejor calidad**: Universidad de Oviedo (175×125) y Proactive Future a color.
@@ -102,3 +103,4 @@ Cloudflare Workers conectado a `llume26/llume-website`: cada push a `main` publi
 
 - **Always Use HTTPS** activado: `http://` redirige a `https://`.
 - **Regla de redirección** `www.llumedigital.com/*` → `llumedigital.com/*` (301).
+- **Web Analytics** (sin cookies) con instalación automática; los datos se ven en Cloudflare → Web analytics.
