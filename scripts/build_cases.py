@@ -37,7 +37,7 @@ LANGS = {
     },
 }
 
-ARTICLE = re.compile(r'<article class="cx reveal" id="caso-(\w+)" data-case="\w+">(.*?)</article>', re.S)
+ARTICLE = re.compile(r'<article class="cx[^"]*" id="caso-(\w+)" data-case="\w+">(.*?)</article>', re.S)
 
 
 def between(text, start, end):
