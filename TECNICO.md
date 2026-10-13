@@ -114,3 +114,33 @@ Cloudflare Workers conectado a `llume26/llume-website`: cada push a `main` publi
 - `sitemap.xml` con todas las URLs y sus alternativas por idioma; `llms.txt` para asistentes de IA.
 - Enlazado interno: casos ↔ artículos del blog relacionados.
 - Pendiente (necesita la cuenta de Google): dar de alta el dominio en Google Search Console y enviar el sitemap.
+
+## 10. Prototipos para clientes
+
+Los prototipos de webs para empresas (que enseñamos antes de cerrar trato) no tienen repositorio propio: viven en este mismo repo, **una carpeta por prototipo dentro de `public/`**, y se publican en `llumedigital.com/<nombre>/`. Así el equipo trabaja sobre un único repositorio y no hay carpetas sueltas en el ordenador de nadie.
+
+**Reglas**
+
+- Una carpeta por prototipo, con el nombre en minúsculas y sin espacios (`public/elpuertoluanco/`). HTML, CSS y JS estáticos, sin compilar.
+- **Rutas relativas** (`img/hero.webp`, `carta/`), no absolutas como las de la web de llume. Así la carpeta se puede mover al dominio del cliente sin tocar nada.
+- **`<meta name="robots" content="noindex, nofollow">` en todas las páginas** del prototipo.
+- No enlazarlo desde la web de llume y no añadirlo a `sitemap.xml` ni a `llms.txt`. Solo lo ve quien reciba la dirección.
+- No tocar archivos de la raíz de `public/` ni otras carpetas. Los scripts de `scripts/` no recorren carpetas de prototipos.
+- El repo es público y el historial conserva lo que se borra: no subir datos personales, claves ni material de terceros que no podamos mostrar.
+
+**Cómo trabajar**
+
+- `git pull` antes de empezar, commits pequeños y `git push` al terminar. Cada push a `main` publica (ver apartado 6), así que se revisa antes de subir.
+- No editar el mismo prototipo dos personas a la vez.
+- El clon no debe estar dentro de iCloud Drive: la carpeta `.git` puede corromperse o duplicarse.
+- En local: `python3 -m http.server 8123 -d public` y abrir `http://localhost:8123/<nombre>/`.
+
+**Si el cliente compra**: copiar la carpeta a su propio repositorio y dominio, quitar el `noindex`, borrarla de aquí (con commit) y avisar al equipo.
+
+**Prototipos actuales**
+
+| Carpeta | Cliente | Qué es |
+|---|---|---|
+| `public/elpuertoluanco/` | Cafetería El Puerto (Luanco, Asturias) | Web de una página y carta digital para QR en `carta/` |
+
+Pendiente en `elpuertoluanco`: fotos propias (las actuales son provisionales), vinos y alérgenos por plato en `carta/carta.json`, horario confirmado, historia real del bar, más reseñas de Google hasta 20 en `resenas.json`, QR de la carta y de reseñas, versión en inglés, y quitar el `noindex` al cerrar el acuerdo (destino previsto: `elpuertoluanco.es`).
