@@ -12,7 +12,7 @@ Web corporativa de una sola página, estática y sin paso de compilación. Todo 
 | 3D | **three.js 0.160** sobre WebGL, con shaders GLSL propios |
 | Tipografía | Geist y Geist Mono (Google Fonts) |
 | Servidor local | `python3 -m http.server` (solo para desarrollo) |
-| Hosting | Cloudflare Pages (estático, despliegue automático desde GitHub) |
+| Hosting | Cloudflare Workers con recursos estáticos (despliegue automático desde GitHub) |
 
 No hay `package.json`, ni Node, ni framework, ni preprocesadores. Three.js se carga desde un CDN con un `importmap`:
 
@@ -29,6 +29,7 @@ No hay `package.json`, ni Node, ni framework, ni preprocesadores. Three.js se ca
 llume-web/
 ├── CONTEXTO.md         Contexto de la empresa y decisiones de marca (no se publica)
 ├── TECNICO.md          Este documento (no se publica)
+├── wrangler.jsonc      Configuración de despliegue en Cloudflare
 └── public/             Lo único que se publica
     ├── index.html      Contenido y estructura (238 líneas)
     ├── styles.css      Todo el diseño (216 líneas)
@@ -149,12 +150,12 @@ Abrir http://localhost:8123. Hace falta servidor HTTP: los módulos ES no cargan
 
 ## 8. Despliegue
 
-Cloudflare Pages conectado al repo `llume-company/llume-web`: cada push a `main` publica la web en llumedigital.com; las demás ramas generan una URL de previsualización. Configuración: sin framework, sin comando de build, directorio de salida `public`. Solo se publica `public/`; los `.md` de la raíz quedan en el repo pero no en la web.
+Cloudflare Workers (recursos estáticos) conectado al repo `llume26/llume-website`: cada push a `main` publica la web en llumedigital.com. Sin comando de build; el despliegue es `npx wrangler deploy`, que lee `wrangler.jsonc` y publica solo `public/`. Los `.md` de la raíz quedan en el repo pero no en la web.
 
 ## 9. Límites conocidos y deuda técnica
 
 - **Dependencia de CDN:** three.js y las fuentes vienen de internet. Para producción, conviene alojar three.js en el propio dominio y fuentes en local (más rápido y sin avisos de privacidad por Google Fonts).
-- **Formulario:** solo abre el correo. Para recibir mensajes directos hace falta un servicio de formularios o una función de servidor (por ejemplo, una Pages Function de Cloudflare). Implica enviar datos de visitantes a un tercero: decidir antes.
+- **Formulario:** solo abre el correo. Para recibir mensajes directos hace falta un servicio de formularios o una función de servidor (por ejemplo, un Worker de Cloudflare). Implica enviar datos de visitantes a un tercero: decidir antes.
 - **Newsletter del pie:** es solo visual, no guarda ningún email.
 - **Legal:** los enlaces de Aviso legal, Privacidad y Cookies apuntan a `#`. Además, al usar Google Fonts, convendría banner de cookies o alojarlas en local.
 - **CSS sobrante:** quedan reglas de versiones anteriores sin uso (`.cases`, `.case`, `.case-img`, `.img-a`/`.img-b`/`.img-c`, `.stack`, `.stack-label`). Se pueden borrar.
@@ -167,4 +168,4 @@ Cloudflare Pages conectado al repo `llume-company/llume-web`: cada push a `main`
 
 ## 10. Si se migra a un framework
 
-Con Node instalado, el camino natural es **Astro** (contenido estático) o **Next.js** (si habrá formularios con servidor, blog o varios idiomas), desplegado en Cloudflare Pages. Piezas a conservar tal cual: `styles.css` (como CSS global), `main.js` (como módulo en el cliente) y los `assets/`. Habría que sustituir el `importmap` por `npm install three`.
+Con Node instalado, el camino natural es **Astro** (contenido estático) o **Next.js** (si habrá formularios con servidor, blog o varios idiomas), desplegado en Cloudflare. Piezas a conservar tal cual: `styles.css` (como CSS global), `main.js` (como módulo en el cliente) y los `assets/`. Habría que sustituir el `importmap` por `npm install three`.
