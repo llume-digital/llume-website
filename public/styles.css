@@ -400,15 +400,53 @@ input::placeholder, textarea::placeholder { color: #5f5b55; }
 .badges p { color: var(--muted); font-size: 14px; margin-top: 6px; }
 
 /* ---------- FAQ ---------- */
-.faq-section { display: grid; grid-template-columns: 1fr 1.3fr; gap: 64px; align-items: start; }
-.faq-section .sub a { color: var(--amber); }
-.faq { border-top: 1px solid var(--line); background: rgba(7,7,10,.55); backdrop-filter: blur(10px); border-radius: 0 0 var(--radius) var(--radius); padding: 0 4px; }
-.faq details { border-bottom: 1px solid var(--line); }
-.faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; gap: 16px; padding: 22px 0; font-size: 17px; font-weight: 400; }
+:root { interpolate-size: allow-keywords; }
+.faq-section { display: grid; grid-template-columns: .85fr 1.4fr; gap: clamp(32px, 5vw, 72px); align-items: start; }
+.faq-intro { position: sticky; top: 100px; }
+.faq-help { margin-top: 28px; padding: 22px 24px; border-radius: var(--radius); border: 1px solid var(--line);
+  background: radial-gradient(ellipse at 0% 0%, rgba(242,192,138,.12), transparent 60%), var(--panel); backdrop-filter: blur(12px); }
+.faq-help-q { font-size: 17px; font-weight: 500; color: var(--text); }
+.faq-help p:not(.faq-help-q) { margin-top: 6px; color: var(--muted); font-size: 14.5px; }
+.faq-help-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.faq { display: grid; gap: 10px; counter-reset: faq; }
+.faq details {
+  counter-increment: faq; border-radius: 16px; border: 1px solid var(--line); background: var(--panel); backdrop-filter: blur(12px);
+  transition: border-color .3s, background .3s, box-shadow .3s;
+}
+.faq details:hover { border-color: rgba(255,255,255,.18); }
+.faq details[open] {
+  border-color: rgba(242,192,138,.45); box-shadow: 0 18px 40px rgba(0,0,0,.35);
+  background: linear-gradient(180deg, rgba(242,192,138,.08), rgba(242,192,138,0) 70%), var(--panel);
+}
+.faq summary {
+  list-style: none; cursor: pointer; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px;
+  padding: 20px 22px; font-size: 16.5px; font-weight: 400; color: #ece7de; border-radius: 16px;
+}
 .faq summary::-webkit-details-marker { display: none; }
-.faq summary::after { content: "+"; color: var(--amber); font-size: 22px; line-height: 1; transition: transform .25s; }
-.faq details[open] summary::after { transform: rotate(45deg); }
-.faq details p { color: var(--muted); font-size: 15px; padding: 0 40px 22px 0; }
+.faq summary::before { content: counter(faq, decimal-leading-zero); font: 400 11px var(--mono); letter-spacing: .1em; color: var(--muted); transition: color .3s; }
+.faq details[open] summary::before { color: var(--amber); }
+.faq summary::after {
+  content: ""; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line);
+  background:
+    linear-gradient(var(--text), var(--text)) center / 11px 1.5px no-repeat,
+    linear-gradient(var(--text), var(--text)) center / 1.5px 11px no-repeat;
+  transition: transform .35s cubic-bezier(.2,.7,.2,1), background-color .3s, border-color .3s;
+}
+.faq details[open] summary::after {
+  transform: rotate(45deg); border-color: transparent; background-color: var(--amber);
+  background-image: linear-gradient(#111, #111), linear-gradient(#111, #111);
+}
+.faq summary:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.faq details::details-content { height: 0; overflow: hidden; transition: height .35s cubic-bezier(.2,.7,.2,1), content-visibility .35s allow-discrete; }
+.faq details[open]::details-content { height: auto; }
+.faq details p { padding: 0 22px 22px 62px; color: var(--muted); font-size: 15px; line-height: 1.65; max-width: 680px; }
+.faq details[open] p { animation: faq-in .45s cubic-bezier(.2,.7,.2,1); }
+@keyframes faq-in { from { opacity: 0; transform: translateY(-6px); } }
+@media (max-width: 860px) {
+  .faq-intro { position: static; }
+  .faq summary { padding: 18px; gap: 12px; font-size: 15.5px; }
+  .faq details p { padding: 0 18px 18px 18px; }
+}
 
 /* ---------- form extras ---------- */
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
