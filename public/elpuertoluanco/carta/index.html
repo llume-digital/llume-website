@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Carta · El Puerto Luanco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0e1a24; --sand:#faf7f1; --sand-2:#ece6d9; --coral:#b8975a; --muted:#5d6b74; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:Jost,system-ui,sans-serif; font-weight:300; background:var(--sand); color:#1d2a33; line-height:1.5; }
+  header { background:var(--navy); color:#fff; padding:28px 20px 20px; text-align:center; }
+  header h1 { font-family:"Cormorant Garamond",Georgia,serif; margin:0; font-size:2.4rem; font-weight:300; letter-spacing:.2em; text-transform:uppercase; }
+  header p { margin:4px 0 0; opacity:.75; font-size:.9rem; }
+  header a { color:#d9c08c; font-size:.85rem; }
+  .demo { background:#fff3cd; color:#664d03; padding:8px 16px; font-size:.8rem; text-align:center; }
+  nav { position:sticky; top:0; z-index:5; background:var(--sand); border-bottom:1px solid var(--sand-2); display:flex; gap:8px; overflow-x:auto; padding:10px 16px; scrollbar-width:none; }
+  nav::-webkit-scrollbar { display:none; }
+  nav a { white-space:nowrap; text-decoration:none; color:var(--navy); background:#fff; padding:7px 14px; border-radius:999px; font-size:.88rem; font-weight:500; border:1px solid var(--sand-2); }
+  main { max-width:720px; margin:0 auto; padding:8px 16px 60px; }
+  h2 { font-family:"Cormorant Garamond",Georgia,serif; font-weight:400; font-size:2rem; margin:34px 0 4px; padding-top:6px; }
+  .plato { display:flex; justify-content:space-between; gap:16px; padding:14px 0; border-bottom:1px dashed #d4c9b3; }
+  .plato h3 { margin:0; font-size:1.02rem; font-weight:400; }
+  .plato p { margin:2px 0 0; color:var(--muted); font-size:.88rem; }
+  .precio { font-weight:400; white-space:nowrap; }
+  .precio small { color:var(--muted); font-size:.75rem; }
+  .star { color:var(--coral); font-size:.75rem; margin-left:6px; font-weight:600; }
+  .al { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
+  .al span { font-size:.68rem; background:var(--sand-2); padding:1px 7px; border-radius:999px; color:#4a5a63; }
+  .filtro { background:#fff; border:1px solid var(--sand-2); border-radius:12px; margin:16px 0 0; padding:12px 14px; }
+  .filtro summary { cursor:pointer; font-weight:600; font-size:.92rem; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .chips label { font-size:.82rem; border:1px solid var(--sand-2); padding:5px 11px; border-radius:999px; cursor:pointer; user-select:none; }
+  .chips input { display:none; }
+  .chips label:has(input:checked) { background:var(--coral); color:#fff; border-color:var(--coral); }
+  .oculto { display:none; }
+  footer { text-align:center; font-size:.78rem; color:var(--muted); padding:0 20px 40px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>El Puerto</h1>
+  <p>Carta · Luanco</p>
+  <p><a href="../">← Volver a la web</a></p>
+</header>
+<nav id="nav"></nav>
+<main>
+  <details class="filtro">
+    <summary>Tengo alergias o intolerancias</summary>
+    <p style="font-size:.82rem;color:var(--muted);margin:8px 0 0">Marca lo que quieres evitar y ocultamos esos platos. Ante cualquier duda, pregunta al personal.</p>
+    <div class="chips" id="chips"></div>
+  </details>
+  <div id="carta">Cargando…</div>
+</main>
+<footer>Precios con IVA incluido. Información de alérgenos orientativa: consulta siempre al personal.</footer>
+
+<script>
+const eur = n => n.toLocaleString('es-ES', { style:'currency', currency:'EUR' });
+let data, evitar = new Set();
+
+function pintar() {
+  const cont = document.getElementById('carta');
+  cont.innerHTML = '';
+  for (const c of data.categorias) {
+    const platos = c.platos.filter(p => !(p.alergenos || []).some(a => evitar.has(a)));
+    if (!platos.length) continue;
+    const sec = document.createElement('section');
+    sec.id = c.id;
+    sec.innerHTML = `<h2>${c.nombre}</h2>` + platos.map(p => `
+      <div class="plato">
+        <div>
+          <h3>${p.nombre}</h3>
+          ${p.desc ? `<p>${p.desc}</p>` : ''}
+          ${(p.alergenos || []).length ? `<div class="al">${p.alergenos.map(a => `<span>${data.alergenos[a]}</span>`).join('')}</div>` : ''}
+        </div>
+        <div class="precio">${eur(p.precio)}${p.nota ? ` <small>(${p.nota})</small>` : ''}</div>
+      </div>`).join('');
+    cont.appendChild(sec);
+  }
+}
+
+fetch('carta.json').then(r => r.json()).then(d => {
+  data = d;
+  if (!d.categorias.some(c => c.platos.some(p => (p.alergenos || []).length))) document.querySelector('.filtro').hidden = true;
+  document.getElementById('nav').innerHTML = d.categorias.map(c => `<a href="#${c.id}">${c.nombre.split(' (')[0].replace('Raciones para compartir y disfrutar','Raciones')}</a>`).join('');
+  document.getElementById('chips').innerHTML = Object.entries(d.alergenos).map(([k, v]) => `<label><input type="checkbox" value="${k}">${v}</label>`).join('');
+  document.getElementById('chips').addEventListener('change', e => {
+    e.target.checked ? evitar.add(e.target.value) : evitar.delete(e.target.value);
+    pintar();
+  });
+  pintar();
+}).catch(() => { document.getElementById('carta').textContent = 'No se pudo cargar la carta.'; });
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+{
+  "_nota": "Platos y precios copiados de la carta digital actual (capturas del 13/10/2026). Faltan Vinos y alérgenos por plato: no se veían en las capturas. Los alérgenos solo se muestran cuando un plato tiene el campo 'alergenos' relleno.",
+  "categorias": [
+    {
+      "id": "ensaladas",
+      "nombre": "Ensaladas",
+      "platos": [
+        { "nombre": "Ensalada de rulo de cabra", "desc": "Lechuga, cebolla y pimiento confitado, queso de cabra, tomate y almendras con una salsa de miel y modena.", "precio": 16.00 },
+        { "nombre": "Ensalada templada de bacalao", "desc": "Lechuga, patata, bacalao y pisto.", "precio": 17.00 },
+        { "nombre": "Ensalada de la casa", "desc": "Espinaca, bonito, queso de cabra, cacahuete, cebolla, aceituna con una salsa de miel y mostaza.", "precio": 16.20 },
+        { "nombre": "Caprese de anchoa", "desc": "Mozzarella de búfala, tomate, anchoa y salsa de pesto.", "precio": 16.90 }
+      ]
+    },
+    {
+      "id": "raciones",
+      "nombre": "Raciones para compartir y disfrutar",
+      "platos": [
+        { "nombre": "Croquetas de jamón", "precio": 13.50 },
+        { "nombre": "Croquetas de puerro y gamba", "precio": 13.50 },
+        { "nombre": "Ensaladilla rusa", "precio": 14.50 },
+        { "nombre": "Bocartes a la sal con tomate natural", "precio": 18.70 },
+        { "nombre": "Calamares a la romana", "precio": 21.00 },
+        { "nombre": "Fritos de merluza", "precio": 20.00 },
+        { "nombre": "Pulpo a la plancha", "precio": 24.50 },
+        { "nombre": "Salpicón de bonito", "precio": 24.50 },
+        { "nombre": "Lomos de bonito guisado", "precio": 25.00 },
+        { "nombre": "Zamburiñas a la plancha", "precio": 19.70 },
+        { "nombre": "Chipirones a la plancha", "precio": 18.50 },
+        { "nombre": "Pulpo a la gallega", "precio": 21.00 },
+        { "nombre": "Tataki de atún rojo", "desc": "Con salsa teriyaki.", "precio": 24.90 },
+        { "nombre": "Bacalao ahumado, patata y tomate natural", "precio": 19.00 },
+        { "nombre": "Cazuela de gambas al ajillo", "precio": 20.00, "nota": "ración" },
+        { "nombre": "Gyoza de langostino con jengibre", "desc": "Con salsa de ají amarillo.", "precio": 14.30 },
+        { "nombre": "Chipirones fritos", "precio": 18.50 }
+      ]
+    },
+    {
+      "id": "tortillas",
+      "nombre": "Tortillas (de 4 huevos)",
+      "platos": [
+        { "nombre": "Tortilla de atún y pimientos", "precio": 15.50 },
+        { "nombre": "Tortilla de merluza y gambas", "precio": 15.50 },
+        { "nombre": "Tortilla de bacalao", "precio": 16.50 }
+      ]
+    },
+    {
+      "id": "carnes",
+      "nombre": "Carnes",
+      "platos": [
+        { "nombre": "Secreto ibérico de bellota a la plancha", "precio": 22.00 },
+        { "nombre": "Escalopines al Cabrales", "precio": 14.50 },
+        { "nombre": "Callos", "precio": 17.50 },
+        { "nombre": "Sartén de picadillo, huevos y patatas", "precio": 15.00 },
+        { "nombre": "Rabo de toro", "precio": 20.00 },
+        { "nombre": "Manitas de cerdo", "precio": 17.50 },
+        { "nombre": "Codillo de cerdo", "precio": 19.00 },
+        { "nombre": "Carrilleras guisadas", "precio": 18.00, "nota": "montadito" }
+      ]
+    },
+    {
+      "id": "postres",
+      "nombre": "Postres",
+      "platos": [
+        { "nombre": "Helado de turrón", "precio": 6.00 },
+        { "nombre": "Helado de yogurt", "precio": 6.00 },
+        { "nombre": "Bombón helado", "precio": 3.50 },
+        { "nombre": "Crema de yogurt, reineta y avellana", "precio": 6.00 },
+        { "nombre": "Coulant de chocolate con helado de yogurt", "precio": 6.50 },
+        { "nombre": "Milhojas de turrón", "precio": 7.00 },
+        { "nombre": "Tarta de queso", "precio": 6.30 }
+      ]
+    }
+  ],
+  "alergenos": {
+    "gluten": "Gluten", "huevos": "Huevos", "pescado": "Pescado", "lacteos": "Lácteos",
+    "soja": "Soja", "frutos_cascara": "Frutos de cáscara", "crustaceos": "Crustáceos",
+    "sesamo": "Sésamo", "moluscos": "Moluscos", "sulfitos": "Sulfitos",
+    "mostaza": "Mostaza", "cacahuetes": "Cacahuetes", "apio": "Apio", "altramuces": "Altramuces"
+  }
+}
