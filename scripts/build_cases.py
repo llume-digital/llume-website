@@ -120,7 +120,7 @@ def render(c, cases, L, code):
     <div class="wrap foot-bottom"><span>© 2026 llume · Oviedo, Asturias</span><span><a href="{L['home']}">{L['back']}</a> · <a href="{L['legal'][0]}">{L['legal'][1]}</a> · <a href="{L['legal'][2]}">{L['legal'][3]}</a></span></div>
   </footer>
   <script type="module" src="/ui.js"></script>
-  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "067b84e48590464ea55b033a36a010bc"}'></script>
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{{"token": "067b84e48590464ea55b033a36a010bc"}}'></script>
 </body>
 </html>
 """

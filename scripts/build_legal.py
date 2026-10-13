@@ -280,7 +280,7 @@ def page(code, kind):
     <div class="wrap foot-bottom"><span>© 2026 llume</span><span><a href="/{L['notice']}">{L['titles'][0]}</a> · <a href="/{L['privacy']}">{L['titles'][1]}</a> · <a href="/{L['cookies']}">{L['titles'][2]}</a> · <a href="{L['home']}">{L['back']}</a></span></div>
   </footer>
   <script type="module" src="/ui.js"></script>
-  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "067b84e48590464ea55b033a36a010bc"}'></script>
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{{"token": "067b84e48590464ea55b033a36a010bc"}}'></script>
 </body>
 </html>
 """
