@@ -30,7 +30,9 @@ if (rotator && !reduceMotion) {
   const items = [...rotator.querySelectorAll("span")];
   let i = 0;
   setInterval(() => {
-    items[i].classList.remove("on");
+    const prev = items[i];
+    prev.classList.replace("on", "out");
+    setTimeout(() => prev.classList.remove("out"), 600);
     i = (i + 1) % items.length;
     items[i].classList.add("on");
   }, 2600);
