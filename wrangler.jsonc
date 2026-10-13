@@ -1,0 +1,8 @@
+{
+  "name": "llume-website",
+  "compatibility_date": "2026-09-01",
+  // Solo se publica public/; los .md de la raíz quedan fuera de la web
+  "assets": {
+    "directory": "./public"
+  }
+}
