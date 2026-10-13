@@ -1,23 +1,21 @@
 import * as THREE from "three";
 
 const canvas = document.getElementById("bg");
-const nav = document.getElementById("nav");
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const isMobile = innerWidth < 860;
 
-/* ---------- nav + reveal ---------- */
-const onScrollNav = () => nav.classList.toggle("scrolled", scrollY > 20);
-addEventListener("scroll", onScrollNav, { passive: true });
-onScrollNav();
-
-const io = new IntersectionObserver(
-  (entries) => entries.forEach((e) => e.isIntersecting && (e.target.classList.add("in"), io.unobserve(e.target))),
-  { threshold: 0.12 }
-);
-document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+/* ---------- without WebGL the page keeps a static background (see .no-webgl in styles.css) ---------- */
+const gl = (() => {
+  try { return canvas.getContext("webgl2", { alpha: true, antialias: false }) || canvas.getContext("webgl", { alpha: true, antialias: false }); }
+  catch { return null; }
+})();
+if (!gl) {
+  document.documentElement.classList.add("no-webgl");
+  throw new Error("WebGL no disponible: se muestra el fondo estático");
+}
 
 /* ---------- 3D: ribbon of light ---------- */
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: "high-performance" });
+const renderer = new THREE.WebGLRenderer({ canvas, context: gl, antialias: false, alpha: true, powerPreference: "high-performance" });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 50);
@@ -243,15 +241,4 @@ if (reduceMotion) addEventListener("scroll", () => requestAnimationFrame(frame),
 /* pause when tab hidden */
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden && !reduceMotion && !running) { running = true; requestAnimationFrame(frame); }
-});
-
-/* ---------- contact form: opens a ready-to-send email to info@llume.net ---------- */
-const form = document.getElementById("contact-form");
-form?.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const d = new FormData(form);
-  const body = `Nombre: ${d.get("nombre")}\nEmpresa: ${d.get("empresa") || "-"}\n\n${d.get("mensaje")}`;
-  const subject = `Solicitud de reunión de 30 minutos: ${d.get("nombre")}${d.get("empresa") ? " (" + d.get("empresa") + ")" : ""}`;
-  location.href = `mailto:info@llume.net?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  form.querySelector("button").textContent = "Abriendo tu correo ✓";
 });

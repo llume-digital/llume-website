@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://llumedigital.com/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/"/>
+  </url>
+  <url>
+    <loc>https://llumedigital.com/en/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/"/>
+  </url>
+  <url><loc>https://llumedigital.com/aviso-legal</loc><lastmod>2026-10-13</lastmod></url>
+  <url><loc>https://llumedigital.com/privacidad</loc><lastmod>2026-10-13</lastmod></url>
+  <url><loc>https://llumedigital.com/cookies</loc><lastmod>2026-10-13</lastmod></url>
+</urlset>

@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>llume · Digital transformation and automation consultancy</title>
+  <meta name="description" content="Technology consultancy based in Oviedo, Spain. We automate processes, migrate to the cloud, build custom software and apply video analytics for companies in Spain and Portugal. Free 30-minute call.">
+  <link rel="canonical" href="https://llumedigital.com/en/">
+  <link rel="alternate" hreflang="es" href="https://llumedigital.com/">
+  <link rel="alternate" hreflang="en" href="https://llumedigital.com/en/">
+  <link rel="alternate" hreflang="x-default" href="https://llumedigital.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:locale:alternate" content="es_ES">
+  <meta property="og:site_name" content="llume">
+  <meta property="og:url" content="https://llumedigital.com/en/">
+  <meta property="og:title" content="llume · Complex problems. Clear solutions.">
+  <meta property="og:description" content="We digitise and automate companies end to end. Free 30-minute call, no strings attached.">
+  <meta property="og:image" content="https://llumedigital.com/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#07070a">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="importmap">{ "imports": { "three": "/vendor/three.module.js" } }</script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "llume",
+    "url": "https://llumedigital.com/en/",
+    "logo": "https://llumedigital.com/assets/mark.svg",
+    "image": "https://llumedigital.com/assets/og.png",
+    "email": "info@llume.net",
+    "description": "Digital transformation consultancy: process automation, integration and cloud migration, custom platforms and video analytics.",
+    "address": { "@type": "PostalAddress", "addressLocality": "Oviedo", "addressRegion": "Asturias", "addressCountry": "ES" },
+    "areaServed": [{ "@type": "Country", "name": "Spain" }, { "@type": "Country", "name": "Portugal" }],
+    "knowsLanguage": ["es", "en", "pt"]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#top">Skip to content</a>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <header class="nav" id="nav">
+    <a href="#top" class="logo" aria-label="llume, home">
+      <img src="/assets/mark.svg" alt="" width="20" height="24"><span>llume.</span>
+    </a>
+    <nav class="links" id="menu" aria-label="Main">
+      <a href="#servicios">Solutions</a>
+      <a href="#sectores">Industries</a>
+      <a href="#casos">Case studies</a>
+      <a href="#proceso">Method</a>
+      <a href="#faq">FAQ</a>
+      <a href="/" class="lang" hreflang="es" lang="es">ES</a>
+    </nav>
+    <div class="nav-right">
+      <a href="#contacto" class="btn btn-light btn-sm">Book 30 min <span aria-hidden="true">→</span></a>
+      <button class="menu-btn" type="button" aria-controls="menu" aria-expanded="false" aria-label="Open menu"><span></span><span></span></button>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero wrap">
+      <p class="eyebrow">Digital transformation with real results</p>
+      <h1>Complex problems.<br>Clear <em>solutions.</em></h1>
+      <p class="rotator" aria-label="To automate processes, connect systems, build your own platform and protect your teams">
+        <span class="on" aria-hidden="true">To automate processes</span>
+        <span aria-hidden="true">To connect your systems</span>
+        <span aria-hidden="true">To build your own platform</span>
+        <span aria-hidden="true">To move your data to the cloud</span>
+        <span aria-hidden="true">To protect your teams</span>
+      </p>
+      <p class="lead">We specialise in digitising and automating companies. We get inside your business, find what is holding you back and turn it into a concrete, measurable, tailor-made solution.</p>
+      <div class="cta-row">
+        <a href="#contacto" class="btn btn-light">Let's talk <span aria-hidden="true">→</span></a>
+        <a href="#casos" class="btn btn-ghost">See case studies</a>
+      </div>
+      <div class="trusted">
+        <p>They have trusted us</p>
+        <ul class="trusted-logos">
+          <li><img class="cc" src="/assets/partners/clevercar.svg" alt="Clevercar" width="747" height="251"></li>
+          <li><img class="pf" src="/assets/partners/proactive-future.webp" alt="Proactive Future" width="191" height="48"></li>
+          <li><img class="cor" src="/assets/partners/corradi.svg" alt="Corradi" width="486" height="486"></li>
+          <li><img class="inj" src="/assets/partners/injuve.svg" alt="Injuve" width="1200" height="450"></li>
+          <li><img class="uo" src="/assets/partners/uniovi.png" alt="University of Oviedo" width="175" height="125"></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- THE PROBLEM -->
+    <section class="wrap section problem" aria-labelledby="problem-title">
+      <p class="eyebrow reveal">Why llume</p>
+      <h2 class="reveal" id="problem-title">Your company has changed.<br>Your tools <em>haven't.</em></h2>
+      <div class="pains">
+        <div class="pain reveal"><span class="pain-n">01</span><h3>Scattered data</h3><p>Spreadsheets, emails and apps that don't talk to each other. Nobody has the full picture.</p></div>
+        <div class="pain reveal"><span class="pain-n">02</span><h3>Hours lost on repetitive tasks</h3><p>Copy, paste, check and send again. Time your team is not spending on what adds value.</p></div>
+        <div class="pain reveal"><span class="pain-n">03</span><h3>Patches that don't scale</h3><p>Generic tools that force you to adapt the way you work, instead of the other way round.</p></div>
+      </div>
+      <div class="statement">
+        <p class="statement-main reveal">At llume we turn the complexity of digitising a company into <em>concrete</em> solutions you can use from day one.</p>
+        <p class="statement-sub reveal">We work with open innovation, free software and the latest technology so your strategy moves faster.</p>
+      </div>
+    </section>
+
+    <!-- SOLUTIONS -->
+    <section id="servicios" class="wrap section">
+      <p class="eyebrow reveal">Solutions</p>
+      <h2 class="reveal">From the first idea<br>to go-live.</h2>
+      <p class="sub reveal">We take care of the whole project, from the first analysis until the solution is part of your day-to-day, so you see results early and with guarantees. And we explore tomorrow's technology to solve today's problems.</p>
+      <div class="grid-2 solutions">
+        <article class="card reveal">
+          <div class="card-top">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M4 12h16M4 17h7"/><circle cx="18" cy="7" r="2"/><circle cx="15" cy="17" r="2"/></svg>
+            <span class="card-num">01</span>
+          </div>
+          <h3>Process automation</h3>
+          <p>We remove manual, repetitive work so your team can spend its time on what really adds value.</p>
+          <ul class="card-list">
+            <li>Quotes, orders and invoices that generate themselves</li>
+            <li>Reports prepared without anyone touching them</li>
+            <li>Automatic reminders and follow-ups</li>
+          </ul>
+          <a class="card-link" href="#caso-presupuestos" data-open-case="presupuestos">Case study: automated quotes <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="card reveal">
+          <div class="card-top">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9.5 3.8 3.8 0 0 1 17.5 18H7Z"/></svg>
+            <span class="card-num">02</span>
+          </div>
+          <h3>Integration and cloud migration</h3>
+          <p>We connect the tools you already use and move your data to the cloud in an orderly, secure way, without stopping your business.</p>
+          <ul class="card-list">
+            <li>Migration of legacy databases</li>
+            <li>Connecting your ERP, CRM and other applications</li>
+            <li>Automatic backups and scaling</li>
+          </ul>
+          <a class="card-link" href="#caso-nube" data-open-case="nube">Case study: from a legacy database to the cloud <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="card reveal">
+          <div class="card-top">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18M7 7h.01"/></svg>
+            <span class="card-num">03</span>
+          </div>
+          <h3>Custom software and platforms</h3>
+          <p>We design and build websites, portals, CRMs and internal tools, with their own frontend and backend, shaped around how your organisation works.</p>
+          <ul class="card-list">
+            <li>Custom CRM and customer management</li>
+            <li>Online payments, bookings and registrations</li>
+            <li>Management dashboards for your team</li>
+          </ul>
+          <a class="card-link" href="#caso-clevercar" data-open-case="clevercar">Case study: Clevercar's CRM <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="card reveal">
+          <div class="card-top">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h12v8H3zM15 11l6-3v8l-6-3"/></svg>
+            <span class="card-num">04</span>
+          </div>
+          <h3>Video analytics and workplace safety</h3>
+          <p>We use the cameras you already have to detect risks and relevant events in real time.</p>
+          <ul class="card-list">
+            <li>Protective equipment checks: helmet and vest</li>
+            <li>Access to restricted or dangerous areas</li>
+            <li>Instant alerts to the person in charge</li>
+          </ul>
+          <a class="card-link" href="#caso-seguridad" data-open-case="seguridad">Case study: workplace safety with cameras <span aria-hidden="true">→</span></a>
+        </article>
+      </div>
+    </section>
+
+    <!-- INDUSTRIES -->
+    <section id="sectores" class="wrap section">
+      <p class="eyebrow reveal">Industries</p>
+      <h2 class="reveal">Every industry has<br>its own challenges.</h2>
+      <p class="sub reveal">We have solved real problems in very different sectors. Pick yours.</p>
+      <div class="sectors reveal">
+        <div class="sector-tabs" role="tablist" aria-label="Industries" aria-orientation="vertical">
+          <button class="sector-tab" role="tab" id="tab-auto" aria-controls="panel-auto" aria-selected="true">Automotive and mobility</button>
+          <button class="sector-tab" role="tab" id="tab-asoc" aria-controls="panel-asoc" aria-selected="false" tabindex="-1">Non-profits and associations</button>
+          <button class="sector-tab" role="tab" id="tab-edu" aria-controls="panel-edu" aria-selected="false" tabindex="-1">Education and youth</button>
+          <button class="sector-tab" role="tab" id="tab-ind" aria-controls="panel-ind" aria-selected="false" tabindex="-1">Construction and industry</button>
+          <button class="sector-tab" role="tab" id="tab-fin" aria-controls="panel-fin" aria-selected="false" tabindex="-1">Banking and finance</button>
+          <button class="sector-tab" role="tab" id="tab-serv" aria-controls="panel-serv" aria-selected="false" tabindex="-1">Professional services</button>
+        </div>
+        <div class="sector-panels">
+          <div class="sector-panel" role="tabpanel" id="panel-auto" aria-labelledby="tab-auto">
+            <h3>Automotive and mobility</h3>
+            <p>Dealers, importers and fleets managing customers, vehicles and paperwork that takes weeks.</p>
+            <ul class="card-list"><li>A CRM showing the status of every deal</li><li>Digital files and documents</li><li>Alerts for deadlines and pending steps</li></ul>
+            <a class="card-link" href="#caso-clevercar" data-open-case="clevercar">Case study: Clevercar <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="sector-panel" role="tabpanel" id="panel-asoc" aria-labelledby="tab-asoc" hidden>
+            <h3>Non-profits and associations</h3>
+            <p>Organisations coordinating members, participants, volunteers and payments with small teams.</p>
+            <ul class="card-list"><li>Online registrations and payments</li><li>Dashboards for coordinators</li><li>Automatic communication with participants</li></ul>
+            <a class="card-link" href="#caso-proactive" data-open-case="proactive">Case study: Proactive Future <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="sector-panel" role="tabpanel" id="panel-edu" aria-labelledby="tab-edu" hidden>
+            <h3>Education and youth</h3>
+            <p>Schools, universities and youth organisations that need to reach their audience with up-to-date information.</p>
+            <ul class="card-list"><li>Catalogues of calls and opportunities</li><li>Automatic collection of information from many sources</li><li>Recommendations based on each profile</li></ul>
+            <a class="card-link" href="#caso-corradi" data-open-case="corradi">Case study: Corradi <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="sector-panel" role="tabpanel" id="panel-ind" aria-labelledby="tab-ind" hidden>
+            <h3>Construction and industry</h3>
+            <p>Sites, plants and workplaces where safety and operational control cannot fail.</p>
+            <ul class="card-list"><li>Video analytics for risk prevention</li><li>Digital work reports and incident logs</li><li>Real-time alerts</li></ul>
+            <a class="card-link" href="#caso-seguridad" data-open-case="seguridad">Case study: workplace safety <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="sector-panel" role="tabpanel" id="panel-fin" aria-labelledby="tab-fin" hidden>
+            <h3>Banking and finance</h3>
+            <p>Institutions with critical legacy systems that must be modernised without putting operations at risk.</p>
+            <ul class="card-list"><li>Phased database migrations</li><li>Data integration across systems</li><li>Monitoring and backups</li></ul>
+            <a class="card-link" href="#caso-nube" data-open-case="nube">Case study: cloud migration <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="sector-panel" role="tabpanel" id="panel-serv" aria-labelledby="tab-serv" hidden>
+            <h3>Professional services</h3>
+            <p>Firms, consultancies and service companies losing hours on quotes, invoices and follow-up.</p>
+            <ul class="card-list"><li>Automatic quotes and invoices</li><li>Customer and opportunity tracking</li><li>Reports without manual work</li></ul>
+            <a class="card-link" href="#caso-presupuestos" data-open-case="presupuestos">Case study: automated quotes <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CASE STUDIES -->
+    <section id="casos" class="wrap section">
+      <p class="eyebrow reveal">Case studies</p>
+      <h2 class="reveal">A real problem.<br>A concrete solution.</h2>
+      <p class="sub reveal">This is how we have solved challenges for companies and organisations. Open each case to see how we did it.</p>
+      <div class="cx-list">
+
+        <article class="cx reveal" id="caso-clevercar" data-case="clevercar">
+          <div class="cx-media media-crm">
+            <div class="crm" aria-hidden="true">
+              <div class="crm-top"><img src="/assets/partners/clevercar.svg" alt="" width="747" height="251"><span class="crm-search">Pesquisar cliente, viatura…</span><span class="crm-user">JM</span></div>
+              <div class="crm-cols">
+                <div class="crm-col"><p>Proposta <b>3</b></p><div class="crm-card"><strong>BMW X3 30e</strong><small>Alemanha · 2022</small></div><div class="crm-card"><strong>Volvo XC60 T6</strong><small>Bélgica · 2023</small></div></div>
+                <div class="crm-col"><p>Transporte <b>2</b></p><div class="crm-card"><strong>Mercedes E 300e</strong><small>Bremen → Lisboa</small><i style="--p:65%"></i></div></div>
+                <div class="crm-col"><p>Legalização <b>2</b></p><div class="crm-card"><strong>Audi Q5 Sportback</strong><small>DAV · IMT</small><i style="--p:40%"></i></div></div>
+                <div class="crm-col"><p>Entregue <b>1</b></p><div class="crm-card done"><strong>Tesla Model 3</strong><small>✓ Chaves entregues</small></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="cx-body">
+            <p class="cx-tag">Automotive · Portugal</p>
+            <h3>Clevercar: internal customer management software</h3>
+            <div class="cx-ps">
+              <div><h4>The problem</h4><p>A vehicle importer tracked every deal (search, purchase abroad, transport, homologation and registration) across emails, messages and spreadsheets.</p></div>
+              <div><h4>The solution</h4><p>A custom CRM that follows every import end to end, with customers, vehicles, documents and deadlines in one shared dashboard for the whole team.</p></div>
+            </div>
+            <button class="cx-open" type="button">Read the full case <span aria-hidden="true">+</span></button>
+          </div>
+          <template class="cx-detail">
+            <h4>Context</h4>
+            <p>Clevercar, based in São Mamede de Infesta (Porto), imports vehicles from other European countries into Portugal and handles the whole process: tailored search, purchase, transport, homologation and registration. Each deal takes weeks and involves the customer, sellers, carriers and public authorities.</p>
+            <h4>The challenge</h4>
+            <p>Every import went through many hands and each salesperson managed their customers in their own way. Without a shared place it was hard to know what was missing from each file, anticipate delays or give an instant answer to a customer asking about their car.</p>
+            <h4>What we did</h4>
+            <ul>
+              <li>A custom CRM with a record for every customer and vehicle: origin, price, import costs and status.</li>
+              <li>A stage-based board (proposal, search, purchase, transport, homologation and delivery) to see at a glance where every deal stands.</li>
+              <li>Document management: invoices, certificates, transport and registration documents linked to each file.</li>
+              <li>Automatic tasks and deadline alerts so no step gets stuck.</li>
+              <li>Deals assigned per salesperson, with the full history of each customer relationship.</li>
+              <li>Portuguese and English interface, designed for desktop and mobile.</li>
+            </ul>
+            <h4>Technology</h4>
+            <ul class="chips"><li>React</li><li>TypeScript</li><li>Node.js</li><li>PostgreSQL</li><li>Cloud</li></ul>
+            <h4>The result</h4>
+            <p>The whole team works from the same information. Every import has a clear owner, deadlines and history, and customers get instant answers about the status of their vehicle.</p>
+          </template>
+        </article>
+
+        <article class="cx reveal" id="caso-proactive" data-case="proactive">
+          <div class="cx-media media-device">
+            <div class="browser">
+              <div class="bar" aria-hidden="true"><i></i><i></i><i></i><span>proactivefuture.eu</span></div>
+              <img src="/assets/cases/pf-desktop.webp" alt="Home page of the Proactive Future website" width="1440" height="900" loading="lazy">
+            </div>
+            <div class="phone"><img src="/assets/cases/pf-mobile.webp" alt="" width="390" height="844" loading="lazy"></div>
+          </div>
+          <div class="cx-body">
+            <p class="cx-tag">Non-profits · Trip management</p>
+            <h3>Trip management platform for Proactive Future</h3>
+            <div class="cx-ps">
+              <div><h4>The problem</h4><p>An association that runs trips managed registrations, payments and participants across spreadsheets, forms and several disconnected platforms.</p></div>
+              <div><h4>The solution</h4><p>Its own web platform, with frontend and backend, that centralises the data, takes payments online and organises participants and coordinators in one place.</p></div>
+            </div>
+            <button class="cx-open" type="button">Read the full case <span aria-hidden="true">+</span></button>
+          </div>
+          <template class="cx-detail">
+            <h4>Context</h4>
+            <p>Proactive Future is an association that organises trips, exchanges and European projects for young people. Every trip involves registrations, limited places, staged payments and a lot of communication with participants and coordinators.</p>
+            <h4>The challenge</h4>
+            <p>Information was spread across spreadsheets, forms, emails and different payment gateways. Knowing who had paid, how many places were left or what was still pending meant cross-checking data by hand, with the risk of errors and duplicates.</p>
+            <h4>What we did</h4>
+            <ul>
+              <li>A public website in Spanish and English with the catalogue of trips and open opportunities.</li>
+              <li>Online registration with user accounts and card payments in stages: deposit and balance.</li>
+              <li>A management dashboard for the team and coordinators, with participants, places, payments and documents for each trip.</li>
+              <li>Automatic notifications: payment reminders, departure countdowns and availability alerts.</li>
+              <li>Participant reviews after each trip, to measure and improve every edition.</li>
+            </ul>
+            <h4>Technology</h4>
+            <ul class="chips"><li>React</li><li>TypeScript</li><li>Node.js</li><li>PostgreSQL</li><li>Stripe</li><li>Cloudflare</li></ul>
+            <h4>The result</h4>
+            <p>The association's entire operation lives in a single system. Participants sign up and pay on their own, and the team sees the status of every trip in real time without cross-checking spreadsheets.</p>
+          </template>
+        </article>
+
+        <article class="cx reveal" id="caso-corradi" data-case="corradi">
+          <div class="cx-media media-device">
+            <div class="browser">
+              <div class="bar" aria-hidden="true"><i></i><i></i><i></i><span>mapa.proactivefuture.eu</span></div>
+              <img src="/assets/cases/cor-desktop.webp" alt="Corradi's catalogue of Erasmus+ opportunities" width="1440" height="900" loading="lazy">
+            </div>
+            <div class="phone"><img src="/assets/cases/cor-mobile.webp" alt="" width="390" height="844" loading="lazy"></div>
+          </div>
+          <div class="cx-body">
+            <p class="cx-tag">Youth and Erasmus+</p>
+            <h3>Corradi: Erasmus+ opportunities in one place</h3>
+            <div class="cx-ps">
+              <div><h4>The problem</h4><p>Erasmus+ calls are scattered across websites, social media and messaging groups. Finding reliable, current ones means tracking dozens of sources that go out of date.</p></div>
+              <div><h4>The solution</h4><p>A system that collects opportunities from many sources, reviews them every morning and publishes them in a catalogue with a map and profile-based recommendations.</p></div>
+            </div>
+            <button class="cx-open" type="button">Read the full case <span aria-hidden="true">+</span></button>
+          </div>
+          <template class="cx-detail">
+            <h4>Context</h4>
+            <p>Corradi was born from a European project between organisations in Spain, Romania and Greece to bring mobility opportunities (exchanges, training courses and volunteering) to more young people.</p>
+            <h4>The challenge</h4>
+            <p>Every call arrives in a different format, many are repeated across channels and others expire without notice. Keeping an up-to-date list by hand was not viable.</p>
+            <h4>What we did</h4>
+            <ul>
+              <li>A Telegram assistant to which any coordinator can forward a call as it is, without filling in forms.</li>
+              <li>Automatic extraction of the key data (country, dates, age, topic and deadline) and duplicate detection.</li>
+              <li>A web catalogue with search, map and filters, plus a compatibility test that recommends opportunities for each young person.</li>
+              <li>Automatic daily review: expired calls are removed on their own.</li>
+              <li>Automatic publishing to a Telegram channel.</li>
+            </ul>
+            <h4>Technology</h4>
+            <ul class="chips"><li>Python</li><li>FastAPI</li><li>PostgreSQL</li><li>Semantic search</li><li>Docker</li><li>AWS</li></ul>
+            <h4>The result</h4>
+            <p>A living catalogue with more than 250 open opportunities reviewed every morning, maintained with almost no manual work.</p>
+          </template>
+        </article>
+
+        <article class="cx reveal" id="caso-seguridad" data-case="seguridad">
+          <div class="cx-media media-cam">
+            <img src="/assets/cases/seguridad.webp" alt="Two workers wearing helmets and high-visibility vests" width="1280" height="800" loading="lazy">
+            <span class="box" style="--x:1%;--y:5%;--w:54%;--h:74%" aria-hidden="true"><b>Helmet ✓</b></span>
+            <span class="box" style="--x:45%;--y:8%;--w:52%;--h:50%" aria-hidden="true"><b>Helmet ✓</b></span>
+            <span class="hud" aria-hidden="true"><i></i>CAM 03 · LIVE</span>
+          </div>
+          <div class="cx-body">
+            <p class="cx-tag">Construction and industry</p>
+            <h3>Workplace safety with cameras</h3>
+            <div class="cx-ps">
+              <div><h4>The problem</h4><p>Checking around the clock that health and safety measures are followed is impossible for one person.</p></div>
+              <div><h4>The solution</h4><p>Video analytics on the existing cameras that detects breaches in real time and alerts the person in charge instantly.</p></div>
+            </div>
+            <button class="cx-open" type="button">Read the full case <span aria-hidden="true">+</span></button>
+          </div>
+          <template class="cx-detail">
+            <h4>Context</h4>
+            <p>On construction sites and in industrial plants, protective equipment is mandatory, but continuous monitoring depends on someone watching.</p>
+            <h4>The challenge</h4>
+            <p>Checking at all times that everyone wears a helmet and a vest, or that nobody enters a restricted area, is impossible by eye. Breaches are discovered late, once there has already been a scare.</p>
+            <h4>What we did</h4>
+            <ul>
+              <li>Video analysis on the cameras already installed, with no change to the infrastructure.</li>
+              <li>Real-time detection of helmet and vest use and of access to dangerous areas.</li>
+              <li>Instant alerts to the safety manager, with the image of the moment.</li>
+              <li>An incident log for audits and improvement plans.</li>
+              <li>Image processing that respects workers' privacy.</li>
+            </ul>
+            <h4>Technology</h4>
+            <ul class="chips"><li>Computer vision</li><li>On-site processing</li><li>Web alert dashboard</li></ul>
+            <h4>The result</h4>
+            <p>Breaches are detected as they happen, not when reviewing recordings, and the safety team spends its time correcting rather than watching.</p>
+          </template>
+        </article>
+
+        <article class="cx reveal" id="caso-presupuestos" data-case="presupuestos">
+          <div class="cx-media media-doc">
+            <img src="/assets/cases/presupuestos.webp" alt="" width="1280" height="800" loading="lazy">
+            <div class="doc" aria-hidden="true">
+              <div class="doc-h"><strong>Quote</strong><small>No. 2026-0412</small></div>
+              <ul>
+                <li><span>Initial analysis</span><span>€480</span></li>
+                <li><span>Implementation</span><span>€1,250</span></li>
+                <li><span>Team training</span><span>€320</span></li>
+              </ul>
+              <div class="doc-t"><span>Total</span><strong>€2,050</strong></div>
+              <span class="chip">✓ Generated automatically</span>
+            </div>
+          </div>
+          <div class="cx-body">
+            <p class="cx-tag">Internal processes</p>
+            <h3>Automated quotes</h3>
+            <div class="cx-ps">
+              <div><h4>The problem</h4><p>Preparing every quote by hand takes hours, repeats data and leaves room for error.</p></div>
+              <div><h4>The solution</h4><p>An automated process that captures the request, generates the quote in the company's format and leaves it ready to send.</p></div>
+            </div>
+            <button class="cx-open" type="button">Read the full case <span aria-hidden="true">+</span></button>
+          </div>
+          <template class="cx-detail">
+            <h4>Context</h4>
+            <p>A service company prepared every quote by hand, copying customer data, rates and terms between several documents.</p>
+            <h4>The challenge</h4>
+            <p>Each quote took hours, the same data was typed again and again, and any mistake in a price or a condition reached the customer.</p>
+            <h4>What we did</h4>
+            <ul>
+              <li>Automatic capture of the customer's request, from the web form or by email.</li>
+              <li>Calculation using the company's rates and rules.</li>
+              <li>Document generation with its corporate identity, ready to review and send.</li>
+              <li>Tracking of sent, accepted and pending quotes.</li>
+            </ul>
+            <h4>Technology</h4>
+            <ul class="chips"><li>Workflow automation</li><li>Email integration</li><li>Document generation</li></ul>
+            <h4>The result</h4>
+            <p>Quotes go out in minutes instead of hours, always in the same format and without copy errors.</p>
+          </template>
+        </article>
+
+        <article class="cx reveal" id="caso-nube" data-case="nube">
+          <div class="cx-media media-cloud">
+            <img src="/assets/cases/nube.webp" alt="" width="1280" height="852" loading="lazy">
+            <div class="flow" aria-hidden="true">
+              <span class="node">Legacy database</span>
+              <span class="pipe"><i></i></span>
+              <span class="node on">Cloud</span>
+            </div>
+            <span class="chip" aria-hidden="true">✓ Migration validated</span>
+          </div>
+          <div class="cx-body">
+            <p class="cx-tag">Banking</p>
+            <h3>From a legacy database to the cloud</h3>
+            <div class="cx-ps">
+              <div><h4>The problem</h4><p>A bank depended on a database that was hard to maintain and to scale.</p></div>
+              <div><h4>The solution</h4><p>We migrated its data to a cloud database that is more modern, scalable and easier to maintain.</p></div>
+            </div>
+            <button class="cx-open" type="button">Read the full case <span aria-hidden="true">+</span></button>
+          </div>
+          <template class="cx-detail">
+            <h4>Context</h4>
+            <p>A bank was running on an old database that was critical to its daily operations.</p>
+            <h4>The challenge</h4>
+            <p>The system was hard to maintain, expensive to scale and relied on very specific know-how. Any change was a risk to the business.</p>
+            <h4>What we did</h4>
+            <ul>
+              <li>An audit of the data and of the processes depending on it.</li>
+              <li>Design of the new cloud database and a phased migration plan.</li>
+              <li>Data migration and validation without interrupting operations.</li>
+              <li>Automatic backups, monitoring and documentation for the team.</li>
+            </ul>
+            <h4>Technology</h4>
+            <ul class="chips"><li>Cloud databases</li><li>Automated migration</li><li>Monitoring</li></ul>
+            <h4>The result</h4>
+            <p>A modern, scalable database that is easier to maintain and ready to grow with the bank.</p>
+          </template>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- FIGURES -->
+    <section class="wrap figures" aria-label="llume in numbers">
+      <div class="figure reveal"><strong><span data-count="6">6</span></strong><p>industries with live projects</p></div>
+      <div class="figure reveal"><strong><span data-count="2">2</span></strong><p>countries: Spain and Portugal</p></div>
+      <div class="figure reveal"><strong><span data-count="250">250</span>+</strong><p>opportunities reviewed every morning at Corradi</p></div>
+      <div class="figure reveal"><strong><span data-count="100">100</span>%</strong><p>of the code owned by the client</p></div>
+    </section>
+
+    <!-- METHOD -->
+    <section id="proceso" class="wrap section">
+      <p class="eyebrow reveal">Method</p>
+      <h2 class="reveal">From problem<br>to solution.</h2>
+      <p class="sub reveal">A clear, agile and transparent process. We adapt to your reality and stay with you at every stage.</p>
+      <ol class="steps">
+        <li class="reveal"><span class="num">01</span><div><span class="step-chip">30-minute call and analysis</span><h3>We understand</h3><p>We analyse your business, your processes and the specific problem you want to solve. We listen before we propose.</p></div></li>
+        <li class="reveal"><span class="num">02</span><div><span class="step-chip">Fixed written proposal</span><h3>We design</h3><p>We define the solution with a clear scope, timeline and expected results before we start.</p></div></li>
+        <li class="reveal"><span class="num">03</span><div><span class="step-chip">Deliveries every two weeks</span><h3>We build</h3><p>We develop it and integrate it into your environment, with frequent deliveries and transparent follow-up.</p></div></li>
+        <li class="reveal"><span class="num">04</span><div><span class="step-chip">Continuous improvement</span><h3>We measure</h3><p>We check that it solves the problem and keep improving it. What isn't measured can't be improved.</p></div></li>
+      </ol>
+    </section>
+
+    <!-- INTEGRATIONS -->
+    <section class="integrations" aria-labelledby="int-title">
+      <div class="wrap">
+        <p class="eyebrow reveal" id="int-title">Integrations</p>
+        <h2 class="reveal">We work with the tools<br>you already use.</h2>
+      </div>
+      <div class="marquee" aria-hidden="true">
+        <ul class="track"><li>Google Workspace</li><li>Microsoft 365</li><li>Salesforce</li><li>HubSpot</li><li>Odoo</li><li>SAP</li><li>Holded</li><li>Stripe</li><li>WhatsApp</li><li>Telegram</li><li>Slack</li><li>PostgreSQL</li><li>AWS</li><li>Cloudflare</li></ul>
+        <ul class="track"><li>Google Workspace</li><li>Microsoft 365</li><li>Salesforce</li><li>HubSpot</li><li>Odoo</li><li>SAP</li><li>Holded</li><li>Stripe</li><li>WhatsApp</li><li>Telegram</li><li>Slack</li><li>PostgreSQL</li><li>AWS</li><li>Cloudflare</li></ul>
+      </div>
+      <p class="wrap sr-only">We integrate with Google Workspace, Microsoft 365, Salesforce, HubSpot, Odoo, SAP, Holded, Stripe, WhatsApp, Telegram, Slack, PostgreSQL, AWS and Cloudflare, among others.</p>
+    </section>
+
+    <!-- ENGAGEMENT MODELS -->
+    <section id="modelos" class="wrap section">
+      <p class="eyebrow reveal">How we work</p>
+      <h2 class="reveal">Three ways to<br>work together.</h2>
+      <p class="sub reveal">No small print. After the first call we recommend the model that fits and send you a fixed written proposal.</p>
+      <div class="models">
+        <div class="model reveal">
+          <p class="model-k">Fixed-scope project</p>
+          <h3>One goal, one price.</h3>
+          <p>Scope, timeline and price agreed from the start.</p>
+          <p class="model-for"><span>Ideal for</span>a platform, a CRM or a specific automation.</p>
+        </div>
+        <div class="model featured reveal">
+          <p class="model-k">Ongoing partnership</p>
+          <h3>Your tech team, without hiring one.</h3>
+          <p>A monthly pool of hours to evolve your systems at your own pace.</p>
+          <p class="model-for"><span>Ideal for</span>companies in the middle of their digital transformation.</p>
+        </div>
+        <div class="model reveal">
+          <p class="model-k">Maintenance and support</p>
+          <h3>Keep everything running.</h3>
+          <p>Updates, backups, security and small improvements.</p>
+          <p class="model-for"><span>Ideal for</span>systems already in production, ours or third-party.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMMITMENTS -->
+    <section class="wrap section commitments" aria-labelledby="commit-title">
+      <p class="eyebrow reveal">Commitments</p>
+      <h2 class="reveal" id="commit-title">Trust from<br>day one.</h2>
+      <ul class="badges">
+        <li class="reveal"><span class="badge-k">Code</span><h3>The code is yours</h3><p>Everything we build for you is your property, with its documentation.</p></li>
+        <li class="reveal"><span class="badge-k">NDA</span><h3>Confidentiality</h3><p>We sign a non-disclosure agreement before accessing your information if you need one.</p></li>
+        <li class="reveal"><span class="badge-k">GDPR</span><h3>Privacy by design</h3><p>We only process the data we need and comply with data protection law.</p></li>
+        <li class="reveal"><span class="badge-k">Open</span><h3>Free software</h3><p>Open, standard technologies, with no vendor lock-in.</p></li>
+        <li class="reveal"><span class="badge-k">€</span><h3>Fixed price</h3><p>A written proposal with scope, timeline and price. No surprises.</p></li>
+        <li class="reveal"><span class="badge-k">Support</span><h3>We don't disappear</h3><p>We stay with you through go-live and after delivery.</p></li>
+      </ul>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="nosotros" class="wrap section">
+      <p class="eyebrow reveal">About us</p>
+      <h2 class="reveal">People who turn<br>problems into solutions.</h2>
+      <p class="sub reveal">llume was born from the belief that technology should serve people and the companies that build the real world. In Asturian, <em>llume</em> means the hearth fire, the light you switch on at home. That is what we want to be for your company: a fixed point, like the North Star, when everything else is moving.</p>
+      <div class="grid-4">
+        <div class="mini reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V17h5v-1.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3Z"/><path d="M10 21h4"/></svg><h3>Innovation</h3><p>We look for the best way to solve each challenge, not the most repeated one.</p></div>
+        <div class="mini reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18 10 11l4 4 6-8"/><path d="M15 7h5v5"/></svg><h3>Cutting-edge technology</h3><p>The latest tools and free software, at the service of your business.</p></div>
+        <div class="mini reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3 5 13h6l-1 8 8-10h-6l1-8Z"/></svg><h3>Agility</h3><p>Frequent deliveries and transparent follow-up at every stage.</p></div>
+        <div class="mini reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3"/><circle cx="16" cy="10" r="2.5"/><path d="M3.5 19c.5-3 2.7-5 5.5-5s5 2 5.5 5M15 15c2.5 0 4.5 1.5 5.5 4"/></svg><h3>Closeness</h3><p>We work with you, not just for you.</p></div>
+      </div>
+      <blockquote class="mission reveal">Our mission is to help companies become more efficient, creative and human through technology.</blockquote>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="wrap section faq-section">
+      <div>
+        <p class="eyebrow reveal">FAQ</p>
+        <h2 class="reveal">What people<br>usually ask us.</h2>
+        <p class="sub reveal">Can't find your answer? Write to <a href="mailto:info@llume.net">info@llume.net</a>.</p>
+      </div>
+      <div class="faq reveal">
+        <details><summary>How much does a project cost?</summary><p>It depends on the scope. After the 30-minute call we send you a fixed written proposal with price, timeline and deliverables, with no commitment. If it doesn't fit, no problem.</p></details>
+        <details><summary>How long does it take?</summary><p>A specific automation can be up and running in a few weeks; a complete platform, in a few months. We deliver every two weeks so you see progress from the start.</p></details>
+        <details><summary>Who owns the code?</summary><p>You do. Everything we build for you is your property and comes with its documentation, so you can continue with us or with anyone you choose.</p></details>
+        <details><summary>Do you work with small companies?</summary><p>Yes. We work with SMEs, associations and large organisations. We adapt the scope to your size and start with what has the most impact.</p></details>
+        <details><summary>Where do you work?</summary><p>We are based in Oviedo, Spain, and work with clients in Spain and Portugal, remotely or in person when needed.</p></details>
+        <details><summary>What happens when the project ends?</summary><p>We train your team and hand over the documentation. Then you can hire maintenance, keep evolving the solution with us or carry on by yourself.</p></details>
+        <details><summary>How do you handle our data?</summary><p>Confidentially and in line with the GDPR. We only access the information we need and, if you wish, we sign a non-disclosure agreement before starting.</p></details>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contacto" class="wrap section contact">
+      <div>
+        <p class="eyebrow reveal">Contact</p>
+        <h2 class="reveal">Let's talk about<br>your next project.</h2>
+        <p class="sub reveal">Book a free 30-minute call, no strings attached. Tell us your challenge and we'll explain how we would approach it.</p>
+        <ul class="contact-list reveal">
+          <li><strong>30-minute call</strong><span>Free and with no commitment, by video call.</span></li>
+          <li><strong>Email us</strong><a href="mailto:info@llume.net">info@llume.net</a></li>
+          <li><strong>Where we are</strong><span>Oviedo, Asturias (Spain)</span></li>
+        </ul>
+      </div>
+      <form class="form reveal" id="contact-form" action="mailto:info@llume.net" method="post"
+        data-to="info@llume.net" data-subject="30-minute call request" data-l-name="Name" data-l-company="Company" data-l-email="Email" data-sent="Opening your email ✓">
+        <p class="form-title">Request your call</p>
+        <div class="form-row">
+          <label>Name<input name="nombre" placeholder="Your name" autocomplete="name" required></label>
+          <label>Company<input name="empresa" placeholder="Your company" autocomplete="organization"></label>
+        </div>
+        <label>Email<input name="email" type="email" placeholder="you@company.com" autocomplete="email" required></label>
+        <label>What would you like to solve?<textarea name="mensaje" rows="4" placeholder="Tell us about your challenge in a couple of lines…" required></textarea></label>
+        <label class="check"><input type="checkbox" name="privacidad" required><span>I have read the <a href="/privacidad">privacy policy</a> (in Spanish).</span></label>
+        <button class="btn btn-light" type="submit">Request a call <span aria-hidden="true">→</span></button>
+        <small class="form-note">Submitting opens your email app with the message ready for info@llume.net.</small>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap foot-grid">
+      <div>
+        <img src="/assets/mark.svg" alt="llume" width="36" height="44">
+        <p class="foot-claim">Technology for a more<br>human future.</p>
+      </div>
+      <div class="foot-cta">
+        <strong>Got a challenge?</strong>
+        <small>Tell us about it in a free 30-minute call.</small>
+        <a href="#contacto" class="btn btn-light btn-sm">Book a call <span aria-hidden="true">→</span></a>
+      </div>
+      <nav class="foot-cols" aria-label="Footer">
+        <div><h4>Solutions</h4><a href="#servicios">Automation</a><a href="#servicios">Cloud migration</a><a href="#servicios">Custom software</a><a href="#servicios">Video analytics</a></div>
+        <div><h4>Company</h4><a href="#casos">Case studies</a><a href="#modelos">How we work</a><a href="#nosotros">About us</a><a href="#faq">FAQ</a></div>
+        <div><h4>Legal (ES)</h4><a href="/aviso-legal">Legal notice</a><a href="/privacidad">Privacy</a><a href="/cookies">Cookies</a></div>
+      </nav>
+    </div>
+    <div class="wrap foot-bottom"><span>© <span data-year>2026</span> llume · Oviedo, Asturias · No tracking cookies.</span><span><a href="mailto:info@llume.net">info@llume.net</a> · <a href="/" hreflang="es" lang="es">Español</a></span></div>
+  </footer>
+
+  <dialog class="case-dialog" id="case-dialog" aria-labelledby="case-dialog-title">
+    <div class="cd-inner">
+      <button class="cd-close" type="button" aria-label="Close">×</button>
+      <div class="cd-media"></div>
+      <div class="cd-body">
+        <p class="cx-tag cd-tag"></p>
+        <h3 id="case-dialog-title" class="cd-title"></h3>
+        <div class="cd-content"></div>
+        <a href="#contacto" class="btn btn-light cd-cta">Facing a similar challenge? Let's talk <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="/ui.js"></script>
+  <script type="module" src="/main.js"></script>
+</body>
+</html>
