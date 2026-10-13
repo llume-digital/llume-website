@@ -48,7 +48,7 @@ main, .footer { position: relative; z-index: 2; }
   padding: 16px max(24px, calc((100% - 1120px) / 2));
   transition: background .3s, backdrop-filter .3s, border-color .3s; border-bottom: 1px solid transparent;
 }
-.nav.scrolled { background: rgba(7,7,10,.6); backdrop-filter: blur(14px); border-color: var(--line); }
+.nav.scrolled { background: rgba(7,7,10,.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-color: var(--line); }
 .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -.03em; font-size: 21px; }
 .links { display: flex; gap: 28px; font-size: 14px; color: var(--muted); }
 .links a { transition: color .2s; }
