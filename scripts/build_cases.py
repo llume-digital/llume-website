@@ -8,6 +8,7 @@ are the source of truth: edit a case there and run
 to regenerate public/casos/*.html, public/en/cases/*.html and public/pt/casos/*.html.
 """
 import html
+import json
 import re
 from pathlib import Path
 
@@ -36,6 +37,15 @@ LANGS = {
         "legal": ("/pt/aviso-legal", "Aviso legal", "/pt/privacidade", "Privacidade"),
     },
 }
+
+BLOG = {
+    "presupuestos": ("automatizar-presupuestos", "Cómo automatizar los presupuestos de tu empresa, paso a paso"),
+    "clevercar": ("crm-a-medida", "7 señales de que tu empresa necesita un CRM a medida (y cuándo no)"),
+    "nube": ("migrar-base-de-datos-nube", "Cómo migrar una base de datos antigua a la nube sin parar el negocio"),
+}
+HOME_NAME = {"es": "Inicio", "en": "Home", "pt": "Início"}
+CASES_NAME = {"es": "Casos", "en": "Case studies", "pt": "Casos"}
+RELATED = {"es": "Artículo relacionado", "en": "Related article (in Spanish)", "pt": "Artigo relacionado (em espanhol)"}
 
 ARTICLE = re.compile(r'<article class="cx[^"]*" id="caso-(\w+)" data-case="\w+">(.*?)</article>', re.S)
 
@@ -68,6 +78,19 @@ def render(c, cases, L, code):
         f'  <link rel="alternate" hreflang="{k}" href="https://llumedigital.com/{v["out"]}/{c["slug"]}">' for k, v in LANGS.items())
     more = "".join(f'<li><a href="/{L["out"]}/{o["slug"]}">{o["title"]}</a></li>' for o in cases if o["slug"] != c["slug"])
     desc = text_of(c["solution"])
+    title = text_of(c["title"])
+    home = f"https://llumedigital.com{L['home']}"
+    schema = {"@context": "https://schema.org", "@graph": [
+        {"@type": "Article", "headline": title, "description": desc, "inLanguage": L["html_lang"], "image": "https://llumedigital.com/assets/og.png",
+         "mainEntityOfPage": url, "author": {"@type": "Organization", "name": "llume", "url": home},
+         "publisher": {"@type": "Organization", "name": "llume", "logo": {"@type": "ImageObject", "url": "https://llumedigital.com/assets/og.png"}}},
+        {"@type": "BreadcrumbList", "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": HOME_NAME[code], "item": home},
+            {"@type": "ListItem", "position": 2, "name": CASES_NAME[code], "item": home + "#casos"},
+            {"@type": "ListItem", "position": 3, "name": title, "item": url}]}]}
+    blog = BLOG.get(c["slug"])
+    related = (f'<aside class="post-case"><p class="eyebrow">{RELATED[code]}</p><a href="/blog/{blog[0]}" hreflang="es">{blog[1]} <span aria-hidden="true">→</span></a></aside>'
+               if blog else "")
     return f"""<!doctype html>
 <html lang="{L['html_lang']}" class="no-webgl">
 <head>
@@ -75,6 +98,7 @@ def render(c, cases, L, code):
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{text_of(c['title'])} · llume</title>
   <meta name="description" content="{html.escape(desc)}">
+  <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="{url}">
 {alternates}
   <meta property="og:type" content="article">
@@ -89,6 +113,7 @@ def render(c, cases, L, code):
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
+  <script type="application/ld+json">{json.dumps(schema, ensure_ascii=False)}</script>
 </head>
 <body>
   <header class="nav scrolled" id="nav">
@@ -96,6 +121,7 @@ def render(c, cases, L, code):
     <a href="{L['home']}#contacto" class="btn btn-light btn-sm">{L['book']} <span aria-hidden="true">→</span></a>
   </header>
   <main class="wrap case-page">
+    <nav class="crumbs" aria-label="breadcrumb"><a href="{L['home']}">{HOME_NAME[code]}</a> <span>/</span> <a href="{L['home']}#casos">{CASES_NAME[code]}</a></nav>
     <p class="eyebrow">{L['eyebrow']} · {c['tag']}</p>
     <h1>{c['title']}</h1>
     {c['media']}
@@ -104,6 +130,7 @@ def render(c, cases, L, code):
       <div><h4>{L['solution']}</h4><p>{c['solution']}</p></div>
     </div>
     <div class="cd-content">{c['detail']}</div>
+    {related}
     <div class="offer">
       <div>
         <h3>{L['cta_title']}</h3>

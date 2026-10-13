@@ -1,0 +1,32 @@
+# llume
+
+> Consultoría tecnológica de transformación digital con sede en Oviedo (Asturias, España). Trabaja con empresas y organizaciones de España y Portugal. Web: https://llumedigital.com · Contacto: info@llume.net
+
+## Qué hace llume
+
+- **Automatización de procesos**: presupuestos, facturas, informes, avisos y seguimientos que se generan solos.
+- **Integración y migración a la nube**: conexión entre herramientas (ERP, CRM, correo…) y migración de bases de datos antiguas sin parar la actividad.
+- **Software y plataformas a medida**: CRM, portales, paneles de gestión, pagos online e inscripciones, con frontend y backend propios.
+- **Videoanálisis y seguridad laboral**: detección en tiempo real sobre las cámaras existentes (equipos de protección, zonas restringidas).
+
+## Cómo trabaja
+
+1. Diagnóstico digital con precio cerrado y garantía (si no encuentra mejoras claras, no se paga).
+2. Después, proyecto cerrado (alcance, plazo y precio fijos) o acompañamiento continuo (cuota mensual con horas).
+3. Mantenimiento y soporte opcional.
+
+El código es siempre propiedad del cliente. Primera reunión de 30 minutos, gratuita y sin compromiso.
+
+## Casos
+
+- [Clevercar: CRM interno para una importadora de vehículos (Portugal)](https://llumedigital.com/casos/clevercar)
+- [Proactive Future: plataforma de gestión de viajes para una asociación](https://llumedigital.com/casos/proactive)
+- [Corradi: catálogo automatizado de oportunidades Erasmus+](https://llumedigital.com/casos/corradi)
+- [Seguridad laboral con cámaras](https://llumedigital.com/casos/seguridad)
+- [Presupuestos automáticos](https://llumedigital.com/casos/presupuestos)
+- [Migración de una base de datos antigua a la nube](https://llumedigital.com/casos/nube)
+
+## Más
+
+- [Blog con guías prácticas](https://llumedigital.com/blog/)
+- [English version](https://llumedigital.com/en/) · [Versão em português](https://llumedigital.com/pt/)

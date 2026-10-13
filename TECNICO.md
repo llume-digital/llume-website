@@ -24,6 +24,7 @@ llume-web/
 ├── wrangler.jsonc       Configuración de despliegue en Cloudflare
 ├── scripts/build_cases.py  Genera las páginas de cada caso a partir de las portadas
 ├── scripts/build_legal.py  Genera las páginas legales en los tres idiomas (datos del titular arriba del todo)
+├── scripts/build_blog.py   Genera el blog (español): artículos en la lista POSTS
 └── public/              Lo único que se publica
     ├── index.html       Página en español
     ├── en/index.html    Página en inglés (misma estructura)
@@ -36,7 +37,8 @@ llume-web/
     ├── main.js          Solo la escena 3D (si no hay WebGL, se queda un fondo estático)
     ├── vendor/three.module.min.js
     ├── fonts/           geist.woff2, geist-mono.woff2
-    ├── robots.txt, sitemap.xml
+    ├── blog/            Blog en español (generado)
+    ├── robots.txt, sitemap.xml, llms.txt
     ├── _headers         Cabeceras de seguridad y caché
     └── assets/
         ├── mark.svg, favicon.svg, og.png (imagen al compartir en redes)
@@ -55,10 +57,10 @@ La portada se ha recortado a 9 bloques:
 | `#retos` | "¿Qué te frena?": pestañas por problema, cada una con el sector donde ya se resolvió y su caso |
 | `#casos` | 3 casos destacados; el botón "Ver los otros 3 casos" despliega el resto (`.cx-extra`) |
 | `#calculadora` | Calculadora del coste de las tareas repetitivas |
-| `#proceso` | Método en 4 pasos, compromisos (`.badges.compact`) y, debajo, las dos filas de logos de integraciones |
+| `#proceso` | Método en 4 pasos, tabla comparativa (llume vs software genérico vs agencia), compromisos (`.badges.compact`) y las dos filas de logos de integraciones |
 | `#modelos` | Camino en 3 pasos (`.journey`): 1 diagnóstico (siempre), 2 proyecto cerrado o acompañamiento continuo, 3 mantenimiento opcional; cada tarjeta dice cómo se paga. Debajo, la nota de ayudas |
 | `#faq` | Preguntas frecuentes (`<details>`), también como datos estructurados `FAQPage` |
-| `#contacto` | Formulario de llamada y primera capa de protección de datos |
+| `#contacto` | "¿Qué pasa en la primera llamada?", formulario de llamada y primera capa de protección de datos |
 
 "Nosotros" tiene página propia: `/nosotros`, `/en/about` y `/pt/sobre-nos`.
 
@@ -104,3 +106,11 @@ Cloudflare Workers conectado a `llume26/llume-website`: cada push a `main` publi
 - **Always Use HTTPS** activado: `http://` redirige a `https://`.
 - **Regla de redirección** `www.llumedigital.com/*` → `llumedigital.com/*` (301).
 - **Web Analytics** (sin cookies) con instalación automática; los datos se ven en Cloudflare → Web analytics.
+
+## 9. SEO
+
+- Títulos con la palabra clave al principio, `meta robots` con vista previa grande de imágenes, `canonical` y `hreflang` en todas las páginas.
+- Datos estructurados: en las portadas, un `@graph` con `WebSite`, `ProfessionalService` (con el catálogo de servicios sacado de las tarjetas de Soluciones) y `FAQPage` (sacado de las propias preguntas de la página). En casos y blog, `Article`/`BlogPosting` y `BreadcrumbList`.
+- `sitemap.xml` con todas las URLs y sus alternativas por idioma; `llms.txt` para asistentes de IA.
+- Enlazado interno: casos ↔ artículos del blog relacionados.
+- Pendiente (necesita la cuenta de Google): dar de alta el dominio en Google Search Console y enviar el sitemap.

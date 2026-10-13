@@ -231,4 +231,20 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cookies"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/cookies"/>
   </url>
+  <url>
+    <loc>https://llumedigital.com/blog/</loc>
+    <lastmod>2026-10-13</lastmod>
+  </url>
+  <url>
+    <loc>https://llumedigital.com/blog/automatizar-presupuestos</loc>
+    <lastmod>2026-10-13</lastmod>
+  </url>
+  <url>
+    <loc>https://llumedigital.com/blog/crm-a-medida</loc>
+    <lastmod>2026-10-13</lastmod>
+  </url>
+  <url>
+    <loc>https://llumedigital.com/blog/migrar-base-de-datos-nube</loc>
+    <lastmod>2026-10-13</lastmod>
+  </url>
 </urlset>
