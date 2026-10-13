@@ -635,3 +635,4 @@ input::placeholder, textarea::placeholder { color: #5f5b55; }
   .j-options { grid-template-columns: 1fr; }
   .j-or { justify-self: center; }
 }
+.j-choice .j-options { padding: 10px; border: 1px dashed rgba(242,192,138,.32); border-radius: 22px; }
