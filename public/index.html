@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>llume · Transformación digital y automatización</title>
+  <meta name="description" content="Especialistas en digitalizar y automatizar empresas. Convertimos problemas complejos en soluciones claras, medibles y a medida.">
+  <meta name="theme-color" content="#07070a">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+  </script>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <header class="nav" id="nav">
+    <a href="#top" class="logo" aria-label="llume, inicio">
+      <img src="assets/mark.svg" alt="" width="20" height="24"><span>llume.</span>
+    </a>
+    <nav class="links" aria-label="Principal">
+      <a href="#servicios">Soluciones</a>
+      <a href="#casos">Casos</a>
+      <a href="#proceso">Método</a>
+      <a href="#nosotros">Nosotros</a>
+    </nav>
+    <a href="#contacto" class="btn btn-light btn-sm">Hablemos <span aria-hidden="true">→</span></a>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero wrap">
+      <p class="eyebrow">Transformación digital con resultados reales</p>
+      <p class="coords" aria-hidden="true"><i></i>LA LUZ QUE GUÍA · α UMi · RUMBO FIJO</p>
+      <h1>Problemas complejos.<br>Soluciones <em>claras.</em></h1>
+      <p class="lead">Somos especialistas en digitalizar y automatizar empresas. Entramos en tu negocio, encontramos lo que te frena y lo convertimos en una solución concreta, medible y a medida.</p>
+      <div class="cta-row">
+        <a href="#contacto" class="btn btn-light">Hablemos <span aria-hidden="true">→</span></a>
+        <a href="#casos" class="btn btn-ghost">Ver casos</a>
+      </div>
+      <dl class="stats">
+        <div><dt>4</dt><dd>pasos, del problema a la solución</dd></div>
+        <div><dt>30 min</dt><dd>de llamada inicial, sin compromiso</dd></div>
+        <div><dt>100%</dt><dd>a medida, nada de plantillas</dd></div>
+      </dl>
+    </section>
+
+
+
+    <!-- SERVICIOS -->
+    <section id="servicios" class="wrap section">
+      <p class="eyebrow reveal">Soluciones</p>
+      <h2 class="reveal">Un mismo método.<br>Cuatro tipos de solución.</h2>
+      <p class="sub reveal">Digitalizamos y automatizamos empresas de principio a fin. Cada proyecto es único y lo resolvemos con tecnología de vanguardia y una metodología ágil y transparente.</p>
+      <div class="grid-2">
+        <a class="card reveal" href="#contacto">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M4 12h16M4 17h7"/><circle cx="18" cy="7" r="2"/><circle cx="15" cy="17" r="2"/></svg>
+          <h3>Automatización de procesos <span class="arrow">→</span></h3>
+          <p>Eliminamos el trabajo manual y repetitivo: pedidos, presupuestos, facturas, informes. Procesos que funcionan solos.</p>
+        </a>
+        <a class="card reveal" href="#contacto">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9.5 3.8 3.8 0 0 1 17.5 18H7Z"/></svg>
+          <h3>Integración y migración a la nube <span class="arrow">→</span></h3>
+          <p>Conectamos tus sistemas y llevamos tus datos a la nube, de forma ordenada y segura.</p>
+        </a>
+        <a class="card reveal" href="#contacto">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18M7 7h.01"/></svg>
+          <h3>Plataformas y aplicaciones a medida <span class="arrow">→</span></h3>
+          <p>Webs, portales y herramientas internas con frontend y backend propios, pensadas para tu negocio.</p>
+        </a>
+        <a class="card reveal" href="#contacto">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h12v8H3zM15 11l6-3v8l-6-3"/></svg>
+          <h3>Videoanálisis y seguridad laboral <span class="arrow">→</span></h3>
+          <p>Detectamos riesgos y eventos en tiempo real con las cámaras que ya tienes.</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- CASOS -->
+    <section id="casos" class="wrap section">
+      <p class="eyebrow reveal">Casos de éxito</p>
+      <h2 class="reveal">Un problema real.<br>Una solución concreta.</h2>
+      <p class="sub reveal">Así resolvemos los retos de las empresas, uno a uno.</p>
+      <div class="cx-list">
+        <article class="cx reveal">
+          <img src="assets/cases/seguridad-laboral.jpg" alt="Trabajadores con casco y chaleco en una obra" loading="lazy">
+          <div class="cx-body">
+            <p class="cx-tag">Construcción e industria</p>
+            <h3>Seguridad laboral con cámaras</h3>
+            <div class="cx-ps">
+              <div><h4>El problema</h4><p>Vigilar a todas horas que se cumplen las medidas de prevención de riesgos laborales es imposible para una persona.</p></div>
+              <div><h4>La solución</h4><p>Videoanálisis sobre las cámaras existentes: detecta incumplimientos en tiempo real y avisa al responsable al instante.</p></div>
+            </div>
+          </div>
+        </article>
+        <article class="cx reveal">
+          <img src="assets/cases/presupuestos.jpg" alt="Persona trabajando con un portátil y documentos" loading="lazy">
+          <div class="cx-body">
+            <p class="cx-tag">Procesos internos</p>
+            <h3>Presupuestos automáticos</h3>
+            <div class="cx-ps">
+              <div><h4>El problema</h4><p>Preparar cada presupuesto a mano lleva horas, repite datos y deja margen al error.</p></div>
+              <div><h4>La solución</h4><p>Un proceso automatizado que recoge la petición, genera el presupuesto con el formato de la empresa y lo deja listo para enviar.</p></div>
+            </div>
+          </div>
+        </article>
+        <article class="cx reveal">
+          <img src="assets/cases/nube.jpg" alt="Servidores de un centro de datos" loading="lazy">
+          <div class="cx-body">
+            <p class="cx-tag">Banca</p>
+            <h3>De una base de datos antigua a la nube</h3>
+            <div class="cx-ps">
+              <div><h4>El problema</h4><p>Una entidad bancaria dependía de una base de datos difícil de mantener y de escalar.</p></div>
+              <div><h4>La solución</h4><p>Digitalizamos y migramos sus datos a una base de datos en la nube, más moderna, escalable y fácil de mantener.</p></div>
+            </div>
+          </div>
+        </article>
+        <article class="cx reveal">
+          <img src="assets/cases/proactive-future.jpg" alt="Web de Proactive Future" loading="lazy">
+          <div class="cx-body">
+            <p class="cx-tag">Asociaciones</p>
+            <h3>Plataforma web de Proactive Future</h3>
+            <div class="cx-ps">
+              <div><h4>El problema</h4><p>Una asociación necesitaba una plataforma propia para publicar sus oportunidades y gestionar a su comunidad.</p></div>
+              <div><h4>La solución</h4><p>Desarrollamos la web completa, con frontend y backend: cuentas de usuario, coordinadores, reseñas y contenido gestionable.</p></div>
+            </div>
+          </div>
+        </article>
+        <article class="cx reveal">
+          <img src="assets/cases/corradi.jpg" alt="Catálogo de oportunidades de Corradi" loading="lazy">
+          <div class="cx-body">
+            <p class="cx-tag">Juventud y Erasmus+</p>
+            <h3>Corradi: difusión automatizada</h3>
+            <div class="cx-ps">
+              <div><h4>El problema</h4><p>Encontrar convocatorias Erasmus+ fiables obliga a rastrear decenas de webs que se quedan desactualizadas.</p></div>
+              <div><h4>La solución</h4><p>Un sistema que recoge datos de múltiples fuentes, los revisa cada mañana y los publica en un catálogo con mapa y recomendación por afinidad. Más de 240 oportunidades abiertas.</p></div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- PROCESO -->
+    <section id="proceso" class="wrap section">
+      <p class="eyebrow reveal">Método</p>
+      <h2 class="reveal">Del problema<br>a la solución.</h2>
+      <p class="sub reveal">Un proceso claro, ágil y transparente. Nos adaptamos a tu realidad y te acompañamos en cada fase.</p>
+      <ol class="steps">
+        <li class="reveal"><span class="num">01</span><div><h3>Entendemos</h3><p>Analizamos tu negocio, tus procesos y el problema concreto que quieres resolver. Escuchamos antes de proponer.</p></div></li>
+        <li class="reveal"><span class="num">02</span><div><h3>Diseñamos</h3><p>Definimos la solución, con alcance, plazos y resultados esperados claros.</p></div></li>
+        <li class="reveal"><span class="num">03</span><div><h3>Implementamos</h3><p>La desarrollamos e integramos en tu entorno, con entregas rápidas y seguimiento transparente.</p></div></li>
+        <li class="reveal"><span class="num">04</span><div><h3>Medimos</h3><p>Comprobamos que resuelve el problema y seguimos mejorándola. Lo que no se mide, no mejora.</p></div></li>
+      </ol>
+    </section>
+
+    <!-- NOSOTROS -->
+    <section id="nosotros" class="wrap section">
+      <p class="eyebrow reveal">Nosotros</p>
+      <h2 class="reveal">Personas que convierten<br>problemas en soluciones.</h2>
+      <p class="sub reveal">llume nace de la convicción de que la tecnología debe estar al servicio de las personas y de las empresas que construyen el mundo real. En asturiano, <em>llume</em> es la lumbre, la luz que se enciende en casa. Queremos ser eso para tu empresa: una referencia fija, como la estrella polar, cuando todo lo demás se mueve.</p>
+      <div class="grid-4">
+        <div class="mini reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V17h5v-1.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3Z"/><path d="M10 21h4"/></svg><h3>Innovación</h3><p>Buscamos la mejor forma de resolver cada reto, no la más repetida.</p></div>
+        <div class="mini reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18 10 11l4 4 6-8"/><path d="M15 7h5v5"/></svg><h3>Tecnología de vanguardia</h3><p>Las herramientas más actuales, al servicio de tu negocio.</p></div>
+        <div class="mini reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3 5 13h6l-1 8 8-10h-6l1-8Z"/></svg><h3>Agilidad</h3><p>Entregas rápidas y seguimiento transparente en cada fase.</p></div>
+        <div class="mini reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3"/><circle cx="16" cy="10" r="2.5"/><path d="M3.5 19c.5-3 2.7-5 5.5-5s5 2 5.5 5M15 15c2.5 0 4.5 1.5 5.5 4"/></svg><h3>Cercanía</h3><p>Trabajamos contigo, no solo para ti.</p></div>
+      </div>
+      <blockquote class="mission reveal">Nuestra misión es ayudar a las empresas a ser más eficientes, creativas y humanas gracias a la tecnología.</blockquote>
+    </section>
+
+
+    <!-- COLABORACIONES -->
+    <section class="partners" aria-label="Colaboraciones">
+      <p class="trust">Confían en nosotros</p>
+      <div class="marquee">
+        <ul class="track">
+        <li><img class="pf" src="assets/partners/proactive-future.webp" alt="Proactive Future" width="191" height="48" loading="lazy"></li>
+        <li><img class="inj" src="assets/partners/injuve.svg" alt="Injuve" width="1200" height="450" loading="lazy"></li>
+        <li><img class="uo" src="assets/partners/uniovi.png" alt="Universidad de Oviedo" width="175" height="125" loading="lazy"></li>
+        <li><img class="cor" src="assets/partners/corradi.svg" alt="Corradi" width="486" height="486" loading="lazy"></li>
+        </ul>
+        <ul class="track" aria-hidden="true">
+        <li><img class="pf" src="assets/partners/proactive-future.webp" alt="" width="191" height="48" loading="lazy"></li>
+        <li><img class="inj" src="assets/partners/injuve.svg" alt="" width="1200" height="450" loading="lazy"></li>
+        <li><img class="uo" src="assets/partners/uniovi.png" alt="" width="175" height="125" loading="lazy"></li>
+        <li><img class="cor" src="assets/partners/corradi.svg" alt="" width="486" height="486" loading="lazy"></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- CONTACTO -->
+    <section id="contacto" class="wrap section contact">
+      <div>
+        <p class="eyebrow reveal">Contacto</p>
+        <h2 class="reveal">Hablemos de<br>tu próximo proyecto.</h2>
+        <p class="sub reveal">Cuéntanos tu reto o tu idea y vemos cómo resolverlo.</p>
+        <ul class="contact-list reveal">
+          <li><strong>Agenda una llamada</strong><span>Hablamos 30 min sin compromiso.</span></li>
+          <li><strong>Escríbenos</strong><a href="mailto:info@llume.net">info@llume.net</a></li>
+          <li><strong>Visítanos</strong><span>Oviedo, Asturias (España)</span></li>
+        </ul>
+      </div>
+      <form class="form reveal" id="contact-form" action="mailto:info@llume.net" method="post">
+        <label>Nombre<input name="nombre" placeholder="Tu nombre" required></label>
+        <label>Empresa<input name="empresa" placeholder="Tu empresa"></label>
+        <label>Mensaje<textarea name="mensaje" rows="5" placeholder="Cuéntanos en qué podemos ayudarte…" required></textarea></label>
+        <button class="btn btn-light" type="submit">Enviar mensaje <span aria-hidden="true">→</span></button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap foot-grid">
+      <div>
+        <img src="assets/mark.svg" alt="llume" width="36" height="44">
+        <p class="foot-claim">Tecnología para un futuro<br>más humano.</p>
+      </div>
+      <form class="news" onsubmit="event.preventDefault(); this.querySelector('button').textContent='✓';">
+        <strong>Newsletter</strong>
+        <small>Ideas y recursos sobre transformación digital.</small>
+        <div><input type="email" placeholder="Tu email" aria-label="Email" required><button class="btn btn-light btn-sm" aria-label="Suscribirme">→</button></div>
+      </form>
+      <nav class="foot-cols" aria-label="Pie">
+        <div><h4>Servicios</h4><a href="#servicios">Automatización</a><a href="#servicios">Migración a la nube</a><a href="#servicios">Plataformas a medida</a><a href="#servicios">Videoanálisis</a></div>
+        <div><h4>Empresa</h4><a href="#nosotros">Nosotros</a><a href="#casos">Casos de éxito</a><a href="#contacto">Contacto</a></div>
+        <div><h4>Legal</h4><a href="#">Aviso legal</a><a href="#">Privacidad</a><a href="#">Cookies</a></div>
+      </nav>
+    </div>
+    <div class="wrap foot-bottom"><span>© 2026 llume. Todos los derechos reservados.</span></div>
+  </footer>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
