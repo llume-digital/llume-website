@@ -107,6 +107,8 @@
           </div>
           <h3>Visión artificial a medida</h3>
           <p>Cámaras que entienden lo que ven: detectan defectos, clasifican productos o avisan de situaciones de riesgo en tiempo real, adaptadas a tu caso.</p>
+          <ul class="vis-tags"><li>Industria y logística</li><li>Seguridad y prevención</li><li>Movilidad y transporte</li><li>Infraestructuras</li></ul>
+          <button class="vis-open" type="button" data-dialog="vision-dialog">Ver qué puede detectar <span aria-hidden="true">+</span></button>
           <a class="card-link" href="#caso-vision" data-open-case="vision">Ver caso: control de calidad en línea de producción <span aria-hidden="true">→</span></a>
         </article>
         <article class="card reveal">
@@ -127,10 +129,6 @@
           <p>Reunimos la información de tu negocio en un panel claro y siempre al día, para que decidas con datos y no a ojo.</p>
           <a class="card-link" href="#caso-proactive" data-open-case="proactive">Ver caso: cifras en vivo de Proactive Future <span aria-hidden="true">→</span></a>
         </article>
-      </div>
-      <div class="vision reveal" id="vision">
-        <div class="vision-head"><h3 class="mini-h">Qué puede detectar una cámara con visión artificial</h3><p>Algunos ejemplos. Si se puede ver, normalmente se puede detectar, contar o clasificar.</p></div>
-        <div class="vis-grid"><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l6 4V10l6 4V6h6v14H3Z"/></svg></span><h4>Industria y logística</h4><ul><li>Defectos en cajas, envases o piezas en la línea</li><li>Clasificación de productos por tipo o formato</li><li>Conteo y trazabilidad sin intervención manual</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v6c0 4.2 3 7.7 7 9 4-1.3 7-4.8 7-9V6l-7-3Z"/></svg></span><h4>Seguridad y prevención</h4><ul><li>Uso de casco, chaleco y otros equipos de protección</li><li>Accesos a zonas restringidas o peligrosas</li><li>Conductas de riesgo o situaciones violentas</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="13" rx="2"/><path d="M4 11h16M8 17v3M16 17v3"/></svg></span><h4>Movilidad y transporte</h4><ul><li>Objetos prohibidos a bordo, como patinetes eléctricos</li><li>Frenadas bruscas y conducción de riesgo</li><li>Objetos abandonados en estaciones o vehículos</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20 10 4M20 20 14 4M12 8v2M12 13v2M12 18v2"/></svg></span><h4>Infraestructuras</h4><ul><li>Grietas y baches en la calzada desde vehículos en ruta</li><li>Estado de señalización y mobiliario urbano</li><li>Inspecciones periódicas con registro fotográfico</li></ul></div></div>
       </div>
     </section>
     <div class="integrations">
@@ -610,6 +608,20 @@
   </footer>
 
   <a class="sticky-cta" href="#contacto">Te llamamos · reunión de 30 min gratis <span aria-hidden="true">→</span></a>
+
+  <dialog class="case-dialog vision-dialog" id="vision-dialog" aria-label="Qué puede detectar una cámara con visión artificial">
+    <div class="cd-inner">
+      <button class="cd-close" type="button" aria-label="Cerrar">×</button>
+      <div class="cd-body">
+        <div class="vision-head"><h3 class="mini-h">Qué puede detectar una cámara con visión artificial</h3><p>Algunos ejemplos. Si se puede ver, normalmente se puede detectar, contar o clasificar.</p></div>
+        <div class="vis-grid"><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l6 4V10l6 4V6h6v14H3Z"/></svg></span><h4>Industria y logística</h4><ul><li>Defectos en cajas, envases o piezas en la línea</li><li>Clasificación de productos por tipo o formato</li><li>Conteo y trazabilidad sin intervención manual</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v6c0 4.2 3 7.7 7 9 4-1.3 7-4.8 7-9V6l-7-3Z"/></svg></span><h4>Seguridad y prevención</h4><ul><li>Uso de casco, chaleco y otros equipos de protección</li><li>Accesos a zonas restringidas o peligrosas</li><li>Conductas de riesgo o situaciones violentas</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="13" rx="2"/><path d="M4 11h16M8 17v3M16 17v3"/></svg></span><h4>Movilidad y transporte</h4><ul><li>Objetos prohibidos a bordo, como patinetes eléctricos</li><li>Frenadas bruscas y conducción de riesgo</li><li>Objetos abandonados en estaciones o vehículos</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20 10 4M20 20 14 4M12 8v2M12 13v2M12 18v2"/></svg></span><h4>Infraestructuras</h4><ul><li>Grietas y baches en la calzada desde vehículos en ruta</li><li>Estado de señalización y mobiliario urbano</li><li>Inspecciones periódicas con registro fotográfico</li></ul></div></div>
+        <h3 class="mini-h vis-how-h">Cómo lo montamos</h3>
+        <ol class="vis-how"><li><span class="num">01</span><div><h4>Analizamos tu caso</h4><p>Qué hay que detectar, dónde y con qué cámaras. Muchas veces sirven las que ya tienes.</p></div></li><li><span class="num">02</span><div><h4>Entrenamos el modelo</h4><p>Con imágenes reales de tu proceso, para que reconozca exactamente lo que te importa.</p></div></li><li><span class="num">03</span><div><h4>Lo ponemos a funcionar</h4><p>En tus instalaciones o en la nube, con avisos al momento en pantalla, en el móvil o con una señal luminosa.</p></div></li><li><span class="num">04</span><div><h4>Medimos y mejoramos</h4><p>Un panel con todo lo detectado y ajustes continuos para reducir las falsas alarmas.</p></div></li></ol>
+        <p class="vis-priv">Cada sistema se diseña respetando la privacidad: se procesa solo lo necesario y, cuando es posible, las imágenes no salen de tus instalaciones.</p>
+        <div class="cd-actions"><a href="#caso-vision" class="btn btn-ghost" data-open-case="vision">Ver caso: línea de producción <span aria-hidden="true">→</span></a><a href="#contacto" class="btn btn-light vis-talk">Hablemos <span aria-hidden="true">→</span></a></div>
+      </div>
+    </div>
+  </dialog>
 
   <dialog class="case-dialog" id="case-dialog" aria-labelledby="case-dialog-title">
     <div class="cd-inner">

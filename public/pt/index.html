@@ -107,6 +107,8 @@
           </div>
           <h3>Visão artificial à medida</h3>
           <p>Câmaras que percebem o que veem: detetam defeitos, classificam produtos ou avisam de situações de risco em tempo real, adaptadas ao seu caso.</p>
+          <ul class="vis-tags"><li>Indústria e logística</li><li>Segurança e prevenção</li><li>Mobilidade e transportes</li><li>Infraestruturas</li></ul>
+          <button class="vis-open" type="button" data-dialog="vision-dialog">Ver o que pode detetar <span aria-hidden="true">+</span></button>
           <a class="card-link" href="#caso-vision" data-open-case="vision">Ver caso: controlo de qualidade numa linha de produção <span aria-hidden="true">→</span></a>
         </article>
         <article class="card reveal">
@@ -127,10 +129,6 @@
           <p>Reunimos a informação do seu negócio num painel claro e sempre atualizado, para decidir com dados e não a olho.</p>
           <a class="card-link" href="#caso-proactive" data-open-case="proactive">Ver caso: números em tempo real da Proactive Future <span aria-hidden="true">→</span></a>
         </article>
-      </div>
-      <div class="vision reveal" id="vision">
-        <div class="vision-head"><h3 class="mini-h">O que uma câmara com visão artificial pode detetar</h3><p>Alguns exemplos. Se se pode ver, normalmente pode detetar-se, contar-se ou classificar-se.</p></div>
-        <div class="vis-grid"><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l6 4V10l6 4V6h6v14H3Z"/></svg></span><h4>Indústria e logística</h4><ul><li>Defeitos em caixas, embalagens ou peças na linha</li><li>Classificação de produtos por tipo ou formato</li><li>Contagem e rastreabilidade sem trabalho manual</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v6c0 4.2 3 7.7 7 9 4-1.3 7-4.8 7-9V6l-7-3Z"/></svg></span><h4>Segurança e prevenção</h4><ul><li>Uso de capacete, colete e outros equipamentos de proteção</li><li>Acessos a zonas restritas ou perigosas</li><li>Comportamentos de risco ou situações violentas</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="13" rx="2"/><path d="M4 11h16M8 17v3M16 17v3"/></svg></span><h4>Mobilidade e transportes</h4><ul><li>Objetos proibidos a bordo, como trotinetes elétricas</li><li>Travagens bruscas e condução de risco</li><li>Objetos abandonados em estações ou veículos</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20 10 4M20 20 14 4M12 8v2M12 13v2M12 18v2"/></svg></span><h4>Infraestruturas</h4><ul><li>Fissuras e buracos na estrada a partir de veículos em circulação</li><li>Estado da sinalização e do mobiliário urbano</li><li>Inspeções periódicas com registo fotográfico</li></ul></div></div>
       </div>
     </section>
     <div class="integrations">
@@ -610,6 +608,20 @@
   </footer>
 
   <a class="sticky-cta" href="#contacto">Nós ligamos-lhe · reunião de 30 min grátis <span aria-hidden="true">→</span></a>
+
+  <dialog class="case-dialog vision-dialog" id="vision-dialog" aria-label="O que uma câmara com visão artificial pode detetar">
+    <div class="cd-inner">
+      <button class="cd-close" type="button" aria-label="Fechar">×</button>
+      <div class="cd-body">
+        <div class="vision-head"><h3 class="mini-h">O que uma câmara com visão artificial pode detetar</h3><p>Alguns exemplos. Se se pode ver, normalmente pode detetar-se, contar-se ou classificar-se.</p></div>
+        <div class="vis-grid"><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l6 4V10l6 4V6h6v14H3Z"/></svg></span><h4>Indústria e logística</h4><ul><li>Defeitos em caixas, embalagens ou peças na linha</li><li>Classificação de produtos por tipo ou formato</li><li>Contagem e rastreabilidade sem trabalho manual</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v6c0 4.2 3 7.7 7 9 4-1.3 7-4.8 7-9V6l-7-3Z"/></svg></span><h4>Segurança e prevenção</h4><ul><li>Uso de capacete, colete e outros equipamentos de proteção</li><li>Acessos a zonas restritas ou perigosas</li><li>Comportamentos de risco ou situações violentas</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="13" rx="2"/><path d="M4 11h16M8 17v3M16 17v3"/></svg></span><h4>Mobilidade e transportes</h4><ul><li>Objetos proibidos a bordo, como trotinetes elétricas</li><li>Travagens bruscas e condução de risco</li><li>Objetos abandonados em estações ou veículos</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20 10 4M20 20 14 4M12 8v2M12 13v2M12 18v2"/></svg></span><h4>Infraestruturas</h4><ul><li>Fissuras e buracos na estrada a partir de veículos em circulação</li><li>Estado da sinalização e do mobiliário urbano</li><li>Inspeções periódicas com registo fotográfico</li></ul></div></div>
+        <h3 class="mini-h vis-how-h">Como o montamos</h3>
+        <ol class="vis-how"><li><span class="num">01</span><div><h4>Analisamos o seu caso</h4><p>O que é preciso detetar, onde e com que câmaras. Muitas vezes servem as que já tem.</p></div></li><li><span class="num">02</span><div><h4>Treinamos o modelo</h4><p>Com imagens reais do seu processo, para que reconheça exatamente o que lhe interessa.</p></div></li><li><span class="num">03</span><div><h4>Pomo-lo a funcionar</h4><p>Nas suas instalações ou na cloud, com avisos no momento no ecrã, no telemóvel ou com um sinal luminoso.</p></div></li><li><span class="num">04</span><div><h4>Medimos e melhoramos</h4><p>Um painel com tudo o que foi detetado e ajustes contínuos para reduzir falsos alarmes.</p></div></li></ol>
+        <p class="vis-priv">Cada sistema é desenhado a respeitar a privacidade: processa-se apenas o necessário e, quando possível, as imagens não saem das suas instalações.</p>
+        <div class="cd-actions"><a href="#caso-vision" class="btn btn-ghost" data-open-case="vision">Ver caso: linha de produção <span aria-hidden="true">→</span></a><a href="#contacto" class="btn btn-light vis-talk">Vamos falar <span aria-hidden="true">→</span></a></div>
+      </div>
+    </div>
+  </dialog>
 
   <dialog class="case-dialog" id="case-dialog" aria-labelledby="case-dialog-title">
     <div class="cd-inner">

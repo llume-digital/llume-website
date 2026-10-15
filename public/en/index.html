@@ -107,6 +107,8 @@
           </div>
           <h3>Custom computer vision</h3>
           <p>Cameras that understand what they see: they detect defects, sort products or flag risky situations in real time, tailored to your case.</p>
+          <ul class="vis-tags"><li>Industry and logistics</li><li>Safety and prevention</li><li>Mobility and transport</li><li>Infrastructure</li></ul>
+          <button class="vis-open" type="button" data-dialog="vision-dialog">See what it can detect <span aria-hidden="true">+</span></button>
           <a class="card-link" href="#caso-vision" data-open-case="vision">Case study: quality control on a production line <span aria-hidden="true">→</span></a>
         </article>
         <article class="card reveal">
@@ -127,10 +129,6 @@
           <p>We bring your business information together in a clear, always up-to-date dashboard, so you decide with data, not by gut feeling.</p>
           <a class="card-link" href="#caso-proactive" data-open-case="proactive">Case study: Proactive Future's live figures <span aria-hidden="true">→</span></a>
         </article>
-      </div>
-      <div class="vision reveal" id="vision">
-        <div class="vision-head"><h3 class="mini-h">What a camera with computer vision can detect</h3><p>A few examples. If it can be seen, it can usually be detected, counted or classified.</p></div>
-        <div class="vis-grid"><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l6 4V10l6 4V6h6v14H3Z"/></svg></span><h4>Industry and logistics</h4><ul><li>Defects in boxes, packaging or parts on the line</li><li>Sorting products by type or format</li><li>Counting and traceability with no manual work</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v6c0 4.2 3 7.7 7 9 4-1.3 7-4.8 7-9V6l-7-3Z"/></svg></span><h4>Safety and prevention</h4><ul><li>Use of helmets, vests and other protective equipment</li><li>Access to restricted or dangerous areas</li><li>Risky behaviour or violent situations</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="13" rx="2"/><path d="M4 11h16M8 17v3M16 17v3"/></svg></span><h4>Mobility and transport</h4><ul><li>Prohibited items on board, such as e-scooters</li><li>Harsh braking and risky driving</li><li>Abandoned objects in stations or vehicles</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20 10 4M20 20 14 4M12 8v2M12 13v2M12 18v2"/></svg></span><h4>Infrastructure</h4><ul><li>Cracks and potholes in the road from vehicles on the move</li><li>Condition of signage and street furniture</li><li>Regular inspections with a photographic record</li></ul></div></div>
       </div>
     </section>
     <div class="integrations">
@@ -610,6 +608,20 @@
   </footer>
 
   <a class="sticky-cta" href="#contacto">We'll call you · free 30-min call <span aria-hidden="true">→</span></a>
+
+  <dialog class="case-dialog vision-dialog" id="vision-dialog" aria-label="What a camera with computer vision can detect">
+    <div class="cd-inner">
+      <button class="cd-close" type="button" aria-label="Close">×</button>
+      <div class="cd-body">
+        <div class="vision-head"><h3 class="mini-h">What a camera with computer vision can detect</h3><p>A few examples. If it can be seen, it can usually be detected, counted or classified.</p></div>
+        <div class="vis-grid"><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V10l6 4V10l6 4V6h6v14H3Z"/></svg></span><h4>Industry and logistics</h4><ul><li>Defects in boxes, packaging or parts on the line</li><li>Sorting products by type or format</li><li>Counting and traceability with no manual work</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v6c0 4.2 3 7.7 7 9 4-1.3 7-4.8 7-9V6l-7-3Z"/></svg></span><h4>Safety and prevention</h4><ul><li>Use of helmets, vests and other protective equipment</li><li>Access to restricted or dangerous areas</li><li>Risky behaviour or violent situations</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="13" rx="2"/><path d="M4 11h16M8 17v3M16 17v3"/></svg></span><h4>Mobility and transport</h4><ul><li>Prohibited items on board, such as e-scooters</li><li>Harsh braking and risky driving</li><li>Abandoned objects in stations or vehicles</li></ul></div><div class="vis-g"><span class="j-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20 10 4M20 20 14 4M12 8v2M12 13v2M12 18v2"/></svg></span><h4>Infrastructure</h4><ul><li>Cracks and potholes in the road from vehicles on the move</li><li>Condition of signage and street furniture</li><li>Regular inspections with a photographic record</li></ul></div></div>
+        <h3 class="mini-h vis-how-h">How we set it up</h3>
+        <ol class="vis-how"><li><span class="num">01</span><div><h4>We study your case</h4><p>What needs detecting, where and with which cameras. The ones you already have often work.</p></div></li><li><span class="num">02</span><div><h4>We train the model</h4><p>With real images of your process, so it recognises exactly what matters to you.</p></div></li><li><span class="num">03</span><div><h4>We put it to work</h4><p>On your premises or in the cloud, with instant alerts on screen, on your phone or with a light signal.</p></div></li><li><span class="num">04</span><div><h4>We measure and improve</h4><p>A dashboard with everything detected and ongoing tuning to cut false alarms.</p></div></li></ol>
+        <p class="vis-priv">Every system is designed with privacy in mind: only what is needed is processed and, where possible, images never leave your premises.</p>
+        <div class="cd-actions"><a href="#caso-vision" class="btn btn-ghost" data-open-case="vision">Case study: production line <span aria-hidden="true">→</span></a><a href="#contacto" class="btn btn-light vis-talk">Let's talk <span aria-hidden="true">→</span></a></div>
+      </div>
+    </div>
+  </dialog>
 
   <dialog class="case-dialog" id="case-dialog" aria-labelledby="case-dialog-title">
     <div class="cd-inner">

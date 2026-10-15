@@ -860,3 +860,26 @@ a.social-link:hover { color: #fff; border-color: #0a66c2; background: #0a66c2; }
 
 picture { display: contents; }
 a.social-link.wa:hover { color: #fff; border-color: #25d366; background: #25d366; }
+
+/* computer vision inside solution 02 */
+.vis-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 14px; }
+.vis-tags li { font: 400 11px var(--mono); letter-spacing: .04em; color: #cfe9d6; padding: 4px 9px; border-radius: 99px; border: 1px solid rgba(143,227,168,.3); background: rgba(143,227,168,.06); }
+.vis-open { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 4px; font-size: 13.5px; color: var(--text);
+  padding: 8px 14px; border-radius: 99px; border: 1px solid rgba(143,227,168,.35); transition: border-color .2s, background .2s; }
+.vis-open span { color: var(--ok); font-size: 16px; line-height: 1; }
+.vis-open:hover { border-color: var(--ok); background: rgba(143,227,168,.08); }
+.vision-dialog { width: min(1040px, 100% - 32px); }
+.vision-dialog .vision-head { padding-right: 48px; }
+.vision-dialog .vis-grid { margin-top: 22px; }
+@media (max-width: 860px) { .vision-dialog .vis-grid { grid-template-columns: 1fr; } }
+
+.vis-how-h { margin-top: 32px !important; }
+.vis-how { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; }
+.vis-how li { display: grid; gap: 10px; align-content: start; padding: 16px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.02); }
+.vis-how .num { width: 36px; height: 36px; font-size: 11px; }
+.vis-how h4 { font-size: 15px; font-weight: 500; }
+.vis-how p { margin-top: 4px; color: var(--muted); font-size: 13.5px; }
+.vis-priv { margin-top: 18px; padding: 12px 16px; border-left: 2px solid var(--ok); background: rgba(143,227,168,.06); border-radius: 0 10px 10px 0; color: #d6d0c6; font-size: 14px; }
+.vision-dialog .cd-actions { margin-top: 24px; }
+@media (max-width: 860px) { .vis-how { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .vis-how { grid-template-columns: 1fr; } }

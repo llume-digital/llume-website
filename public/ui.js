@@ -119,6 +119,7 @@ if (dialog) {
   document.querySelectorAll("[data-open-case]").forEach((btn) =>
     btn.addEventListener("click", (e) => {
       const card = caseById(btn.dataset.openCase);
+      btn.closest("dialog")?.close();
       if (card) { e.preventDefault(); openCase(card); }
     })
   );
@@ -196,3 +197,13 @@ if (langBtn && langList) {
   document.addEventListener("click", (e) => { if (!langList.contains(e.target)) setLang(false); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") setLang(false); });
 }
+
+/* ---------- simple dialogs (e.g. computer vision examples) ---------- */
+document.querySelectorAll("[data-dialog]").forEach((btn) => {
+  const dlg = document.getElementById(btn.dataset.dialog);
+  if (!dlg) return;
+  btn.addEventListener("click", () => dlg.showModal());
+  dlg.querySelector(".cd-close")?.addEventListener("click", () => dlg.close());
+  dlg.addEventListener("click", (e) => e.target === dlg && dlg.close());
+  dlg.querySelectorAll('a[href^="#"]:not([data-open-case])').forEach((a) => a.addEventListener("click", () => dlg.close()));
+});
