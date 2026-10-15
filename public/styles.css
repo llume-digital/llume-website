@@ -855,3 +855,5 @@ input::placeholder, textarea::placeholder { color: #5f5b55; }
 .social-link svg { width: 17px; height: 17px; fill: currentColor; }
 a.social-link:hover { color: #fff; border-color: #0a66c2; background: #0a66c2; }
 .social-link.soon { opacity: .55; cursor: default; }
+.session .step-chip { white-space: nowrap; flex: none; }
+.session-n { flex: none; }
