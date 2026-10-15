@@ -72,7 +72,7 @@ def content(code, kind):
     <h2>1. Responsable del tratamiento</h2>
 {owner_list(code, True)}
     <h2>2. Qué datos tratamos y de dónde vienen</h2>
-    <p>Esta web no guarda datos en sus propios servidores. El formulario de contacto abre tu programa de correo con un mensaje ya preparado, y solo recibimos los datos que decidas enviarnos: lo que necesitas, tu nombre y tu teléfono y, si quieres, tu empresa y tu email. Si nos escribes directamente por correo, tratamos los datos que incluyas en el mensaje.</p>
+    <p>Esta web no guarda datos en sus propios servidores. El formulario de contacto abre tu programa de correo con un mensaje ya preparado, y solo recibimos los datos que decidas enviarnos: lo que necesitas, tu nombre y tu teléfono y, si quieres, tu empresa y tu email. Si nos escribes directamente por correo o por WhatsApp, tratamos los datos que incluyas en el mensaje y, en el caso de WhatsApp, tu número de teléfono.</p>
     <p>Nuestro proveedor de alojamiento procesa datos técnicos, como la dirección IP, para servir la web y protegerla frente a ataques. Para conocer las visitas usamos una analítica sin cookies que no te identifica.</p>
     <h2>3. Para qué los usamos</h2>
     <ul>
@@ -94,6 +94,7 @@ def content(code, kind):
     <ul>
       <li><strong>Google</strong> (Google Workspace): correo electrónico.</li>
       <li><strong>Cloudflare</strong>: alojamiento, seguridad y estadísticas de visitas sin cookies.</li>
+      <li><strong>WhatsApp</strong> (Meta): mensajería, solo si eliges escribirnos por esa vía.</li>
     </ul>
     <h2>7. Transferencias internacionales</h2>
     <p>Estos proveedores pueden tratar datos fuera del Espacio Económico Europeo, principalmente en Estados Unidos. Lo hacen al amparo del Marco de Privacidad de Datos UE-EE. UU. y de las cláusulas contractuales tipo aprobadas por la Comisión Europea, que garantizan un nivel de protección adecuado.</p>
@@ -137,7 +138,7 @@ def content(code, kind):
     <h2>1. Data controller</h2>
 {owner_list(code, True)}
     <h2>2. What data we process and where it comes from</h2>
-    <p>This website does not store data on its own servers. The contact form opens your email app with a ready-made message, and we only receive the data you choose to send us: what you need, your name and phone number and, optionally, your company and email. If you email us directly, we process the data included in your message.</p>
+    <p>This website does not store data on its own servers. The contact form opens your email app with a ready-made message, and we only receive the data you choose to send us: what you need, your name and phone number and, optionally, your company and email. If you email us or message us on WhatsApp, we process the data included in your message and, for WhatsApp, your phone number.</p>
     <p>Our hosting provider processes technical data, such as your IP address, to serve the website and protect it from attacks. We count visits with cookie-free analytics that do not identify you.</p>
     <h2>3. What we use it for</h2>
     <ul>
@@ -159,6 +160,7 @@ def content(code, kind):
     <ul>
       <li><strong>Google</strong> (Google Workspace): email.</li>
       <li><strong>Cloudflare</strong>: hosting, security and cookie-free visit statistics.</li>
+      <li><strong>WhatsApp</strong> (Meta): messaging, only if you choose to contact us that way.</li>
     </ul>
     <h2>7. International transfers</h2>
     <p>These providers may process data outside the European Economic Area, mainly in the United States, under the EU-US Data Privacy Framework and the standard contractual clauses approved by the European Commission, which guarantee an adequate level of protection.</p>
@@ -202,7 +204,7 @@ def content(code, kind):
     <h2>1. Responsável pelo tratamento</h2>
 {owner_list(code, True)}
     <h2>2. Que dados tratamos e de onde vêm</h2>
-    <p>Este site não guarda dados nos seus próprios servidores. O formulário de contacto abre o seu programa de e-mail com uma mensagem já preparada, e só recebemos os dados que decidir enviar-nos: o que precisa, o seu nome e telefone e, se quiser, a sua empresa e e-mail. Se nos escrever diretamente por e-mail, tratamos os dados incluídos na mensagem.</p>
+    <p>Este site não guarda dados nos seus próprios servidores. O formulário de contacto abre o seu programa de e-mail com uma mensagem já preparada, e só recebemos os dados que decidir enviar-nos: o que precisa, o seu nome e telefone e, se quiser, a sua empresa e e-mail. Se nos escrever diretamente por e-mail ou por WhatsApp, tratamos os dados incluídos na mensagem e, no caso do WhatsApp, o seu número de telefone.</p>
     <p>O nosso fornecedor de alojamento trata dados técnicos, como o endereço IP, para servir o site e protegê-lo contra ataques. Para contar as visitas usamos uma análise sem cookies que não o identifica.</p>
     <h2>3. Para que os usamos</h2>
     <ul>
@@ -224,6 +226,7 @@ def content(code, kind):
     <ul>
       <li><strong>Google</strong> (Google Workspace): e-mail.</li>
       <li><strong>Cloudflare</strong>: alojamento, segurança e estatísticas de visitas sem cookies.</li>
+      <li><strong>WhatsApp</strong> (Meta): mensagens, apenas se escolher contactar-nos por essa via.</li>
     </ul>
     <h2>7. Transferências internacionais</h2>
     <p>Estes fornecedores podem tratar dados fora do Espaço Económico Europeu, sobretudo nos Estados Unidos, ao abrigo do Quadro de Privacidade de Dados UE-EUA e das cláusulas contratuais-tipo aprovadas pela Comissão Europeia, que garantem um nível de proteção adequado.</p>

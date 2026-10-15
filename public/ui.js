@@ -90,6 +90,8 @@ if (dialog) {
   const openCase = (card) => {
     media.replaceChildren(card.querySelector(".cx-media").cloneNode(true));
     media.querySelectorAll("img").forEach((img) => (img.loading = "eager"));
+    // larger rendition in the dialog
+    media.querySelectorAll("[data-lg]").forEach((el) => (el.sizes = el.dataset.lg));
     tag.textContent = card.querySelector(".cx-tag").textContent;
     title.textContent = card.querySelector("h3").textContent;
     content.replaceChildren(card.querySelector(".cx-detail").content.cloneNode(true));

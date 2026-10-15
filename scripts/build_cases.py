@@ -67,7 +67,8 @@ def parse(page):
         title = between(body, "<h3>", "</h3>")
         ps = re.findall(r"<div><h4>.*?</h4><p>(.*?)</p></div>", between(body, '<div class="cx-ps">', '<button class="cx-open"'), re.S)
         detail = between(body, '<template class="cx-detail">', "</template>")
-        cases.append({"slug": slug, "media": media.replace(' loading="lazy"', ""), "tag": tag, "title": title,
+        media = re.sub(r'sizes="[^"]*" data-lg="([^"]*)"', r'sizes="\1" data-lg="\1"', media.replace(' loading="lazy"', ""))
+        cases.append({"slug": slug, "media": media, "tag": tag, "title": title,
                       "problem": ps[0], "solution": ps[1], "detail": detail})
     return cases
 
