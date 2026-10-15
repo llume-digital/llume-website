@@ -919,3 +919,4 @@ a.social-link.wa:hover { color: #fff; border-color: #25d366; background: #25d366
 .sol-dialog[open] .vis-how li { animation-delay: calc(.2s + var(--d, 0s)); }
 @keyframes sol-in { from { opacity: 0; transform: translateY(10px); } }
 @media (prefers-reduced-motion: reduce) { .sol:hover { transform: none; } .sol:hover .sol-ico { transform: none; } }
+.integrations .slow .track { animation-duration: 95s; }
