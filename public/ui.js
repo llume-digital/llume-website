@@ -184,3 +184,13 @@ if (document.getElementById("bg")) {
   if ("requestIdleCallback" in window) requestIdleCallback(start3D, { timeout: 1500 });
   else setTimeout(start3D, 600);
 }
+
+/* ---------- language menu ---------- */
+const langBtn = document.querySelector(".lang-btn");
+const langList = document.querySelector(".lang-list");
+if (langBtn && langList) {
+  const setLang = (open) => { langList.hidden = !open; langBtn.setAttribute("aria-expanded", open); };
+  langBtn.addEventListener("click", (e) => { e.stopPropagation(); setLang(langList.hidden); });
+  document.addEventListener("click", (e) => { if (!langList.contains(e.target)) setLang(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setLang(false); });
+}
