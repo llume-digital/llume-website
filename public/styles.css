@@ -861,25 +861,61 @@ a.social-link:hover { color: #fff; border-color: #0a66c2; background: #0a66c2; }
 picture { display: contents; }
 a.social-link.wa:hover { color: #fff; border-color: #25d366; background: #25d366; }
 
-/* computer vision inside solution 02 */
-.vis-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 14px; }
-.vis-tags li { font: 400 11px var(--mono); letter-spacing: .04em; color: #cfe9d6; padding: 4px 9px; border-radius: 99px; border: 1px solid rgba(143,227,168,.3); background: rgba(143,227,168,.06); }
-.vis-open { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 4px; font-size: 13.5px; color: var(--text);
-  padding: 8px 14px; border-radius: 99px; border: 1px solid rgba(143,227,168,.35); transition: border-color .2s, background .2s; }
-.vis-open span { color: var(--ok); font-size: 16px; line-height: 1; }
-.vis-open:hover { border-color: var(--ok); background: rgba(143,227,168,.08); }
-.vision-dialog { width: min(1040px, 100% - 32px); }
-.vision-dialog .vision-head { padding-right: 48px; }
-.vision-dialog .vis-grid { margin-top: 22px; }
-@media (max-width: 860px) { .vision-dialog .vis-grid { grid-template-columns: 1fr; } }
+@media (max-width: 860px) {  }
 
-.vis-how-h { margin-top: 32px !important; }
 .vis-how { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; }
 .vis-how li { display: grid; gap: 10px; align-content: start; padding: 16px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.02); }
 .vis-how .num { width: 36px; height: 36px; font-size: 11px; }
 .vis-how h4 { font-size: 15px; font-weight: 500; }
 .vis-how p { margin-top: 4px; color: var(--muted); font-size: 13.5px; }
 .vis-priv { margin-top: 18px; padding: 12px 16px; border-left: 2px solid var(--ok); background: rgba(143,227,168,.06); border-radius: 0 10px 10px 0; color: #d6d0c6; font-size: 14px; }
-.vision-dialog .cd-actions { margin-top: 24px; }
 @media (max-width: 860px) { .vis-how { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .vis-how { grid-template-columns: 1fr; } }
+
+/* ---------- solutions: clickable cards with a popup each ---------- */
+.sol { position: relative; cursor: pointer; overflow: hidden; isolation: isolate; padding: 24px; }
+.sol::before { content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0; transition: opacity .35s;
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 0%), rgba(242,192,138,.16), transparent 70%); }
+.sol:hover::before, .sol:focus-within::before { opacity: 1; }
+.sol:hover, .sol:focus-within { transform: translateY(-4px); border-color: rgba(242,192,138,.45); box-shadow: 0 20px 44px rgba(0,0,0,.4); }
+.sol .card-top { margin-bottom: 20px; align-items: center; }
+.sol-ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center;
+  border: 1px solid rgba(242,192,138,.35); background: linear-gradient(145deg, rgba(242,192,138,.14), rgba(242,192,138,.02));
+  transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s, border-color .35s; }
+.sol-ico svg { width: 22px; height: 22px; margin: 0; stroke: var(--amber); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.sol:hover .sol-ico { transform: scale(1.08) rotate(-4deg); border-color: var(--amber); box-shadow: 0 0 24px rgba(242,192,138,.3); }
+.solutions.compact .sol h3 { font-size: 18px; }
+.solutions.compact .sol > p { margin-bottom: 0; }
+.sol-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0 18px; }
+.sol-tags li { font: 400 10.5px var(--mono); letter-spacing: .04em; color: #cfc9bf; padding: 4px 9px; border-radius: 99px; border: 1px solid var(--line); background: rgba(255,255,255,.03); transition: border-color .3s, color .3s; }
+.sol:hover .sol-tags li { border-color: rgba(242,192,138,.3); color: #ecdcc6; }
+.sol-more { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center;
+  width: 100%; text-align: left; font-size: 13.5px; font-weight: 500; color: var(--text); }
+.sol-more::after { content: ""; position: absolute; inset: 0; z-index: 1; }   /* whole card clickable */
+.sol-more:focus-visible { outline: none; }
+.sol:has(.sol-more:focus-visible) { outline: 2px solid var(--amber); outline-offset: 3px; }
+.sol-plus { position: relative; width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line); transition: transform .35s cubic-bezier(.2,.7,.2,1), background .3s, border-color .3s; }
+.sol-plus::before, .sol-plus::after { content: ""; position: absolute; left: 50%; top: 50%; width: 10px; height: 1.5px; background: var(--text); transform: translate(-50%, -50%); transition: background .3s; }
+.sol-plus::after { transform: translate(-50%, -50%) rotate(90deg); }
+.sol:hover .sol-plus { transform: rotate(90deg); background: var(--amber); border-color: var(--amber); }
+.sol:hover .sol-plus::before, .sol:hover .sol-plus::after { background: #111; }
+
+/* solution popups */
+.sol-dialog { width: min(1040px, 100% - 32px); }
+.sol-dhead { display: flex; align-items: center; gap: 14px; }
+.sol-dialog .cd-title { margin-top: 18px; }
+.sol-lead { margin-top: 12px; color: #d6d0c6; font-size: 16px; line-height: 1.65; max-width: 760px; }
+.sol-k { margin: 30px 0 14px; font: 400 11px var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.sol-dialog .vis-grid { margin-top: 0; }
+.sol-dialog .vis-g h4 { margin-top: 0; color: var(--text); }
+.sol-dialog .vis-g li::before { border-color: var(--amber); }
+.sol-dialog .vis-how { margin-top: 0; }
+.sol-dialog .vis-priv { border-left-color: var(--amber); background: rgba(242,192,138,.06); }
+.sol-dialog .cd-actions { margin-top: 26px; }
+.sol-dialog[open] .vis-g, .sol-dialog[open] .vis-how li { animation: sol-in .5s cubic-bezier(.2,.7,.2,1) both; }
+.sol-dialog[open] .vis-g:nth-child(2), .sol-dialog[open] .vis-how li:nth-child(2) { animation-delay: .06s; }
+.sol-dialog[open] .vis-g:nth-child(3), .sol-dialog[open] .vis-how li:nth-child(3) { animation-delay: .12s; }
+.sol-dialog[open] .vis-g:nth-child(4), .sol-dialog[open] .vis-how li:nth-child(4) { animation-delay: .18s; }
+.sol-dialog[open] .vis-how li { animation-delay: calc(.2s + var(--d, 0s)); }
+@keyframes sol-in { from { opacity: 0; transform: translateY(10px); } }
+@media (prefers-reduced-motion: reduce) { .sol:hover { transform: none; } .sol:hover .sol-ico { transform: none; } }

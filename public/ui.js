@@ -207,3 +207,12 @@ document.querySelectorAll("[data-dialog]").forEach((btn) => {
   dlg.addEventListener("click", (e) => e.target === dlg && dlg.close());
   dlg.querySelectorAll('a[href^="#"]:not([data-open-case])').forEach((a) => a.addEventListener("click", () => dlg.close()));
 });
+
+/* ---------- solution cards: light that follows the cursor ---------- */
+document.querySelectorAll(".sol").forEach((card) => {
+  card.addEventListener("pointermove", (e) => {
+    const r = card.getBoundingClientRect();
+    card.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    card.style.setProperty("--my", `${e.clientY - r.top}px`);
+  });
+});

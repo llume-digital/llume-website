@@ -54,7 +54,7 @@ La portada tiene 9 bloques:
 | id / clase | Sección |
 |---|---|
 | `.hero` | Titular, frase rotatoria, llamada a la acción y franja de logos "Han confiado en nosotros" |
-| `#servicios` | 4 soluciones (automatización, visión artificial, software/integración/nube, datos) ; la tarjeta de visión artificial abre un diálogo (`#vision-dialog`) con ejemplos por sector, cómo se monta y nota de privacidad. Justo debajo, las dos filas de logos de integraciones |
+| `#servicios` | 4 soluciones en tarjetas clicables (icono, texto corto, etiquetas y "Ver más"); cada una abre su diálogo `#sol-1`…`#sol-4` con ejemplos, cómo lo hacemos, caso relacionado y contacto. Justo debajo, las filas de logos de integraciones |
 | `#retos` | "¿Qué te frena?": pestañas por problema, cada una con el sector donde ya se resolvió y su caso |
 | `#casos` | 3 destacados (Clevercar, visión artificial como "Experiencia del equipo", Proactive); "Ver los otros 4 casos" despliega el resto (`.cx-extra`). El caso de visión no nombra cliente a propósito |
 | `#calculadora` | Calculadora del coste de las tareas repetitivas |
