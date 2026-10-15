@@ -8,6 +8,7 @@
 - **Integración y migración a la nube**: conexión entre herramientas (ERP, CRM, correo…) y migración de bases de datos antiguas sin parar la actividad.
 - **Software y plataformas a medida**: CRM, portales, paneles de gestión, pagos online e inscripciones, con frontend y backend propios.
 - **Formación en IA y digitalización**: talleres y programas para equipos, en persona u online, sobre el uso práctico de la IA (asistentes, automatizaciones, conexión con correo, documentos y CRM). Herramientas como Claude y Claude Code, entre otras.
+- **Visión artificial a medida**: cámaras que detectan defectos, clasifican productos o avisan de situaciones de riesgo (industria y logística, seguridad y prevención, movilidad y transporte, infraestructuras).
 - **Datos y cuadros de mando**: la información del negocio reunida en paneles que se actualizan solos, para decidir con datos.
 
 ## Cómo trabaja
@@ -20,6 +21,7 @@ El código es siempre propiedad del cliente. Primera reunión de 30 minutos, gra
 
 ## Casos
 
+- [Control de calidad con visión artificial en una línea de producción (experiencia del equipo)](https://llumedigital.com/casos/vision)
 - [Clevercar: CRM interno para una importadora de vehículos (Portugal)](https://llumedigital.com/casos/clevercar)
 - [Proactive Future: plataforma de gestión de viajes para una asociación](https://llumedigital.com/casos/proactive)
 - [Corradi: catálogo automatizado de oportunidades Erasmus+](https://llumedigital.com/casos/corradi)
@@ -29,5 +31,7 @@ El código es siempre propiedad del cliente. Primera reunión de 30 minutos, gra
 
 ## Más
 
+- [Programa de formación en IA para empresas](https://llumedigital.com/formacion)
+- [Preguntas frecuentes](https://llumedigital.com/preguntas)
 - [Blog con guías prácticas](https://llumedigital.com/blog/)
 - [English version](https://llumedigital.com/en/) · [Versão em português](https://llumedigital.com/pt/)

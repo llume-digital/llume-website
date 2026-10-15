@@ -12,3 +12,12 @@
 
 /assets/*
   Cache-Control: public, max-age=604800
+
+/styles.css
+  Cache-Control: no-cache
+
+/ui.js
+  Cache-Control: no-cache
+
+/main.js
+  Cache-Control: no-cache

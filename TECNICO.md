@@ -25,6 +25,7 @@ llume-web/
 ├── scripts/build_cases.py  Genera las páginas de cada caso a partir de las portadas
 ├── scripts/build_legal.py  Genera las páginas legales en los tres idiomas (datos del titular arriba del todo)
 ├── scripts/build_blog.py   Genera el blog (español): artículos en la lista POSTS
+├── scripts/build_pages.py  Genera Formación y Preguntas frecuentes en los tres idiomas
 └── public/              Lo único que se publica
     ├── index.html       Página en español
     ├── en/index.html    Página en inglés (misma estructura)
@@ -53,16 +54,15 @@ La portada tiene 9 bloques:
 | id / clase | Sección |
 |---|---|
 | `.hero` | Titular, frase rotatoria, llamada a la acción y franja de logos "Han confiado en nosotros" |
-| `#servicios` | 4 soluciones en tarjetas compactas, con las frases de presentación de llume |
+| `#servicios` | 4 soluciones (automatización, visión artificial, software/integración/nube, datos) y el bloque "Qué puede detectar una cámara" con ejemplos por sector. Justo debajo, las dos filas de logos de integraciones |
 | `#retos` | "¿Qué te frena?": pestañas por problema, cada una con el sector donde ya se resolvió y su caso |
-| `#casos` | 3 casos destacados; el botón "Ver los otros 3 casos" despliega el resto (`.cx-extra`) |
+| `#casos` | 3 destacados (Clevercar, visión artificial como "Experiencia del equipo", Proactive); "Ver los otros 4 casos" despliega el resto (`.cx-extra`). El caso de visión no nombra cliente a propósito |
 | `#calculadora` | Calculadora del coste de las tareas repetitivas |
 | `#proceso` | "Cuatro pasos, sin sorpresas": incluye la primera reunión gratis, el diagnóstico con garantía y el acompañamiento posterior; botón "Pedir diagnóstico", tabla comparativa, 3 compromisos y las dos filas de logos de integraciones |
 | `#formacion` | Formación en IA y digitalización para equipos: qué aprenderán, herramientas (Claude, Claude Code…), 4 formatos y modalidades; sin precio |
-| `#faq` | Preguntas frecuentes (`<details>`), también como datos estructurados `FAQPage` |
 | `#contacto` | "¿Qué pasa en la primera llamada?", formulario de llamada y primera capa de protección de datos |
 
-"Nosotros" tiene página propia: `/nosotros`, `/en/about` y `/pt/sobre-nos`.
+"Nosotros" tiene página propia: `/nosotros`, `/en/about` y `/pt/sobre-nos`. Formación completa en `/formacion` (`/en/training`, `/pt/formacao`) y preguntas frecuentes en `/preguntas` (`/en/faq`, `/pt/perguntas`), generadas con `scripts/build_pages.py`.
 
 ### Casos de éxito
 

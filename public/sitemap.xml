@@ -247,4 +247,67 @@
     <loc>https://llumedigital.com/blog/migrar-base-de-datos-nube</loc>
     <lastmod>2026-10-13</lastmod>
   </url>
+  <url>
+    <loc>https://llumedigital.com/casos/vision</loc>
+    <lastmod>2026-10-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/vision"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/vision"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/vision"/>
+  </url>
+  <url>
+    <loc>https://llumedigital.com/en/cases/vision</loc>
+    <lastmod>2026-10-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/vision"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/vision"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/vision"/>
+  </url>
+  <url>
+    <loc>https://llumedigital.com/pt/casos/vision</loc>
+    <lastmod>2026-10-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/vision"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/vision"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/vision"/>
+  </url>
+  <url>
+    <loc>https://llumedigital.com/formacion</loc>
+    <lastmod>2026-10-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/formacion"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/training"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/formacao"/>
+  </url>
+  <url>
+    <loc>https://llumedigital.com/en/training</loc>
+    <lastmod>2026-10-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/formacion"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/training"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/formacao"/>
+  </url>
+  <url>
+    <loc>https://llumedigital.com/pt/formacao</loc>
+    <lastmod>2026-10-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/formacion"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/training"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/formacao"/>
+  </url>
+  <url>
+    <loc>https://llumedigital.com/preguntas</loc>
+    <lastmod>2026-10-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/preguntas"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/faq"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/perguntas"/>
+  </url>
+  <url>
+    <loc>https://llumedigital.com/en/faq</loc>
+    <lastmod>2026-10-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/preguntas"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/faq"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/perguntas"/>
+  </url>
+  <url>
+    <loc>https://llumedigital.com/pt/perguntas</loc>
+    <lastmod>2026-10-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/preguntas"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/faq"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/perguntas"/>
+  </url>
 </urlset>
