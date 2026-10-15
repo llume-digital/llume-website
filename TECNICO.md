@@ -59,7 +59,7 @@ La portada tiene 9 bloques:
 | `#casos` | 3 destacados (Clevercar, visión artificial como "Experiencia del equipo", Proactive); "Ver los otros 4 casos" despliega el resto (`.cx-extra`). El caso de visión no nombra cliente a propósito |
 | `#calculadora` | Calculadora del coste de las tareas repetitivas |
 | `#proceso` | "Cuatro pasos, sin sorpresas": incluye la primera reunión gratis, el diagnóstico con garantía y el acompañamiento posterior; botón "Pedir diagnóstico", tabla comparativa, 3 compromisos y las dos filas de logos de integraciones |
-| `#formacion` | Formación en IA y digitalización para equipos: qué aprenderán, herramientas (Claude, Claude Code…), 4 formatos y modalidades; sin precio |
+| `#formacion` | Formación en IA en 3 sesiones (conocer la empresa + 2 talleres de 3 h) y guía final; independiente de la herramienta. Programa completo en `/formacion` |
 | `#contacto` | "¿Qué pasa en la primera llamada?", formulario de llamada y primera capa de protección de datos |
 
 "Nosotros" tiene página propia: `/nosotros`, `/en/about` y `/pt/sobre-nos`. Formación completa en `/formacion` (`/en/training`, `/pt/formacao`) y preguntas frecuentes en `/preguntas` (`/en/faq`, `/pt/perguntas`), generadas con `scripts/build_pages.py`.
@@ -102,6 +102,9 @@ Cloudflare Workers conectado a `llume26/llume-website`: cada push a `main` publi
 - **Logos en mejor calidad**: Universidad de Oviedo (175×125) y Proactive Future a color.
 
 ## 8. Configuración de Cloudflare
+
+LinkedIn: el pie de las portadas lleva el icono como `<span class="social-link soon">` (no clicable). Cuando exista la página de empresa, cambiarlo por `<a class="social-link" href="…">` en las tres portadas y añadir la URL en `sameAs` del `ProfessionalService`.
+
 
 - **Always Use HTTPS** activado: `http://` redirige a `https://`.
 - **Regla de redirección** `www.llumedigital.com/*` → `llumedigital.com/*` (301).

@@ -826,3 +826,32 @@ input::placeholder, textarea::placeholder { color: #5f5b55; }
 .faq-page h1 { font-size: clamp(34px, 4.6vw, 54px); font-weight: 300; letter-spacing: -.03em; line-height: 1.08; }
 @media (max-width: 1000px) { .track-grid { grid-template-columns: 1fr 1fr; } .grid-3-why { grid-template-columns: 1fr; } .train-split { grid-template-columns: 1fr; gap: 0; } }
 @media (max-width: 640px) { .track-grid { grid-template-columns: 1fr; } }
+
+/* ---------- training: 3 sessions ---------- */
+.sessions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; position: relative; }
+.session { padding: 24px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel); backdrop-filter: blur(12px); display: flex; flex-direction: column; }
+.session:first-child { background: radial-gradient(ellipse at 0% 0%, rgba(242,192,138,.12), transparent 60%), var(--panel); }
+.session-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.session-n { font: 500 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--amber); }
+.session .step-chip { margin: 0; }
+.session h3 { margin-top: 16px; font-size: 20px; font-weight: 400; letter-spacing: -.01em; }
+.session > p { margin-top: 8px; color: var(--muted); font-size: 14.5px; }
+.session .card-list { margin: 16px 0 0; font-size: 14px; }
+.t-foot-text { display: grid; gap: 10px; max-width: 640px; }
+.t-foot-text p { color: var(--muted); font-size: 14px; }
+.train-page .t-mods { margin-top: 22px; }
+.guide { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; padding: clamp(22px, 3vw, 32px);
+  border-radius: var(--radius); border: 1px solid rgba(242,192,138,.4); background: radial-gradient(ellipse at 100% 0%, rgba(242,192,138,.12), transparent 60%), var(--panel); }
+.guide .page-h2 { margin: 0 0 8px; font-size: clamp(22px, 2.6vw, 28px); }
+.guide p { color: var(--muted); }
+.guide .card-list { margin: 0; }
+.train-page .sessions { margin-top: 0; }
+.train-page .law-note { margin-top: 14px; }
+@media (max-width: 1000px) { .sessions { grid-template-columns: 1fr; } .guide { grid-template-columns: 1fr; } }
+
+/* footer social */
+.social { display: flex; gap: 10px; margin-top: 22px; }
+.social-link { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; border: 1px solid var(--line); color: #d6d0c6; transition: color .2s, border-color .2s; }
+.social-link svg { width: 17px; height: 17px; fill: currentColor; }
+a.social-link:hover { color: #fff; border-color: #0a66c2; background: #0a66c2; }
+.social-link.soon { opacity: .55; cursor: default; }

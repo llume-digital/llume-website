@@ -25,7 +25,7 @@ FAQ = {
  "es": {
   "eyebrow": "Preguntas frecuentes",
   "h2": "Lo que nos<br>suelen preguntar.",
-  "help": "<p class=\"faq-help-q\">¿No encuentras tu respuesta?</p>\n          <p>Escríbenos y te contestamos personalmente, sin respuestas automáticas.</p>\n          <div class=\"faq-help-actions\"><a class=\"btn btn-light btn-sm\" href=\"#contacto\">Hablemos <span aria-hidden=\"true\">→</span></a><a class=\"btn btn-ghost btn-sm\" href=\"mailto:info@llume.net\">Escríbenos</a>",
+  "help": "<p class=\"faq-help-q\">¿No encuentras tu respuesta?</p>\n          <p>Escríbenos y te contestamos personalmente, sin respuestas automáticas.</p>\n          <div class=\"faq-help-actions\"><a class=\"btn btn-light btn-sm\" href=\"#contacto\">Hablemos <span aria-hidden=\"true\">→</span></a><a class=\"btn btn-ghost btn-sm\" href=\"mailto:info@llume.net\">Escríbenos</a></div>",
   "items": [
    [
     "¿Cuánto cuesta un proyecto?",
@@ -68,7 +68,7 @@ FAQ = {
  "en": {
   "eyebrow": "FAQ",
   "h2": "What people<br>usually ask us.",
-  "help": "<p class=\"faq-help-q\">Can't find your answer?</p>\n          <p>Write to us and a real person will reply, no automated answers.</p>\n          <div class=\"faq-help-actions\"><a class=\"btn btn-light btn-sm\" href=\"#contacto\">Let's talk <span aria-hidden=\"true\">→</span></a><a class=\"btn btn-ghost btn-sm\" href=\"mailto:info@llume.net\">Email us</a>",
+  "help": "<p class=\"faq-help-q\">Can't find your answer?</p>\n          <p>Write to us and a real person will reply, no automated answers.</p>\n          <div class=\"faq-help-actions\"><a class=\"btn btn-light btn-sm\" href=\"#contacto\">Let's talk <span aria-hidden=\"true\">→</span></a><a class=\"btn btn-ghost btn-sm\" href=\"mailto:info@llume.net\">Email us</a></div>",
   "items": [
    [
     "How much does a project cost?",
@@ -111,7 +111,7 @@ FAQ = {
  "pt": {
   "eyebrow": "Perguntas frequentes",
   "h2": "O que nos<br>costumam perguntar.",
-  "help": "<p class=\"faq-help-q\">Não encontra a sua resposta?</p>\n          <p>Escreva-nos e responde-lhe uma pessoa, sem respostas automáticas.</p>\n          <div class=\"faq-help-actions\"><a class=\"btn btn-light btn-sm\" href=\"#contacto\">Vamos falar <span aria-hidden=\"true\">→</span></a><a class=\"btn btn-ghost btn-sm\" href=\"mailto:info@llume.net\">Escreva-nos</a>",
+  "help": "<p class=\"faq-help-q\">Não encontra a sua resposta?</p>\n          <p>Escreva-nos e responde-lhe uma pessoa, sem respostas automáticas.</p>\n          <div class=\"faq-help-actions\"><a class=\"btn btn-light btn-sm\" href=\"#contacto\">Vamos falar <span aria-hidden=\"true\">→</span></a><a class=\"btn btn-ghost btn-sm\" href=\"mailto:info@llume.net\">Escreva-nos</a></div>",
   "items": [
    [
     "Quanto custa um projeto?",
@@ -156,129 +156,84 @@ FAQ = {
 TRAINING = {
     "es": {
         "title": "Formación en IA para empresas",
-        "desc": "Formación práctica en inteligencia artificial para equipos: productividad, asistentes conectados, automatización sin código, Claude Code y uso seguro. En persona u online.",
+        "desc": "Formación práctica en inteligencia artificial para equipos en tres sesiones: conocemos tu empresa y hacemos dos talleres de 3 horas con ejercicios sobre vuestro trabajo real, con guía final.",
         "eyebrow": "Formación",
         "h1": "Que tu equipo le saque todo el partido a la IA.",
-        "lead": "No se trata de enseñar a chatear con una herramienta. Formamos a tu equipo para trabajar con IA de verdad: conectada a vuestros datos, con habilidades propias para cada puesto y automatizando lo repetitivo. Con casos de tu empresa, en persona u online.",
+        "lead": "Una formación práctica en tres sesiones, pensada para tu empresa. Primero entendemos cómo trabajáis y después hacemos dos talleres con ejercicios sobre vuestras tareas reales. Vale para cualquier herramienta de IA.",
         "law": "Además, el Reglamento europeo de IA obliga a las empresas que usan IA a adoptar medidas para que su personal tenga un nivel suficiente de alfabetización en IA (artículo 4).",
-        "why_h": "Cómo es nuestra formación",
-        "why": [("Con tus casos reales", "Antes de empezar analizamos tareas reales de tu equipo y practicamos con ellas, no con ejemplos de manual."),
-                ("Práctica desde el minuto uno", "Cada sesión termina con algo funcionando: una plantilla, una habilidad, una automatización."),
-                ("Para cualquier nivel", "Desde quien nunca ha usado IA hasta equipos técnicos que quieren trabajar con agentes.")],
-        "tracks_h": "Programas",
-        "for": "Para",
-        "tracks": [
-            ("IA para dirección", "gerencia y mandos", "Dónde aporta valor la IA en tu empresa y dónde no, cómo priorizar y cómo organizar su adopción.",
-             ["Mapa de oportunidades por área", "Casos reales, costes y límites", "Plan de adopción y reglas de uso"]),
-            ("Productividad con IA para todo el equipo", "cualquier puesto", "Usar asistentes de IA a diario y con criterio para escribir, resumir, analizar y preparar trabajo.",
-             ["Cómo pedirle las cosas para que funcione", "Correos, documentos e informes", "Hojas de cálculo y análisis de datos", "Revisar resultados y evitar errores"]),
-            ("Tu asistente con superpoderes", "equipos que quieren ir más allá del chat", "Convertir la IA en una herramienta de trabajo conectada con tu empresa.",
-             ["Proyectos con el contexto de tu empresa", "Habilidades (skills) reutilizables para cada puesto", "Artefactos: documentos, páginas y pequeñas herramientas", "Conectores con correo, calendario, documentos y CRM"]),
-            ("Automatización sin código con IA", "administración, operaciones y atención al cliente", "Quitar trabajo repetitivo combinando IA y automatización, sin programar.",
-             ["Correos y respuestas automáticas", "Leer documentos y extraer datos", "Informes que se preparan solos", "Flujos con Make, n8n o Zapier"]),
-            ("Claude Code para equipos", "equipos técnicos y perfiles con curiosidad", "Trabajar con agentes que programan contigo: de la idea a una herramienta funcionando.",
-             ["Scripts, webs y herramientas internas", "Trabajar con repositorios y revisar código", "Automatizar tareas con agentes", "Buenas prácticas, seguridad y calidad"]),
-            ("IA segura y responsable", "toda la empresa", "Usar la IA sin poner en riesgo datos, clientes ni reputación.",
-             ["Protección de datos y RGPD", "Qué exige el Reglamento europeo de IA", "Política de uso interna", "Errores, sesgos y fugas de información"]),
+        "sessions_h": "Cómo es la formación",
+        "sessions": [
+            ("Sesión 1", "Antes de formar", "Conocemos cómo trabajáis",
+             "Hablamos con el equipo para entender a qué os dedicáis, qué herramientas usáis y qué tareas os quitan más tiempo. Con eso preparamos los ejercicios de los talleres.",
+             ["Tareas y procesos del día a día", "Herramientas que ya usáis", "Nivel de partida del equipo", "Casos reales con los que practicar"]),
+            ("Sesión 2", "Taller práctico · 3 h", "Trabajar con IA en el día a día",
+             "Los fundamentos para usar la IA con criterio y sacarle partido desde el primer día.",
+             ["Cómo funcionan los modelos y qué pueden hacer (y qué no)", "Elegir el modelo y el nivel de esfuerzo adecuados para cada tarea", "Pedir bien: instrucciones, contexto y ejemplos", "Gestionar conversaciones: bifurcar, rebobinar y retomar", "Revisar resultados y evitar errores", "Ejercicios con vuestros correos, documentos e informes"]),
+            ("Sesión 3", "Taller práctico · 3 h", "De asistente a agente",
+             "Llevar la IA más allá del chat: que conozca vuestra empresa, trabaje con vuestras herramientas y haga tareas por vosotros.",
+             ["Archivos de instrucciones para agentes (AGENTS.md y similares): tu empresa explicada a la IA", "Habilidades reutilizables para cada puesto", "Conectar la IA con el correo, el calendario, los documentos y el CRM", "Automatizar tareas repetitivas y correos", "Crear documentos y pequeñas herramientas sin programar", "Seguridad y protección de datos"]),
         ],
-        "how_h": "Cómo funciona",
-        "how": [("Antes", "Hablamos con tu equipo, vemos qué herramientas usáis y elegimos las tareas con las que practicar."),
-                ("Durante", "Sesiones prácticas en tu empresa o en directo online, con ejercicios sobre vuestro trabajo real."),
-                ("Después", "Materiales, grabaciones y un periodo para resolver dudas mientras lo aplicáis.")],
-        "formats_h": "Formatos",
-        "formats": [("Taller de introducción", "Media jornada para todo el equipo: qué puede hacer la IA en su día a día y primeros usos prácticos."),
-                    ("Programa por niveles", "Varias sesiones, de lo básico a lo avanzado, combinando los programas que necesitéis."),
-                    ("A medida por departamento", "Cada área practica con sus propios procesos y documentos."),
-                    ("Acompañamiento posterior", "Sesiones de seguimiento para resolver dudas y llevar lo aprendido a más tareas.")],
-        "get_h": "Qué se lleva tu equipo",
-        "get": ["Una guía de uso de la IA adaptada a tu empresa", "Biblioteca de instrucciones y habilidades para cada puesto", "Plantillas y automatizaciones listas para usar", "Grabaciones y materiales de las sesiones", "Certificado de asistencia"],
-        "tools": "Trabajamos con herramientas como Claude, Claude Code, ChatGPT, Microsoft Copilot, Gemini, Make o n8n, y nos adaptamos a las que ya uséis.",
+        "guide_h": "Y al final, una guía para seguir por vuestra cuenta",
+        "guide_p": "Un documento adaptado a tu empresa con todo lo trabajado en los talleres:",
+        "guide": ["Las instrucciones y habilidades creadas para vuestros puestos", "Plantillas de peticiones para las tareas más habituales", "Qué modelo y nivel de esfuerzo usar para cada tipo de tarea", "Buenas prácticas y normas de uso para el equipo"],
+        "tools": "Es independiente de la herramienta: trabajamos con ChatGPT, Claude, Gemini, Microsoft Copilot o la que uséis.",
+        "mods": ["En persona, en tu empresa", "Online, en directo", "Para todo el equipo o por áreas"],
         "cta_h": "¿Formamos a tu equipo?",
         "cta_p": "Cuéntanos cuántas personas sois, qué hacéis y qué herramientas usáis, y te enviamos una propuesta.",
         "cta": "Pedir propuesta de formación",
     },
     "en": {
         "title": "AI training for companies",
-        "desc": "Hands-on artificial intelligence training for teams: productivity, connected assistants, no-code automation, Claude Code and safe use. In person or online.",
+        "desc": "Hands-on artificial intelligence training for teams in three sessions: we get to know your company and run two 3-hour workshops with exercises on your real work, plus a final guide.",
         "eyebrow": "Training",
         "h1": "Help your team get the most out of AI.",
-        "lead": "This is not about learning to chat with a tool. We train your team to really work with AI: connected to your data, with skills built for each role and automating the repetitive work. With your own company's cases, in person or online.",
+        "lead": "Hands-on training in three sessions, designed around your company. First we understand how you work, then we run two workshops with exercises on your real tasks. It works with any AI tool.",
         "law": "What is more, the EU AI Act requires companies that use AI to take measures to ensure a sufficient level of AI literacy among their staff (Article 4).",
-        "why_h": "What our training is like",
-        "why": [("With your real cases", "Before we start, we look at your team's real tasks and practise with them, not with textbook examples."),
-                ("Hands-on from minute one", "Every session ends with something working: a template, a skill, an automation."),
-                ("For every level", "From people who have never used AI to technical teams that want to work with agents.")],
-        "tracks_h": "Programmes",
-        "for": "For",
-        "tracks": [
-            ("AI for leadership", "management and team leads", "Where AI adds value in your company and where it doesn't, how to prioritise and how to organise its adoption.",
-             ["Opportunity map by area", "Real cases, costs and limits", "Adoption plan and usage rules"]),
-            ("AI productivity for the whole team", "any role", "Using AI assistants every day, wisely, to write, summarise, analyse and prepare work.",
-             ["How to ask so it works", "Emails, documents and reports", "Spreadsheets and data analysis", "Checking results and avoiding errors"]),
-            ("Your assistant with superpowers", "teams that want to go beyond chat", "Turning AI into a work tool connected to your company.",
-             ["Projects with your company's context", "Reusable skills for each role", "Artifacts: documents, pages and small tools", "Connectors to email, calendar, documents and CRM"]),
-            ("No-code automation with AI", "admin, operations and customer service", "Removing repetitive work by combining AI and automation, without coding.",
-             ["Automatic emails and replies", "Reading documents and extracting data", "Reports that prepare themselves", "Workflows with Make, n8n or Zapier"]),
-            ("Claude Code for teams", "technical teams and curious profiles", "Working with agents that code alongside you: from idea to a working tool.",
-             ["Scripts, websites and internal tools", "Working with repositories and reviewing code", "Automating tasks with agents", "Good practice, security and quality"]),
-            ("Safe and responsible AI", "the whole company", "Using AI without putting data, customers or reputation at risk.",
-             ["Data protection and GDPR", "What the EU AI Act requires", "Internal usage policy", "Errors, bias and data leaks"]),
+        "sessions_h": "How the training works",
+        "sessions": [
+            ("Session 1", "Before the training", "We get to know how you work",
+             "We talk to your team to understand what you do, which tools you use and which tasks take up most of your time. We use that to prepare the workshop exercises.",
+             ["Day-to-day tasks and processes", "Tools you already use", "Your team's starting level", "Real cases to practise with"]),
+            ("Session 2", "Hands-on workshop · 3 h", "Working with AI every day",
+             "The fundamentals to use AI wisely and get value from day one.",
+             ["How models work and what they can (and can't) do", "Choosing the right model and effort level for each task", "Asking well: instructions, context and examples", "Managing conversations: branching, rewinding and resuming", "Checking results and avoiding errors", "Exercises with your own emails, documents and reports"]),
+            ("Session 3", "Hands-on workshop · 3 h", "From assistant to agent",
+             "Taking AI beyond chat: so it knows your company, works with your tools and does tasks for you.",
+             ["Instruction files for agents (AGENTS.md and similar): your company explained to the AI", "Reusable skills for each role", "Connecting AI to email, calendar, documents and the CRM", "Automating repetitive tasks and emails", "Creating documents and small tools without coding", "Security and data protection"]),
         ],
-        "how_h": "How it works",
-        "how": [("Before", "We talk to your team, look at the tools you use and choose the tasks to practise with."),
-                ("During", "Hands-on sessions at your company or live online, with exercises on your real work."),
-                ("After", "Materials, recordings and a period to answer questions while you put it into practice.")],
-        "formats_h": "Formats",
-        "formats": [("Introductory workshop", "Half a day for the whole team: what AI can do in their day-to-day and first practical uses."),
-                    ("Programme by levels", "Several sessions, from basic to advanced, combining the programmes you need."),
-                    ("Tailored by department", "Each area practises with its own processes and documents."),
-                    ("Follow-up support", "Follow-up sessions to answer questions and extend what was learned to more tasks.")],
-        "get_h": "What your team takes away",
-        "get": ["An AI usage guide adapted to your company", "A library of instructions and skills for each role", "Ready-to-use templates and automations", "Session recordings and materials", "Certificate of attendance"],
-        "tools": "We work with tools such as Claude, Claude Code, ChatGPT, Microsoft Copilot, Gemini, Make or n8n, and adapt to the ones you already use.",
+        "guide_h": "And at the end, a guide to keep going on your own",
+        "guide_p": "A document adapted to your company with everything covered in the workshops:",
+        "guide": ["The instructions and skills created for your roles", "Prompt templates for your most common tasks", "Which model and effort level to use for each kind of task", "Good practice and usage rules for the team"],
+        "tools": "It is tool-independent: we work with ChatGPT, Claude, Gemini, Microsoft Copilot or whichever you use.",
+        "mods": ["In person, at your company", "Online, live", "For the whole team or by area"],
         "cta_h": "Shall we train your team?",
         "cta_p": "Tell us how many you are, what you do and which tools you use, and we'll send you a proposal.",
         "cta": "Request a training proposal",
     },
     "pt": {
         "title": "Formação em IA para empresas",
-        "desc": "Formação prática em inteligência artificial para equipas: produtividade, assistentes ligados aos seus dados, automação sem código, Claude Code e uso seguro. Presencial ou online.",
+        "desc": "Formação prática em inteligência artificial para equipas em três sessões: conhecemos a sua empresa e fazemos dois workshops de 3 horas com exercícios sobre o vosso trabalho real, com guia final.",
         "eyebrow": "Formação",
         "h1": "Que a sua equipa tire todo o partido da IA.",
-        "lead": "Não se trata de aprender a conversar com uma ferramenta. Formamos a sua equipa para trabalhar a sério com IA: ligada aos vossos dados, com competências próprias para cada função e a automatizar o repetitivo. Com casos da sua empresa, presencial ou online.",
+        "lead": "Uma formação prática em três sessões, pensada para a sua empresa. Primeiro percebemos como trabalham e depois fazemos dois workshops com exercícios sobre as vossas tarefas reais. Serve para qualquer ferramenta de IA.",
         "law": "Além disso, o Regulamento europeu da IA obriga as empresas que usam IA a adotar medidas para que o seu pessoal tenha um nível suficiente de literacia em IA (artigo 4.º).",
-        "why_h": "Como é a nossa formação",
-        "why": [("Com os seus casos reais", "Antes de começar analisamos tarefas reais da sua equipa e praticamos com elas, não com exemplos de manual."),
-                ("Prática desde o primeiro minuto", "Cada sessão termina com algo a funcionar: um modelo, uma competência, uma automação."),
-                ("Para qualquer nível", "Desde quem nunca usou IA até equipas técnicas que querem trabalhar com agentes.")],
-        "tracks_h": "Programas",
-        "for": "Para",
-        "tracks": [
-            ("IA para a direção", "gestão e chefias", "Onde a IA acrescenta valor na sua empresa e onde não, como priorizar e como organizar a adoção.",
-             ["Mapa de oportunidades por área", "Casos reais, custos e limites", "Plano de adoção e regras de uso"]),
-            ("Produtividade com IA para toda a equipa", "qualquer função", "Usar assistentes de IA todos os dias e com critério para escrever, resumir, analisar e preparar trabalho.",
-             ["Como pedir para que funcione", "E-mails, documentos e relatórios", "Folhas de cálculo e análise de dados", "Rever resultados e evitar erros"]),
-            ("O seu assistente com superpoderes", "equipas que querem ir além do chat", "Transformar a IA numa ferramenta de trabalho ligada à sua empresa.",
-             ["Projetos com o contexto da sua empresa", "Competências (skills) reutilizáveis para cada função", "Artefactos: documentos, páginas e pequenas ferramentas", "Conectores com e-mail, calendário, documentos e CRM"]),
-            ("Automação sem código com IA", "administração, operações e apoio ao cliente", "Eliminar trabalho repetitivo combinando IA e automação, sem programar.",
-             ["E-mails e respostas automáticas", "Ler documentos e extrair dados", "Relatórios que se preparam sozinhos", "Fluxos com Make, n8n ou Zapier"]),
-            ("Claude Code para equipas", "equipas técnicas e perfis curiosos", "Trabalhar com agentes que programam consigo: da ideia a uma ferramenta a funcionar.",
-             ["Scripts, sites e ferramentas internas", "Trabalhar com repositórios e rever código", "Automatizar tarefas com agentes", "Boas práticas, segurança e qualidade"]),
-            ("IA segura e responsável", "toda a empresa", "Usar a IA sem pôr em risco dados, clientes nem reputação.",
-             ["Proteção de dados e RGPD", "O que exige o Regulamento europeu da IA", "Política de uso interna", "Erros, enviesamentos e fugas de informação"]),
+        "sessions_h": "Como é a formação",
+        "sessions": [
+            ("Sessão 1", "Antes da formação", "Conhecemos como trabalham",
+             "Falamos com a equipa para perceber o que fazem, que ferramentas usam e que tarefas vos ocupam mais tempo. Com isso preparamos os exercícios dos workshops.",
+             ["Tarefas e processos do dia a dia", "Ferramentas que já usam", "Nível de partida da equipa", "Casos reais para praticar"]),
+            ("Sessão 2", "Workshop prático · 3 h", "Trabalhar com IA no dia a dia",
+             "Os fundamentos para usar a IA com critério e tirar partido dela desde o primeiro dia.",
+             ["Como funcionam os modelos e o que conseguem fazer (e o que não)", "Escolher o modelo e o nível de esforço adequados a cada tarefa", "Pedir bem: instruções, contexto e exemplos", "Gerir conversas: bifurcar, recuar e retomar", "Rever resultados e evitar erros", "Exercícios com os vossos e-mails, documentos e relatórios"]),
+            ("Sessão 3", "Workshop prático · 3 h", "De assistente a agente",
+             "Levar a IA além do chat: que conheça a vossa empresa, trabalhe com as vossas ferramentas e faça tarefas por vós.",
+             ["Ficheiros de instruções para agentes (AGENTS.md e semelhantes): a sua empresa explicada à IA", "Competências reutilizáveis para cada função", "Ligar a IA ao e-mail, ao calendário, aos documentos e ao CRM", "Automatizar tarefas repetitivas e e-mails", "Criar documentos e pequenas ferramentas sem programar", "Segurança e proteção de dados"]),
         ],
-        "how_h": "Como funciona",
-        "how": [("Antes", "Falamos com a sua equipa, vemos que ferramentas usam e escolhemos as tarefas para praticar."),
-                ("Durante", "Sessões práticas na sua empresa ou em direto online, com exercícios sobre o vosso trabalho real."),
-                ("Depois", "Materiais, gravações e um período para tirar dúvidas enquanto aplicam o que aprenderam.")],
-        "formats_h": "Formatos",
-        "formats": [("Workshop de introdução", "Meio dia para toda a equipa: o que a IA pode fazer no dia a dia e primeiros usos práticos."),
-                    ("Programa por níveis", "Várias sessões, do básico ao avançado, combinando os programas de que precisarem."),
-                    ("À medida por departamento", "Cada área pratica com os seus próprios processos e documentos."),
-                    ("Acompanhamento posterior", "Sessões de acompanhamento para tirar dúvidas e levar o que aprenderam a mais tarefas.")],
-        "get_h": "O que a sua equipa leva",
-        "get": ["Um guia de uso da IA adaptado à sua empresa", "Biblioteca de instruções e competências para cada função", "Modelos e automações prontos a usar", "Gravações e materiais das sessões", "Certificado de presença"],
-        "tools": "Trabalhamos com ferramentas como Claude, Claude Code, ChatGPT, Microsoft Copilot, Gemini, Make ou n8n, e adaptamo-nos às que já usam.",
+        "guide_h": "E no fim, um guia para continuarem por vossa conta",
+        "guide_p": "Um documento adaptado à sua empresa com tudo o que foi trabalhado nos workshops:",
+        "guide": ["As instruções e competências criadas para as vossas funções", "Modelos de pedidos para as tarefas mais habituais", "Que modelo e nível de esforço usar para cada tipo de tarefa", "Boas práticas e regras de uso para a equipa"],
+        "tools": "É independente da ferramenta: trabalhamos com ChatGPT, Claude, Gemini, Microsoft Copilot ou a que usarem.",
+        "mods": ["Presencial, na sua empresa", "Online, em direto", "Para toda a equipa ou por áreas"],
         "cta_h": "Formamos a sua equipa?",
         "cta_p": "Diga-nos quantas pessoas são, o que fazem e que ferramentas usam, e enviamos uma proposta.",
         "cta": "Pedir proposta de formação",
@@ -344,45 +299,35 @@ def training(code):
     schema = {"@context": "https://schema.org", "@type": "Service", "name": T["title"], "description": T["desc"],
               "provider": {"@type": "Organization", "name": "llume", "url": BASE + S["home"]},
               "areaServed": ["ES", "PT"], "serviceType": T["title"]}
-    why = "".join(f'<div class="mini"><h3>{h}</h3><p>{p}</p></div>' for h, p in T["why"])
-    tracks = "".join(f"""
-        <article class="track-card">
-          <span class="track-n">{i + 1:02d}</span>
-          <h3>{n}</h3>
-          <p class="track-for">{T['for']} {who}</p>
-          <p>{d}</p>
+    sessions = "".join(f"""
+        <article class="session">
+          <div class="session-top"><span class="session-n">{label}</span><span class="step-chip">{when}</span></div>
+          <h3>{title}</h3>
+          <p>{intro}</p>
           <ul class="card-list">{''.join(f'<li>{x}</li>' for x in items)}</ul>
-        </article>""" for i, (n, who, d, items) in enumerate(T["tracks"]))
-    how = "".join(f'<li><span class="step-chip">{k}</span><p>{p}</p></li>' for k, p in T["how"])
-    fmts = "".join(f'<div class="t-fmt"><h4>{h}</h4><p>{p}</p></div>' for h, p in T["formats"])
-    get = "".join(f"<li>{x}</li>" for x in T["get"])
+        </article>""" for label, when, title, intro, items in T["sessions"])
+    guide = "".join(f"<li>{x}</li>" for x in T["guide"])
+    mods = "".join(f"<li>{m}</li>" for m in T["mods"])
     return head(code, T["title"], T["desc"], S["train"], schema) + f"""  <main class="wrap train-page">
     <p class="eyebrow">{T['eyebrow']}</p>
     <h1>{T['h1']}</h1>
     <p class="lead">{T['lead']}</p>
-    <p class="law-note">{T['law']}</p>
-    <div class="cta-row"><a href="{S['home']}#contacto" class="btn btn-light">{T['cta']} <span aria-hidden="true">→</span></a></div>
+    <ul class="t-mods">{mods}</ul>
 
-    <h2 class="page-h2">{T['why_h']}</h2>
-    <div class="grid-3-why">{why}</div>
-
-    <h2 class="page-h2">{T['tracks_h']}</h2>
-    <div class="track-grid">{tracks}
+    <h2 class="page-h2">{T['sessions_h']}</h2>
+    <div class="sessions">{sessions}
     </div>
+
+    <div class="guide">
+      <div>
+        <h2 class="page-h2">{T['guide_h']}</h2>
+        <p>{T['guide_p']}</p>
+      </div>
+      <ul class="card-list">{guide}</ul>
+    </div>
+
     <p class="t-tools">{T['tools']}</p>
-
-    <div class="train-split">
-      <div>
-        <h2 class="page-h2">{T['how_h']}</h2>
-        <ol class="how-list">{how}</ol>
-        <h2 class="page-h2">{T['get_h']}</h2>
-        <ul class="card-list get-list">{get}</ul>
-      </div>
-      <div>
-        <h2 class="page-h2">{T['formats_h']}</h2>
-        <div class="t-fmts">{fmts}</div>
-      </div>
-    </div>
+    <p class="law-note">{T['law']}</p>
 
     <div class="offer">
       <div>
@@ -422,12 +367,22 @@ def faq_page(code):
 """ + foot(code)
 
 
+def check_balance(page, name):
+    import re
+    for tag in ("div", "section", "ul", "ol", "main", "details", "article"):
+        opened, closed = len(re.findall(rf"<{tag}[\s>]", page)), page.count(f"</{tag}>")
+        if opened != closed:
+            raise SystemExit(f"{name}: <{tag}> abiertos {opened}, cerrados {closed}")
+
+
 def main():
     for code, S in SITE.items():
         for slug, render in ((S["train"], training), (S["faq"], faq_page)):
             out = PUBLIC / f"{slug}.html"
             out.parent.mkdir(parents=True, exist_ok=True)
-            out.write_text(render(code))
+            page = render(code)
+            check_balance(page, slug)
+            out.write_text(page)
             print(f"/{slug}")
 
 

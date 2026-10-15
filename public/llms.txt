@@ -7,7 +7,7 @@
 - **Automatización de procesos**: presupuestos, facturas, informes, avisos y seguimientos que se generan solos.
 - **Integración y migración a la nube**: conexión entre herramientas (ERP, CRM, correo…) y migración de bases de datos antiguas sin parar la actividad.
 - **Software y plataformas a medida**: CRM, portales, paneles de gestión, pagos online e inscripciones, con frontend y backend propios.
-- **Formación en IA y digitalización**: talleres y programas para equipos, en persona u online, sobre el uso práctico de la IA (asistentes, automatizaciones, conexión con correo, documentos y CRM). Herramientas como Claude y Claude Code, entre otras.
+- **Formación en IA para empresas**: tres sesiones (una para conocer la empresa y dos talleres prácticos de 3 horas) y una guía final. Elegir modelo y nivel de esfuerzo, gestionar conversaciones, archivos de instrucciones para agentes (AGENTS.md), habilidades, conectores y automatizaciones. Independiente de la herramienta (ChatGPT, Claude, Gemini, Copilot…). En persona u online.
 - **Visión artificial a medida**: cámaras que detectan defectos, clasifican productos o avisan de situaciones de riesgo (industria y logística, seguridad y prevención, movilidad y transporte, infraestructuras).
 - **Datos y cuadros de mando**: la información del negocio reunida en paneles que se actualizan solos, para decidir con datos.
 
