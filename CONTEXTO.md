@@ -2,6 +2,8 @@
 
 > Nombre siempre en minúscula: **llume** (nunca "Llume" ni "LLUME"). Con punto en el logotipo: **llume.**
 
+> Este documento conserva decisiones y descripciones de etapas anteriores. Para el estado técnico actual, consultar `TECNICO.md` y `AUDITORIA.md`.
+
 ## 1. Qué es llume
 
 - Consultora que **soluciona problemas y automatiza procesos en otras empresas mediante agentes de IA**.
@@ -37,7 +39,7 @@ Logos en [assets/partners/](assets/partners/):
 - Universidad de Oviedo · `uniovi.png` (versión pequeña, 175×125; convendría conseguir vectorial)
 - Corradi · `corradi.svg` (viene de mapa.proactivefuture.eu)
 
-Pendiente: confirmar permiso de uso de cada entidad antes de publicar, y que la afirmación "confían en nosotros" sea cierta con las cuatro.
+El titular confirmó el 22 de octubre de 2026 que los logos, testimonios y resultados publicados están autorizados.
 
 ## 5. Identidad visual
 
@@ -93,8 +95,8 @@ Luego abrir http://localhost:8123.
 
 - [ ] Casos de éxito reales (ahora son ilustrativos) e imágenes reales o generadas.
 - [ ] Páginas legales: aviso legal, privacidad, cookies (los enlaces del footer están vacíos).
-- [ ] Envío real del formulario a info@llumedigital.com (servicio de formularios o función en Vercel; implica pasar datos de visitantes a un tercero, decidir).
-- [ ] Confirmar ubicación (Oviedo) y permisos de uso de los logos de colaboradores.
+- [ ] Envío directo del formulario a info@llumedigital.com: aplazado por decisión del titular; se mantiene el correo preparado en la aplicación del visitante.
+- [ ] Confirmar ubicación (Oviedo). Los permisos de logos, testimonios y resultados publicados ya fueron confirmados.
 - [ ] Logo oficial en vectorial y logos de mejor calidad (Universidad de Oviedo, Proactive Future a color).
 - [ ] Newsletter del footer: ahora solo es visual, no guarda emails.
 - [ ] Decidir idioma(s): ahora solo español. Se planteó español/inglés.

@@ -90,9 +90,9 @@ Cloudflare Workers conectado a `llume26/llume-website`: cada push a `main` publi
 
 ## 7. Pendiente
 
-- **Datos legales**: cuando la empresa esté constituida, rellenar `OWNER` en `scripts/build_legal.py` (NIF, domicilio, registro) y ejecutarlo. Hoy solo figura el nombre y el email.
-- **Envío real del formulario** sin abrir el correo (un Worker con envío de email) y **agenda** para reservar la reunión.
-- **Equipo con fotos, testimonios reales y cifras de resultados** de cada caso, cuando existan.
+- **Datos legales**: por decisión del titular, los campos de NIF, domicilio y registro en `OWNER` (`scripts/build_legal.py`) quedan sin publicar por ahora. Hoy solo figuran el nombre y el email.
+- **Formulario**: se mantiene el envío mediante la aplicación de correo del visitante. El envío directo y una agenda quedan como posibles mejoras posteriores.
+- **Equipo y casos**: faltan identidad y fotos del equipo, y verificación documental de las cifras. El titular confirmó la autorización para mostrar los logos, testimonios y resultados publicados.
 - **Teléfono, LinkedIn y perfil de Google Business**.
 - **Precio del diagnóstico digital** y confirmar que se puede ofrecer la garantía.
 - **Alta como agente digitalizador / asesor** si se quiere afirmar que los proyectos se pueden pagar con el Kit Digital o el Kit Consulting (hoy la web solo ofrece ayudar a comprobarlo).

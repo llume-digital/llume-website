@@ -1,6 +1,6 @@
 # Auditoría de llume — 17 de octubre de 2026
 
-Auditoría realizada con tres agentes especializados (contenido/SEO, usabilidad/diseño y rendimiento/seguridad) y revisión integrada con navegador. Cambios aplicados al repositorio local; no se ha publicado ni hecho push.
+Auditoría realizada con tres agentes especializados (contenido/SEO, usabilidad/diseño y rendimiento/seguridad) y revisión integrada con navegador. Los cambios se publicaron posteriormente en `llumedigital.com`.
 
 ## Diagnóstico
 
@@ -52,12 +52,12 @@ Los cambios en páginas generadas también se han aplicado a sus scripts fuente.
 
 ## Pendientes que requieren información real
 
-1. Completar identidad del titular, domicilio e identificación fiscal en `scripts/build_legal.py` y regenerar. No se han inventado datos.
-2. Confirmar permiso de logos, testimonios, resultados cuantificados, alcance de la garantía y condiciones de propiedad del código.
+1. Completar identidad del titular, domicilio e identificación fiscal en `scripts/build_legal.py` y regenerar cuando se decida publicarlos. Por decisión del titular, esos campos permanecen vacíos por ahora; no se han inventado datos.
+2. Confirmar alcance de la garantía y condiciones de propiedad del código. El titular confirmó el permiso para mostrar los logos, testimonios y resultados presentes en la web el 22 de octubre de 2026.
 3. Identificar equipo y responsables, con material autorizado.
-4. Configurar envío real y, si interesa, agenda: el formulario actual necesita que el visitante envíe el correo desde su aplicación.
+4. El formulario seguirá preparando un correo en la aplicación del visitante por decisión del titular. Un envío directo y, si interesa, una agenda quedan para una fase posterior.
 5. Validar con El Puerto carta, alérgenos, fotografías y horario. El filtro no sustituye información confirmada por el establecimiento.
-6. Revisar producción tras publicar: cabeceras efectivas de Cloudflare, HTTPS, compresión, caché y mediciones de usuarios reales. La conexión HTTPS externa desde este entorno encontró un certificado no verificable; esto por sí solo no demuestra un defecto del dominio.
+6. Medir compresión, caché y experiencia de usuarios reales en producción cuando se disponga del acceso a la cuenta de Cloudflare. Tras la publicación se comprobaron la carga HTTPS de las páginas principales y la cabecera CSP.
 
 ## Evidencia y límites
 
@@ -82,3 +82,5 @@ Evidencia resumida en `audit/2026-10-17/`: `results.json` es el barrido inicial,
 ## Cambios posteriores
 
 Se eliminó el blog por petición posterior. Las páginas «Nosotros» y «Preguntas frecuentes» se reescribieron en español, inglés y portugués para explicar mejor los servicios y el proceso, y para precisar alcance, plazos, titularidad, licencias y gestión de datos sin presentar condiciones como garantizadas. Se regeneraron los casos y las páginas de preguntas desde sus fuentes.
+
+El 22 de octubre de 2026 se confirmó la autorización para mostrar los logos, testimonios y resultados publicados. El titular decidió conservar el formulario por correo y no publicar todavía los campos de identificación del titular. La comprobación de autorización no sustituye la verificación independiente de las cifras ni de las condiciones comerciales.
