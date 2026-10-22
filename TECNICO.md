@@ -93,14 +93,14 @@ Cloudflare Workers conectado a `llume26/llume-website`: cada push a `main` publi
 - **Datos legales**: por decisión del titular, los campos de NIF, domicilio y registro en `OWNER` (`scripts/build_legal.py`) quedan sin publicar por ahora. Hoy solo figuran el nombre y el email.
 - **Formulario**: se mantiene el envío mediante la aplicación de correo del visitante. El envío directo y una agenda quedan como posibles mejoras posteriores.
 - **Equipo y casos**: faltan identidad y fotos del equipo, y verificación documental de las cifras. El titular confirmó la autorización para mostrar los logos, testimonios y resultados publicados.
-- **Teléfono, LinkedIn y perfil de Google Business**.
+- **Teléfono y perfil de Google Business**.
 - **Precio del diagnóstico digital** y confirmar que se puede ofrecer la garantía.
 - **Alta como agente digitalizador / asesor** si se quiere afirmar que los proyectos se pueden pagar con el Kit Digital o el Kit Consulting (hoy la web solo ofrece ayudar a comprobarlo).
 - **Logos en mejor calidad**: Universidad de Oviedo (175×125) y Proactive Future a color.
 
 ## 8. Configuración de Cloudflare
 
-LinkedIn: el pie de las portadas lleva el icono como `<span class="social-link soon">` (no clicable). Cuando exista la página de empresa, cambiarlo por `<a class="social-link" href="…">` en las tres portadas y añadir la URL en `sameAs` del `ProfessionalService`.
+LinkedIn: el pie de las tres portadas enlaza a la página de empresa y el `ProfessionalService` incluye esa URL en `sameAs`.
 
 
 - **Always Use HTTPS** activado: `http://` redirige a `https://`.

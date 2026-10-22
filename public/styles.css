@@ -821,7 +821,6 @@ input::placeholder, textarea::placeholder { color: #a39c92; opacity: 1; }
 .social-link { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; border: 1px solid var(--line); color: #d6d0c6; transition: color .2s, border-color .2s; }
 .social-link svg { width: 17px; height: 17px; fill: currentColor; }
 a.social-link:hover { color: #fff; border-color: #0a66c2; background: #0a66c2; }
-.social-link.soon { opacity: .55; cursor: default; }
 .session .step-chip { white-space: nowrap; flex: none; }
 .session-n { flex: none; }
 
