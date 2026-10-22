@@ -1,0 +1,37 @@
+[
+  {
+    "path": "/",
+    "violations": [],
+    "canvas": {
+      "fallback": false
+    }
+  },
+  {
+    "path": "/en/",
+    "violations": [],
+    "canvas": {
+      "fallback": false
+    }
+  },
+  {
+    "path": "/pt/",
+    "violations": [],
+    "canvas": {
+      "fallback": false
+    }
+  },
+  {
+    "path": "/elpuertoluanco/",
+    "violations": [],
+    "canvas": {
+      "fallback": false
+    }
+  },
+  {
+    "path": "/elpuertoluanco/carta/",
+    "violations": [],
+    "canvas": {
+      "fallback": false
+    }
+  }
+]

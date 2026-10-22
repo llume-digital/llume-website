@@ -1,0 +1,2096 @@
+[
+  {
+    "file": "aviso-legal.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "cookies.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "formacion.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "index.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [
+      "http://127.0.0.1:8123/assets/cases/pf-desktop-720.webp",
+      "http://127.0.0.1:8123/assets/cases/pf-mobile-200.webp",
+      "http://127.0.0.1:8123/assets/cases/cor-desktop-720.webp",
+      "http://127.0.0.1:8123/assets/cases/cor-mobile-200.webp",
+      "http://127.0.0.1:8123/assets/cases/seguridad-640.webp",
+      "http://127.0.0.1:8123/assets/cases/nube-640.webp"
+    ],
+    "overflowElements": [
+      "track",
+      "",
+      {},
+      {},
+      "",
+      "",
+      {},
+      {}
+    ],
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".rotator"
+            ],
+            "summary": "Fix all of the following:\n  aria-label attribute cannot be used on \"p\" elements with no valid role attribute."
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".crm-col:nth-child(1) > .crm-card:nth-child(2) > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".crm-card:nth-child(3) > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".crm-col:nth-child(2) > .crm-card > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "#caso-proactive > .media-device.cx-media > .browser > .bar[aria-hidden=\"true\"] > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.19 (foreground color: #8d8a85, background color: #2a292f, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "nosotros.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "preguntas.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "privacidad.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "blog/automatizar-presupuestos.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "blog/crm-a-medida.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "blog/index.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "blog/migrar-base-de-datos-nube.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/clevercar.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".crm-col:nth-child(1) > .crm-card:nth-child(2) > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".crm-card:nth-child(3) > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".crm-col:nth-child(2) > .crm-card > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "casos/corradi.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".bar > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.19 (foreground color: #8d8a85, background color: #2a292f, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "casos/nube.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/presupuestos.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".doc-h > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.02 (foreground color: #7d766b, background color: #f6f2ea, font size: 7.1pt (9.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "casos/proactive.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".bar > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.19 (foreground color: #8d8a85, background color: #2a292f, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "casos/seguridad.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/vision.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [
+      ""
+    ],
+    "violations": []
+  },
+  {
+    "file": "elpuertoluanco/index.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [
+      "http://127.0.0.1:8123/elpuertoluanco/img/g1.webp",
+      "http://127.0.0.1:8123/elpuertoluanco/img/g2.webp"
+    ],
+    "overflowElements": [
+      "track",
+      "rev",
+      "stars",
+      "",
+      "",
+      "",
+      "",
+      "rev"
+    ],
+    "violations": []
+  },
+  {
+    "file": "en/about.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cookies.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/faq.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/index.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [
+      "http://127.0.0.1:8123/assets/cases/pf-desktop-720.webp",
+      "http://127.0.0.1:8123/assets/cases/pf-mobile-200.webp",
+      "http://127.0.0.1:8123/assets/cases/cor-desktop-720.webp",
+      "http://127.0.0.1:8123/assets/cases/cor-mobile-200.webp",
+      "http://127.0.0.1:8123/assets/cases/seguridad-640.webp",
+      "http://127.0.0.1:8123/assets/cases/nube-640.webp"
+    ],
+    "overflowElements": [
+      "track",
+      "",
+      {},
+      {},
+      "",
+      "",
+      {},
+      {}
+    ],
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".rotator"
+            ],
+            "summary": "Fix all of the following:\n  aria-label attribute cannot be used on \"p\" elements with no valid role attribute."
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".crm-col:nth-child(1) > .crm-card:nth-child(2) > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".crm-card:nth-child(3) > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".crm-col:nth-child(2) > .crm-card > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "#caso-proactive > .media-device.cx-media > .browser > .bar[aria-hidden=\"true\"] > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.19 (foreground color: #8d8a85, background color: #2a292f, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "en/legal-notice.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/privacy.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/training.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/aviso-legal.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/cookies.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/formacao.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/index.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [
+      "http://127.0.0.1:8123/assets/cases/pf-desktop-720.webp",
+      "http://127.0.0.1:8123/assets/cases/pf-mobile-200.webp",
+      "http://127.0.0.1:8123/assets/cases/cor-desktop-720.webp",
+      "http://127.0.0.1:8123/assets/cases/cor-mobile-200.webp",
+      "http://127.0.0.1:8123/assets/cases/seguridad-640.webp",
+      "http://127.0.0.1:8123/assets/cases/nube-640.webp"
+    ],
+    "overflowElements": [
+      "track",
+      "",
+      {},
+      {},
+      "",
+      "",
+      {},
+      {}
+    ],
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".rotator"
+            ],
+            "summary": "Fix all of the following:\n  aria-label attribute cannot be used on \"p\" elements with no valid role attribute."
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".crm-col:nth-child(1) > .crm-card:nth-child(2) > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".crm-card:nth-child(3) > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".crm-col:nth-child(2) > .crm-card > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "#caso-proactive > .media-device.cx-media > .browser > .bar[aria-hidden=\"true\"] > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.19 (foreground color: #8d8a85, background color: #2a292f, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "pt/perguntas.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/privacidade.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/sobre-nos.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "elpuertoluanco/carta/index.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [
+      ""
+    ],
+    "violations": []
+  },
+  {
+    "file": "en/cases/clevercar.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".crm-col:nth-child(1) > .crm-card:nth-child(2) > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".crm-card:nth-child(3) > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".crm-col:nth-child(2) > .crm-card > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "en/cases/corradi.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".bar > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.19 (foreground color: #8d8a85, background color: #2a292f, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "en/cases/nube.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/presupuestos.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".doc-h > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.02 (foreground color: #7d766b, background color: #f6f2ea, font size: 7.1pt (9.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "en/cases/proactive.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".bar > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.19 (foreground color: #8d8a85, background color: #2a292f, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "en/cases/seguridad.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/vision.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [
+      ""
+    ],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/clevercar.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".crm-col:nth-child(1) > .crm-card:nth-child(2) > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".crm-card:nth-child(3) > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".crm-col:nth-child(2) > .crm-card > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #6b7c8c, background color: #ffffff, font size: 5.6pt (7.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "pt/casos/corradi.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".bar > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.19 (foreground color: #8d8a85, background color: #2a292f, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "pt/casos/nube.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/presupuestos.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".doc-h > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.02 (foreground color: #7d766b, background color: #f6f2ea, font size: 7.1pt (9.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "pt/casos/proactive.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".bar > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.19 (foreground color: #8d8a85, background color: #2a292f, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "pt/casos/seguridad.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/vision.html",
+    "width": 390,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [
+      ""
+    ],
+    "violations": []
+  },
+  {
+    "file": "aviso-legal.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "cookies.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "formacion.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "index.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [
+      "http://127.0.0.1:8123/assets/cases/pf-desktop-720.webp",
+      "http://127.0.0.1:8123/assets/cases/pf-mobile-200.webp",
+      "http://127.0.0.1:8123/assets/cases/cor-desktop-720.webp",
+      "http://127.0.0.1:8123/assets/cases/cor-mobile-200.webp",
+      "http://127.0.0.1:8123/assets/cases/seguridad-640.webp",
+      "http://127.0.0.1:8123/assets/cases/nube-640.webp"
+    ],
+    "overflowElements": [
+      "track",
+      "",
+      {},
+      {},
+      "",
+      "",
+      {},
+      {}
+    ],
+    "violations": []
+  },
+  {
+    "file": "nosotros.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "preguntas.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "privacidad.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "blog/automatizar-presupuestos.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "blog/crm-a-medida.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "blog/index.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "blog/migrar-base-de-datos-nube.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/clevercar.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/corradi.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/nube.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/presupuestos.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/proactive.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/seguridad.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/vision.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [
+      "belt",
+      ""
+    ],
+    "violations": []
+  },
+  {
+    "file": "elpuertoluanco/index.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [
+      "http://127.0.0.1:8123/elpuertoluanco/img/g1.webp",
+      "http://127.0.0.1:8123/elpuertoluanco/img/g2.webp"
+    ],
+    "overflowElements": [
+      "track",
+      "rev",
+      "stars",
+      "",
+      "",
+      "",
+      "",
+      "rev"
+    ],
+    "violations": []
+  },
+  {
+    "file": "en/about.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cookies.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/faq.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/index.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [
+      "track",
+      "",
+      {},
+      {},
+      "",
+      "",
+      {},
+      {}
+    ],
+    "violations": []
+  },
+  {
+    "file": "en/legal-notice.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/privacy.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/training.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/aviso-legal.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/cookies.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/formacao.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/index.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [
+      "http://127.0.0.1:8123/assets/cases/pf-desktop-720.webp",
+      "http://127.0.0.1:8123/assets/cases/pf-mobile-200.webp",
+      "http://127.0.0.1:8123/assets/cases/cor-desktop-720.webp",
+      "http://127.0.0.1:8123/assets/cases/cor-mobile-200.webp",
+      "http://127.0.0.1:8123/assets/cases/seguridad-640.webp",
+      "http://127.0.0.1:8123/assets/cases/nube-640.webp"
+    ],
+    "overflowElements": [
+      "track",
+      "",
+      {},
+      {},
+      "",
+      "",
+      {},
+      {}
+    ],
+    "violations": []
+  },
+  {
+    "file": "pt/perguntas.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/privacidade.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/sobre-nos.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "elpuertoluanco/carta/index.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/clevercar.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/corradi.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/nube.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/presupuestos.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/proactive.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/seguridad.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/vision.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [
+      "belt",
+      ""
+    ],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/clevercar.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/corradi.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/nube.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/presupuestos.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/proactive.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/seguridad.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/vision.html",
+    "width": 768,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [
+      "belt",
+      ""
+    ],
+    "violations": []
+  },
+  {
+    "file": "aviso-legal.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "cookies.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "formacion.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "index.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [
+      "http://127.0.0.1:8123/assets/cases/pf-desktop-720.webp",
+      "http://127.0.0.1:8123/assets/cases/pf-mobile-200.webp",
+      "http://127.0.0.1:8123/assets/cases/cor-desktop-720.webp",
+      "http://127.0.0.1:8123/assets/cases/cor-mobile-200.webp",
+      "http://127.0.0.1:8123/assets/cases/seguridad-640.webp",
+      "http://127.0.0.1:8123/assets/cases/nube-640.webp"
+    ],
+    "overflowElements": [
+      "track",
+      "",
+      {},
+      {},
+      "",
+      "",
+      {},
+      {}
+    ],
+    "violations": []
+  },
+  {
+    "file": "nosotros.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "preguntas.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "privacidad.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "blog/automatizar-presupuestos.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "blog/crm-a-medida.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "blog/index.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "blog/migrar-base-de-datos-nube.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/clevercar.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/corradi.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/nube.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/presupuestos.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/proactive.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/seguridad.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "casos/vision.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [
+      ""
+    ],
+    "violations": []
+  },
+  {
+    "file": "elpuertoluanco/index.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [
+      "http://127.0.0.1:8123/elpuertoluanco/img/g1.webp",
+      "http://127.0.0.1:8123/elpuertoluanco/img/g2.webp"
+    ],
+    "overflowElements": [
+      "track",
+      "rev",
+      "rev",
+      "stars",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "violations": []
+  },
+  {
+    "file": "en/about.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cookies.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/faq.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/index.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [
+      "track",
+      "",
+      {},
+      {},
+      "",
+      "",
+      {},
+      {}
+    ],
+    "violations": []
+  },
+  {
+    "file": "en/legal-notice.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/privacy.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/training.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/aviso-legal.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/cookies.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/formacao.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/index.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [
+      "http://127.0.0.1:8123/assets/cases/pf-desktop-720.webp",
+      "http://127.0.0.1:8123/assets/cases/pf-mobile-200.webp",
+      "http://127.0.0.1:8123/assets/cases/cor-desktop-720.webp",
+      "http://127.0.0.1:8123/assets/cases/cor-mobile-200.webp",
+      "http://127.0.0.1:8123/assets/cases/seguridad-640.webp",
+      "http://127.0.0.1:8123/assets/cases/nube-640.webp"
+    ],
+    "overflowElements": [
+      "track",
+      "",
+      {},
+      {},
+      "",
+      "",
+      {},
+      {}
+    ],
+    "violations": []
+  },
+  {
+    "file": "pt/perguntas.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/privacidade.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/sobre-nos.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "elpuertoluanco/carta/index.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/clevercar.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/corradi.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/nube.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/presupuestos.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/proactive.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/seguridad.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "en/cases/vision.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [
+      ""
+    ],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/clevercar.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/corradi.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/nube.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/presupuestos.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/proactive.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/seguridad.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [],
+    "violations": []
+  },
+  {
+    "file": "pt/casos/vision.html",
+    "width": 1440,
+    "status": 200,
+    "errors": [],
+    "overflow": false,
+    "h1": 1,
+    "brokenImages": [],
+    "overflowElements": [
+      ""
+    ],
+    "violations": []
+  }
+]

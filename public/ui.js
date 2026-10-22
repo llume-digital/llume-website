@@ -4,28 +4,48 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 /* ---------- nav ---------- */
 const nav = document.getElementById("nav");
 const onScrollNav = () => {
-  nav.classList.toggle("scrolled", scrollY > 20);
+  nav?.classList.toggle("scrolled", scrollY > 20);
   document.documentElement.classList.toggle("deep", scrollY > innerHeight * 0.7);
 };
 addEventListener("scroll", onScrollNav, { passive: true });
 onScrollNav();
 
 const menuBtn = document.querySelector(".menu-btn");
-menuBtn?.addEventListener("click", () => {
-  const open = nav.classList.toggle("open");
-  menuBtn.setAttribute("aria-expanded", open);
-});
-nav.querySelectorAll(".links a").forEach((a) => a.addEventListener("click", () => {
-  nav.classList.remove("open");
-  menuBtn?.setAttribute("aria-expanded", "false");
-}));
+const mobileNav = matchMedia("(max-width: 860px)");
+const setMenu = (open, restoreFocus = false) => {
+  nav?.classList.toggle("open", open);
+  menuBtn?.setAttribute("aria-expanded", String(open));
+  if (restoreFocus) menuBtn?.focus();
+};
+if (nav && menuBtn) {
+  nav.classList.add("nav-enhanced");
+  menuBtn.addEventListener("click", () => {
+    const open = !nav.classList.contains("open");
+    setMenu(open);
+    if (open) nav.querySelector(".links a")?.focus();
+  });
+  nav.querySelectorAll(".links a").forEach((a) => a.addEventListener("click", () => setMenu(false)));
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && nav.classList.contains("open")) setMenu(false, true);
+  });
+  document.addEventListener("click", (e) => {
+    if (!nav.contains(e.target)) setMenu(false);
+  });
+  nav.addEventListener("focusout", () => {
+    queueMicrotask(() => { if (!nav.contains(document.activeElement)) setMenu(false); });
+  });
+  mobileNav.addEventListener("change", () => setMenu(false));
+}
 
 /* ---------- reveal on scroll ---------- */
 const io = new IntersectionObserver(
   (entries) => entries.forEach((e) => e.isIntersecting && (e.target.classList.add("in"), io.unobserve(e.target))),
   { threshold: 0.12 }
 );
-document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+document.querySelectorAll(".reveal").forEach((el) => {
+  if (!reduceMotion) el.classList.add("reveal-pending");
+  io.observe(el);
+});
 
 /* ---------- hero: rotating phrase ---------- */
 const rotator = document.querySelector(".rotator");
@@ -33,6 +53,7 @@ if (rotator && !reduceMotion) {
   const items = [...rotator.querySelectorAll("span")];
   let i = 0;
   setInterval(() => {
+    if (document.hidden) return;
     const prev = items[i];
     prev.classList.replace("on", "out");
     setTimeout(() => prev.classList.remove("out"), 600);
@@ -56,9 +77,10 @@ tabs.forEach((tab, idx) => {
   tab.addEventListener("click", () => selectTab(tab));
   tab.addEventListener("keydown", (e) => {
     const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
-    if (!step) return;
+    if (!step && e.key !== "Home" && e.key !== "End") return;
     e.preventDefault();
-    selectTab(tabs[(idx + step + tabs.length) % tabs.length], true);
+    const next = e.key === "Home" ? 0 : e.key === "End" ? tabs.length - 1 : (idx + step + tabs.length) % tabs.length;
+    selectTab(tabs[next], true);
   });
 });
 
@@ -140,7 +162,22 @@ form?.addEventListener("submit", (e) => {
   const who = `${d.get("nombre")}${d.get("empresa") ? " (" + d.get("empresa") + ")" : ""}`;
   const body = `${d.get("mensaje")}\n\n${f.lName}: ${d.get("nombre")}\n${f.lPhone}: ${d.get("telefono")}\n${f.lCompany}: ${d.get("empresa") || "-"}\n${f.lEmail}: ${d.get("email") || "-"}`;
   location.href = `mailto:${f.to}?subject=${encodeURIComponent(`${f.subject}: ${who}`)}&body=${encodeURIComponent(body)}`;
-  form.querySelector("button[type=submit]").textContent = f.sent;
+  let status = form.querySelector(".form-status");
+  if (!status) {
+    status = document.createElement("p");
+    status.className = "form-status";
+    status.setAttribute("role", "status");
+    form.append(status);
+  }
+  const messages = {
+    es: "Se ha solicitado abrir tu correo. Envía el mensaje desde tu aplicación de correo. Si no se abre, escríbenos a ",
+    en: "Your email app has been requested to open. Send the message from your email app. If it does not open, write to ",
+    pt: "Foi solicitada a abertura do teu email. Envia a mensagem na tua aplicação de email. Se não abrir, escreve para ",
+  };
+  const fallback = document.createElement("a");
+  fallback.href = `mailto:${f.to}`;
+  fallback.textContent = f.to;
+  status.replaceChildren(messages[document.documentElement.lang.split("-")[0]] || messages.es, fallback, ".");
 });
 
 /* ---------- footer year ---------- */
@@ -175,14 +212,21 @@ if (sticky && contact) {
   const onScrollCta = () => {
     const pastHero = scrollY > innerHeight * 0.8;
     const atContact = contact.getBoundingClientRect().top < innerHeight;
-    sticky.classList.toggle("show", pastHero && !atContact);
+    const visible = pastHero && !atContact;
+    sticky.classList.toggle("show", visible);
+    sticky.inert = !visible;
   };
   addEventListener("scroll", onScrollCta, { passive: true });
+  addEventListener("resize", onScrollCta, { passive: true });
   onScrollCta();
 }
 
 /* ---------- 3D background: loaded once the page is idle so text appears first ---------- */
-if (document.getElementById("bg")) {
+const connection = navigator.connection;
+const lightExperience = reduceMotion || mobileNav.matches || matchMedia("(pointer: coarse)").matches
+  || connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType || "");
+if (document.getElementById("bg") && lightExperience) document.documentElement.classList.add("no-webgl");
+if (document.getElementById("bg") && !lightExperience) {
   const start3D = () => import("/main.js").catch(() => document.documentElement.classList.add("no-webgl"));
   if ("requestIdleCallback" in window) requestIdleCallback(start3D, { timeout: 1500 });
   else setTimeout(start3D, 600);
@@ -195,7 +239,12 @@ if (langBtn && langList) {
   const setLang = (open) => { langList.hidden = !open; langBtn.setAttribute("aria-expanded", open); };
   langBtn.addEventListener("click", (e) => { e.stopPropagation(); setLang(langList.hidden); });
   document.addEventListener("click", (e) => { if (!langList.contains(e.target)) setLang(false); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setLang(false); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !langList.hidden) { setLang(false); langBtn.focus(); }
+  });
+  langBtn.closest(".lang-menu")?.addEventListener("focusout", (e) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) setLang(false);
+  });
 }
 
 /* ---------- simple dialogs (e.g. computer vision examples) ---------- */

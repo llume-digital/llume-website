@@ -8,7 +8,7 @@
 - Se adapta a cualquier tipo de trabajo que pueda interesar a una empresa, no solo a la automatización.
 - Forma habitual de trabajar: **con Claude Code**.
 - Está en fase de creación. Aún no hay casos de éxito reales publicados.
-- Contacto: **info@llume.net**.
+- Contacto: **info@llumedigital.com**.
 - Ubicación que aparece en la web: Oviedo, Asturias (España). *Viene del mockup, pendiente de confirmar.*
 
 ## 2. El nombre y el concepto
@@ -73,7 +73,7 @@ Menú: Servicios, Casos, Proceso, Nosotros + botón "Hablemos".
 
 **Banner de colaboraciones:** franja crema clara, logos en sus colores originales, se desplaza hacia la **derecha** y muy lento (90 s por vuelta), con la etiqueta "Confían en nosotros:". Se pausa al pasar el ratón.
 
-**Formulario de contacto:** al enviar abre el cliente de correo del visitante con un mensaje ya redactado para **info@llume.net**. No envía nada por sí solo.
+**Formulario de contacto:** al enviar abre el cliente de correo del visitante con un mensaje ya redactado para **info@llumedigital.com**. No envía nada por sí solo.
 
 ### Para verla en local
 
@@ -93,7 +93,7 @@ Luego abrir http://localhost:8123.
 
 - [ ] Casos de éxito reales (ahora son ilustrativos) e imágenes reales o generadas.
 - [ ] Páginas legales: aviso legal, privacidad, cookies (los enlaces del footer están vacíos).
-- [ ] Envío real del formulario a info@llume.net (servicio de formularios o función en Vercel; implica pasar datos de visitantes a un tercero, decidir).
+- [ ] Envío real del formulario a info@llumedigital.com (servicio de formularios o función en Vercel; implica pasar datos de visitantes a un tercero, decidir).
 - [ ] Confirmar ubicación (Oviedo) y permisos de uso de los logos de colaboradores.
 - [ ] Logo oficial en vectorial y logos de mejor calidad (Universidad de Oviedo, Proactive Future a color).
 - [ ] Newsletter del footer: ahora solo es visual, no guarda emails.

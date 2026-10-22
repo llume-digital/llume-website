@@ -12,6 +12,8 @@ import json
 import re
 from pathlib import Path
 
+SKIP = {'es': 'Saltar al contenido', 'en': 'Skip to content', 'pt': 'Saltar para o conteúdo'}
+
 PUBLIC = Path(__file__).resolve().parent.parent / "public"
 
 LANGS = {
@@ -38,26 +40,18 @@ LANGS = {
     },
 }
 
-BLOG = {
-    "presupuestos": ("automatizar-presupuestos", "Cómo automatizar los presupuestos de tu empresa, paso a paso"),
-    "clevercar": ("crm-a-medida", "7 señales de que tu empresa necesita un CRM a medida (y cuándo no)"),
-    "nube": ("migrar-base-de-datos-nube", "Cómo migrar una base de datos antigua a la nube sin parar el negocio"),
-}
+BREADCRUMB = {"es": "Ruta de navegación", "en": "Breadcrumb", "pt": "Caminho de navegação"}
 HOME_NAME = {"es": "Inicio", "en": "Home", "pt": "Início"}
 CASES_NAME = {"es": "Casos", "en": "Case studies", "pt": "Casos"}
-RELATED = {"es": "Artículo relacionado", "en": "Related article (in Spanish)", "pt": "Artigo relacionado (em espanhol)"}
 
 ARTICLE = re.compile(r'<article class="cx[^"]*" id="caso-(\w+)" data-case="\w+">(.*?)</article>', re.S)
-
 
 def between(text, start, end):
     i = text.index(start) + len(start)
     return text[i:text.index(end, i)]
 
-
 def text_of(fragment):
     return html.unescape(re.sub(r"<[^>]+>", "", fragment)).strip()
-
 
 def parse(page):
     cases = []
@@ -71,7 +65,6 @@ def parse(page):
         cases.append({"slug": slug, "media": media, "tag": tag, "title": title,
                       "problem": ps[0], "solution": ps[1], "detail": detail})
     return cases
-
 
 def render(c, cases, L, code):
     url = f"https://llumedigital.com/{L['out']}/{c['slug']}"
@@ -89,9 +82,6 @@ def render(c, cases, L, code):
             {"@type": "ListItem", "position": 1, "name": HOME_NAME[code], "item": home},
             {"@type": "ListItem", "position": 2, "name": CASES_NAME[code], "item": home + "#casos"},
             {"@type": "ListItem", "position": 3, "name": title, "item": url}]}]}
-    blog = BLOG.get(c["slug"])
-    related = (f'<aside class="post-case"><p class="eyebrow">{RELATED[code]}</p><a href="/blog/{blog[0]}" hreflang="es">{blog[1]} <span aria-hidden="true">→</span></a></aside>'
-               if blog else "")
     return f"""<!doctype html>
 <html lang="{L['html_lang']}" class="no-webgl">
 <head>
@@ -117,12 +107,13 @@ def render(c, cases, L, code):
   <script type="application/ld+json">{json.dumps(schema, ensure_ascii=False)}</script>
 </head>
 <body>
+  <a class="skip" href="#main-content">{SKIP[code]}</a>
   <header class="nav scrolled" id="nav">
     <a href="{L['home']}" class="logo" aria-label="llume"><img src="/assets/mark.svg" alt="" width="20" height="24"><span>llume.</span></a>
     <a href="{L['home']}#contacto" class="btn btn-light btn-sm">{L['book']} <span aria-hidden="true">→</span></a>
   </header>
-  <main class="wrap case-page">
-    <nav class="crumbs" aria-label="breadcrumb"><a href="{L['home']}">{HOME_NAME[code]}</a> <span>/</span> <a href="{L['home']}#casos">{CASES_NAME[code]}</a></nav>
+  <main id="main-content" tabindex="-1" class="wrap case-page">
+    <nav class="crumbs" aria-label="{BREADCRUMB[code]}"><a href="{L['home']}">{HOME_NAME[code]}</a> <span>/</span> <a href="{L['home']}#casos">{CASES_NAME[code]}</a></nav>
     <p class="eyebrow">{L['eyebrow']} · {c['tag']}</p>
     <h1>{c['title']}</h1>
     {c['media']}
@@ -131,7 +122,6 @@ def render(c, cases, L, code):
       <div><h4>{L['solution']}</h4><p>{c['solution']}</p></div>
     </div>
     <div class="cd-content">{c['detail']}</div>
-    {related}
     <div class="offer">
       <div>
         <h3>{L['cta_title']}</h3>
@@ -153,7 +143,6 @@ def render(c, cases, L, code):
 </html>
 """
 
-
 def main():
     written = []
     for code, L in LANGS.items():
@@ -164,7 +153,6 @@ def main():
             (out / f"{c['slug']}.html").write_text(render(c, cases, L, code))
             written.append(f"/{L['out']}/{c['slug']}")
     print("\n".join(written))
-
 
 if __name__ == "__main__":
     main()

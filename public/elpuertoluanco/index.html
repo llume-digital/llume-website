@@ -7,6 +7,7 @@
 <title>El Puerto · Cafetería con las mejores vistas de Luanco</title>
 <meta name="description" content="Cafetería El Puerto, en la calle Riba de Luanco (Asturias). Café, tortilla, bonito y croquetas con las mejores vistas del puerto.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <script type="application/ld+json">
@@ -23,11 +24,12 @@
 </script>
 </head>
 <body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
 
 <header class="top" id="top">
   <div class="wrap">
     <a class="brand" href="#">El Puerto</a>
-    <nav>
+    <nav aria-label="Navegación principal">
       <a href="#historia">El bar</a>
       <a href="#destacados">Qué tomar</a>
       <a href="#galeria">Galería</a>
@@ -38,6 +40,7 @@
 </header>
 
 <!-- Foto de portada PROVISIONAL: img/hero.webp (terraza con vistas). Sustituir por foto propia. -->
+<main id="contenido">
 <section class="hero">
   <div class="wrap">
     <p class="eyebrow">Luanco · Asturias</p>
@@ -46,7 +49,7 @@
     <div class="btns">
       <a class="btn primary" href="carta/">Ver la carta</a>
       <a class="btn" href="https://www.google.com/maps/dir/?api=1&destination=43.615778,-5.789854" target="_blank" rel="noopener">Cómo llegar</a>
-      <a class="btn" href="https://wa.me/34985880001?text=Hola%2C%20quer%C3%ADa%20reservar%20mesa" target="_blank" rel="noopener">Reservar por WhatsApp</a>
+      <a class="btn" href="tel:+34985880001">Llamar para reservar</a>
     </div>
   </div>
 </section>
@@ -60,7 +63,7 @@
       <p>En la calle Riba, mirando al puerto y a la isla del Carmen, El Puerto es de esos sitios donde se entra a por un café y se sale dos horas después. Terraza al aire libre, comedor interior y un equipo que te conoce por el nombre.</p>
       <p>Cocina de siempre, producto del Cantábrico y una carta pensada para compartir.</p>
     </div>
-    <div class="photo"><img src="img/bar.webp" alt="Terraza de El Puerto frente al puerto de Luanco" onerror="this.remove()"></div>
+    <div class="photo"><img src="img/bar.webp" alt="Terraza de El Puerto frente al puerto de Luanco" loading="lazy" decoding="async"></div>
   </div>
 </section>
 
@@ -82,11 +85,10 @@
   <div class="wrap">
     <p class="eyebrow">La carta</p>
     <h2>Del mar a <em>la mesa</em></h2>
-    <nav class="indice" id="indice"></nav>
+    <nav class="indice" id="indice" aria-label="Secciones de la carta"></nav>
     <div class="btns"><a class="btn primary" href="carta/">Ver toda la carta</a></div>
   </div>
 </section>
-
 
 <section id="galeria" class="light">
   <div class="wrap">
@@ -94,8 +96,8 @@
     <h2>Mañana, tarde y <em>atardecer</em></h2>
     <!-- Fotos provisionales: img/g1.webp, img/g2.webp -->
     <div class="gallery">
-      <div class="photo"><img src="img/g1.webp" alt="" onerror="this.remove()"></div>
-      <div class="photo"><img src="img/g2.webp" alt="" onerror="this.remove()"></div>
+      <div class="photo"><img src="img/g1.webp" alt="" loading="lazy" decoding="async"></div>
+      <div class="photo"><img src="img/g2.webp" alt="" loading="lazy" decoding="async"></div>
     </div>
   </div>
 </section>
@@ -106,7 +108,8 @@
     <h2>Lo que dicen <em>en Google</em></h2>
     <div class="rating"><b id="r-media">4,1</b><span id="r-total">/5 · 2.084 opiniones en Google</span></div>
   </div>
-  <div class="marquee"><div class="track" id="track"></div></div>
+  <div class="wrap"><p class="review-note">Selección de reseñas positivas. Valoración consultada en octubre de 2026.</p></div>
+  <div class="marquee" tabindex="0" role="region" aria-label="Reseñas de clientes"><div class="track" id="track"></div></div>
 </section>
 
 <section id="visitanos" class="light" style="background:var(--stone)">
@@ -122,7 +125,7 @@
       </dl>
       <div class="btns">
         <a class="btn dark" href="https://www.google.com/maps/dir/?api=1&destination=43.615778,-5.789854" target="_blank" rel="noopener">Cómo llegar</a>
-        <a class="btn dark" href="https://wa.me/34985880001" target="_blank" rel="noopener">WhatsApp</a>
+        <a class="btn dark" href="tel:+34985880001">Llamar</a>
         <!-- Sustituir por el enlace real de reseñas cuando tengamos el Place ID: https://search.google.com/local/writereview?placeid=XXXX -->
         <a class="btn dark" href="https://www.google.com/maps/search/?api=1&query=43.615778,-5.789854" target="_blank" rel="noopener">Déjanos tu opinión</a>
       </div>
@@ -131,58 +134,14 @@
   </div>
 </section>
 
+</main>
 <footer>
   <div class="wrap">
     <span>© Cafetería El Puerto · Luanco</span>
-    <span>Web por <a href="#">llume.</a></span>
+    <span>Web por <a href="https://llumedigital.com/">llume.</a></span>
   </div>
 </footer>
 
-<script>
-  // Cabecera con dos capas: blanca (base) y oscura (clonada). La oscura solo se ve
-  // en los píxeles que coinciden con una sección clara (.light), vía clip-path.
-  const cab = document.getElementById('top');
-  const alt = document.createElement('div');
-  alt.className = 'alt';
-  alt.setAttribute('aria-hidden', 'true');
-  alt.inert = true;
-  alt.innerHTML = cab.innerHTML;
-  alt.querySelectorAll('a').forEach(a => a.tabIndex = -1);
-  cab.appendChild(alt);
-  const claras = [...document.querySelectorAll('.light')];
-  let pendiente = false;
-  function pintarCabecera() {
-    pendiente = false;
-    const H = cab.offsetHeight, W = innerWidth;
-    let d = '';
-    for (const s of claras) {
-      const r = s.getBoundingClientRect();
-      const y1 = Math.max(0, r.top), y2 = Math.min(H, r.bottom);
-      if (y2 > y1) d += `M0 ${y1}H${W}V${y2}H0Z`;
-    }
-    alt.style.clipPath = d ? `path('${d}')` : 'inset(100% 0 0 0)';
-  }
-  const pedir = () => { if (!pendiente) { pendiente = true; requestAnimationFrame(pintarCabecera); } };
-  addEventListener('scroll', pedir, { passive: true });
-  addEventListener('resize', pedir);
-  pintarCabecera();
-
-  const eur = n => n.toLocaleString('es-ES', { style:'currency', currency:'EUR' });
-
-  // Reseñas (resenas.json) en marquesina
-  fetch('resenas.json').then(r => r.json()).then(d => {
-    document.getElementById('r-media').textContent = d.puntuacion_media;
-    document.getElementById('r-total').textContent = '/5 · ' + d.total + ' opiniones en Google';
-    const card = r => `<article class="rev"><div class="stars" aria-label="${r.puntuacion/2} de 5">${'★'.repeat(Math.round(r.puntuacion/2))}${'☆'.repeat(5-Math.round(r.puntuacion/2))}</div><p>“${r.texto}”</p><footer><b>${r.nombre}</b><span>Google · ${r.fecha}</span></footer></article>`;
-    const html = d.resenas.map(card).join('');
-    document.getElementById('track').innerHTML = html + html + html + html;
-  }).catch(() => document.getElementById('opiniones').hidden = true);
-
-  // Índice de la carta, alimentado por carta.json
-  fetch('carta/carta.json').then(r => r.json()).then(d => {
-    document.getElementById('indice').innerHTML = d.categorias.map(c =>
-      `<a href="carta/#${c.id}"><span>${c.nombre.split(' (')[0].replace('Raciones para compartir y disfrutar','Raciones')}</span><small>${c.platos.length} platos</small></a>`).join('');
-  });
-</script>
+<script src="site.js" defer></script>
 </body>
 </html>

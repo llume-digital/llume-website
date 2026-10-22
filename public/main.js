@@ -1,22 +1,25 @@
 import * as THREE from "three";
 
+function initBackground() {
 const canvas = document.getElementById("bg");
-const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const motionPreference = matchMedia("(prefers-reduced-motion: reduce)");
+let reduceMotion = motionPreference.matches;
+if (!canvas) return;
 const isMobile = innerWidth < 860;
 
 /* ---------- without WebGL the page keeps a static background (see .no-webgl in styles.css) ---------- */
 const gl = (() => {
-  try { return canvas.getContext("webgl2", { alpha: true, antialias: false }) || canvas.getContext("webgl", { alpha: true, antialias: false }); }
+  try { return canvas.getContext("webgl2", { alpha: true, antialias: false, powerPreference: "low-power" }) || canvas.getContext("webgl", { alpha: true, antialias: false, powerPreference: "low-power" }); }
   catch { return null; }
 })();
 if (!gl) {
   document.documentElement.classList.add("no-webgl");
-  throw new Error("WebGL no disponible: se muestra el fondo estático");
+  return;
 }
 
 /* ---------- 3D: ribbon of light ---------- */
-const renderer = new THREE.WebGLRenderer({ canvas, context: gl, antialias: false, alpha: true, powerPreference: "high-performance" });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+const renderer = new THREE.WebGLRenderer({ canvas, context: gl, antialias: false, alpha: true, powerPreference: "low-power" });
+renderer.setPixelRatio(Math.min(devicePixelRatio, isMobile ? 1.25 : 1.5));
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 50);
 camera.position.set(0, 0, 7);
@@ -218,7 +221,18 @@ addEventListener("pointermove", (e) => {
 
 let scrollSmooth = 0;
 const clock = new THREE.Clock();
-function frame() {
+let frameId = 0;
+let lastFrame = -Infinity;
+let contextLost = false;
+function frame(now = performance.now()) {
+  frameId = 0;
+  if (document.hidden || contextLost) return;
+  // A decorative background does not need the display's 120/144 Hz refresh rate.
+  if (!reduceMotion && now - lastFrame < 1000 / 30) {
+    frameId = requestAnimationFrame(frame);
+    return;
+  }
+  lastFrame = now;
   const max = document.documentElement.scrollHeight - innerHeight;
   const target = max > 0 ? scrollY / max : 0;
   scrollSmooth += (target - scrollSmooth) * 0.05;
@@ -231,14 +245,37 @@ function frame() {
   constGroup.rotation.z = Math.sin(t * 0.15) * 0.04;
   camera.position.x = mouse.x * 0.25; camera.position.y = mouse.y * 0.15; camera.lookAt(0, 0, 0);
   renderer.render(scene, camera);
-  if (!reduceMotion && !document.hidden) requestAnimationFrame(frame);
-  else running = false;
+  if (!reduceMotion) frameId = requestAnimationFrame(frame);
 }
-let running = true;
+function resume() {
+  if (!frameId && !document.hidden && !contextLost) frameId = requestAnimationFrame(frame);
+}
 frame();
-if (reduceMotion) addEventListener("scroll", () => requestAnimationFrame(frame), { passive: true });
-
-/* pause when tab hidden */
+addEventListener("resize", resume);
 document.addEventListener("visibilitychange", () => {
-  if (!document.hidden && !reduceMotion && !running) { running = true; requestAnimationFrame(frame); }
+  if (document.hidden) { cancelAnimationFrame(frameId); frameId = 0; }
+  else resume();
 });
+motionPreference.addEventListener("change", () => {
+  reduceMotion = motionPreference.matches;
+  cancelAnimationFrame(frameId);
+  frameId = 0;
+  if (reduceMotion) { mouse.set(0, 0); mouseT.set(0, 0); }
+  resume();
+});
+canvas.addEventListener("webglcontextlost", (event) => {
+  event.preventDefault();
+  contextLost = true;
+  cancelAnimationFrame(frameId);
+  frameId = 0;
+  document.documentElement.classList.add("no-webgl");
+});
+canvas.addEventListener("webglcontextrestored", () => {
+  contextLost = false;
+  document.documentElement.classList.remove("no-webgl");
+  resize();
+  resume();
+});
+}
+try { initBackground(); }
+catch { document.documentElement.classList.add("no-webgl"); }

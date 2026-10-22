@@ -13,7 +13,7 @@ Web corporativa estática, sin paso de compilación. En tres idiomas (español e
 | Tipografía | Geist y Geist Mono variables, alojadas en `public/fonts/` (sin Google Fonts) |
 | Hosting | Cloudflare Workers con recursos estáticos, despliegue automático desde GitHub |
 
-No hay `package.json` ni dependencias externas en tiempo de ejecución: todo se sirve desde el propio dominio, así que la web no instala cookies ni conecta con terceros.
+No hay `package.json` ni paso de compilación. Los recursos principales se sirven desde el propio dominio. Las portadas cargan Cloudflare Web Analytics y envían estadísticas a Cloudflare; las páginas de privacidad y cookies describen esta conexión. El prototipo El Puerto también usa fuentes de Google y un mapa externo.
 
 ## 2. Estructura de archivos
 
@@ -24,7 +24,6 @@ llume-web/
 ├── wrangler.jsonc       Configuración de despliegue en Cloudflare
 ├── scripts/build_cases.py  Genera las páginas de cada caso a partir de las portadas
 ├── scripts/build_legal.py  Genera las páginas legales en los tres idiomas (datos del titular arriba del todo)
-├── scripts/build_blog.py   Genera el blog (español): artículos en la lista POSTS
 ├── scripts/build_pages.py  Genera Formación y Preguntas frecuentes en los tres idiomas
 └── public/              Lo único que se publica
     ├── index.html       Página en español
@@ -38,7 +37,6 @@ llume-web/
     ├── main.js          Solo la escena 3D (si no hay WebGL, se queda un fondo estático)
     ├── vendor/three.module.min.js
     ├── fonts/           geist.woff2, geist-mono.woff2
-    ├── blog/            Blog en español (generado)
     ├── robots.txt, sitemap.xml, llms.txt
     ├── _headers         Cabeceras de seguridad y caché
     └── assets/
@@ -76,7 +74,7 @@ Para añadir o cambiar un caso: editar el `<article class="cx">` en las tres por
 
 ## 4. Formulario
 
-Debajo lleva la primera capa de información de protección de datos (responsable, finalidad, legitimación, destinatarios y derechos). Pide qué necesita y un teléfono para llamarle (empresa y email opcionales). Abre el programa de correo del visitante con el mensaje preparado para `info@llume.net`. Los textos del asunto y del cuerpo salen de los `data-*` del `<form>`, así el mismo `ui.js` sirve para los dos idiomas. Exige aceptar la política de privacidad.
+Debajo lleva la primera capa de información de protección de datos (responsable, finalidad, legitimación, destinatarios y derechos). Pide qué necesita y un teléfono para llamarle (empresa y email opcionales). Abre el programa de correo del visitante con el mensaje preparado para `info@llumedigital.com`. Los textos del asunto y del cuerpo salen de los `data-*` del `<form>`, así el mismo `ui.js` sirve para los dos idiomas. Exige aceptar la política de privacidad.
 
 ## 5. Cómo ejecutar en local
 
@@ -94,7 +92,6 @@ Cloudflare Workers conectado a `llume26/llume-website`: cada push a `main` publi
 
 - **Datos legales**: cuando la empresa esté constituida, rellenar `OWNER` en `scripts/build_legal.py` (NIF, domicilio, registro) y ejecutarlo. Hoy solo figura el nombre y el email.
 - **Envío real del formulario** sin abrir el correo (un Worker con envío de email) y **agenda** para reservar la reunión.
-- **Correo @llumedigital.com** y cambiarlo en la web cuando funcione.
 - **Equipo con fotos, testimonios reales y cifras de resultados** de cada caso, cuando existan.
 - **Teléfono, LinkedIn y perfil de Google Business**.
 - **Precio del diagnóstico digital** y confirmar que se puede ofrecer la garantía.
@@ -113,9 +110,9 @@ LinkedIn: el pie de las portadas lleva el icono como `<span class="social-link s
 ## 9. SEO
 
 - Títulos con la palabra clave al principio, `meta robots` con vista previa grande de imágenes, `canonical` y `hreflang` en todas las páginas.
-- Datos estructurados: en las portadas, un `@graph` con `WebSite`, `ProfessionalService` (con el catálogo de servicios sacado de las tarjetas de Soluciones) y `FAQPage` (sacado de las propias preguntas de la página). En casos y blog, `Article`/`BlogPosting` y `BreadcrumbList`.
+- Datos estructurados: en las portadas, un `@graph` con `WebSite`, `ProfessionalService` (con el catálogo de servicios sacado de las tarjetas de Soluciones) y `FAQPage` (sacado de las propias preguntas de la página). En casos, `Article` y `BreadcrumbList`.
 - `sitemap.xml` con todas las URLs y sus alternativas por idioma; `llms.txt` para asistentes de IA.
-- Enlazado interno: casos ↔ artículos del blog relacionados.
+- Enlazado interno entre portadas, servicios, preguntas frecuentes y páginas de casos.
 - Pendiente (necesita la cuenta de Google): dar de alta el dominio en Google Search Console y enviar el sitemap.
 
 ## 10. Prototipos para clientes
@@ -147,3 +144,9 @@ Los prototipos de webs para empresas (que enseñamos antes de cerrar trato) no t
 | `public/elpuertoluanco/` | Cafetería El Puerto (Luanco, Asturias) | Web de una página y carta digital para QR en `carta/` |
 
 Pendiente en `elpuertoluanco`: fotos propias (las actuales son provisionales), vinos y alérgenos por plato en `carta/carta.json`, horario confirmado, historia real del bar, más reseñas de Google hasta 20 en `resenas.json`, QR de la carta y de reseñas, versión en inglés, y quitar el `noindex` al cerrar el acuerdo (destino previsto: `elpuertoluanco.es`).
+
+## 11. Auditoría de octubre de 2026
+
+Ver `AUDITORIA.md` para el alcance, las mejoras aplicadas, resultados de pruebas y pendientes. En móvil (hasta 860 px), dispositivos con puntero táctil, ahorro de datos, conexión 2G o movimiento reducido se usa un fondo estático sin descargar Three.js. En escritorio, el fondo 3D limita el renderizado a 30 FPS y se pausa al ocultar la pestaña.
+
+La CSP de `public/_headers` permite los recursos propios y los terceros utilizados. El hash autoriza exactamente el importmap de las tres portadas: si cambia su contenido, debe recalcularse. Los scripts del prototipo son archivos externos. El formulario prepara un correo; no confirma un envío ni dispone de backend.

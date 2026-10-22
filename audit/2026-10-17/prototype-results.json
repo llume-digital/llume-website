@@ -1,0 +1,76 @@
+[
+  {
+    "width": 320,
+    "path": "/elpuertoluanco/",
+    "overflow": false,
+    "cards": 17,
+    "errors": [],
+    "axe": []
+  },
+  {
+    "width": 320,
+    "path": "/elpuertoluanco/carta/",
+    "overflow": false,
+    "cards": 39,
+    "menu": "Ensaladas\n      \n        \n          Ensalada de rulo de cabra\n          Lechuga, cebolla y pimiento ",
+    "errors": [],
+    "axe": []
+  },
+  {
+    "width": 390,
+    "path": "/elpuertoluanco/",
+    "overflow": false,
+    "cards": 17,
+    "errors": [],
+    "axe": []
+  },
+  {
+    "width": 390,
+    "path": "/elpuertoluanco/carta/",
+    "overflow": false,
+    "cards": 39,
+    "menu": "Ensaladas\n      \n        \n          Ensalada de rulo de cabra\n          Lechuga, cebolla y pimiento ",
+    "errors": [],
+    "axe": []
+  },
+  {
+    "width": 768,
+    "path": "/elpuertoluanco/",
+    "overflow": false,
+    "cards": 17,
+    "errors": [],
+    "axe": []
+  },
+  {
+    "width": 768,
+    "path": "/elpuertoluanco/carta/",
+    "overflow": false,
+    "cards": 39,
+    "menu": "Ensaladas\n      \n        \n          Ensalada de rulo de cabra\n          Lechuga, cebolla y pimiento ",
+    "errors": [],
+    "axe": []
+  },
+  {
+    "width": 1440,
+    "path": "/elpuertoluanco/",
+    "overflow": false,
+    "cards": 17,
+    "errors": [],
+    "axe": []
+  },
+  {
+    "width": 1440,
+    "path": "/elpuertoluanco/carta/",
+    "overflow": false,
+    "cards": 39,
+    "menu": "Ensaladas\n      \n        \n          Ensalada de rulo de cabra\n          Lechuga, cebolla y pimiento ",
+    "errors": [],
+    "axe": []
+  },
+  {
+    "allergenFiltering": [
+      "\n        \n          Confirmado\n          \n          \n        \n        10,00 €\n      "
+    ],
+    "injectedImages": 0
+  }
+]

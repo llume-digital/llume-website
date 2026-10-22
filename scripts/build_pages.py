@@ -8,6 +8,8 @@ import html
 import json
 from pathlib import Path
 
+SKIP = {'es': 'Saltar al contenido', 'en': 'Skip to content', 'pt': 'Saltar para o conteúdo'}
+
 PUBLIC = Path(__file__).resolve().parent.parent / "public"
 BASE = "https://llumedigital.com"
 BEACON = """  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "067b84e48590464ea55b033a36a010bc"}'></script>"""
@@ -21,137 +23,114 @@ SITE = {
            "legal": ("/pt/aviso-legal", "Aviso legal", "/pt/privacidade", "Privacidade"), "og": "pt_PT"},
 }
 
-FAQ = {
- "es": {
-  "eyebrow": "Preguntas frecuentes",
-  "h2": "Lo que nos<br>suelen preguntar.",
-  "help": "<p class=\"faq-help-q\">¿No encuentras tu respuesta?</p>\n          <p>Escríbenos y te contestamos personalmente, sin respuestas automáticas.</p>\n          <div class=\"faq-help-actions\"><a class=\"btn btn-light btn-sm\" href=\"#contacto\">Hablemos <span aria-hidden=\"true\">→</span></a><a class=\"btn btn-ghost btn-sm\" href=\"mailto:info@llume.net\">Escríbenos</a></div>",
-  "items": [
-   [
-    "¿Cuánto cuesta un proyecto?",
-    "Depende del alcance. Tras la primera reunión te enviamos una propuesta por escrito con precio, plazos y entregables. Si no encaja, no pasa nada."
-   ],
-   [
-    "¿Cuánto se tarda?",
-    "Una automatización concreta puede estar funcionando en pocas semanas; una plataforma completa, en unos meses. Trabajamos con entregas cada dos semanas para que veas avances desde el principio."
-   ],
-   [
-    "¿De quién es el código?",
-    "Tuyo. Todo lo que desarrollamos para ti es de tu propiedad e incluye su documentación, para que puedas seguir con nosotros o con quien quieras."
-   ],
-   [
-    "¿Trabajáis con empresas pequeñas?",
-    "Sí, es con quien más trabajamos: pymes, autónomos y asociaciones. Adaptamos el alcance a tu tamaño y empezamos por lo que más impacto tiene."
-   ],
-   [
-    "¿Dónde trabajáis?",
-    "Estamos en Oviedo y trabajamos con clientes de España y Portugal, en remoto o en persona cuando hace falta."
-   ],
-   [
-    "¿Qué pasa cuando termina el proyecto?",
-    "Formamos a tu equipo y te entregamos la documentación. Después puedes contratar mantenimiento, seguir evolucionando la solución con nosotros o continuar por tu cuenta."
-   ],
-   [
-    "¿Hay ayudas para financiar el proyecto?",
-    "A veces sí. Cada cierto tiempo se abren ayudas públicas a la digitalización para pymes y autónomos. Te ayudamos a comprobar si hay alguna abierta que encaje con tu proyecto."
-   ],
-   [
-    "¿Hacéis formación en IA para empresas?",
-    "Sí. Formamos a equipos completos o por áreas, en persona u online, para usar la IA y las herramientas digitales en su trabajo diario: asistentes, automatizaciones y conexión con el correo, los documentos y el CRM. Preparamos una propuesta según tu equipo."
-   ],
-   [
-    "¿Cómo tratáis nuestros datos?",
-    "Con confidencialidad y conforme al RGPD. Accedemos solo a la información necesaria y, si lo necesitas, firmamos un acuerdo de confidencialidad antes de empezar."
-   ]
-  ]
- },
- "en": {
-  "eyebrow": "FAQ",
-  "h2": "What people<br>usually ask us.",
-  "help": "<p class=\"faq-help-q\">Can't find your answer?</p>\n          <p>Write to us and a real person will reply, no automated answers.</p>\n          <div class=\"faq-help-actions\"><a class=\"btn btn-light btn-sm\" href=\"#contacto\">Let's talk <span aria-hidden=\"true\">→</span></a><a class=\"btn btn-ghost btn-sm\" href=\"mailto:info@llume.net\">Email us</a></div>",
-  "items": [
-   [
-    "How much does a project cost?",
-    "It depends on the scope. After the first call we send you a written proposal with price, timeline and deliverables. If it doesn't fit, no problem."
-   ],
-   [
-    "How long does it take?",
-    "A specific automation can be up and running in a few weeks; a complete platform, in a few months. We deliver every two weeks so you see progress from the start."
-   ],
-   [
-    "Who owns the code?",
-    "You do. Everything we build for you is your property and comes with its documentation, so you can continue with us or with anyone you choose."
-   ],
-   [
-    "Do you work with small companies?",
-    "Yes, they are who we work with most: SMEs, the self-employed and associations. We adapt the scope to your size and start with what has the most impact."
-   ],
-   [
-    "Where do you work?",
-    "We are based in Oviedo, Spain, and work with clients in Spain and Portugal, remotely or in person when needed."
-   ],
-   [
-    "What happens when the project ends?",
-    "We train your team and hand over the documentation. Then you can hire maintenance, keep evolving the solution with us or carry on by yourself."
-   ],
-   [
-    "Are there grants to fund the project?",
-    "Sometimes, yes. Public digitalisation grants for SMEs and the self-employed open from time to time. We help you check whether there is one open that fits your project."
-   ],
-   [
-    "Do you offer AI training for companies?",
-    "Yes. We train whole teams or specific areas, in person or online, to use AI and digital tools in their daily work: assistants, automations and connecting them with email, documents and the CRM. We prepare a proposal based on your team."
-   ],
-   [
-    "How do you handle our data?",
-    "Confidentially and in line with the GDPR. We only access the information we need and, if you wish, we sign a non-disclosure agreement before starting."
-   ]
-  ]
- },
- "pt": {
-  "eyebrow": "Perguntas frequentes",
-  "h2": "O que nos<br>costumam perguntar.",
-  "help": "<p class=\"faq-help-q\">Não encontra a sua resposta?</p>\n          <p>Escreva-nos e responde-lhe uma pessoa, sem respostas automáticas.</p>\n          <div class=\"faq-help-actions\"><a class=\"btn btn-light btn-sm\" href=\"#contacto\">Vamos falar <span aria-hidden=\"true\">→</span></a><a class=\"btn btn-ghost btn-sm\" href=\"mailto:info@llume.net\">Escreva-nos</a></div>",
-  "items": [
-   [
-    "Quanto custa um projeto?",
-    "Depende do âmbito. Depois da primeira reunião enviamos uma proposta por escrito com preço, prazos e entregáveis. Se não encaixar, não há problema."
-   ],
-   [
-    "Quanto tempo demora?",
-    "Uma automação concreta pode estar a funcionar em poucas semanas; uma plataforma completa, em alguns meses. Fazemos entregas a cada duas semanas para que veja avanços desde o início."
-   ],
-   [
-    "De quem é o código?",
-    "Seu. Tudo o que desenvolvemos para si é sua propriedade e inclui a respetiva documentação, para que possa continuar connosco ou com quem quiser."
-   ],
-   [
-    "Trabalham com empresas pequenas?",
-    "Sim, é com quem mais trabalhamos: PME, trabalhadores independentes e associações. Adaptamos o âmbito à sua dimensão e começamos pelo que tem mais impacto."
-   ],
-   [
-    "Onde trabalham?",
-    "Estamos em Oviedo e trabalhamos com clientes em Espanha e Portugal, à distância ou presencialmente quando é necessário."
-   ],
-   [
-    "O que acontece quando o projeto termina?",
-    "Formamos a sua equipa e entregamos a documentação. Depois pode contratar manutenção, continuar a evoluir a solução connosco ou seguir por conta própria."
-   ],
-   [
-    "Há apoios para financiar o projeto?",
-    "Às vezes, sim. De tempos a tempos abrem apoios públicos à digitalização para PME. Ajudamo-lo a verificar se há algum aberto que se enquadre no seu projeto."
-   ],
-   [
-    "Fazem formação em IA para empresas?",
-    "Sim. Formamos equipas completas ou por áreas, presencialmente ou online, para usar a IA e as ferramentas digitais no trabalho diário: assistentes, automações e ligação ao e-mail, aos documentos e ao CRM. Preparamos uma proposta conforme a sua equipa."
-   ],
-   [
-    "Como tratam os nossos dados?",
-    "Com confidencialidade e em conformidade com o RGPD. Acedemos apenas à informação necessária e, se quiser, assinamos um acordo de confidencialidade antes de começar."
-   ]
-  ]
- }
-}
+FAQ = {'es': {'eyebrow': 'Preguntas frecuentes',
+        'h2': 'Antes de empezar,<br>conviene tenerlo claro.',
+        'help': '<p class="faq-help-q">¿Tienes una pregunta concreta?</p>\n'
+                '          <p>Cuéntanos el contexto y te orientamos sobre el siguiente paso.</p>\n'
+                '          <div class="faq-help-actions"><a class="btn btn-light btn-sm" '
+                'href="#contacto">Hablemos <span aria-hidden="true">→</span></a><a class="btn btn-ghost btn-sm" '
+                'href="mailto:info@llumedigital.com">Escríbenos</a></div>',
+        'items': [('¿En qué puede ayudar llume a mi empresa?',
+                   'Analizamos tareas y procesos para proponer soluciones de automatización, integración de '
+                   'herramientas, migración a la nube, aplicaciones a medida o visión artificial. La '
+                   'recomendación depende del problema y de las herramientas que ya utilizas.'),
+                  ('¿Cómo empezamos?',
+                   'Puedes pedir una primera conversación de 30 minutos, gratuita y sin compromiso. Nos explicas '
+                   'el reto y valoramos si podemos ayudarte. Si hay encaje, preparamos una propuesta con alcance, '
+                   'entregables, calendario y precio antes de empezar.'),
+                  ('¿Cuánto cuesta y cuánto tarda un proyecto?',
+                   'Depende de su alcance, complejidad e integraciones. La propuesta concreta el precio y el '
+                   'calendario; no damos un plazo o ahorro estándar que sirva para todos los proyectos.'),
+                  ('¿Necesito conocimientos técnicos?',
+                   'No. Empezamos por cómo trabaja tu equipo y explicamos las opciones en lenguaje claro. Si una '
+                   'solución requiere cambios en tus sistemas, concretamos antes qué accesos y decisiones hacen '
+                   'falta.'),
+                  ('¿Qué recibimos al terminar?',
+                   'Los entregables, documentación, formación y soporte se detallan en la propuesta. También '
+                   'dejamos acordado qué incluye el mantenimiento y qué gastos recurrentes, como licencias o '
+                   'alojamiento, dependen de terceros.'),
+                  ('¿De quién es el código y qué pasa con las licencias?',
+                   'La propuesta y el contrato deben especificar la titularidad y entrega del desarrollo, así '
+                   'como las licencias de componentes o servicios de terceros. Lo dejamos claro antes de iniciar '
+                   'el trabajo.'),
+                  ('¿Cómo se gestionan nuestros datos?',
+                   'Antes de acceder a datos del proyecto, acordamos qué información es necesaria, quién puede '
+                   'acceder y qué servicios externos intervienen. Las condiciones aplicables y los canales para '
+                   'ejercer derechos están en la Política de privacidad.'),
+                  ('¿Ofrecéis formación para equipos?',
+                   'Sí. Podemos preparar formación práctica sobre herramientas digitales e IA, adaptada a las '
+                   'tareas y al nivel del equipo. El formato, contenido y duración se concretan en la '
+                   'propuesta.')]},
+ 'en': {'eyebrow': 'Frequently asked questions',
+        'h2': 'Before we start,<br>let’s make it clear.',
+        'help': '<p class="faq-help-q">Have a specific question?</p>\n'
+                '          <p>Tell us a little about the context and we’ll suggest a useful next step.</p>\n'
+                '          <div class="faq-help-actions"><a class="btn btn-light btn-sm" href="#contacto">Let’s '
+                'talk <span aria-hidden="true">→</span></a><a class="btn btn-ghost btn-sm" '
+                'href="mailto:info@llumedigital.com">Email us</a></div>',
+        'items': [('How can llume help my company?',
+                   'We look at tasks and processes and may suggest automation, tool integration, cloud migration, '
+                   'custom applications or computer vision. The right approach depends on the problem and the '
+                   'tools you already use.'),
+                  ('How do we get started?',
+                   'You can request a free, no-obligation 30-minute introductory call. Tell us about the '
+                   'challenge and we’ll assess whether we can help. If there is a fit, we’ll prepare a proposal '
+                   'with scope, deliverables, timeline and price before work begins.'),
+                  ('How much does a project cost and how long does it take?',
+                   'It depends on scope, complexity and integrations. The proposal sets out the price and '
+                   'timeline; we do not promise a standard schedule or saving for every project.'),
+                  ('Do I need technical skills?',
+                   'No. We start with how your team works and explain the options in plain language. If a '
+                   'solution requires changes to your systems, we agree in advance what access and decisions are '
+                   'needed.'),
+                  ('What do we receive at the end?',
+                   'Deliverables, documentation, training and support are described in the proposal. We also '
+                   'clarify maintenance and any recurring costs, such as third-party licences or hosting.'),
+                  ('Who owns the code, and what about licences?',
+                   'The proposal and contract should set out ownership and handover of the work, along with '
+                   'licences for third-party components or services. We clarify this before starting.'),
+                  ('How do you handle our data?',
+                   'Before accessing project data, we agree what information is needed, who can access it and '
+                   'which external services are involved. Applicable terms and ways to exercise your rights are '
+                   'described in the Privacy Policy.'),
+                  ('Do you offer team training?',
+                   'Yes. We can prepare practical training on digital tools and AI, tailored to your team’s tasks '
+                   'and experience. Format, content and duration are agreed in the proposal.')]},
+ 'pt': {'eyebrow': 'Perguntas frequentes',
+        'h2': 'Antes de começar,<br>vale a pena esclarecer.',
+        'help': '<p class="faq-help-q">Tem uma pergunta concreta?</p>\n'
+                '          <p>Conte-nos o contexto e ajudamos a definir o próximo passo.</p>\n'
+                '          <div class="faq-help-actions"><a class="btn btn-light btn-sm" href="#contacto">Vamos '
+                'falar <span aria-hidden="true">→</span></a><a class="btn btn-ghost btn-sm" '
+                'href="mailto:info@llumedigital.com">Escreva-nos</a></div>',
+        'items': [('Como pode a llume ajudar a minha empresa?',
+                   'Analisamos tarefas e processos para propor soluções de automação, integração de ferramentas, '
+                   'migração para a cloud, aplicações à medida ou visão artificial. A recomendação depende do '
+                   'problema e das ferramentas que já utiliza.'),
+                  ('Como começamos?',
+                   'Pode pedir uma primeira conversa de 30 minutos, gratuita e sem compromisso. Explique-nos o '
+                   'desafio e avaliamos se podemos ajudar. Se fizer sentido, preparamos uma proposta com âmbito, '
+                   'entregáveis, calendário e preço antes de começar.'),
+                  ('Quanto custa e quanto tempo demora um projeto?',
+                   'Depende do âmbito, da complexidade e das integrações. A proposta especifica o preço e o '
+                   'calendário; não prometemos um prazo ou uma poupança padrão para todos os projetos.'),
+                  ('Preciso de conhecimentos técnicos?',
+                   'Não. Começamos por perceber como trabalha a sua equipa e explicamos as opções com clareza. Se '
+                   'a solução exigir alterações nos seus sistemas, combinamos previamente os acessos e as '
+                   'decisões necessárias.'),
+                  ('O que recebemos no final?',
+                   'Os entregáveis, a documentação, a formação e o suporte ficam descritos na proposta. Também '
+                   'clarificamos a manutenção e os custos recorrentes, como licenças ou alojamento de terceiros.'),
+                  ('A quem pertence o código e como funcionam as licenças?',
+                   'A proposta e o contrato devem definir a titularidade e a entrega do desenvolvimento, bem como '
+                   'as licenças de componentes ou serviços de terceiros. Clarificamos tudo antes de começar.'),
+                  ('Como tratam os nossos dados?',
+                   'Antes de aceder aos dados do projeto, combinamos que informação é necessária, quem pode '
+                   'aceder e que serviços externos são utilizados. As condições aplicáveis e os meios para '
+                   'exercer os seus direitos estão na Política de privacidade.'),
+                  ('Fazem formação para equipas?',
+                   'Sim. Podemos preparar formação prática sobre ferramentas digitais e IA, adaptada às tarefas e '
+                   'à experiência da equipa. O formato, o conteúdo e a duração são definidos na proposta.')]}}
 
 TRAINING = {
     "es": {
@@ -270,6 +249,7 @@ def head(code, title, desc, slug, schema):
   <script type="application/ld+json">{json.dumps(schema, ensure_ascii=False)}</script>
 </head>
 <body>
+  <a class="skip" href="#main-content">{SKIP[code]}</a>
   <header class="nav scrolled" id="nav">
     <a href="{S['home']}" class="logo" aria-label="llume"><img src="/assets/mark.svg" alt="" width="20" height="24"><span>llume.</span></a>
     <a href="{S['home']}#contacto" class="btn btn-light btn-sm">{S['talk']} <span aria-hidden="true">→</span></a>
@@ -308,7 +288,7 @@ def training(code):
         </article>""" for label, when, title, intro, items in T["sessions"])
     guide = "".join(f"<li>{x}</li>" for x in T["guide"])
     mods = "".join(f"<li>{m}</li>" for m in T["mods"])
-    return head(code, T["title"], T["desc"], S["train"], schema) + f"""  <main class="wrap train-page">
+    return head(code, T["title"], T["desc"], S["train"], schema) + f"""  <main id="main-content" tabindex="-1" class="wrap train-page">
     <p class="eyebrow">{T['eyebrow']}</p>
     <h1>{T['h1']}</h1>
     <p class="lead">{T['lead']}</p>
@@ -343,9 +323,9 @@ def training(code):
 def faq_page(code):
     F, S = FAQ[code], SITE[code]
     title = {"es": "Preguntas frecuentes", "en": "Frequently asked questions", "pt": "Perguntas frequentes"}[code]
-    desc = {"es": "Respuestas a lo que más nos preguntan: precio, plazos, propiedad del código, tamaño de empresa, formación y datos.",
-            "en": "Answers to what we get asked most: price, timelines, code ownership, company size, training and data.",
-            "pt": "Respostas ao que mais nos perguntam: preço, prazos, propriedade do código, dimensão da empresa, formação e dados."}[code]
+    desc = {"es": "Qué soluciones ofrecemos, cómo empezamos, precios y plazos, entregables, titularidad del código y gestión de datos.",
+            "en": "What we do, how to get started, project pricing and timelines, deliverables, ownership and data handling.",
+            "pt": "O que fazemos, como começar, preços e prazos, entregáveis, titularidade do código e tratamento de dados."}[code]
     def txt(x):
         import re
         return html.unescape(re.sub(r"<[^>]+>", "", x)).strip()
@@ -353,7 +333,7 @@ def faq_page(code):
         {"@type": "Question", "name": txt(q), "acceptedAnswer": {"@type": "Answer", "text": txt(a)}} for q, a in F["items"]]}
     items = "".join(f'\n        <details name="faq"><summary>{q}</summary><p>{a}</p></details>' for q, a in F["items"])
     help_html = F["help"].replace(' href="#contacto"', f' href="{S["home"]}#contacto"')
-    return head(code, title, desc, S["faq"], schema) + f"""  <main class="wrap section faq-section faq-page">
+    return head(code, title, desc, S["faq"], schema) + f"""  <main id="main-content" tabindex="-1" class="wrap section faq-section faq-page">
     <div class="faq-intro">
       <p class="eyebrow">{F['eyebrow']}</p>
       <h1>{F['h2']}</h1>

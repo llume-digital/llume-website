@@ -1,6 +1,6 @@
 # llume
 
-> Consultoría tecnológica de transformación digital con sede en Oviedo (Asturias, España). Trabaja con empresas y organizaciones de España y Portugal. Web: https://llumedigital.com · Contacto: info@llume.net
+> Consultoría tecnológica de transformación digital con sede en Oviedo (Asturias, España). Trabaja con empresas y organizaciones de España y Portugal. Web: https://llumedigital.com · Contacto: info@llumedigital.com
 
 ## Qué hace llume
 
@@ -33,5 +33,4 @@ El código es siempre propiedad del cliente. Primera reunión de 30 minutos, gra
 
 - [Programa de formación en IA para empresas](https://llumedigital.com/formacion)
 - [Preguntas frecuentes](https://llumedigital.com/preguntas)
-- [Blog con guías prácticas](https://llumedigital.com/blog/)
 - [English version](https://llumedigital.com/en/) · [Versão em português](https://llumedigital.com/pt/)

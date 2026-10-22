@@ -6,6 +6,8 @@ When the company is set up, fill in OWNER below and run:
 """
 from pathlib import Path
 
+SKIP = {'es': 'Saltar al contenido', 'en': 'Skip to content', 'pt': 'Saltar para o conteúdo'}
+
 PUBLIC = Path(__file__).resolve().parent.parent / "public"
 UPDATED = {"es": "13 de octubre de 2026", "en": "13 October 2026", "pt": "13 de outubro de 2026"}
 
@@ -15,7 +17,7 @@ OWNER = {
     "tax_id": "",        # NIF / CIF
     "address": "",       # registered office
     "registry": "",      # e.g. Registro Mercantil de Asturias, tomo..., folio..., hoja...
-    "email": "info@llume.net",
+    "email": "info@llumedigital.com",
 }
 
 PAGES = {
@@ -73,7 +75,7 @@ def content(code, kind):
 {owner_list(code, True)}
     <h2>2. Qué datos tratamos y de dónde vienen</h2>
     <p>Esta web no guarda datos en sus propios servidores. El formulario de contacto abre tu programa de correo con un mensaje ya preparado, y solo recibimos los datos que decidas enviarnos: lo que necesitas, tu nombre y tu teléfono y, si quieres, tu empresa y tu email. Si nos escribes directamente por correo o por WhatsApp, tratamos los datos que incluyas en el mensaje y, en el caso de WhatsApp, tu número de teléfono.</p>
-    <p>Nuestro proveedor de alojamiento procesa datos técnicos, como la dirección IP, para servir la web y protegerla frente a ataques. Para conocer las visitas usamos una analítica sin cookies que no te identifica.</p>
+    <p>Nuestro proveedor de alojamiento procesa datos técnicos, como la dirección IP, para servir la web y protegerla frente a ataques. Para conocer las visitas, el navegador carga Cloudflare Web Analytics y envía estadísticas de uso a Cloudflare, sin cookies de seguimiento.</p>
     <h2>3. Para qué los usamos</h2>
     <ul>
       <li>Atender tu consulta y llamarte para organizar la reunión que solicitas.</li>
@@ -109,7 +111,7 @@ def content(code, kind):
     <p>Podemos actualizar esta política para adaptarla a cambios legales o en nuestros servicios. Publicaremos siempre la versión vigente en esta página, con su fecha de actualización.</p>"""
         return """    <h2>Esta web no usa cookies de seguimiento</h2>
     <p>No instalamos cookies propias ni de terceros con fines analíticos, publicitarios o de personalización. Por eso no te mostramos ningún banner de cookies.</p>
-    <p>Las fuentes tipográficas y las librerías que usa la web se sirven desde nuestro propio dominio, de modo que tu navegador no se conecta a servicios de terceros como Google Fonts al visitarnos. Para contar las visitas usamos la analítica de Cloudflare, que funciona sin cookies y sin identificarte.</p>
+    <p>Las fuentes tipográficas y la biblioteca 3D se sirven desde nuestro propio dominio, sin conexiones a Google Fonts. Para contar las visitas, el navegador carga el script de Cloudflare Web Analytics desde static.cloudflareinsights.com y envía estadísticas a Cloudflare. Esta analítica funciona sin cookies de seguimiento.</p>
     <h2>Cookies técnicas del alojamiento</h2>
     <p>Nuestro proveedor de alojamiento, Cloudflare, puede usar cookies técnicas estrictamente necesarias para proteger la web frente a tráfico malicioso. Estas cookies están exentas de consentimiento según el artículo 22.2 de la LSSI-CE.</p>
     <table>
@@ -139,7 +141,7 @@ def content(code, kind):
 {owner_list(code, True)}
     <h2>2. What data we process and where it comes from</h2>
     <p>This website does not store data on its own servers. The contact form opens your email app with a ready-made message, and we only receive the data you choose to send us: what you need, your name and phone number and, optionally, your company and email. If you email us or message us on WhatsApp, we process the data included in your message and, for WhatsApp, your phone number.</p>
-    <p>Our hosting provider processes technical data, such as your IP address, to serve the website and protect it from attacks. We count visits with cookie-free analytics that do not identify you.</p>
+    <p>Our hosting provider processes technical data, such as your IP address, to serve the website and protect it from attacks. To count visits, your browser loads Cloudflare Web Analytics and sends usage statistics to Cloudflare, without tracking cookies.</p>
     <h2>3. What we use it for</h2>
     <ul>
       <li>To handle your enquiry and call you to arrange the meeting you request.</li>
@@ -175,7 +177,7 @@ def content(code, kind):
     <p>We may update this policy to reflect legal changes or changes to our services. The current version will always be published on this page with its update date.</p>"""
         return """    <h2>This website does not use tracking cookies</h2>
     <p>We do not set our own or third-party cookies for analytics, advertising or personalisation, which is why we do not show you a cookie banner.</p>
-    <p>The fonts and libraries used by the website are served from our own domain, so your browser does not connect to third-party services such as Google Fonts when you visit us. We count visits with Cloudflare's analytics, which works without cookies and without identifying you.</p>
+    <p>The fonts and 3D library are served from our own domain, without connections to Google Fonts. To count visits, your browser loads the Cloudflare Web Analytics script from static.cloudflareinsights.com and sends statistics to Cloudflare. This analytics service works without tracking cookies.</p>
     <h2>Technical cookies from our hosting provider</h2>
     <p>Our hosting provider, Cloudflare, may use strictly necessary technical cookies to protect the website from malicious traffic. These cookies are exempt from consent under Article 22.2 of the Spanish LSSI-CE.</p>
     <table>
@@ -205,7 +207,7 @@ def content(code, kind):
 {owner_list(code, True)}
     <h2>2. Que dados tratamos e de onde vêm</h2>
     <p>Este site não guarda dados nos seus próprios servidores. O formulário de contacto abre o seu programa de e-mail com uma mensagem já preparada, e só recebemos os dados que decidir enviar-nos: o que precisa, o seu nome e telefone e, se quiser, a sua empresa e e-mail. Se nos escrever diretamente por e-mail ou por WhatsApp, tratamos os dados incluídos na mensagem e, no caso do WhatsApp, o seu número de telefone.</p>
-    <p>O nosso fornecedor de alojamento trata dados técnicos, como o endereço IP, para servir o site e protegê-lo contra ataques. Para contar as visitas usamos uma análise sem cookies que não o identifica.</p>
+    <p>O nosso fornecedor de alojamento trata dados técnicos, como o endereço IP, para servir o site e protegê-lo contra ataques. Para contar as visitas, o navegador carrega a Cloudflare Web Analytics e envia estatísticas de utilização à Cloudflare, sem cookies de rastreio.</p>
     <h2>3. Para que os usamos</h2>
     <ul>
       <li>Tratar o seu pedido e ligar-lhe para marcar a reunião que solicita.</li>
@@ -241,7 +243,7 @@ def content(code, kind):
     <p>Podemos atualizar esta política para a adaptar a alterações legais ou dos nossos serviços. Publicaremos sempre a versão em vigor nesta página, com a respetiva data de atualização.</p>"""
     return """    <h2>Este site não usa cookies de rastreio</h2>
     <p>Não instalamos cookies próprios nem de terceiros para fins analíticos, publicitários ou de personalização. Por isso não lhe mostramos nenhum aviso de cookies.</p>
-    <p>As fontes tipográficas e as bibliotecas que o site usa são servidas a partir do nosso próprio domínio, pelo que o seu navegador não se liga a serviços de terceiros como o Google Fonts quando nos visita. Para contar as visitas usamos a análise da Cloudflare, que funciona sem cookies e sem o identificar.</p>
+    <p>As fontes tipográficas e a biblioteca 3D são servidas a partir do nosso próprio domínio, sem ligações ao Google Fonts. Para contar as visitas, o navegador carrega o script da Cloudflare Web Analytics a partir de static.cloudflareinsights.com e envia estatísticas à Cloudflare. Esta análise funciona sem cookies de rastreio.</p>
     <h2>Cookies técnicos do alojamento</h2>
     <p>O nosso fornecedor de alojamento, a Cloudflare, pode usar cookies técnicos estritamente necessários para proteger o site contra tráfego malicioso. Estes cookies estão isentos de consentimento nos termos do artigo 22.2 da LSSI-CE espanhola.</p>
     <table>
@@ -269,11 +271,12 @@ def page(code, kind):
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+  <a class="skip" href="#main-content">{SKIP[code]}</a>
   <header class="nav scrolled" id="nav">
     <a href="{L['home']}" class="logo" aria-label="llume"><img src="/assets/mark.svg" alt="" width="20" height="24"><span>llume.</span></a>
     <a href="{L['home']}#contacto" class="btn btn-light btn-sm">{L['book']} <span aria-hidden="true">→</span></a>
   </header>
-  <main class="wrap legal">
+  <main id="main-content" tabindex="-1" class="wrap legal">
     <p class="eyebrow">Legal</p>
     <h1>{title}</h1>
     <p class="updated">{L['updated']}: {UPDATED[code]}</p>

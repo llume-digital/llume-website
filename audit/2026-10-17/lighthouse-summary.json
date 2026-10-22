@@ -1,0 +1,18 @@
+{
+  "url": "http://127.0.0.1:8124/",
+  "fetchTime": "2026-10-17T17:23:48.511Z",
+  "lighthouseVersion": "13.5.0",
+  "categories": {
+    "performance": 0.86,
+    "accessibility": 1,
+    "best-practices": 0.96,
+    "seo": 1
+  },
+  "metrics": {
+    "first-contentful-paint": "2.4\u00a0s",
+    "largest-contentful-paint": "3.4\u00a0s",
+    "total-blocking-time": "180\u00a0ms",
+    "cumulative-layout-shift": "0"
+  },
+  "limitations": "Local server without compression/CDN; concurrent host applications; Analytics CORS errors on localhost. Not production measurements."
+}
