@@ -330,10 +330,10 @@ input::placeholder, textarea::placeholder { color: #a39c92; opacity: 1; }
 .trusted { margin-top: clamp(40px, 6vh, 72px); }
 .trusted p { font: 400 11px var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
 .trusted-logos { display: flex; flex-wrap: wrap; align-items: center; gap: 18px clamp(28px, 4.5vw, 56px); }
-.trusted-logos img { width: auto; display: block; filter: brightness(0) invert(1); opacity: .55; transition: opacity .3s; }
+.trusted-logos img { width: auto; display: block; filter: brightness(0) invert(1); opacity: .78; transition: opacity .3s; }
 .trusted-logos li:hover img { opacity: 1; }
 .trusted-logos .cc { height: 26px; } .trusted-logos .pf { height: 26px; } .trusted-logos .cor { height: 32px; }
-.trusted-logos .inj { height: 30px; } .trusted-logos .uo { height: 40px; }
+.trusted-logos .inj { height: 30px; } .trusted-logos .uo { height: 48px; opacity: .9; }
 
 /* ---------- sectors ---------- */
 .sectors { display: grid; grid-template-columns: 300px 1fr; gap: 16px; margin-top: 28px; }
@@ -910,3 +910,32 @@ html:has(dialog[open]) { overflow-y: hidden; }
   .reveal.reveal-pending { opacity: 1; transform: none; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Home: testimonial, calculator, form, method and carousels */
+.cx-more + .quote { margin-top: 48px; }
+.quote figcaption a { color: var(--amber); font-size: 13.5px; margin-top: 2px; text-decoration: underline; text-underline-offset: 3px; }
+.form .btn-wa svg { width: 18px; height: 18px; fill: currentColor; }
+.form .btn-wa { margin-top: -6px; }
+.marquee-ctl { display: flex; justify-content: flex-end; margin-top: 10px; }
+.marquee-toggle { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.03); color: var(--muted); font: 400 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
+.marquee-toggle:hover { color: var(--text); border-color: rgba(255,255,255,.25); }
+.marquee-toggle:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+.mq-ico { width: 8px; height: 10px; border-left: 2.5px solid currentColor; border-right: 2.5px solid currentColor; }
+.integrations.paused .mq-ico { width: 0; height: 0; border: 0; border-left: 9px solid currentColor; border-top: 5.5px solid transparent; border-bottom: 5.5px solid transparent; }
+.integrations.paused .track, .integrations:focus-within .track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .marquee-ctl { display: none; } }
+@media (min-width: 1000px) {
+  .method-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); grid-template-rows: auto 1fr; column-gap: clamp(48px, 6vw, 96px); }
+  .method-intro { grid-column: 1; grid-row: 1; }
+  .method-grid .steps { grid-column: 2; grid-row: 1 / span 2; margin-top: 8px; max-width: none; }
+  .method-grid .steps-cta { grid-column: 1; grid-row: 2; align-self: start; justify-self: start; margin-top: 28px; }
+}
+/* Long home page: sections below the fold are laid out only when they get close */
+#retos, #casos, #calculadora, #proceso, #formacion { content-visibility: auto; contain-intrinsic-size: auto 900px; }
+/* 404 */
+.nf-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.nf-links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.03); }
+.nf-links a:hover { border-color: rgba(255,255,255,.25); }
+.nf-other { margin-top: 36px; color: var(--muted); font-size: 14px; }
+.nf-other a { color: var(--amber); text-decoration: underline; text-underline-offset: 3px; }
+.quote figcaption a span { display: inline; }
