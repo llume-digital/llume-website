@@ -1,80 +1,396 @@
 {
-  "_nota": "Platos y precios copiados de la carta digital actual (capturas del 13/10/2026). Faltan Vinos y alérgenos por plato: no se veían en las capturas. Los alérgenos solo se muestran cuando un plato tiene el campo 'alergenos' relleno.",
+  "_nota": "Platos y precios copiados de la carta física de El Puerto (fotos del 27/10/2026). Vinos: solo las páginas fotografiadas; faltan los vinos del principio de blancos y de tintos. Faltan alérgenos por plato. Los alérgenos solo se muestran cuando un plato tiene el campo 'alergenos' relleno.",
   "categorias": [
     {
       "id": "ensaladas",
       "nombre": "Ensaladas",
       "platos": [
-        { "nombre": "Ensalada de rulo de cabra", "desc": "Lechuga, cebolla y pimiento confitado, queso de cabra, tomate y almendras con una salsa de miel y modena.", "precio": 16.00 },
-        { "nombre": "Ensalada templada de bacalao", "desc": "Lechuga, patata, bacalao y pisto.", "precio": 17.00 },
-        { "nombre": "Ensalada de la casa", "desc": "Espinaca, bonito, queso de cabra, cacahuete, cebolla, aceituna con una salsa de miel y mostaza.", "precio": 16.20 },
-        { "nombre": "Caprese de anchoa", "desc": "Mozzarella de búfala, tomate, anchoa y salsa de pesto.", "precio": 16.90 }
+        {
+          "nombre": "Ensalada caprese",
+          "desc": "Mozzarella, tomate, anchoa y pesto.",
+          "precio": 16.9
+        },
+        {
+          "nombre": "Ensalada de queso de cabra",
+          "desc": "Lechuga, cebolla, pimiento confitado, queso de cabra, tomate y almendras con una salsa de miel y Módena.",
+          "precio": 16.0
+        },
+        {
+          "nombre": "Ensalada templada de bacalao",
+          "desc": "Lechuga, patata, bacalao y pisto.",
+          "precio": 17.0
+        },
+        {
+          "nombre": "Ensalada de la casa",
+          "desc": "Espinaca, bonito, queso, cacahuete, cebolla, aceituna con una salsa de miel y mostaza.",
+          "precio": 16.2
+        }
       ]
     },
     {
       "id": "raciones",
       "nombre": "Raciones para compartir y disfrutar",
       "platos": [
-        { "nombre": "Croquetas de jamón", "precio": 13.50 },
-        { "nombre": "Croquetas de puerro y gamba", "precio": 13.50 },
-        { "nombre": "Ensaladilla rusa", "precio": 14.50 },
-        { "nombre": "Bocartes a la sal con tomate natural", "precio": 18.70 },
-        { "nombre": "Calamares a la romana", "precio": 21.00 },
-        { "nombre": "Fritos de merluza", "precio": 20.00 },
-        { "nombre": "Pulpo a la plancha", "precio": 24.50 },
-        { "nombre": "Salpicón de bonito", "precio": 24.50 },
-        { "nombre": "Lomos de bonito guisado", "precio": 25.00 },
-        { "nombre": "Zamburiñas a la plancha", "precio": 19.70 },
-        { "nombre": "Chipirones a la plancha", "precio": 18.50 },
-        { "nombre": "Pulpo a la gallega", "precio": 21.00 },
-        { "nombre": "Tataki de atún rojo", "desc": "Con salsa teriyaki.", "precio": 24.90 },
-        { "nombre": "Bacalao ahumado, patata y tomate natural", "precio": 19.00 },
-        { "nombre": "Cazuela de gambas al ajillo", "precio": 20.00, "nota": "ración" },
-        { "nombre": "Gyoza de langostino con jengibre", "desc": "Con salsa de ají amarillo.", "precio": 14.30 },
-        { "nombre": "Chipirones fritos", "precio": 18.50 }
+        {
+          "nombre": "Croquetas de jamón",
+          "precio": 13.5
+        },
+        {
+          "nombre": "Croquetas de puerro y gamba",
+          "precio": 13.5
+        },
+        {
+          "nombre": "Bocartes ahumados con tomate natural",
+          "precio": 18.7
+        },
+        {
+          "nombre": "Calamares a la romana",
+          "precio": 21.0
+        },
+        {
+          "nombre": "Fritos de merluza",
+          "precio": 20.0
+        },
+        {
+          "nombre": "Zamburiñas a la plancha",
+          "precio": 19.7
+        },
+        {
+          "nombre": "Pulpo a la gallega",
+          "precio": 21.0
+        },
+        {
+          "nombre": "Bacalao ahumado, patata y tomate natural",
+          "precio": 19.0
+        },
+        {
+          "nombre": "Chipirones fritos",
+          "precio": 18.5
+        },
+        {
+          "nombre": "Ensaladilla rusa",
+          "precio": 14.5
+        },
+        {
+          "nombre": "Salpicón de bonito",
+          "precio": 24.5
+        },
+        {
+          "nombre": "Lomos de bonito guisados",
+          "precio": 25.0
+        },
+        {
+          "nombre": "Pulpo a la plancha",
+          "precio": 24.5
+        },
+        {
+          "nombre": "Cazuela de gambas al ajillo",
+          "precio": 20.0
+        },
+        {
+          "nombre": "Tataki de atún rojo",
+          "desc": "Con salsa teriyaki.",
+          "precio": 24.9
+        },
+        {
+          "nombre": "Gyoza de langostino con jengibre",
+          "desc": "Con salsa de ají amarillo.",
+          "precio": 14.3
+        }
       ]
     },
     {
       "id": "tortillas",
       "nombre": "Tortillas (de 4 huevos)",
       "platos": [
-        { "nombre": "Tortilla de atún y pimientos", "precio": 15.50 },
-        { "nombre": "Tortilla de merluza y gambas", "precio": 15.50 },
-        { "nombre": "Tortilla de bacalao", "precio": 16.50 }
+        {
+          "nombre": "Tortilla de atún y pimientos",
+          "precio": 15.5
+        },
+        {
+          "nombre": "Tortilla de merluza y gambas",
+          "precio": 15.5
+        },
+        {
+          "nombre": "Tortilla de bacalao",
+          "precio": 16.5
+        }
       ]
     },
     {
       "id": "carnes",
       "nombre": "Carnes",
       "platos": [
-        { "nombre": "Secreto ibérico de bellota a la plancha", "precio": 22.00 },
-        { "nombre": "Escalopines al Cabrales", "precio": 14.50 },
-        { "nombre": "Callos", "precio": 17.50 },
-        { "nombre": "Sartén de picadillo, huevos y patatas", "precio": 15.00 },
-        { "nombre": "Rabo de toro", "precio": 20.00 },
-        { "nombre": "Manitas de cerdo", "precio": 17.50 },
-        { "nombre": "Codillo de cerdo", "precio": 19.00 },
-        { "nombre": "Carrilleras guisadas", "precio": 18.00, "nota": "montadito" }
+        {
+          "nombre": "Escalopines al Cabrales",
+          "precio": 14.5
+        },
+        {
+          "nombre": "Callos",
+          "precio": 17.5
+        },
+        {
+          "nombre": "Sartén de picadillo, huevos y patatas",
+          "precio": 15.0
+        },
+        {
+          "nombre": "Manitas de cerdo",
+          "precio": 17.5
+        },
+        {
+          "nombre": "Codillo de cerdo",
+          "precio": 19.0
+        },
+        {
+          "nombre": "Carrilleras guisadas",
+          "precio": 18.0
+        },
+        {
+          "nombre": "Rabo de toro",
+          "precio": 20.0
+        },
+        {
+          "nombre": "Secreto ibérico de bellota a la plancha",
+          "precio": 22.0
+        }
       ]
     },
     {
       "id": "postres",
       "nombre": "Postres",
       "platos": [
-        { "nombre": "Helado de turrón", "precio": 6.00 },
-        { "nombre": "Helado de yogurt", "precio": 6.00 },
-        { "nombre": "Bombón helado", "precio": 3.50 },
-        { "nombre": "Crema de yogurt, reineta y avellana", "precio": 6.00 },
-        { "nombre": "Coulant de chocolate con helado de yogurt", "precio": 6.50 },
-        { "nombre": "Milhojas de turrón", "precio": 7.00 },
-        { "nombre": "Tarta de queso", "precio": 6.30 }
+        {
+          "nombre": "Helado de turrón",
+          "precio": 6.0
+        },
+        {
+          "nombre": "Helado de yogur",
+          "precio": 6.0
+        },
+        {
+          "nombre": "Bombón helado",
+          "precio": 3.5
+        },
+        {
+          "nombre": "Crema de yogur, reineta y avellana",
+          "precio": 6.0
+        },
+        {
+          "nombre": "Coulant de chocolate con helado de yogur",
+          "precio": 6.5
+        },
+        {
+          "nombre": "Milhojas de turrón",
+          "precio": 7.0
+        },
+        {
+          "nombre": "Tarta de queso",
+          "precio": 6.3
+        },
+        {
+          "nombre": "Arroz con leche",
+          "precio": 6.5
+        }
+      ]
+    },
+    {
+      "id": "vinos-blancos",
+      "nombre": "Vinos blancos",
+      "platos": [
+        {
+          "nombre": "Viña Calera",
+          "desc": "D.O. Rueda · Bodega Marqués de Riscal · Verdejo",
+          "precio": 19.0,
+          "nota": "copa 2,80 €"
+        },
+        {
+          "nombre": "Casal de Armán",
+          "desc": "D.O. Ribeiro · Bodega Casal de Armán · 90% Treixadura, 5% Godello, 5% Albariño",
+          "precio": 24.0
+        },
+        {
+          "nombre": "Follas Novas",
+          "desc": "D.O. Albariño · Bodega Adega · Albariño",
+          "precio": 19.0,
+          "nota": "copa 2,80 €"
+        },
+        {
+          "nombre": "D.O. Ferreiro",
+          "desc": "D.O. Albariño · Bodega Gerardo Méndez · Albariño",
+          "precio": 26.0
+        },
+        {
+          "nombre": "Mar de Frades",
+          "desc": "D.O. Albariño · Bodega Mar de Frades · Albariño",
+          "precio": 26.0
+        },
+        {
+          "nombre": "Ponte da Boga Godello",
+          "desc": "D.O. Valdeorras · Godello",
+          "precio": 20.0,
+          "nota": "copa 3,00 €"
+        },
+        {
+          "nombre": "Moscato Dolce",
+          "desc": "I.G.T. Emilia-Romagna · Moscato",
+          "precio": 15.5,
+          "nota": "copa 2,70 €"
+        }
+      ]
+    },
+    {
+      "id": "vinos-rosados",
+      "nombre": "Vinos rosados",
+      "platos": [
+        {
+          "nombre": "Pagos de Araiz",
+          "desc": "D.O. Navarra · Bodega Masaveu · Garnacha",
+          "precio": 15.5,
+          "nota": "copa 2,70 €"
+        },
+        {
+          "nombre": "Peregrino",
+          "desc": "V.T. Castilla y León · Bodega Gordonzello · Prieto Picudo",
+          "precio": 15.5,
+          "nota": "copa 2,70 €"
+        }
+      ]
+    },
+    {
+      "id": "vinos-tintos",
+      "nombre": "Vinos tintos",
+      "platos": [
+        {
+          "nombre": "Mauro Crianza",
+          "desc": "D.O. Castilla y León (vinos de la tierra) · Bodega Mauro · 95% Tempranillo, 5% Syrah",
+          "precio": 43.0
+        },
+        {
+          "nombre": "Pintia",
+          "desc": "D.O. Toro · Bodega Vega Sicilia · Tinto de Toro",
+          "precio": 88.0
+        },
+        {
+          "nombre": "Arienzo (Marqués de Riscal) Crianza",
+          "desc": "D.O. Rioja · Bodega Herederos de Marqués de Riscal · Tempranillo",
+          "precio": 20.0,
+          "nota": "copa 2,80 €"
+        },
+        {
+          "nombre": "Murua Reserva",
+          "desc": "D.O. Rioja · Bodega Masaveu · 92% Tempranillo, Graciano y Mazuelo",
+          "precio": 26.0
+        },
+        {
+          "nombre": "Sela",
+          "desc": "D.O. Rioja · Bodega Roda · 82% Tempranillo, Garnacha y Mazuelo",
+          "precio": 27.0
+        },
+        {
+          "nombre": "Roda Reserva",
+          "desc": "D.O. Rioja · Bodega Roda · 97% Tempranillo, 3% Graciano",
+          "precio": 40.0
+        },
+        {
+          "nombre": "Muga",
+          "desc": "D.O. Rioja · Bodega Muga · Tempranillo, Garnacha, Mazuelo y Graciano",
+          "precio": 32.0
+        },
+        {
+          "nombre": "Muga Selección Especial",
+          "desc": "D.O. Rioja · Bodegas Muga · Tempranillo, Graciano, Garnacha y Mazuelo",
+          "precio": 41.0
+        },
+        {
+          "nombre": "Macan Clásico",
+          "desc": "D.O. Rioja · Bodega Vega Sicilia · Tempranillo",
+          "precio": 66.0
+        },
+        {
+          "nombre": "Cirsion",
+          "desc": "D.O. Rioja · Bodega Roda · Tempranillo",
+          "precio": 280.0
+        },
+        {
+          "nombre": "Briego vendimia seleccionada",
+          "desc": "D.O. Ribera del Duero · Tempranillo",
+          "precio": 20.0,
+          "nota": "copa 2,70 €"
+        },
+        {
+          "nombre": "Cruz de Alba Crianza",
+          "desc": "D.O. Ribera del Duero · Bodega Cruz de Alba · Tempranillo",
+          "precio": 25.0
+        },
+        {
+          "nombre": "Corimbo",
+          "desc": "D.O. Ribera del Duero · Bodega La Horra · Tinta del país",
+          "precio": 31.0
+        },
+        {
+          "nombre": "Alión",
+          "desc": "D.O. Ribera del Duero · Bodega Vega Sicilia · Tinto fino",
+          "precio": 99.0
+        },
+        {
+          "nombre": "Valbuena",
+          "desc": "D.O. Ribera del Duero · Bodega Vega Sicilia · 95% Tempranillo, 5% Merlot",
+          "precio": 190.0
+        },
+        {
+          "nombre": "Único",
+          "desc": "D.O. Ribera del Duero · Bodega Vega Sicilia · 94% Tinto fino, 6% Cabernet Sauvignon",
+          "precio": 500.0
+        }
+      ]
+    },
+    {
+      "id": "cava",
+      "nombre": "Cava",
+      "platos": [
+        {
+          "nombre": "Gramona La Cuvée Brut",
+          "desc": "Xarel·lo y Macabeo",
+          "precio": 27.0
+        },
+        {
+          "nombre": "Gramona Imperial Brut Gran Reserva",
+          "desc": "50% Xarel·lo, 40% Macabeo, 10% Chardonnay",
+          "precio": 32.0
+        }
+      ]
+    },
+    {
+      "id": "champagne",
+      "nombre": "Champagne",
+      "platos": [
+        {
+          "nombre": "Moët & Chandon Rosé Impérial Brut",
+          "desc": "Chardonnay, Pinot Meunier y Pinot Noir",
+          "precio": 83.0
+        },
+        {
+          "nombre": "Pommery Blanc de Blancs",
+          "desc": "Chardonnay",
+          "precio": 60.0
+        }
       ]
     }
   ],
   "alergenos": {
-    "gluten": "Gluten", "huevos": "Huevos", "pescado": "Pescado", "lacteos": "Lácteos",
-    "soja": "Soja", "frutos_cascara": "Frutos de cáscara", "crustaceos": "Crustáceos",
-    "sesamo": "Sésamo", "moluscos": "Moluscos", "sulfitos": "Sulfitos",
-    "mostaza": "Mostaza", "cacahuetes": "Cacahuetes", "apio": "Apio", "altramuces": "Altramuces"
+    "gluten": "Gluten",
+    "huevos": "Huevos",
+    "pescado": "Pescado",
+    "lacteos": "Lácteos",
+    "soja": "Soja",
+    "frutos_cascara": "Frutos de cáscara",
+    "crustaceos": "Crustáceos",
+    "sesamo": "Sésamo",
+    "moluscos": "Moluscos",
+    "sulfitos": "Sulfitos",
+    "mostaza": "Mostaza",
+    "cacahuetes": "Cacahuetes",
+    "apio": "Apio",
+    "altramuces": "Altramuces"
   }
 }
