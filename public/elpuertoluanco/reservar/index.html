@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Reservar mesa · El Puerto Luanco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../app.css">
+</head>
+<body class="pub">
+<header class="hd"><a class="brand" href="../">El Puerto</a><p>Luanco</p></header>
+<main class="card-wrap">
+  <p class="eyebrow">Reservas</p>
+  <h1>Reserva tu <em>mesa</em></h1>
+  <p class="lead">Dinos cuántos sois, cuándo venís y un teléfono para avisarte si hace falta.</p>
+  <form id="f" novalidate>
+    <div class="grid">
+      <label>Personas<select id="personas" required></select></label>
+      <label>Fecha<input type="date" id="fecha" required></label>
+      <label>Hora de llegada<select id="hora" required></select></label>
+      <label>Teléfono de contacto<input type="tel" id="tel" inputmode="tel" autocomplete="tel" placeholder="6XX XXX XXX" required></label>
+    </div>
+    <label>Nombre<input id="nombre" autocomplete="name" required></label>
+    <label>Comentarios (opcional)<textarea id="notas" rows="2" maxlength="200" placeholder="Terraza, trona, alergias…"></textarea></label>
+    <input id="web" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <label class="chk"><input type="checkbox" id="ok" required> Acepto que El Puerto use mis datos solo para gestionar esta reserva.</label>
+    <p id="err" class="err" role="alert" hidden></p>
+    <button class="btn primary" type="submit">Reservar mesa</button>
+    <p class="mini">Grupos de más de 10 personas: llama al <a href="tel:+34985880001">985 88 00 01</a>. Suplemento de 20 cts. en terraza.</p>
+  </form>
+  <div id="ok-box" class="okbox" hidden></div>
+  <p class="demo">Versión de demostración: la reserva se guarda solo en este navegador.</p>
+</main>
+<script src="../reservas-data.js"></script>
+<script src="reservar.js"></script>
+</body>
+</html>
