@@ -282,6 +282,7 @@ document.querySelectorAll("[data-dialog]").forEach((btn) => {
 
 /* ---------- tool carousels: pause button (WCAG 2.2.2) ---------- */
 const mqToggle = document.querySelector(".marquee-toggle");
+if (mqToggle) mqToggle.hidden = false;
 mqToggle?.addEventListener("click", () => {
   const paused = mqToggle.closest(".integrations").classList.toggle("paused");
   const t = mqToggle.dataset;
