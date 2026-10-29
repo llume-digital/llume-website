@@ -74,7 +74,7 @@ Para añadir o cambiar un caso: editar el `<article class="cx">` en las tres por
 
 ## 4. Formulario
 
-Debajo lleva la primera capa de información de protección de datos (responsable, finalidad, legitimación, destinatarios y derechos). Pide qué necesita y un teléfono para llamarle (empresa y email opcionales). Abre el programa de correo del visitante con el mensaje preparado para `info@llumedigital.com`. Los textos del asunto y del cuerpo salen de los `data-*` del `<form>`, así el mismo `ui.js` sirve para los dos idiomas. Exige aceptar la política de privacidad.
+Debajo lleva la primera capa de información de protección de datos (responsable, finalidad, legitimación, destinatarios y derechos). Pide qué necesita y un teléfono para llamarle (empresa y email opcionales). Abre el programa de correo del visitante con el mensaje preparado para `info@llumedigital.com`. Un segundo botón, «Enviar por WhatsApp», abre `wa.me` con el mismo mensaje (número en `data-wa` del `<form>`). El botón «Quiero recuperar ese tiempo» de la calculadora rellena el mensaje con la estimación si el campo está vacío (plantilla en `data-msg` de `#calc`). Los textos del asunto y del cuerpo salen de los `data-*` del `<form>`, así el mismo `ui.js` sirve para los dos idiomas. Exige aceptar la política de privacidad.
 
 ## 5. Cómo ejecutar en local
 
@@ -86,7 +86,7 @@ Abrir http://localhost:8123. Las rutas son absolutas (`/styles.css`), así que h
 
 ## 6. Despliegue
 
-Cloudflare Workers conectado a `llume26/llume-website`: cada push a `main` publica en llumedigital.com (`npx wrangler deploy`, que lee `wrangler.jsonc` y publica solo `public/`). Las rutas sin extensión (`/privacidad`) las resuelve Cloudflare con el `.html` correspondiente.
+Cloudflare Workers conectado a `llume26/llume-website`: cada push a `main` publica en llumedigital.com (`npx wrangler deploy`, que lee `wrangler.jsonc` y publica solo `public/`). Las rutas sin extensión (`/privacidad`) las resuelve Cloudflare con el `.html` correspondiente. Las rutas que no existen muestran `public/404.html` con estado 404 (`not_found_handling` en `wrangler.jsonc`).
 
 ## 7. Pendiente
 

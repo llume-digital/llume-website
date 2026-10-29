@@ -180,20 +180,34 @@ form?.addEventListener("submit", (e) => {
   status.replaceChildren(messages[document.documentElement.lang.split("-")[0]] || messages.es, fallback, ".");
 });
 
+// Second way to send the same request: WhatsApp with the message ready
+const waSend = form?.querySelector("[data-wa-send]");
+if (form && waSend) {
+  waSend.hidden = false;
+  waSend.addEventListener("click", () => {
+    if (!form.reportValidity()) return;
+    const d = new FormData(form), f = form.dataset;
+    const text = `${f.waHi}\n\n${d.get("mensaje")}\n\n${f.lName}: ${d.get("nombre")}\n${f.lPhone}: ${d.get("telefono")}${d.get("empresa") ? `\n${f.lCompany}: ${d.get("empresa")}` : ""}${d.get("email") ? `\n${f.lEmail}: ${d.get("email")}` : ""}`;
+    window.open(`https://wa.me/${f.wa}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+  });
+}
+
 /* ---------- footer year ---------- */
 document.querySelectorAll("[data-year]").forEach((el) => (el.textContent = new Date().getFullYear()));
 
 /* ---------- calculator: cost of repetitive tasks ---------- */
 const calc = document.getElementById("calc");
 if (calc) {
-  const fmt = new Intl.NumberFormat(calc.dataset.locale, { maximumFractionDigits: 0 });
-  const money = new Intl.NumberFormat(calc.dataset.locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+  // useGrouping "always": Spanish and Portuguese skip the separator in 4-digit numbers ("8625 €" next to "17.250 €")
+  const fmt = new Intl.NumberFormat(calc.dataset.locale, { maximumFractionDigits: 0, useGrouping: "always" });
+  const money = new Intl.NumberFormat(calc.dataset.locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0, useGrouping: "always" });
+  let out = {};
   const WEEKS = 46; // working weeks per year
   const update = () => {
     const v = Object.fromEntries([...calc.querySelectorAll("input")].map((i) => [i.name, +i.value]));
     calc.querySelectorAll("output").forEach((o) => (o.textContent = (o.dataset.prefix || "") + fmt.format(v[o.dataset.for]) + (o.dataset.suffix || "")));
     const hoursYear = v.people * v.hours * WEEKS;
-    const out = {
+    out = {
       hoursYear: fmt.format(hoursYear),
       costYear: money.format(hoursYear * v.rate),
       savedHours: fmt.format(hoursYear * v.share / 100),
@@ -203,6 +217,15 @@ if (calc) {
   };
   calc.addEventListener("input", update);
   update();
+
+  // "I want that time back" carries the estimate into the contact form
+  const msg = document.querySelector('#contact-form textarea[name="mensaje"]');
+  let prefilled = "";
+  calc.querySelector("[data-calc-cta]")?.addEventListener("click", () => {
+    if (!msg || !calc.dataset.msg || (msg.value.trim() && msg.value !== prefilled)) return;
+    prefilled = calc.dataset.msg.replace(/\{(\w+)\}/g, (_, k) => ({ hours: out.hoursYear, cost: out.costYear, saved: out.savedHours, savedCost: out.savedCost })[k] ?? "");
+    msg.value = prefilled;
+  });
 }
 
 /* ---------- mobile: fixed call-to-action, hidden on the hero and at the contact form ---------- */
@@ -255,6 +278,16 @@ document.querySelectorAll("[data-dialog]").forEach((btn) => {
   dlg.querySelector(".cd-close")?.addEventListener("click", () => dlg.close());
   dlg.addEventListener("click", (e) => e.target === dlg && dlg.close());
   dlg.querySelectorAll('a[href^="#"]:not([data-open-case])').forEach((a) => a.addEventListener("click", () => dlg.close()));
+});
+
+/* ---------- tool carousels: pause button (WCAG 2.2.2) ---------- */
+const mqToggle = document.querySelector(".marquee-toggle");
+if (mqToggle) mqToggle.hidden = false;
+mqToggle?.addEventListener("click", () => {
+  const paused = mqToggle.closest(".integrations").classList.toggle("paused");
+  const t = mqToggle.dataset;
+  mqToggle.setAttribute("aria-label", paused ? t.play : t.pause);
+  mqToggle.querySelector(".mq-t").textContent = paused ? t.playT : t.pauseT;
 });
 
 /* ---------- solution cards: light that follows the cursor ---------- */
