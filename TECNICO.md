@@ -86,7 +86,7 @@ Abrir http://localhost:8123. Las rutas son absolutas (`/styles.css`), así que h
 
 ## 6. Despliegue
 
-Cloudflare Workers conectado a `llume26/llume-website`: cada push a `main` publica en llumedigital.com (`npx wrangler deploy`, que lee `wrangler.jsonc` y publica solo `public/`). Las rutas sin extensión (`/privacidad`) las resuelve Cloudflare con el `.html` correspondiente. Las rutas que no existen muestran `public/404.html` con estado 404 (`not_found_handling` en `wrangler.jsonc`).
+Cloudflare Workers conectado a `llume-digital/llume-website` (Workers Builds, con la app «Cloudflare Workers and Pages» instalada en la organización llume-digital): cada push a `main` publica en llumedigital.com (`npx wrangler deploy`, que lee `wrangler.jsonc` y publica solo `public/`). Las rutas sin extensión (`/privacidad`) las resuelve Cloudflare con el `.html` correspondiente. Las rutas que no existen muestran `public/404.html` con estado 404 (`not_found_handling` en `wrangler.jsonc`). Cada commit desplegado lleva en GitHub el check «Workers Builds: llume-website»: si un commit de `main` no lo tiene, el despliegue automático está desconectado (pasó al mover el repo de `llume26` a `llume-digital`) y hay que reconectarlo en Cloudflare → Workers & Pages → llume-website → Settings → Build.
 
 ## 7. Pendiente
 
