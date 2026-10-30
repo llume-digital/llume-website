@@ -197,7 +197,7 @@
             <p>Revisar a mano cada producto de una línea, o vigilar a todas horas un centro de trabajo, depende de la atención de una persona. Los fallos se descubren tarde.</p>
             <p class="panel-k">Qué hacemos</p>
             <ul class="card-list"><li>Cámaras con visión artificial sobre tu proceso</li><li>Detección y clasificación en tiempo real</li><li>Avisos al momento y registro de incidencias</li></ul>
-            <div class="panel-foot"><span class="solved">Experiencia del equipo en <b>industria</b></span><a class="card-link" href="#caso-vision" data-open-case="vision">Ver caso: línea de producción <span aria-hidden="true">→</span></a></div>
+            <div class="panel-foot"><span class="solved">Experiencia del equipo en <b>industria</b></span><a class="card-link" href="#caso-vision" data-open-case="vision">Ver caso: cajas en línea <span aria-hidden="true">→</span></a></div>
           </div>
         </div>
       </div>
@@ -253,35 +253,41 @@
         </article>
 
         <article class="cx reveal" id="caso-vision" data-case="vision">
-          <div class="cx-media media-line" aria-hidden="true">
-            <div class="belt"><i></i></div>
-            <div class="pkg ok"><b>Correcta ✓</b></div>
-            <div class="pkg bad"><b>Defecto</b></div>
-            <div class="pkg typ"><b>Tipo B</b></div>
-            <span class="hud"><i></i>LÍNEA 2 · EN DIRECTO</span>
-          </div>
+          <div class="cx-media"><img src="/assets/vision/cajas-deteccion.jpg" alt="Sistema de visión que distingue cajas abiertas y cerradas sobre una cinta" loading="lazy" width="960" height="540"></div>
           <div class="cx-body">
             <p class="cx-tag">Experiencia del equipo · Industria</p>
-            <h3>Control de calidad con visión artificial en una línea de producción</h3>
+            <h3>Detección de cajas abiertas y cerradas en una línea</h3>
             <div class="cx-ps">
-              <div><h4>El problema</h4><p>En una línea de producción, comprobar a ojo que cada caja sale sin defectos, y separar los distintos tipos, depende de la atención de una persona durante horas.</p></div>
-              <div><h4>La solución</h4><p>Una cámara sobre la línea que detecta defectos y distingue tipos de caja en tiempo real, y avisa a los operarios para que actúen en el momento.</p></div>
+              <div><h4>El problema</h4><p>En una cinta, distinguir a tiempo las cajas abiertas de las cerradas exige revisar el flujo de forma continua.</p></div>
+              <div><h4>La solución</h4><p>Un sistema de visión identifica cada caja en vídeo y señala si está abierta o cerrada al pasar por la cámara.</p></div>
             </div>
             <button class="cx-open" type="button">Ver caso completo <span aria-hidden="true">+</span></button>
           </div>
           <template class="cx-detail">
-            <div class="ba"><div><span>Antes</span><p>Revisión visual a mano, con fallos que se escapan al final del turno.</p></div><div><span>Después</span><p>Cada caja revisada al pasar, con aviso inmediato si algo no cuadra.</p></div></div>
-            <h4>El contexto</h4>
-            <p>Fábricas y almacenes mueven cientos de cajas por hora. Un defecto de cartón o una caja equivocada que se cuela en la línea acaba en un pedido mal servido o en una devolución.</p>
-            <h4>El reto</h4>
-            <p>La revisión depende de la vista y la atención de los operarios, que además tienen otras tareas. Los errores se descubren tarde, cuando el producto ya ha salido.</p>
-            <h4>Cómo lo planteamos</h4>
-            <ul><li>Cámara industrial e iluminación adecuadas sobre el punto clave de la línea.</li><li>Un modelo de visión entrenado con imágenes reales del producto: golpes, roturas, mal plegado o etiquetas incorrectas.</li><li>Clasificación de cada caja por tipo o formato, para que no se mezclen referencias.</li><li>Aviso inmediato a los operarios en pantalla o con una señal luminosa, o desvío automático de la caja.</li><li>Registro de incidencias y estadísticas por turno para detectar patrones.</li></ul>
+            <p>En esta demostración de nuestro trabajo, el modelo localiza cajas sobre una cinta y muestra en pantalla la clase detectada: abierta o cerrada. La línea amarilla marca el punto de paso para el conteo.</p>
+            <video class="case-video" controls preload="none" playsinline poster="/assets/vision/cajas-deteccion.jpg" aria-label="Vídeo de detección de cajas abiertas y cerradas"><source src="/assets/vision/cajas-deteccion.mp4" type="video/mp4">Tu navegador no puede reproducir este vídeo.</video>
+            <h4>Aplicación en planta</h4>
+            <p>La misma detección puede alimentar un recuento por estado o ayudar a localizar cajas que necesitan revisión. La conexión con avisos o maquinaria depende de cada instalación.</p>
             <h4>Tecnología</h4>
-            <ul class="chips"><li>Visión artificial</li><li>Cámaras industriales</li><li>Procesamiento en la propia planta</li><li>Panel web</li></ul>
-            <h4>El resultado</h4>
-            <p>Menos productos defectuosos llegan al cliente y los operarios saben al instante qué revisar, sin depender de la vista durante todo el turno. La misma idea sirve para piezas, envases o cualquier producto que pase por delante de una cámara.</p>
-            <p class="case-note">Proyecto desarrollado por personas de nuestro equipo. Por confidencialidad no mostramos el cliente ni los detalles técnicos.</p>
+            <ul class="chips"><li>Visión artificial</li><li>Clasificación</li><li>Conteo en línea</li></ul>
+            <p class="case-note">Vídeo de una solución trabajada por nuestro equipo. No publicamos datos del cliente ni cifras de rendimiento.</p>
+          </template>
+        </article>
+
+        <article class="cx reveal" id="caso-botellas" data-case="botellas">
+          <div class="cx-media"><img src="/assets/vision/botellas-deteccion.jpg" alt="Botellas detectadas y contadas en una línea" loading="lazy" width="960" height="467"></div>
+          <div class="cx-body">
+            <p class="cx-tag">Experiencia del equipo · Industria</p>
+            <h3>Conteo de botellas en una línea de producción</h3>
+            <div class="cx-ps"><div><h4>El problema</h4><p>Contar unidades que pasan por una línea rápida requiere observar el flujo sin interrupciones.</p></div><div><h4>La solución</h4><p>La cámara detecta las botellas en movimiento y muestra el conteo sobre el vídeo.</p></div></div>
+            <button class="cx-open" type="button">Ver caso completo <span aria-hidden="true">+</span></button>
+          </div>
+          <template class="cx-detail">
+            <p>Esta demostración muestra la identificación visual de cada botella y el recuento del flujo en una línea. La detección se superpone a la imagen para que el proceso sea fácil de comprobar.</p>
+            <video class="case-video" controls preload="none" playsinline poster="/assets/vision/botellas-deteccion.jpg" aria-label="Vídeo del conteo de botellas"><source src="/assets/vision/botellas-deteccion.mp4" type="video/mp4">Tu navegador no puede reproducir este vídeo.</video>
+            <h4>Aplicación en planta</h4><p>El conteo visual puede ayudar a contrastar el paso de unidades y detectar interrupciones del flujo. Su integración con otros sistemas se define según la línea.</p>
+            <ul class="chips"><li>Visión artificial</li><li>Detección</li><li>Conteo</li></ul>
+            <p class="case-note">Vídeo de una solución trabajada por nuestro equipo. No publicamos datos del cliente ni cifras de rendimiento.</p>
           </template>
         </article>
 
@@ -645,12 +651,18 @@
         <div class="sol-dhead"><span class="sol-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span><span class="card-num">02</span></div>
         <h3 class="cd-title" id="sol-2-t">Visión artificial a medida</h3>
         <p class="sol-lead">Si algo se puede ver, normalmente se puede detectar, contar o clasificar. Montamos sistemas de visión artificial adaptados a tu caso, muchas veces sobre las cámaras que ya tienes.</p>
-        <h4 class="sol-k">Ejemplos</h4>
-        <div class="vis-grid"><div class="vis-g"><h4>Industria y logística</h4><ul><li>Defectos en cajas, envases o piezas en la línea</li><li>Clasificación de productos por tipo o formato</li><li>Conteo y trazabilidad sin intervención manual</li></ul></div><div class="vis-g"><h4>Seguridad y prevención</h4><ul><li>Uso de casco, chaleco y otros equipos de protección</li><li>Accesos a zonas restringidas o peligrosas</li><li>Conductas de riesgo o situaciones violentas</li></ul></div><div class="vis-g"><h4>Movilidad y transporte</h4><ul><li>Objetos prohibidos a bordo, como patinetes eléctricos</li><li>Frenadas bruscas y conducción de riesgo</li><li>Objetos abandonados en estaciones o vehículos</li></ul></div><div class="vis-g"><h4>Infraestructuras</h4><ul><li>Grietas y baches en la calzada desde vehículos en ruta</li><li>Estado de señalización y mobiliario urbano</li><li>Inspecciones periódicas con registro fotográfico</li></ul></div></div>
+        <h4 class="sol-k">Casos de uso de nuestro equipo</h4>
+        <p class="vision-intro">Cuatro ejemplos en vídeo de sistemas de visión que hemos trabajado. Pulsa para reproducir cada demostración.</p>
+        <div class="vision-demos">
+          <article class="vision-demo"><video controls preload="none" playsinline poster="/assets/vision/cajas-deteccion.jpg" aria-label="Cajas en línea"><source src="/assets/vision/cajas-deteccion.mp4" type="video/mp4">Tu navegador no puede reproducir este vídeo.</video><div><h5>Cajas en línea</h5><p>Detección de cajas abiertas y cerradas mientras avanzan por la cinta.</p></div></article>
+          <article class="vision-demo"><video controls preload="none" playsinline poster="/assets/vision/botellas-deteccion.jpg" aria-label="Flujo de botellas"><source src="/assets/vision/botellas-deteccion.mp4" type="video/mp4">Tu navegador no puede reproducir este vídeo.</video><div><h5>Flujo de botellas</h5><p>Identificación y conteo visual de botellas en una línea de producción.</p></div></article>
+          <article class="vision-demo"><video controls preload="none" playsinline poster="/assets/vision/aforo_plaza.jpg" aria-label="Aforo de una plaza"><source src="/assets/vision/aforo_plaza.mp4" type="video/mp4">Tu navegador no puede reproducir este vídeo.</video><div><h5>Aforo de una plaza</h5><p>Seguimiento de personas y ocupación de zonas en una plaza.</p></div></article>
+          <article class="vision-demo"><video controls preload="none" playsinline poster="/assets/vision/epi_obra.jpg" aria-label="EPI en obra"><source src="/assets/vision/epi_obra.mp4" type="video/mp4">Tu navegador no puede reproducir este vídeo.</video><div><h5>EPI en obra</h5><p>Detección visual de casco y chaleco en una escena de obra.</p></div></article>
+        </div>
         <h4 class="sol-k">Cómo lo hacemos</h4>
         <ol class="vis-how"><li><span class="num">01</span><div><h4>Analizamos tu caso</h4><p>Qué hay que detectar, dónde y con qué cámaras.</p></div></li><li><span class="num">02</span><div><h4>Entrenamos el modelo</h4><p>Con imágenes reales de tu proceso.</p></div></li><li><span class="num">03</span><div><h4>Lo ponemos a funcionar</h4><p>En tus instalaciones o en la nube, con avisos al momento.</p></div></li><li><span class="num">04</span><div><h4>Medimos y mejoramos</h4><p>Panel con lo detectado y ajustes para reducir falsas alarmas.</p></div></li></ol>
         <p class="vis-priv">Cada sistema se diseña respetando la privacidad: se procesa solo lo necesario y, cuando es posible, las imágenes no salen de tus instalaciones.</p>
-        <div class="cd-actions"><a href="#caso-vision" class="btn btn-ghost" data-open-case="vision">Ver caso: línea de producción <span aria-hidden="true">→</span></a><a href="#contacto" class="btn btn-light">Hablemos <span aria-hidden="true">→</span></a></div>
+        <div class="cd-actions"><a href="#caso-vision" class="btn btn-ghost" data-open-case="vision">Ver caso: cajas en línea <span aria-hidden="true">→</span></a><a href="#contacto" class="btn btn-light">Hablemos <span aria-hidden="true">→</span></a></div>
       </div>
     </div>
   </dialog>

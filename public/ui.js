@@ -134,7 +134,10 @@ if (dialog) {
     if (open) document.querySelectorAll(".cx-extra").forEach((el) => el.classList.add("in"));
   });
 
-  dialog.addEventListener("close", () => history.replaceState(null, "", location.pathname + location.search));
+  dialog.addEventListener("close", () => {
+    dialog.querySelectorAll("video").forEach((video) => video.pause());
+    history.replaceState(null, "", location.pathname + location.search);
+  });
   // The whole card opens the case; its button keeps it reachable by keyboard
   document.querySelectorAll(".cx").forEach((card) => card.addEventListener("click", () => openCase(card)));
   // "See case" links elsewhere on the page
@@ -275,6 +278,7 @@ document.querySelectorAll("[data-dialog]").forEach((btn) => {
   const dlg = document.getElementById(btn.dataset.dialog);
   if (!dlg) return;
   btn.addEventListener("click", () => dlg.showModal());
+  dlg.addEventListener("close", () => dlg.querySelectorAll("video").forEach((video) => video.pause()));
   dlg.querySelector(".cd-close")?.addEventListener("click", () => dlg.close());
   dlg.addEventListener("click", (e) => e.target === dlg && dlg.close());
   dlg.querySelectorAll('a[href^="#"]:not([data-open-case])').forEach((a) => a.addEventListener("click", () => dlg.close()));

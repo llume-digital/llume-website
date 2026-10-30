@@ -66,10 +66,10 @@ def parse(page):
                       "problem": ps[0], "solution": ps[1], "detail": detail})
     return cases
 
-def render(c, cases, L, code):
+def render(c, cases, L, code, available):
     url = f"https://llumedigital.com/{L['out']}/{c['slug']}"
     alternates = "\n".join(
-        f'  <link rel="alternate" hreflang="{k}" href="https://llumedigital.com/{v["out"]}/{c["slug"]}">' for k, v in LANGS.items())
+        f'  <link rel="alternate" hreflang="{k}" href="https://llumedigital.com/{v["out"]}/{c["slug"]}">' for k, v in LANGS.items() if c['slug'] in available[k])
     more = "".join(f'<li><a href="/{L["out"]}/{o["slug"]}">{o["title"]}</a></li>' for o in cases if o["slug"] != c["slug"])
     desc = text_of(c["solution"])
     title = text_of(c["title"])
@@ -145,12 +145,14 @@ def render(c, cases, L, code):
 
 def main():
     written = []
+    parsed = {code: parse((PUBLIC / L["src"]).read_text()) for code, L in LANGS.items()}
+    available = {code: {case["slug"] for case in cases} for code, cases in parsed.items()}
     for code, L in LANGS.items():
-        cases = parse((PUBLIC / L["src"]).read_text())
+        cases = parsed[code]
         out = PUBLIC / L["out"]
         out.mkdir(parents=True, exist_ok=True)
         for c in cases:
-            (out / f"{c['slug']}.html").write_text(render(c, cases, L, code))
+            (out / f"{c['slug']}.html").write_text(render(c, cases, L, code, available))
             written.append(f"/{L['out']}/{c['slug']}")
     print("\n".join(written))
 

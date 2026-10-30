@@ -883,6 +883,15 @@ a.social-link.wa:hover { color: #fff; border-color: #25d366; background: #25d366
 .sol-dialog[open] .vis-g:nth-child(3), .sol-dialog[open] .vis-how li:nth-child(3) { animation-delay: .12s; }
 .sol-dialog[open] .vis-g:nth-child(4), .sol-dialog[open] .vis-how li:nth-child(4) { animation-delay: .18s; }
 .sol-dialog[open] .vis-how li { animation-delay: calc(.2s + var(--d, 0s)); }
+.vision-intro { color: var(--muted); margin: 0 0 18px; }
+.vision-demos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.vision-demo { overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: rgba(0,0,0,.22); }
+.vision-demo video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #08090b; }
+.vision-demo > div { padding: 14px 16px 18px; }
+.vision-demo h5 { font-size: 16px; font-weight: 600; color: var(--text); }
+.vision-demo p { color: var(--muted); font-size: 14px; margin-top: 4px; }
+.case-video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: contain; background: #08090b; border-radius: 12px; margin: 20px 0; }
+@media (max-width: 680px) { .vision-demos { grid-template-columns: 1fr; } }
 @keyframes sol-in { from { opacity: 0; transform: translateY(10px); } }
 @media (prefers-reduced-motion: reduce) { .sol:hover { transform: none; } .sol:hover .sol-ico { transform: none; } }
 .integrations .slow .track { animation-duration: 95s; }
