@@ -73,16 +73,7 @@
         <a href="#contacto" class="btn btn-light">Let's talk <span aria-hidden="true">→</span></a>
         <a href="#casos" class="btn btn-ghost">See case studies</a>
       </div>
-      <div class="trusted">
-        <p>Trusted by</p>
-        <ul class="trusted-logos">
-          <li><img class="cc" src="/assets/partners/clevercar.svg" alt="Clevercar" width="747" height="251"></li>
-          <li><img class="pf" src="/assets/partners/proactive-future.webp" alt="Proactive Future" width="191" height="48"></li>
-          <li><img class="cor" src="/assets/partners/corradi.svg" alt="Corradi" width="486" height="486"></li>
-          <li><img class="inj" src="/assets/partners/injuve.svg" alt="Injuve" width="1200" height="450"></li>
-          <li><img class="uo" src="/assets/partners/uniovi.png" alt="University of Oviedo" width="175" height="125"></li>
-        </ul>
-      </div>
+
     </section>
     <!-- SOLUTIONS -->
     <section id="servicios" class="wrap section">
@@ -97,7 +88,6 @@
           </div>
           <h3>Process automation</h3>
           <p>We remove manual, repetitive work so your team can focus on what adds value.</p>
-          <ul class="sol-tags"><li>Quotes</li><li>Invoices</li><li>Reports</li><li>Alerts</li></ul>
           <button class="sol-more" type="button" data-dialog="sol-1">See more <span class="sol-plus" aria-hidden="true"></span></button>
         </article>
         <article class="card sol reveal">
@@ -106,9 +96,8 @@
             <span class="card-num">02</span>
           </div>
           <h3>Custom computer vision</h3>
-          <p>Cameras that detect defects, sort products or flag risks in real time.</p>
-          <ul class="sol-tags"><li>Industry</li><li>Safety</li><li>Mobility</li><li>Infrastructure</li></ul>
-          <button class="sol-more" type="button" data-dialog="sol-2">See more <span class="sol-plus" aria-hidden="true"></span></button>
+          <p>Cameras that detect defects, sort products or flag risks in real time. <strong class="sol-teaser">Watch the video examples ↗</strong></p>
+          <button class="sol-more" type="button" data-dialog="sol-2">Watch 4 real videos <span class="sol-plus" aria-hidden="true"></span></button>
         </article>
         <article class="card sol reveal">
           <div class="card-top">
@@ -117,7 +106,6 @@
           </div>
           <h3>Custom software, integration and cloud</h3>
           <p>Websites, portals, CRMs and internal tools, connected to what you already use and in the cloud.</p>
-          <ul class="sol-tags"><li>CRM</li><li>Portals</li><li>Integrations</li><li>Cloud</li></ul>
           <button class="sol-more" type="button" data-dialog="sol-3">See more <span class="sol-plus" aria-hidden="true"></span></button>
         </article>
         <article class="card sol reveal">
@@ -127,7 +115,6 @@
           </div>
           <h3>Data and dashboards</h3>
           <p>All your business information in a clear, always up-to-date dashboard.</p>
-          <ul class="sol-tags"><li>Dashboards</li><li>KPIs</li><li>Reports</li><li>Alerts</li></ul>
           <button class="sol-more" type="button" data-dialog="sol-4">See more <span class="sol-plus" aria-hidden="true"></span></button>
         </article>
       </div>
@@ -259,7 +246,7 @@
             <div class="pkg bad"><b>Defect</b></div>
             <div class="pkg typ"><b>Type B</b></div>
             <span class="hud"><i></i>LINE 2 · LIVE</span>
-          </div>
+          <video class="cx-preview" muted loop playsinline preload="none" poster="/assets/vision/cajas-deteccion.jpg" aria-hidden="true"><source src="/assets/vision/cajas-deteccion.mp4" type="video/mp4"></video></div>
           <div class="cx-body">
             <p class="cx-tag">Team experience · Industry</p>
             <h3>Quality control with computer vision on a production line</h3>
@@ -367,40 +354,17 @@
         </article>
 
         <article class="cx cx-extra reveal" id="caso-seguridad" data-case="seguridad">
-          <div class="cx-media media-cam">
-            <picture><source type="image/avif" srcset="/assets/cases/seguridad-640.avif 640w, /assets/cases/seguridad-1280.avif 1280w" sizes="(max-width: 860px) 100vw, 380px" data-lg="(max-width: 860px) 100vw, 920px"><img src="/assets/cases/seguridad-640.webp" srcset="/assets/cases/seguridad-640.webp 640w, /assets/cases/seguridad.webp 1280w" sizes="(max-width: 860px) 100vw, 380px" data-lg="(max-width: 860px) 100vw, 920px" alt="Two workers wearing helmets and high-visibility vests" width="1280" height="800" loading="lazy"></picture>
-            <span class="box" style="--x:1%;--y:5%;--w:54%;--h:74%" aria-hidden="true"><b>Helmet ✓</b></span>
-            <span class="box" style="--x:45%;--y:8%;--w:52%;--h:50%" aria-hidden="true"><b>Helmet ✓</b></span>
-            <span class="hud" aria-hidden="true"><i></i>CAM 03 · LIVE</span>
-          </div>
+          <div class="cx-media"><img src="/assets/vision/epi_obra.jpg" alt="Detección visual de casco y chaleco en obra" loading="lazy" width="960" height="540"><video class="cx-preview" muted loop playsinline preload="none" poster="/assets/vision/epi_obra.jpg" aria-hidden="true"><source src="/assets/vision/epi_obra.mp4" type="video/mp4"></video></div>
           <div class="cx-body">
             <p class="cx-tag">Construction and industry</p>
-            <h3>Workplace safety with cameras</h3>
+            <h3>Hard-hat and safety vest detection on site</h3>
             <div class="cx-ps">
               <div><h4>The problem</h4><p>Checking around the clock that health and safety measures are followed is impossible for one person.</p></div>
-              <div><h4>The solution</h4><p>Video analytics on the existing cameras that detects breaches in real time and alerts the person in charge instantly.</p></div>
+              <div><h4>The solution</h4><p>A vision system identifies hard hats and safety vests visible in the scene.</p></div>
             </div>
             <button class="cx-open" type="button">Read the full case <span aria-hidden="true">+</span></button>
           </div>
-          <template class="cx-detail">
-            <div class="ba"><div><span>Before</span><p>Breaches were discovered late, by reviewing recordings.</p></div><div><span>After</span><p>Alerts as it happens, with the image of what occurred.</p></div></div>
-            <h4>Context</h4>
-            <p>On construction sites and in industrial plants, protective equipment is mandatory, but continuous monitoring depends on someone watching.</p>
-            <h4>The challenge</h4>
-            <p>Checking at all times that everyone wears a helmet and a vest, or that nobody enters a restricted area, is impossible by eye. Breaches are discovered late, once there has already been a scare.</p>
-            <h4>What we did</h4>
-            <ul>
-              <li>Video analysis on the cameras already installed, with no change to the infrastructure.</li>
-              <li>Real-time detection of helmet and vest use and of access to dangerous areas.</li>
-              <li>Instant alerts to the safety manager, with the image of the moment.</li>
-              <li>An incident log for audits and improvement plans.</li>
-              <li>Image processing that respects workers' privacy.</li>
-            </ul>
-            <h4>Technology</h4>
-            <ul class="chips"><li>Computer vision</li><li>On-site processing</li><li>Web alert dashboard</li></ul>
-            <h4>The result</h4>
-            <p>Breaches are detected as they happen, not when reviewing recordings, and the safety team spends its time correcting rather than watching.</p>
-          </template>
+          <template class="cx-detail"><p>This video shows a demonstration of hard-hat and vest detection on a construction site. The system highlights people and the protective equipment it recognises in each frame.</p><video class="case-video" controls preload="none" playsinline poster="/assets/vision/epi_obra.jpg" aria-label="Hard-hat and safety vest detection on site"><source src="/assets/vision/epi_obra.mp4" type="video/mp4"></video><h4>Application</h4><p>This detection can support site supervision. Alerts, incident logs and image handling depend on the installation and its privacy requirements.</p><p class="case-note">Demo of a solution developed by our team. We do not publish performance figures.</p></template>
         </article>
 
         <article class="cx cx-extra reveal" id="caso-presupuestos" data-case="presupuestos">
@@ -537,35 +501,18 @@
         <div class="compare-wrap reveal"><table class="compare"><thead><tr><th scope="col"></th><th scope="col" class="us">llume</th><th scope="col">Generic software</th><th scope="col">Traditional agency</th></tr></thead><tbody><tr><th scope="row">Fits the way you work</th><td class="us">Yes, it is built for you</td><td data-l="Generic software">Configuration within the tool’s available options</td><td data-l="Traditional agency">Depends on the project</td></tr><tr><th scope="row">If you want to switch provider tomorrow</th><td class="us">You keep the code and documentation</td><td data-l="Generic software">Access and export depend on the licence</td><td data-l="Traditional agency">Ownership and handover depend on the contract</td></tr><tr><th scope="row">How you pay</th><td class="us">Fixed price per project, no per-user licences</td><td data-l="Generic software">Pricing depends on the plan and licence</td><td data-l="Traditional agency">Depends on the project</td></tr><tr><th scope="row">Changes and improvements</th><td class="us">Fast: you talk directly to the people building it</td><td data-l="Generic software">Depends on the vendor roadmap</td><td data-l="Traditional agency">Process depends on the team and contract</td></tr><tr><th scope="row">Relationship</th><td class="us">Direct, with the people doing the work</td><td data-l="Generic software">Support channels depend on the plan</td><td data-l="Traditional agency">Point of contact depends on the team</td></tr></tbody></table></div>
       </div>
     </section>
-    <!-- FORMACIÓN -->
-    <section id="formacion" class="wrap section">
-      <p class="eyebrow reveal">Training</p>
-      <h2 class="reveal">Your team, getting<br>the most out of AI.</h2>
-      <p class="sub reveal">Hands-on training in three sessions, designed around your company. First we understand how you work, then we run two workshops with exercises on your real tasks. It works with any AI tool.</p>
-      <div class="sessions">
-        <article class="session reveal">
-          <div class="session-top"><span class="session-n">Session 1</span><span class="step-chip">Before the training</span></div>
-          <h3>We get to know how you work</h3>
-          <p>We talk to your team to understand what you do, which tools you use and which tasks take up most of your time. We use that to prepare the workshop exercises.</p>
-        </article>
-        <article class="session reveal">
-          <div class="session-top"><span class="session-n">Session 2</span><span class="step-chip">Hands-on workshop · 3 h</span></div>
-          <h3>Working with AI every day</h3>
-          <p>The fundamentals to use AI wisely and get value from day one.</p>
-        </article>
-        <article class="session reveal">
-          <div class="session-top"><span class="session-n">Session 3</span><span class="step-chip">Hands-on workshop · 3 h</span></div>
-          <h3>From assistant to agent</h3>
-          <p>Taking AI beyond chat: so it knows your company, works with your tools and does tasks for you.</p>
-        </article>
+    <div class="wrap trusted trusted-lower">
+<div class="trusted">
+        <p>Trusted by</p>
+        <ul class="trusted-logos">
+          <li><img class="cc" src="/assets/partners/clevercar.svg" alt="Clevercar" width="747" height="251"></li>
+          <li><img class="pf" src="/assets/partners/proactive-future.webp" alt="Proactive Future" width="191" height="48"></li>
+          <li><img class="cor" src="/assets/partners/corradi.svg" alt="Corradi" width="486" height="486"></li>
+          <li><img class="inj" src="/assets/partners/injuve.svg" alt="Injuve" width="1200" height="450"></li>
+          <li><img class="uo" src="/assets/partners/uniovi.png" alt="University of Oviedo" width="175" height="125"></li>
+        </ul>
       </div>
-      <div class="t-foot reveal">
-        <div class="t-foot-text"><p>At the end, a guide adapted to your company with everything covered. It is tool-independent: we work with ChatGPT, Claude, Gemini, Microsoft Copilot or whichever you use.</p><ul class="t-mods"><li>In person, at your company</li><li>Online, live</li><li>For the whole team or by area</li></ul></div>
-        <div><a href="/en/training" class="btn btn-ghost">See the full programme</a><a href="#contacto" class="btn btn-light">Request a training proposal <span aria-hidden="true">→</span></a></div>
-      </div>
-    </section>
-
-   <!-- CONTACT -->
+    </div>
     <section id="contacto" class="wrap section contact">
       <div>
         <p class="eyebrow reveal">Contact</p>

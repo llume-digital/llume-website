@@ -103,6 +103,27 @@ counters.forEach((c) => countIO.observe(c));
 
 /* ---------- case studies: full case in a dialog ---------- */
 const dialog = document.getElementById("case-dialog");
+if (matchMedia("(hover: hover) and (pointer: fine)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  document.querySelectorAll(".cx-preview").forEach((video) => {
+    const card = video.closest(".cx");
+    if (!card) return;
+    let hovering = false;
+    card.addEventListener("pointerenter", () => {
+      hovering = true;
+      video.currentTime = 0;
+      video.play().then(() => {
+        if (hovering) card.classList.add("is-previewing");
+        else video.pause();
+      }).catch(() => {});
+    });
+    card.addEventListener("pointerleave", () => {
+      hovering = false;
+      card.classList.remove("is-previewing");
+      video.pause();
+      video.currentTime = 0;
+    });
+  });
+}
 if (dialog) {
   const media = dialog.querySelector(".cd-media");
   const tag = dialog.querySelector(".cd-tag");

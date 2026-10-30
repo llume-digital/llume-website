@@ -132,6 +132,9 @@ h3 { font-weight: 500; font-size: 17px; line-height: 1.3; }
 /* Case media (shared by card and dialog) */
 .cx-media { position: relative; overflow: hidden; min-height: 260px; background: #0c0b0e; isolation: isolate; }
 .cx-media > img, .cx-media > picture > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.cx-preview { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
+.cx.is-previewing .cx-preview { opacity: 1; }
+.cd-media .cx-preview, .case-page .cx-preview { display: none; }
 
 /* real website: browser + phone */
 .media-device {
@@ -334,6 +337,7 @@ input::placeholder, textarea::placeholder { color: #a39c92; opacity: 1; }
 .trusted-logos li:hover img { opacity: 1; }
 .trusted-logos .cc { height: 26px; } .trusted-logos .pf { height: 26px; } .trusted-logos .cor { height: 32px; }
 .trusted-logos .inj { height: 30px; } .trusted-logos .uo { height: 48px; opacity: .9; }
+.trusted-lower { margin-top: clamp(44px, 7vw, 90px); margin-bottom: 0; padding: 28px 0; border-top: 1px solid var(--line); }
 
 /* ---------- sectors ---------- */
 .sectors { display: grid; grid-template-columns: 300px 1fr; gap: 16px; margin-top: 28px; }
@@ -852,6 +856,7 @@ a.social-link.wa:hover { color: #fff; border-color: #25d366; background: #25d366
 .sol:hover .sol-ico { transform: scale(1.08) rotate(-4deg); border-color: var(--amber); box-shadow: 0 0 24px rgba(242,192,138,.3); }
 .solutions.compact .sol h3 { font-size: 18px; }
 .solutions.compact .sol > p { margin-bottom: 0; }
+.sol-teaser { display: block; margin-top: 12px; color: var(--amber); font-size: 13px; font-weight: 600; }
 .sol-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0 18px; }
 .sol-tags li { font: 400 10.5px var(--mono); letter-spacing: .04em; color: #cfc9bf; padding: 4px 9px; border-radius: 99px; border: 1px solid var(--line); background: rgba(255,255,255,.03); transition: border-color .3s, color .3s; }
 .sol:hover .sol-tags li { border-color: rgba(242,192,138,.3); color: #ecdcc6; }
