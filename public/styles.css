@@ -332,7 +332,10 @@ input::placeholder, textarea::placeholder { color: #a39c92; opacity: 1; }
 .rotator span.out { opacity: 0; transform: translateY(-100%); }
 .trusted { margin-top: clamp(40px, 6vh, 72px); }
 .trusted p { font: 400 11px var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
-.trusted-logos { display: flex; flex-wrap: wrap; align-items: center; gap: 18px clamp(28px, 4.5vw, 56px); }
+.trusted-logos { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 18px clamp(28px, 4.5vw, 56px); }
+.trusted-inner > p { text-align: center; }
+.trusted-logos a { display: inline-flex; align-items: center; min-height: 52px; }
+.trusted-logos a:focus-visible { outline: 2px solid var(--amber); outline-offset: 6px; }
 .trusted-logos img { width: auto; display: block; filter: brightness(0) invert(1); opacity: .78; transition: opacity .3s; }
 .trusted-logos li:hover img { opacity: 1; }
 .trusted-logos .cc { height: 26px; } .trusted-logos .pf { height: 26px; } .trusted-logos .cor { height: 32px; }
@@ -390,10 +393,10 @@ input::placeholder, textarea::placeholder { color: #a39c92; opacity: 1; }
   border: 1px solid var(--line); background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)); backdrop-filter: blur(8px);
   font-size: 15px; font-weight: 400; color: #d6d0c6; transition: border-color .3s, color .3s, background .3s;
 }
-.integrations .track svg { width: 22px; height: 22px; fill: currentColor; color: #e9e4db; transition: color .3s, filter .3s; flex: none; }
+.integrations .track svg { width: 22px; height: 22px; fill: currentColor; color: var(--c); flex: none; }
+.integrations .track li { border-color: color-mix(in srgb, var(--c) 27%, var(--line)); background: color-mix(in srgb, var(--c) 5%, rgba(255,255,255,.025)); }
 .integrations .track li:hover { color: var(--text); border-color: color-mix(in srgb, var(--c) 55%, transparent); background: color-mix(in srgb, var(--c) 10%, transparent); }
 .integrations .track li:hover svg { color: var(--c); filter: drop-shadow(0 0 10px color-mix(in srgb, var(--c) 60%, transparent)); }
-.integrations .marquee:hover .track { animation-play-state: paused; }
 @keyframes marquee { to { transform: translateX(-100%); } }
 
 /* ---------- commitments ---------- */
@@ -928,17 +931,9 @@ html:has(dialog[open]) { overflow-y: hidden; }
 /* Home: testimonial, calculator, form, method and carousels */
 .cx-more + .quote { margin-top: 48px; }
 .quote figcaption a { color: var(--amber); font-size: 13.5px; margin-top: 2px; text-decoration: underline; text-underline-offset: 3px; }
-.form .btn-wa[hidden], .marquee-toggle[hidden] { display: none; }
+.form .btn-wa[hidden] { display: none; }
 .form .btn-wa svg { width: 18px; height: 18px; fill: currentColor; }
 .form .btn-wa { margin-top: -6px; }
-.marquee-ctl { display: flex; justify-content: flex-end; margin-top: 10px; }
-.marquee-toggle { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.03); color: var(--muted); font: 400 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
-.marquee-toggle:hover { color: var(--text); border-color: rgba(255,255,255,.25); }
-.marquee-toggle:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
-.mq-ico { width: 8px; height: 10px; border-left: 2.5px solid currentColor; border-right: 2.5px solid currentColor; }
-.integrations.paused .mq-ico { width: 0; height: 0; border: 0; border-left: 9px solid currentColor; border-top: 5.5px solid transparent; border-bottom: 5.5px solid transparent; }
-.integrations.paused .track { animation-play-state: paused; }
-@media (prefers-reduced-motion: reduce) { .marquee-ctl { display: none; } }
 @media (min-width: 1000px) {
   .method-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); grid-template-rows: auto 1fr; column-gap: clamp(48px, 6vw, 96px); }
   .method-intro { grid-column: 1; grid-row: 1; }
@@ -952,3 +947,7 @@ html:has(dialog[open]) { overflow-y: hidden; }
 .nf-other { margin-top: 36px; color: var(--muted); font-size: 14px; }
 .nf-other a { color: var(--amber); text-decoration: underline; text-underline-offset: 3px; }
 .quote figcaption a span { display: inline; }
+
+.quote-rotating { transition: opacity .55s ease, filter .55s ease; min-height: 4.5em; }
+.quote-rotating.is-fading { opacity: 0; filter: blur(8px); }
+@media (prefers-reduced-motion: reduce) { .quote-rotating { transition: none; } }

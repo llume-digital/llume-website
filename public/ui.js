@@ -305,15 +305,21 @@ document.querySelectorAll("[data-dialog]").forEach((btn) => {
   dlg.querySelectorAll('a[href^="#"]:not([data-open-case])').forEach((a) => a.addEventListener("click", () => dlg.close()));
 });
 
-/* ---------- tool carousels: pause button (WCAG 2.2.2) ---------- */
-const mqToggle = document.querySelector(".marquee-toggle");
-if (mqToggle) mqToggle.hidden = false;
-mqToggle?.addEventListener("click", () => {
-  const paused = mqToggle.closest(".integrations").classList.toggle("paused");
-  const t = mqToggle.dataset;
-  mqToggle.setAttribute("aria-label", paused ? t.play : t.pause);
-  mqToggle.querySelector(".mq-t").textContent = paused ? t.playT : t.pauseT;
-});
+/* ---------- testimonial excerpts from the same attributed quote ---------- */
+const quote = document.querySelector(".quote-rotating");
+if (quote && !reduceMotion) {
+  const excerpts = [quote.textContent, ...[...quote.parentElement.querySelectorAll(".quote-source")].map((el) => el.textContent)];
+  let index = 0;
+  setInterval(() => {
+    if (document.hidden) return;
+    quote.classList.add("is-fading");
+    setTimeout(() => {
+      index = (index + 1) % excerpts.length;
+      quote.textContent = excerpts[index];
+      quote.classList.remove("is-fading");
+    }, 550);
+  }, 6500);
+}
 
 /* ---------- solution cards: light that follows the cursor ---------- */
 document.querySelectorAll(".sol").forEach((card) => {
