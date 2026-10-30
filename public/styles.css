@@ -393,10 +393,10 @@ input::placeholder, textarea::placeholder { color: #a39c92; opacity: 1; }
   border: 1px solid var(--line); background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)); backdrop-filter: blur(8px);
   font-size: 15px; font-weight: 400; color: #d6d0c6; transition: border-color .3s, color .3s, background .3s;
 }
-.integrations .track svg { width: 22px; height: 22px; fill: currentColor; color: var(--c); flex: none; }
-.integrations .track li { border-color: color-mix(in srgb, var(--c) 27%, var(--line)); background: color-mix(in srgb, var(--c) 5%, rgba(255,255,255,.025)); }
-.integrations .track li:hover { color: var(--text); border-color: color-mix(in srgb, var(--c) 55%, transparent); background: color-mix(in srgb, var(--c) 10%, transparent); }
-.integrations .track li:hover svg { color: var(--c); filter: drop-shadow(0 0 10px color-mix(in srgb, var(--c) 60%, transparent)); }
+.integrations .track svg { width: 22px; height: 22px; fill: currentColor; color: color-mix(in srgb, var(--c) 62%, #d6d0c6); flex: none; }
+.integrations .track li { border-color: color-mix(in srgb, var(--c) 14%, var(--line)); background: color-mix(in srgb, var(--c) 2%, rgba(255,255,255,.025)); }
+.integrations .track li:hover { color: var(--text); border-color: color-mix(in srgb, var(--c) 30%, var(--line)); background: color-mix(in srgb, var(--c) 5%, transparent); }
+.integrations .track li:hover svg { color: color-mix(in srgb, var(--c) 78%, #d6d0c6); }
 @keyframes marquee { to { transform: translateX(-100%); } }
 
 /* ---------- commitments ---------- */
