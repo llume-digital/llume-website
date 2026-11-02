@@ -27,3 +27,7 @@
 /elpuertoluanco/*
   X-Robots-Tag: noindex, nofollow
   Cache-Control: no-cache
+
+/lopita/*
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-cache
