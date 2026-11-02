@@ -239,9 +239,13 @@ function renderView() {
     ? { inicio: viewMiInicio, horas: viewMisHoras, vacaciones: viewMisVacaciones, preferencias: viewMisPrefs, guia: viewGuia }
     : { horarios: r.arg ? () => viewDetalle(Number(r.arg)) : viewHorarios, calendario: viewCalendario, alertas: viewAlertas, solicitudes: viewSolicitudes, informes: viewInformes, equipo: viewEquipo, funciones: viewFunciones, turnos: viewTurnos, demanda: viewDemanda, ausencias: viewAusencias, preferencias: viewPreferencias, reglas: viewReglas, web: viewWeb, comentarios: viewComentarios, ajustes: viewAjustes, guia: viewGuia };
   const name = views[r.name] ? r.name : (w ? 'inicio' : 'horarios');
+  // Si había un turno enfocado (teclado), sigue enfocado tras redibujar aunque la vista se recargue por detrás.
+  const foco = document.activeElement && document.activeElement.closest && document.activeElement.closest('.g-bar');
+  const focoEmp = foco && foco.dataset.emp;
   $('#tabs').innerHTML = tabsHtml(name);
   view.innerHTML = views[name]();
   renderSavebar();
+  if (focoEmp) { const b = view.querySelector(`.g-bar[data-emp="${CSS.escape(focoEmp)}"]`); if (b) b.focus({ preventScroll: true }); }
   if (name === 'guia' && r.arg && state.guiaVista !== r.arg) {
     state.guiaVista = r.arg;
     const sec = document.getElementById(`guia-${r.arg}`);
