@@ -3,10 +3,23 @@
   "compatibility_date": "2026-09-01",
   // Vista previa de cada rama/PR en Workers Builds (`npx wrangler preview`); vacío usa la misma config
   "previews": {},
+  // Solo atiende las rutas de assets.run_worker_first; el resto lo sirve Cloudflare directamente desde public/
+  "main": "src/worker.js",
   // Solo se publica public/; los .md de la raíz quedan fuera de la web
   "assets": {
     "directory": "./public",
+    "binding": "ASSETS",
     // Rutas inexistentes muestran public/404.html con estado 404
-    "not_found_handling": "404-page"
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/lopita/horarios/nube/*"]
+  },
+  // Base de datos compartida de la app de horarios de Lopita (ver src/worker.js)
+  "durable_objects": {
+    "bindings": [{ "name": "LOPITA_DATOS", "class_name": "LopitaDatos" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["LopitaDatos"] }],
+  "vars": {
+    // sha256 de la clave de acceso a los datos de Lopita (la clave no está en el repo)
+    "LOPITA_CLAVE_SHA256": "6ee72bf395616d1c96c79e8a64811a73c3bec78b9dde0389db5b8e618cb9bb8d"
   }
 }
