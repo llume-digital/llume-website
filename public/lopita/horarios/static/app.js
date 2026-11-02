@@ -199,7 +199,7 @@ function render() {
       <header class="topbar"><div class="topbar-inner">
         <a class="wordmark" href="#/" aria-label="Lopita & Co · Horarios"><b>LOPITA &amp; CO</b><span>Horarios</span></a>
         <nav class="tabs" id="tabs"></nav>
-        <div class="userbox"><span>${esc(state.me.nombre)}</span><button data-act="feedback" class="fb-btn" title="Deja una sugerencia, un fallo o una duda">Comentarios</button><button data-act="pwDialog">Contraseña</button><button data-act="logout">Salir</button></div>
+        <div class="userbox"><span>${esc(state.me.nombre)}</span><button data-act="goGuia" title="Cómo funciona la app">Guía</button><button data-act="feedback" class="fb-btn" title="Deja una sugerencia, un fallo o una duda">Comentarios</button><button data-act="pwDialog">Contraseña</button><button data-act="logout">Salir</button></div>
       </div></header>
       <main id="view"></main>
       <div id="savebar"></div>`;
@@ -209,9 +209,9 @@ function render() {
 
 const NAV_ADMIN = [
   ['horarios', 'Horarios'], ['calendario', 'Calendario'], ['alertas', 'Alertas'], ['solicitudes', 'Solicitudes'], ['informes', 'Informes'], ['equipo', 'Equipo'], ['funciones', 'Funciones'], ['turnos', 'Turnos'], ['demanda', 'Demanda'],
-  ['ausencias', 'Ausencias'], ['preferencias', 'Preferencias'], ['reglas', 'Reglas'], ['web', 'Web'], ['comentarios', 'Comentarios'], ['ajustes', 'Ajustes'],
+  ['ausencias', 'Ausencias'], ['preferencias', 'Preferencias'], ['reglas', 'Reglas'], ['web', 'Web'], ['comentarios', 'Comentarios'], ['ajustes', 'Ajustes'], ['guia', 'Guía'],
 ];
-const NAV_WORKER = [['inicio', 'Inicio'], ['horas', 'Mis horas'], ['vacaciones', 'Vacaciones'], ['preferencias', 'Preferencias']];
+const NAV_WORKER = [['inicio', 'Inicio'], ['horas', 'Mis horas'], ['vacaciones', 'Vacaciones'], ['preferencias', 'Preferencias'], ['guia', 'Guía']];
 const isWorker = () => state.me && state.me.rol === 'empleado';
 
 function route() {
@@ -233,12 +233,18 @@ function renderView() {
   const r = route();
   const w = isWorker();
   const views = w
-    ? { inicio: viewMiInicio, horas: viewMisHoras, vacaciones: viewMisVacaciones, preferencias: viewMisPrefs }
-    : { horarios: r.arg ? () => viewDetalle(Number(r.arg)) : viewHorarios, calendario: viewCalendario, alertas: viewAlertas, solicitudes: viewSolicitudes, informes: viewInformes, equipo: viewEquipo, funciones: viewFunciones, turnos: viewTurnos, demanda: viewDemanda, ausencias: viewAusencias, preferencias: viewPreferencias, reglas: viewReglas, web: viewWeb, comentarios: viewComentarios, ajustes: viewAjustes };
+    ? { inicio: viewMiInicio, horas: viewMisHoras, vacaciones: viewMisVacaciones, preferencias: viewMisPrefs, guia: viewGuia }
+    : { horarios: r.arg ? () => viewDetalle(Number(r.arg)) : viewHorarios, calendario: viewCalendario, alertas: viewAlertas, solicitudes: viewSolicitudes, informes: viewInformes, equipo: viewEquipo, funciones: viewFunciones, turnos: viewTurnos, demanda: viewDemanda, ausencias: viewAusencias, preferencias: viewPreferencias, reglas: viewReglas, web: viewWeb, comentarios: viewComentarios, ajustes: viewAjustes, guia: viewGuia };
   const name = views[r.name] ? r.name : (w ? 'inicio' : 'horarios');
   $('#tabs').innerHTML = tabsHtml(name);
   view.innerHTML = views[name]();
   renderSavebar();
+  if (name === 'guia' && r.arg && state.guiaVista !== r.arg) {
+    state.guiaVista = r.arg;
+    const sec = document.getElementById(`guia-${r.arg}`);
+    if (sec) { sec.scrollIntoView({ block: 'start' }); sec.classList.add('flash'); }
+  }
+  if (name !== 'guia') state.guiaVista = null;
 }
 
 function renderSavebar() {
@@ -254,7 +260,10 @@ function renderSavebar() {
 }
 
 function head(title, lead, actions = '') {
-  return `<div class="page-head"><div><h1>${title}</h1>${lead ? `<p class="lead">${lead}</p>` : ''}</div>${actions ? `<div class="row">${actions}</div>` : ''}</div>`;
+  const r = route();
+  const ayuda = r.name !== 'guia' && guiaSecciones().some((g) => g.id === r.name)
+    ? `<a class="guia-link no-print" href="#/guia/${r.name}">¿Cómo funciona esta pantalla?</a>` : '';
+  return `<div class="page-head"><div><h1>${title}</h1>${lead ? `<p class="lead">${lead}</p>` : ''}${ayuda}</div>${actions ? `<div class="row">${actions}</div>` : ''}</div>`;
 }
 
 // helpers de formulario
@@ -1739,6 +1748,151 @@ function viewWeb() {
   <p class="small muted section">Los CV y mensajes son datos personales: bórralos cuando ya no hagan falta.</p>`;
 }
 
+// ------------------------------------------------------------------ GUÍA DE USO
+// Una sección por pantalla: para qué sirve, cómo se usa en pocos pasos y un botón que lleva a ella.
+// Cada pantalla enlaza a su sección con «¿Cómo funciona esta pantalla?» (#/guia/<pantalla>).
+const GUIA_ADMIN = [
+  { id: 'horarios', titulo: 'Horarios', para: 'Crear, revisar y publicar el horario de una semana, un mes o unas fechas.', pasos: [
+    'Elige el periodo (semana, mes o fechas) y pulsa <b>Generar</b>. El motor reparte los turnos cumpliendo las reglas y cubriendo la demanda.',
+    'Abre el horario. Arriba ves los avisos y la cobertura de cada día; abajo, el cuadrante y las horas de cada persona.',
+    'Toca una casilla para cambiar un turno. Los cambios a mano quedan bloqueados (candado) y se respetan si regeneras.',
+    'Con <b>Día · Semana · Mes</b> cambias de vista. En la de día puedes arrastrar los turnos hora a hora.',
+    '<b>Solucionar problemas</b> propone los mínimos cambios para quitar alertas. <b>Publicar y enviar a Slack</b> lo hace visible al equipo.',
+  ] },
+  { id: 'calendario', titulo: 'Calendario', para: 'Ver todos los horarios juntos, día a día, semana a semana o mes a mes.', pasos: [
+    'Elige <b>Semana</b> o <b>Mes</b> y muévete con ‹ › u <b>Hoy</b>.',
+    'Con <b>Persona</b> ves solo los turnos de alguien (útil para revisar su mes).',
+    'Toca un día o un turno para abrirlo en la vista de día y editarlo.',
+    'Los días sin horario salen en gris: créalo en Horarios.',
+  ] },
+  { id: 'dia', ir: 'calendario', titulo: 'Retocar un día (vista de día)', para: 'Mover, alargar, acortar, añadir o quitar turnos hora a hora viendo la cobertura al momento.', pasos: [
+    '<b>Arrastra</b> un turno para moverlo y <b>tira de sus bordes</b> para alargarlo o acortarlo.',
+    '<b>Toca</b> un turno para el menú: horas exactas, botones de <b>±30 min</b>, <b>±1 h</b> y <b>desplazar</b>, puesto (sala o cocina) o quitarlo.',
+    'Toca un hueco en la fila de alguien para añadirle un turno.',
+    'Nada se guarda hasta <b>Confirmar cambios</b>: verás qué alertas aparecen o se resuelven antes de guardar o publicar.',
+    'Desde el cuadrante también puedes usar los ajustes rápidos: te llevan a la vista de día para confirmarlos.',
+  ] },
+  { id: 'alertas', titulo: 'Alertas', para: 'Saber qué revisar en los horarios en curso, de lo más a lo menos importante.', pasos: [
+    '<b>Críticas</b>: el horario no vale (momentos sin nadie, nadie que pueda abrir o cerrar). Arréglalas antes de publicar.',
+    'Cada alerta explica el problema y sugiere qué hacer; muchas traen botón para ir a arreglarlo.',
+    '<b>Reconocer</b> aparta una alerta que ya conoces. Si cambia, vuelve a salir.',
+    'Qué se avisa y con qué umbrales se ajusta en Reglas → Alertas.',
+  ] },
+  { id: 'solicitudes', titulo: 'Solicitudes', para: 'Aprobar o rechazar vacaciones, permisos y correcciones de horas que pide el equipo.', pasos: [
+    'Las pendientes salen arriba, con un número en la pestaña.',
+    'Al aprobar unas vacaciones se añaden a Ausencias y la app arregla los horarios afectados (sin publicar nada).',
+    'Las correcciones aprobadas ajustan el informe de horas y el saldo del siguiente horario.',
+  ] },
+  { id: 'informes', titulo: 'Informes de horas', para: 'Ver de un vistazo cuánto ha trabajado cada persona en el periodo que elijas.', pasos: [
+    'Elige las fechas o usa <b>Este mes</b>, <b>Mes anterior</b>, <b>Últimos 3 meses</b> o <b>Este año</b>.',
+    'Por persona: horas trabajadas, contrato, horas extra o de menos, días, fines de semana, festivos, aperturas y cierres.',
+    'Si el periodo abarca varios meses, abajo sale la tabla <b>mes a mes</b>.',
+    'Activa <b>Contar también los borradores</b> para incluir horarios aún no publicados. <b>Descargar CSV</b> para la gestoría.',
+  ] },
+  { id: 'equipo', titulo: 'Equipo', para: 'Las personas: horas de contrato, si son camareros o cocineros, sus funciones y qué días libran.', pasos: [
+    '<b>Añadir persona</b> y rellena su nombre y horas por semana.',
+    '<b>Tipo de empleado</b>: Camarero/a (sala), Cocinero/a (cocina) o los dos.',
+    '<b>Funciones</b>: puede abrir, puede cerrar, encargado/a y las que hayas creado (p. ej. preparar pinchos).',
+    'Marca sus <b>días que libra</b> fijos. Si deja la empresa, desactiva «En plantilla» en vez de borrarla.',
+    'Pulsa <b>Guardar cambios</b> abajo.',
+  ] },
+  { id: 'funciones', titulo: 'Funciones', para: 'Lo que solo hacen algunas personas (abrir, cerrar, encargado o lo que añadas) y las reglas que deben cumplirse.', pasos: [
+    '<b>Añadir función</b>, por ejemplo «Preparar pinchos», y marca quién la tiene.',
+    '<b>Añadir regla</b>: de qué hora a qué hora hace falta, cuántas personas y qué días.',
+    'El motor pondrá a alguien con esa función en ese tramo y, si no puede, salta una alerta con sugerencias.',
+    'Pulsa <b>Guardar cambios</b> y regenera los horarios que quieras actualizar.',
+  ] },
+  { id: 'turnos', titulo: 'Turnos', para: 'Los turnos posibles (apertura, mañana, tarde, cierre…) con sus horas.', pasos: [
+    'Cada turno tiene un código, un nombre, horas, tipo (apertura, normal o cierre) y color.',
+    'Los de apertura y cierre solo los hace quien puede abrir o cerrar.',
+    'Si un turno solo existe algunos días (p. ej. refuerzo de fin de semana), márcalos.',
+  ] },
+  { id: 'demanda', titulo: 'Demanda', para: 'Cuántas personas hacen falta en cada franja del día y las tareas fijas.', pasos: [
+    'Define los <b>tipos de día</b> (laborable, viernes, sábado…) con sus franjas y personas, y cuál toca cada día de la semana.',
+    'En cada franja puedes pedir un mínimo en <b>cocina</b> y en <b>sala</b>.',
+    '<b>Tareas fijas</b>: trabajo que no depende de la clientela (preparar, limpiar, recibir pedidos).',
+    'Festivos y días especiales (cerrado, otra demanda) también se ponen aquí.',
+  ] },
+  { id: 'ausencias', titulo: 'Ausencias', para: 'Vacaciones, bajas y permisos, y cambios fijos para un día concreto.', pasos: [
+    'Añade la persona, las fechas y el motivo. El motor no le pondrá turnos esos días.',
+    'Si ya había horarios en esas fechas, la app los arregla sola y te avisa.',
+  ] },
+  { id: 'preferencias', titulo: 'Preferencias', para: 'Turnos que alguien prefiere o evita, y cuánto le importa.', pasos: [
+    'Elige la persona, si prefiere o evita, los turnos y (opcional) los días.',
+    'Se respetan si no comprometen la cobertura. Cada trabajador puede editar las suyas.',
+  ] },
+  { id: 'reglas', titulo: 'Reglas', para: 'Lo que todo horario debe cumplir y los avisos que quieres recibir.', pasos: [
+    'Descanso entre jornadas, días libres por semana, horas máximas al día y bolsa de horas.',
+    '<b>Cobertura</b>: si debe haber siempre un encargado.',
+    '<b>Alertas</b>: umbrales y avisos que quieres silenciar.',
+    '<b>Ajuste fino del motor</b> (avanzado): cuánto pesa cada cosa.',
+  ] },
+  { id: 'web', titulo: 'Web', para: 'Lo que llega desde la web pública (candidaturas y catering) y la carta en PDF.', pasos: [
+    'Marca los mensajes como atendidos y borra los CV cuando ya no hagan falta.',
+    'Sube el PDF de cada carta: la web enlaza siempre al último.',
+  ] },
+  { id: 'comentarios', titulo: 'Comentarios', para: 'Sugerencias, fallos y dudas sobre la app, para que quede todo apuntado.', pasos: [
+    'Desde cualquier pantalla, pulsa <b>Comentarios</b> arriba a la derecha y escribe. Se guarda con la pantalla en la que estabas.',
+    'En esta pestaña se ven todos: cambia su estado (nuevo, en curso, hecho, descartado) y responde.',
+    'Quien lo envió ve la respuesta en su ventana de comentarios.',
+  ] },
+  { id: 'ajustes', titulo: 'Ajustes', para: 'Cuentas de acceso, Slack, copias e historial de la configuración.', pasos: [
+    '<b>Cuentas de acceso</b>: crea una cuenta de trabajador para cada persona (con contraseña temporal) o de encargado.',
+    '<b>Versiones</b>: cada guardado crea una versión; puedes restaurar cualquiera.',
+    '<b>Exportar</b> o <b>Cargar archivo</b> la configuración completa.',
+  ] },
+];
+const GUIA_WORKER = [
+  { id: 'inicio', titulo: 'Inicio', para: 'Tus próximos turnos y los avisos de cambios.', pasos: [
+    'Arriba ves tus turnos de los próximos días.',
+    'Si tu horario cambia, sale un aviso con lo que ha cambiado; márcalo como visto.',
+  ] },
+  { id: 'horas', titulo: 'Mis horas', para: 'Las horas que has trabajado y corregir un día que fue distinto.', pasos: [
+    'Elige el periodo para ver tus horas previstas y ajustadas.',
+    'Si un día trabajaste otras horas (o no trabajaste), pulsa <b>Corregir</b> y explica el motivo. Tu encargado lo revisará.',
+  ] },
+  { id: 'vacaciones', titulo: 'Vacaciones', para: 'Pedir vacaciones o permisos.', pasos: [
+    'Elige las fechas y el motivo y envía la solicitud.',
+    'Verás si está pendiente, aprobada o rechazada.',
+  ] },
+  { id: 'preferencias', titulo: 'Preferencias', para: 'Decir qué turnos prefieres o prefieres evitar.', pasos: [
+    'Añade una preferencia, elige los turnos, los días y cuánto te importa, y guarda.',
+    'Se tienen en cuenta siempre que no dejen el local sin cubrir.',
+  ] },
+  { id: 'comentarios', ir: null, titulo: 'Comentarios', para: 'Contarnos qué mejorarías o qué no funciona.', pasos: [
+    'Pulsa <b>Comentarios</b> arriba a la derecha, escribe y envía.',
+    'En la misma ventana verás la respuesta.',
+  ] },
+];
+const guiaSecciones = () => (isWorker() ? GUIA_WORKER : GUIA_ADMIN);
+
+function viewGuia() {
+  const w = isWorker();
+  const secs = guiaSecciones();
+  const nombreTab = (id) => ((w ? NAV_WORKER : NAV_ADMIN).find(([k]) => k === id) || [])[1];
+  const primeros = w ? '' : `<div class="card guia-pasos"><h2>Primeros pasos</h2><ol>
+    <li>Da de alta al <a href="#/equipo">equipo</a>: horas de contrato, camarero o cocinero, funciones y días que libra.</li>
+    <li>Crea las <a href="#/funciones">funciones</a> especiales (p. ej. preparar pinchos) y sus reglas.</li>
+    <li>Revisa los <a href="#/turnos">turnos</a> y la <a href="#/demanda">demanda</a> de cada tipo de día.</li>
+    <li>Apunta las <a href="#/ausencias">ausencias</a> conocidas y repasa las <a href="#/reglas">reglas</a>.</li>
+    <li>Genera el primer <a href="#/horarios">horario</a>, revisa las <a href="#/alertas">alertas</a>, retócalo si hace falta y publícalo.</li>
+    <li>Cada mes, mira los <a href="#/informes">informes de horas</a>.</li>
+  </ol></div>`;
+  const indice = `<nav class="guia-indice chips" aria-label="Secciones de la guía">${secs.map((g) => `<a class="chip" href="#/guia/${g.id}">${esc(g.titulo)}</a>`).join('')}</nav>`;
+  const tarjetas = secs.map((g) => {
+    const ir = g.ir === undefined ? g.id : g.ir;
+    return `<section class="card guia-sec" id="guia-${g.id}">
+      <div class="row" style="align-items:baseline"><h2 style="margin:0">${esc(g.titulo)}</h2><span class="spacer"></span>
+        ${ir ? `<a class="btn small primary" href="#/${ir}">Ir a ${esc(nombreTab(ir) || g.titulo)} →</a>` : `<button class="btn small primary" data-act="feedback">Abrir comentarios</button>`}</div>
+      <p class="lead" style="margin:6px 0 10px">${esc(g.para)}</p>
+      <ol class="guia-lista">${g.pasos.map((p) => `<li>${p}</li>`).join('')}</ol>
+    </section>`;
+  }).join('');
+  return `${head('Guía de uso', w ? 'Cómo usar la app en tu día a día. Cada apartado tiene un botón para ir a esa pantalla.' : 'Cómo funciona cada pantalla, en pocos pasos. Cada apartado tiene un botón para ir directamente a ella, y cada pantalla tiene arriba un enlace «¿Cómo funciona esta pantalla?» que trae aquí.')}
+  ${primeros}${indice}<div class="stack guia">${tarjetas}</div>
+  <p class="small muted section">¿Algo no queda claro? Pulsa <a href="#" data-act="feedback">Comentarios</a> y cuéntanoslo.</p>`;
+}
+
 // ------------------------------------------------------------------ COMENTARIOS (feedback sobre la app)
 const FB_TIPOS = { sugerencia: 'Sugerencia', error: 'Algo no funciona', duda: 'Duda' };
 const FB_ESTADOS = { nuevo: ['warn', 'Nuevo'], en_curso: ['borrador', 'En curso'], hecho: ['publicado', 'Hecho'], descartado: ['neutral', 'Descartado'] };
@@ -1959,6 +2113,7 @@ const actions = {
     state.current = await api('DELETE', `/api/horarios/${state.current.id}/bloqueos`); renderView();
   },
   cell: (el) => openCellMenu(el),
+  goGuia: () => { location.hash = '#/guia'; },
   feedback: async () => {
     overlay(feedbackDialog([]));
     try { const mios = await api('GET', '/api/comentarios'); if ($('#fb-form')) { const t = $('#fb-form textarea').value; overlay(feedbackDialog(isWorker() ? mios : mios.filter((c) => c.autor === state.me.username))); $('#fb-form textarea').value = t; } } catch { /* sin lista no pasa nada */ }
@@ -2524,7 +2679,7 @@ document.addEventListener('submit', async (e) => {
   }
 });
 window.addEventListener('scroll', closeMenu, true);
-window.addEventListener('hashchange', () => { closeMenu(); if (route().name === 'calendario') state.cal.data = {}; if (route().name !== 'horarios' || !route().arg) state.current = state.current; if (route().name === 'web') state.web.data = undefined; renderView(); window.scrollTo(0, 0); });
+window.addEventListener('hashchange', () => { closeMenu(); if (route().name === 'calendario') state.cal.data = {}; if (route().name !== 'horarios' || !route().arg) state.current = state.current; if (route().name === 'web') state.web.data = undefined; renderView(); if (!(route().name === 'guia' && route().arg)) window.scrollTo(0, 0); });
 window.addEventListener('beforeunload', (e) => { if (state.dirty || (state.dia && diaCambios(state.dia).length)) { e.preventDefault(); e.returnValue = ''; } });
 
 async function importConfig(file) {
