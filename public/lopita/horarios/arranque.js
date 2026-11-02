@@ -14,6 +14,11 @@ const pendientes = new Map();
 worker.onmessage = (ev) => {
   const m = ev.data;
   if (m.tipo === 'progreso') { if ($estado) $estado.textContent = m.texto; return; }
+  if (m.tipo === 'conflicto') {
+    alert('Otra persona ha guardado cambios a la vez que tú. Se cargan sus datos: repite tu último cambio.');
+    location.reload();
+    return;
+  }
   const p = pendientes.get(m.id);
   if (!p) return;
   pendientes.delete(m.id);
@@ -98,6 +103,24 @@ async function reiniciarDemo() {
   location.reload();
 }
 
+// Datos compartidos (config.js → nube): la clave llega una vez en el enlace (#clave=…) y se recuerda en este
+// navegador. Sin ella, se pide.
+const CLAVE = 'lopita-clave-nube';
+function claveNube() {
+  const enEnlace = /(?:^#|&)clave=([^&]+)/.exec(location.hash);
+  if (enEnlace) {
+    try { localStorage.setItem(CLAVE, decodeURIComponent(enEnlace[1])); } catch (e) { /* sin almacenamiento */ }
+    history.replaceState(null, '', location.pathname + location.search);
+    return decodeURIComponent(enEnlace[1]);
+  }
+  try { if (localStorage.getItem(CLAVE)) return localStorage.getItem(CLAVE); } catch (e) { /* sin almacenamiento */ }
+  return (window.prompt('Clave de acceso a los horarios de Lopita:') || '').trim();
+}
+
+function olvidarClave() {
+  try { localStorage.removeItem(CLAVE); } catch (e) { /* sin almacenamiento */ }
+}
+
 async function iniciar() {
   // Dentro del .apk (Capacitor) los archivos ya van en la app: el service worker sobra y sus fetch no los
   // serviría el contenedor nativo, así que solo se registra en la versión web.
@@ -106,14 +129,28 @@ async function iniciar() {
     navigator.serviceWorker.register('sw.js').catch((e) => console.warn('Sin modo offline:', e));
   }
   try {
-    const demo = await pedir('arrancar', { paquetes: PAQUETES });
+    const rutaNube = window.LOPITA_OFFLINE.nube;
+    const nube = rutaNube ? { ruta: rutaNube, clave: claveNube() } : null;
+    const demo = await pedir('arrancar', { paquetes: PAQUETES, nube });
     window.LOPITA_OFFLINE.demo = demo;
-    document.getElementById('demo-acceso').textContent = `Usuario «${demo.usuario}», contraseña «${demo.clave}»`;
-    document.getElementById('demo-reiniciar').addEventListener('click', reiniciarDemo);
+    if (nube) {
+      document.querySelector('#demo summary').textContent = 'Datos compartidos';
+      document.getElementById('demo-texto').textContent = 'Los datos se guardan en el servidor de llume y los ve todo el que tenga la clave. El horario se calcula en este dispositivo. Slack no envía nada todavía.';
+      document.getElementById('demo-acceso').textContent = `Primera entrada: usuario «${demo.usuario}», contraseña «${demo.clave}» (cámbiala desde la app).`;
+      document.getElementById('demo-reiniciar').remove();
+    } else {
+      document.getElementById('demo-acceso').textContent = `Usuario «${demo.usuario}», contraseña «${demo.clave}»`;
+      document.getElementById('demo-reiniciar').addEventListener('click', reiniciarDemo);
+    }
     document.getElementById('demo').hidden = false;
     await import('./static/app.js');
   } catch (e) {
     console.error(e);
+    if (e.message === 'CLAVE') {
+      olvidarClave();
+      if ($estado) $estado.textContent = 'Clave incorrecta. Recarga la página para volver a escribirla.';
+      return;
+    }
     if ($estado) $estado.textContent = `No se pudo arrancar la app: ${e.message}`;
   }
 }
