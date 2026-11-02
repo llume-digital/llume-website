@@ -37,6 +37,7 @@ const fmtStamp = (s) => { if (!s) return ''; const d = new Date(s); return d.toL
 const ICON = {
   lock: '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 9V7a5 5 0 0 0-10 0v2H5v13h14V9h-2Zm-8-2a3 3 0 0 1 6 0v2H9V7Z"/></svg>',
   trash: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  mic: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
   plus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
 };
 
@@ -122,6 +123,7 @@ function overlay(html) {
   return o;
 }
 function closeOverlay() {
+  pararDictado();
   const habia = document.querySelector('.overlay');
   document.querySelectorAll('.overlay').forEach((o) => o.remove());
   if (habia && state.notifPending) setTimeout(showNotifications, 50);
@@ -228,6 +230,7 @@ function tabsHtml(name) {
 }
 
 function renderView() {
+  pararDictado();
   const view = $('#view');
   if (!view) return render();
   const r = route();
@@ -236,9 +239,13 @@ function renderView() {
     ? { inicio: viewMiInicio, horas: viewMisHoras, vacaciones: viewMisVacaciones, preferencias: viewMisPrefs, guia: viewGuia }
     : { horarios: r.arg ? () => viewDetalle(Number(r.arg)) : viewHorarios, calendario: viewCalendario, alertas: viewAlertas, solicitudes: viewSolicitudes, informes: viewInformes, equipo: viewEquipo, funciones: viewFunciones, turnos: viewTurnos, demanda: viewDemanda, ausencias: viewAusencias, preferencias: viewPreferencias, reglas: viewReglas, web: viewWeb, comentarios: viewComentarios, ajustes: viewAjustes, guia: viewGuia };
   const name = views[r.name] ? r.name : (w ? 'inicio' : 'horarios');
+  // Si había un turno enfocado (teclado), sigue enfocado tras redibujar aunque la vista se recargue por detrás.
+  const foco = document.activeElement && document.activeElement.closest && document.activeElement.closest('.g-bar');
+  const focoEmp = foco && foco.dataset.emp;
   $('#tabs').innerHTML = tabsHtml(name);
   view.innerHTML = views[name]();
   renderSavebar();
+  if (focoEmp) { const b = view.querySelector(`.g-bar[data-emp="${CSS.escape(focoEmp)}"]`); if (b) b.focus({ preventScroll: true }); }
   if (name === 'guia' && r.arg && state.guiaVista !== r.arg) {
     state.guiaVista = r.arg;
     const sec = document.getElementById(`guia-${r.arg}`);
@@ -303,6 +310,42 @@ function dayChips(path, selected, allLabel) {
   const set = new Set(selected || []);
   return `<div class="chips" role="group">${DAYS.map((d, i) => `<button type="button" class="chip ${set.has(d) ? 'on' : ''}" data-act="toggleDay" data-path="${path}" data-day="${d}" aria-pressed="${set.has(d)}" title="${DAY_LABEL[i]}">${DAY_CHIP[i]}</button>`).join('')}${allLabel && !set.size ? `<span class="small muted" style="align-self:center">${allLabel}</span>` : ''}</div>`;
 }
+// Dictado por voz para los textos (solicitudes, comentarios…). Usa el reconocimiento de voz del navegador
+// (Chrome, Edge, Safari); donde no existe, el botón no aparece y se escribe como siempre.
+const Reconocimiento = window.SpeechRecognition || window.webkitSpeechRecognition;
+let dictando = null;
+function mic(name) {
+  if (!Reconocimiento) return '';
+  return `<div class="mic-row"><button type="button" class="btn small mic" data-act="dictar" data-for="${name}" aria-pressed="false">${ICON.mic} Dictar</button><span class="small muted mic-estado" aria-live="polite"></span></div>`;
+}
+function pararDictado() { if (dictando) { try { dictando.rec.stop(); } catch { /* ya parado */ } } }
+function dictar(btn) {
+  if (dictando) { const mismo = dictando.btn === btn; pararDictado(); if (mismo) return; }
+  const ta = btn.closest('form').querySelector(`textarea[name="${btn.dataset.for}"]`);
+  const estado = btn.parentElement.querySelector('.mic-estado');
+  const rec = new Reconocimiento();
+  rec.lang = 'es-ES'; rec.interimResults = true; rec.continuous = true;
+  const base = ta.value.trim();
+  let final = '';
+  rec.onresult = (ev) => {
+    let parcial = '';
+    for (let i = ev.resultIndex; i < ev.results.length; i++) {
+      const t = ev.results[i][0].transcript;
+      if (ev.results[i].isFinal) final += (final ? ' ' : '') + t.trim(); else parcial += t;
+    }
+    const txt = [final, parcial.trim()].filter(Boolean).join(' ');
+    ta.value = [base, txt ? txt.charAt(0).toUpperCase() + txt.slice(1) : ''].filter(Boolean).join(' ');
+  };
+  rec.onerror = (ev) => {
+    estado.textContent = ev.error === 'not-allowed' || ev.error === 'service-not-allowed' ? 'Sin permiso para usar el micrófono.' : ev.error === 'no-speech' ? 'No se oye nada.' : 'No se pudo dictar.';
+  };
+  rec.onend = () => { btn.classList.remove('on'); btn.setAttribute('aria-pressed', 'false'); btn.innerHTML = `${ICON.mic} Dictar`; if (estado.textContent === 'Escuchando… habla y pulsa «Parar» al acabar.') estado.textContent = ''; dictando = null; };
+  dictando = { rec, btn };
+  btn.classList.add('on'); btn.setAttribute('aria-pressed', 'true'); btn.innerHTML = `${ICON.mic} Parar`;
+  estado.textContent = 'Escuchando… habla y pulsa «Parar» al acabar.';
+  try { rec.start(); } catch { rec.onend(); estado.textContent = 'No se pudo usar el micrófono.'; }
+}
+
 function toggle(path, checked, label) {
   return `<label class="toggle"><input type="checkbox" data-bind="${path}" ${checked ? 'checked' : ''}> ${label}</label>`;
 }
@@ -869,6 +912,20 @@ function dayNav(cur, fecha) {
   </div>`;
 }
 
+// Zoom horizontal del diagrama del día: más ancho para afinar al arrastrar, más estrecho para verlo entero.
+const ZOOMS = [0.5, 0.75, 1, 1.5, 2, 3];
+function ganttZoom() {
+  if (state.zoom == null) { let z = 1; try { z = Number(localStorage.getItem('lopita-zoom')) || 1; } catch { /* sin almacenamiento */ } state.zoom = ZOOMS.includes(z) ? z : 1; }
+  return state.zoom;
+}
+function zoomCtl() {
+  const z = ganttZoom(), k = ZOOMS.indexOf(z);
+  return `<div class="zoom-ctl" role="group" aria-label="Zoom del horario">
+    <button class="btn small" data-act="zoom" data-d="-1" ${k === 0 ? 'disabled' : ''} aria-label="Alejar" title="Alejar">−</button>
+    <button class="btn small zoom-val" data-act="zoom" data-d="0" title="Volver al 100 %">${Math.round(z * 100)} %</button>
+    <button class="btn small" data-act="zoom" data-d="1" ${k === ZOOMS.length - 1 ? 'disabled' : ''} aria-label="Acercar" title="Acercar">+</button></div>`;
+}
+
 function dayView(cur) {
   const cfg = state.config;
   const d = diaEstado(cur);
@@ -895,7 +952,10 @@ function dayView(cur) {
     return `<div class="g-row g-cov"><div class="g-name">${esc(f.nombre)}<small class="${faltan.length ? 'bad-text' : ''}">${esc(resumen)}</small></div>
       <div class="g-track" aria-label="${esc(`${f.nombre}: ${resumen}`)}">${cells.join('')}</div></div>`;
   };
-  const emps = cfg.empleados.filter((e) => e.activo || d.tramos.some((t) => t.empleado_id === e.id));
+  // Ordenadas por hora de entrada: primero quien entra antes; después, quien no trabaja ese día.
+  const entrada = (e) => { const t = d.tramos.find((x) => x.empleado_id === e.id); return t ? toMin(t.inicio) * 2000 + toMin(t.fin) : Infinity; };
+  const emps = cfg.empleados.filter((e) => e.activo || d.tramos.some((t) => t.empleado_id === e.id))
+    .map((e, k) => [e, entrada(e), k]).sort((a, b) => a[1] - b[1] || a[2] - b[2]).map((x) => x[0]);
   const filas = emps.map((e) => {
     const t = d.tramos.find((x) => x.empleado_id === e.id);
     const ausencia = cfg.ausencias.find((a) => a.empleado_id === e.id && a.desde <= d.fecha && d.fecha <= a.hasta);
@@ -920,8 +980,8 @@ function dayView(cur) {
   return `${dayNav(cur, d.fecha)}
     ${ro ? `<div class="notice warn no-print"><span>Este horario tiene un <b>arreglo pendiente de publicar</b>: los cambios se hacen en él.</span><span class="spacer"></span><a class="btn small primary" href="#/horarios/${cur.arreglo_pendiente}">Editar el arreglo</a></div>` : ''}
     ${cob.cerrado ? '<div class="notice info">El local está cerrado este día.</div>' : ''}
-    <p class="small muted no-print" style="margin:8px 0">${ro ? 'Solo lectura.' : 'Arrastra un turno para moverlo, tira de sus bordes para alargarlo o acortarlo, tócalo para cambiar el puesto, las horas o quitarlo, y toca un hueco en la fila de alguien para añadirle un turno. Nada se guarda hasta que confirmes.'}</p>
-    <div class="gantt-wrap"><div class="gantt" style="--hours:${span / 60}">
+    <div class="row no-print" style="margin:8px 0;gap:10px;align-items:center;flex-wrap:nowrap"><p class="small muted" style="margin:0;flex:1">${ro ? 'Solo lectura.' : 'Arrastra un turno para moverlo, tira de sus bordes para alargarlo o acortarlo, tócalo para cambiar el puesto, las horas o quitarlo, y toca un hueco en la fila de alguien para añadirle un turno. Nada se guarda hasta que confirmes.'}</p>${zoomCtl()}</div>
+    <div class="gantt-wrap"><div class="gantt" style="--hours:${span / 60};--zoom:${ganttZoom()}">
       <div class="g-row g-head"><div class="g-name"></div><div class="g-track">${horas.map((m) => `<span style="left:${pct(m)}">${String(Math.floor(m / 60)).padStart(2, '0')}</span>`).join('')}</div></div>
       ${cob.filas.map(cobFila).join('')}
       ${filas}
@@ -1199,16 +1259,19 @@ function puestosField(i, e) {
 }
 
 // Funciones de la persona: las fijas (abrir, cerrar, encargado) y las que añade el encargado en Funciones.
+// «Preparar pinchos» sale siempre junto a abrir y cerrar; si aún no existe la función, se crea al marcarla.
+const PINCHOS = { id: 'preparar-pinchos', nombre: 'Preparar pinchos', color: '#C9733B', reglas: [] };
 function funcionesField(i, e) {
-  const propias = funcionesCfg(state.draft);
+  const cfgFs = funcionesCfg(state.draft);
+  const propias = cfgFs.some((f) => f.id === PINCHOS.id || /pincho/i.test(f.nombre)) ? cfgFs : [PINCHOS, ...cfgFs];
   const tiene = new Set(e.funciones || []);
   return `<div style="margin-top:14px"><div class="row" style="margin-bottom:6px"><span class="small muted" style="font-weight:600">Funciones</span><span class="spacer"></span><a class="small" href="#/funciones">Gestionar funciones</a></div>
     <div class="stack" style="gap:8px">
       ${toggle(`empleados.${i}.puede_abrir`, e.puede_abrir, 'Puede abrir')}
       ${toggle(`empleados.${i}.puede_cerrar`, e.puede_cerrar, 'Puede cerrar')}
       ${toggle(`empleados.${i}.es_encargado`, e.es_encargado, 'Es encargado/a')}
-    </div>
-    ${propias.length ? `<div class="chips" role="group" aria-label="Otras funciones" style="margin-top:10px">${propias.map((f) => `<button type="button" class="chip ${tiene.has(f.id) ? 'on' : ''}" data-act="toggleFuncion" data-i="${i}" data-f="${esc(f.id)}" aria-pressed="${tiene.has(f.id)}">${esc(f.nombre)}</button>`).join('')}</div>` : ''}</div>`;
+      ${propias.map((f) => `<label class="toggle"><input type="checkbox" data-act-change="funcCheck" data-i="${i}" data-f="${esc(f.id)}" ${tiene.has(f.id) ? 'checked' : ''}> ${esc(f.nombre)}</label>`).join('')}
+    </div></div>`;
 }
 
 // ------------------------------------------------------------------ FUNCIONES (categorías de empleado con reglas)
@@ -1654,7 +1717,7 @@ function viewMisVacaciones() {
       <form id="abs-form" class="stack" style="gap:12px">
         <div class="fields two"><label class="field">Desde<input type="date" name="desde" min="${today}" required></label><label class="field">Hasta<input type="date" name="hasta" min="${today}" required></label></div>
         <label class="field">Tipo<select name="motivo"><option value="vacaciones">Vacaciones</option><option value="permiso">Permiso</option><option value="otro">Otro</option></select></label>
-        <label class="field">Nota para tu encargado (opcional)<textarea name="nota" rows="2"></textarea></label>
+        <label class="field">Nota para tu encargado (opcional)<textarea name="nota" rows="2"></textarea></label>${mic("nota")}
         <button class="btn primary" type="submit" style="justify-content:center">Enviar solicitud</button>
       </form></div>
     <div class="card"><h2>Ausencias aprobadas</h2>
@@ -1762,13 +1825,15 @@ const GUIA_ADMIN = [
   { id: 'calendario', titulo: 'Calendario', para: 'Ver todos los horarios juntos, día a día, semana a semana o mes a mes.', pasos: [
     'Elige <b>Semana</b> o <b>Mes</b> y muévete con ‹ › u <b>Hoy</b>.',
     'Con <b>Persona</b> ves solo los turnos de alguien (útil para revisar su mes).',
-    'Toca un día o un turno para abrirlo en la vista de día y editarlo.',
+    'Toca un día o un turno para abrirlo en la vista de día y editarlo. Con <b>Día</b> se abre el día que estás viendo; si no tiene horario, se abre el siguiente día que sí lo tiene.',
     'Los días sin horario salen en gris: créalo en Horarios.',
   ] },
   { id: 'dia', ir: 'calendario', titulo: 'Retocar un día (vista de día)', para: 'Mover, alargar, acortar, añadir o quitar turnos hora a hora viendo la cobertura al momento.', pasos: [
     '<b>Arrastra</b> un turno para moverlo y <b>tira de sus bordes</b> para alargarlo o acortarlo.',
     '<b>Toca</b> un turno para el menú: horas exactas, botones de <b>±30 min</b>, <b>±1 h</b> y <b>desplazar</b>, puesto (sala o cocina) o quitarlo.',
     'Toca un hueco en la fila de alguien para añadirle un turno.',
+    'Las personas salen <b>por hora de entrada</b>: arriba quien entra antes; abajo quien no trabaja ese día.',
+    'Con <b>− / +</b> (arriba a la derecha del diagrama) acercas para afinar al arrastrar o alejas para ver el día entero. Pulsa el porcentaje para volver al 100 %.',
     'Nada se guarda hasta <b>Confirmar cambios</b>: verás qué alertas aparecen o se resuelven antes de guardar o publicar.',
     'Desde el cuadrante también puedes usar los ajustes rápidos: te llevan a la vista de día para confirmarlos.',
   ] },
@@ -1850,9 +1915,10 @@ const GUIA_WORKER = [
   { id: 'horas', titulo: 'Mis horas', para: 'Las horas que has trabajado y corregir un día que fue distinto.', pasos: [
     'Elige el periodo para ver tus horas previstas y ajustadas.',
     'Si un día trabajaste otras horas (o no trabajaste), pulsa <b>Corregir</b> y explica el motivo. Tu encargado lo revisará.',
+    'Si no quieres escribir, pulsa <b>Dictar</b>, habla y pulsa <b>Parar</b>: el texto se escribe solo (en Chrome, Edge y Safari).',
   ] },
   { id: 'vacaciones', titulo: 'Vacaciones', para: 'Pedir vacaciones o permisos.', pasos: [
-    'Elige las fechas y el motivo y envía la solicitud.',
+    'Elige las fechas y el motivo y envía la solicitud. La nota la puedes <b>dictar</b> con el botón del micrófono.',
     'Verás si está pendiente, aprobada o rechazada.',
   ] },
   { id: 'preferencias', titulo: 'Preferencias', para: 'Decir qué turnos prefieres o prefieres evitar.', pasos: [
@@ -1905,7 +1971,7 @@ function feedbackDialog(mios) {
     <h2 style="margin:0">Comentarios sobre la app</h2>
     <p class="small muted" style="margin:0">Cuéntanos qué cambiarías, qué falla o qué no entiendes. Se guarda en la app con la pantalla en la que estás (<b>${esc(pantallaActual())}</b>) y te responderemos aquí mismo.</p>
     <div class="chips" role="radiogroup" aria-label="Tipo">${Object.entries(FB_TIPOS).map(([k, l], i) => `<label class="chip radio-chip"><input type="radio" name="tipo" value="${k}" ${i === 0 ? 'checked' : ''}> ${l}</label>`).join('')}</div>
-    <label class="field">Comentario<textarea name="texto" rows="5" maxlength="4000" required placeholder="Por ejemplo: en la vista de mes me gustaría ver también las horas de cada persona"></textarea></label>
+    <label class="field">Comentario<textarea name="texto" rows="5" maxlength="4000" required placeholder="Por ejemplo: en la vista de mes me gustaría ver también las horas de cada persona"></textarea></label>${mic("texto")}
     <div class="row end"><button type="button" class="btn" data-act="closeOverlay">Cancelar</button><button class="btn primary" type="submit">Enviar comentario</button></div>
     ${lista.length ? `<div><h3 style="margin:6px 0">Tus últimos comentarios</h3><ul class="fb-mios">${lista.map((c) => `<li><div class="row" style="gap:6px">${fbEstado(c.estado)}<span class="small muted">${fmtStamp(c.created_at)}</span></div><div class="small fb-texto">${esc(c.texto)}</div>${c.respuesta ? `<div class="small fb-resp"><b>Respuesta:</b> ${esc(c.respuesta)}</div>` : ''}</li>`).join('')}</ul></div>` : ''}
   </form>`;
@@ -2017,7 +2083,7 @@ function openCorrection(pre = {}) {
       <label class="field">¿Qué ocurrió?<select name="clase" data-act-change="corrClase">
         ${Object.entries({ horas: 'Hice más o menos horas de las previstas', turno: 'Hice otro turno distinto', no_trabajado: 'No trabajé ese día', extra: 'Trabajé un día que tenía libre' }).map(([k, v]) => `<option value="${k}" ${k === clase ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
       <div id="corr-detail" class="stack" style="gap:12px">${corrDetail(clase, turnos, { inicio: sh && clase === 'horas' ? sh.inicio : '', fin: sh && clase === 'horas' ? sh.fin : '' })}</div>
-      <label class="field">Motivo<textarea name="motivo" rows="3" required placeholder="Por ejemplo: me pidieron quedarme hasta el cierre"></textarea></label>
+      <label class="field">Motivo<textarea name="motivo" rows="3" required placeholder="Por ejemplo: me pidieron quedarme hasta el cierre"></textarea></label>${mic("motivo")}
       <div class="row end"><button type="button" class="btn" data-act="closeOverlay">Cancelar</button><button class="btn primary" type="submit">Enviar solicitud</button></div>
     </form>`);
 }
@@ -2142,15 +2208,27 @@ const actions = {
   },
   calHoy: () => { state.cal.ref = todayIso(); renderView(); },
   calDia: (el) => {
-    const f = el.dataset.date;
+    let f = el.dataset.date;
     const [desde, hasta] = calRango();
     const data = state.cal.data[`${desde}|${hasta}`];
     let info = data && data.dias && data.dias[f];
     if (!info) {
-      const s = state.schedules.filter((x) => x.desde <= f && f <= x.hasta).sort((a, b) => (a.estado === 'publicado' ? 0 : 1) - (b.estado === 'publicado' ? 0 : 1))[0];
-      info = s && { horario_id: s.id };
+      const pub = (x) => (x.estado === 'publicado' ? 0 : 1);
+      const s = state.schedules.filter((x) => x.desde <= f && f <= x.hasta).sort((a, b) => pub(a) - pub(b))[0];
+      if (s) info = { horario_id: s.id };
+      else {
+        // Sin horario ese día: se abre el primer día posterior que tenga uno (o, si no hay, el último anterior).
+        const despues = state.schedules.filter((x) => x.desde > f).sort((a, b) => a.desde.localeCompare(b.desde) || pub(a) - pub(b))[0];
+        const antes = state.schedules.filter((x) => x.hasta < f).sort((a, b) => b.hasta.localeCompare(a.hasta) || pub(a) - pub(b))[0];
+        const alt = despues || antes;
+        if (alt) {
+          const nf = despues ? alt.desde : alt.hasta;
+          toast(`No hay horario el ${fmtLong(f)}; te enseño el ${fmtLong(nf)}, el ${despues ? 'siguiente' : 'último'} día que tiene.`);
+          f = nf; info = { horario_id: alt.id };
+        }
+      }
     }
-    if (!info) { toast('No hay ningún horario para ese día. Créalo en Horarios.', true); return; }
+    if (!info) { toast('Aún no hay ningún horario. Créalo en Horarios.', true); return; }
     state.cal.ref = f;
     state.vista = 'dia'; state.diaFecha = f; state.dia = null;
     if (!state.current || state.current.id !== info.horario_id) state.current = null;
@@ -2351,7 +2429,7 @@ const actions = {
     overlay(`<h2>${ap ? 'Aprobar' : 'Rechazar'} solicitud</h2>
       <form id="resolve-form" class="stack" style="gap:12px" data-id="${el.dataset.id}" data-accion="${el.dataset.accion}" data-tipo="${el.dataset.tipo}">
         <p class="small muted" style="margin:0">${nota}</p>
-        <label class="field">Respuesta para la persona (opcional)<textarea name="respuesta" rows="3"></textarea></label>
+        <label class="field">Respuesta para la persona (opcional)<textarea name="respuesta" rows="3"></textarea></label>${mic("respuesta")}
         <div class="row end"><button type="button" class="btn" data-act="closeOverlay">Cancelar</button><button class="btn ${ap ? 'primary' : 'danger'}" type="submit">${ap ? 'Aprobar' : 'Rechazar'}</button></div>
       </form>`);
   },
@@ -2385,6 +2463,15 @@ const actions = {
     if (ps.includes(p) && ps.length === 1) { toast('Cada persona tiene que tener al menos un puesto', true); return; }
     e.puestos = ps.includes(p) ? ps.filter((x) => x !== p) : [...ps, p];
     markDirty(); renderView();
+  },
+  dictar: (el) => dictar(el),
+  zoom: (el) => {
+    const d = Number(el.dataset.d), k = ZOOMS.indexOf(ganttZoom());
+    state.zoom = d === 0 ? 1 : ZOOMS[Math.max(0, Math.min(ZOOMS.length - 1, k + d))];
+    try { localStorage.setItem('lopita-zoom', String(state.zoom)); } catch { /* sin almacenamiento */ }
+    const w = $('.gantt-wrap'), centro = w ? (w.scrollLeft + w.clientWidth / 2) / w.scrollWidth : 0;
+    renderView();
+    const w2 = $('.gantt-wrap'); if (w2) w2.scrollLeft = centro * w2.scrollWidth - w2.clientWidth / 2;
   },
   toggleFuncion: (el) => {
     const e = state.draft.empleados[Number(el.dataset.i)];
@@ -2511,6 +2598,15 @@ const actions = {
 
 // cambios de <select> que no son un simple data-bind
 const changeActions = {
+  // Función propia marcada o desmarcada en la ficha de la persona (igual que «Puede abrir»).
+  funcCheck: (el) => {
+    const c = state.draft;
+    if (el.dataset.f === PINCHOS.id && !(c.funciones || []).some((f) => f.id === PINCHOS.id)) c.funciones = [...(c.funciones || []), { ...PINCHOS, reglas: [] }];
+    const e = c.empleados[Number(el.dataset.i)];
+    const fs = (e.funciones || []).filter((x) => x !== el.dataset.f);
+    e.funciones = el.checked ? [...fs, el.dataset.f] : fs;
+    markDirty();
+  },
   toggleConfirm: (el) => { const b = $('#confirm-publish'); if (b) b.disabled = !el.checked; },
   specialMode: (el) => {
     const o = state.draft.excepciones_fecha[Number(el.dataset.i)];
@@ -2623,6 +2719,7 @@ document.addEventListener('change', (e) => {
 });
 document.addEventListener('submit', async (e) => {
   e.preventDefault();
+  pararDictado();
   const f = e.target;
   const data = Object.fromEntries(new FormData(f));
   if (f.id === 'login-form') {
