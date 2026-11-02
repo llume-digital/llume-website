@@ -146,7 +146,7 @@ Los prototipos de webs para empresas (que enseñamos antes de cerrar trato) no t
 
 Pendiente en `elpuertoluanco`: fotos propias (las actuales son provisionales), vinos y alérgenos por plato en `carta/carta.json`, horario confirmado, historia real del bar, más reseñas de Google hasta 20 en `resenas.json`, QR de la carta y de reseñas, versión en inglés, y quitar el `noindex` al cerrar el acuerdo (destino previsto: `elpuertoluanco.es`).
 
-Pendiente en `lopita`: fotos (las baja `sh herramientas/descargar_recursos_web.sh` en `lopita-horarios`; desde nuestros servidores lopita.es responde 403, hay que lanzarlo desde un ordenador y volver a exportar). Mientras faltan, la web quita las fotos sola. Destino previsto: `lopita.es`.
+Las fotos de `lopita/recursos/img/` vienen de lopita.es (se bajan con `herramientas/descargar_recursos_web.sh` en `lopita-horarios`; desde servidores lopita.es responde 403). Al regenerar con el exportador se conservan si están en `web/recursos/img`. Destino previsto: `lopita.es`.
 
 ## 11. Auditoría de octubre de 2026
 
