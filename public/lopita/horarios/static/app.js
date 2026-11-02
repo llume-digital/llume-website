@@ -95,6 +95,7 @@ async function showNotifications() {
   const item = (n) => `<article class="notif ${n.tipo}">
       <h3>${esc(n.titulo)}</h3><p>${esc(n.texto)}</p>
       ${n.detalle.problemas && n.detalle.problemas.length ? `<ul class="small">${n.detalle.problemas.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}
+      ${n.detalle.turnos && n.detalle.turnos.length ? `<ul class="small notif-turnos">${n.detalle.turnos.map((t) => `<li><b>${esc(fmtLong(t.fecha))}</b> · ${esc(t.turno)} ${esc(t.inicio)}–${esc(t.fin)} <span class="muted">(horario ${esc(t.periodo)}${t.estado === 'publicado' ? ', publicado' : ', borrador'})</span></li>`).join('')}</ul>` : ''}
       <p class="small muted">${esc(fmtStamp(n.created_at))}</p>
       ${n.schedule_id ? `<div class="row end"><button class="btn small primary" data-act="openNotification" data-id="${n.id}" data-sid="${n.schedule_id}">Abrir horario</button></div>` : ''}
     </article>`;
@@ -149,6 +150,7 @@ async function saveConfig() {
     toast('Cambios guardados');
     if (r.arreglos && r.arreglos.length) { state.current = null; await refreshList(); }
     renderView();
+    showNotifications();
     return true;
   } catch (e) {
     state.saveError = e.message;
@@ -337,7 +339,7 @@ function dictar(btn) {
     ta.value = [base, txt ? txt.charAt(0).toUpperCase() + txt.slice(1) : ''].filter(Boolean).join(' ');
   };
   rec.onerror = (ev) => {
-    estado.textContent = ev.error === 'not-allowed' || ev.error === 'service-not-allowed' ? 'Sin permiso para usar el micrófono.' : ev.error === 'no-speech' ? 'No se oye nada.' : 'No se pudo dictar.';
+    estado.textContent = ev.error === 'not-allowed' || ev.error === 'service-not-allowed' ? 'El navegador no deja usar el micrófono: pulsa el candado junto a la dirección, permite el micrófono y vuelve a intentarlo.' : ev.error === 'no-speech' ? 'No se oye nada.' : 'No se pudo dictar.';
   };
   rec.onend = () => { btn.classList.remove('on'); btn.setAttribute('aria-pressed', 'false'); btn.innerHTML = `${ICON.mic} Dictar`; if (estado.textContent === 'Escuchando… habla y pulsa «Parar» al acabar.') estado.textContent = ''; dictando = null; };
   dictando = { rec, btn };
@@ -1244,9 +1246,26 @@ function viewEquipo() {
     <div class="stack" style="gap:8px;margin-top:14px">
       ${toggle(`empleados.${i}.activo`, e.activo, 'En plantilla')}
     </div>
+    ${bajaField(e)}
     ${funcionesField(i, e)}
     <div style="margin-top:14px"><div class="small muted" style="font-weight:600;margin-bottom:6px">Días que libra</div>${dayChips(`empleados.${i}.libranzas_fijas`, e.libranzas_fijas, 'El motor elige sus días libres')}</div>
   </div>`).join('')}</div>` : '<div class="card empty">No hay nadie en el equipo todavía.</div>'}`;
+}
+
+// Bajas: una ausencia con motivo «baja». Sin fecha de alta se guarda para un año (hasta que se dé el alta).
+const BAJA_SIN_FIN = 364;
+const bajaDe = (e) => state.draft.ausencias.find((a) => a.empleado_id === e.id && a.motivo === 'baja' && a.hasta >= todayIso());
+const bajaSinFin = (a) => daysBetween(a.desde, a.hasta) >= BAJA_SIN_FIN;
+function bajaTexto(a) {
+  const hoy = todayIso();
+  return `${a.desde <= hoy ? 'De baja desde' : 'Baja a partir del'} ${fmtLong(a.desde)}${bajaSinFin(a) ? ', sin fecha de alta' : `, hasta el ${fmtLong(a.hasta)}`}`;
+}
+function bajaField(e) {
+  if (!e.activo) return '';
+  const b = bajaDe(e);
+  return `<div class="baja-box${b ? ' on' : ''}">${b
+    ? `<span class="baja-tag">Baja</span><span class="small">${esc(bajaTexto(b))}</span><span class="spacer"></span><button class="btn small" data-act="bajaAlta" data-emp="${esc(e.id)}">Dar el alta</button>`
+    : `<span class="small muted">Si se va de baja, márcalo: verás qué turnos suyos no se van a hacer y se prepara un arreglo.</span><span class="spacer"></span><button class="btn small" data-act="bajaDialog" data-emp="${esc(e.id)}">Marcar baja</button>`}</div>`;
 }
 
 // Cocina, sala o ambos; con los dos, el primero es el principal (adonde va si la demanda no pide otro).
@@ -1860,6 +1879,7 @@ const GUIA_ADMIN = [
     '<b>Funciones</b>: puede abrir, puede cerrar, encargado/a y las que hayas creado (p. ej. preparar pinchos).',
     'Marca sus <b>días que libra</b> fijos. Si deja la empresa, desactiva «En plantilla» en vez de borrarla.',
     'Pulsa <b>Guardar cambios</b> abajo.',
+    '<b>Marcar baja</b> (en la ficha de cada persona): desde cuándo y, si se sabe, hasta cuándo. Si ya tenía turnos asignados, te sale un aviso con los que no va a hacer, una alerta en el horario y un arreglo preparado como borrador. Con <b>Dar el alta</b> indicas el día que vuelve.',
   ] },
   { id: 'funciones', titulo: 'Funciones', para: 'Lo que solo hacen algunas personas (abrir, cerrar, encargado o lo que añadas) y las reglas que deben cumplirse.', pasos: [
     '<b>Añadir función</b>, por ejemplo «Preparar pinchos», y marca quién la tiene.',
@@ -2561,6 +2581,27 @@ const actions = {
   delTask: (el) => { state.draft.tareas.splice(Number(el.dataset.i), 1); markDirty(); renderView(); },
   goTo: (el) => { closeOverlay(); location.hash = `#/${el.dataset.to}`; },
   delSpecial: (el) => { state.draft.excepciones_fecha.splice(Number(el.dataset.i), 1); markDirty(); renderView(); },
+  bajaDialog: (el) => {
+    const e = empById(state.draft, el.dataset.emp);
+    overlay(`<h2>Baja de ${esc(e.nombre)}</h2>
+      <form id="baja-form" class="stack" style="gap:12px" data-emp="${esc(e.id)}">
+        <div class="fields two"><label class="field">Desde<input type="date" name="desde" value="${todayIso()}" required></label>
+          <label class="field">Hasta (si se sabe)<input type="date" name="hasta"><span class="hint">Vacío: hasta que le des el alta.</span></label></div>
+        <p class="small muted" style="margin:0">Al guardar, el motor deja de darle turnos esos días. Si ya tenía turnos asignados, te aviso de cuáles no se van a hacer y preparo un arreglo como borrador para que lo revises y lo publiques.${state.dirty ? ' También se guardarán los demás cambios que tienes sin guardar.' : ''}</p>
+        <div class="row end"><button type="button" class="btn" data-act="closeOverlay">Cancelar</button><button class="btn primary" type="submit">Guardar la baja</button></div>
+      </form>`);
+  },
+  bajaAlta: (el) => {
+    const e = empById(state.draft, el.dataset.emp);
+    const b = bajaDe(e);
+    const min = b.desde > todayIso() ? b.desde : todayIso();
+    overlay(`<h2>Alta de ${esc(e.nombre)}</h2>
+      <form id="alta-form" class="stack" style="gap:12px" data-emp="${esc(e.id)}">
+        <label class="field">Vuelve a trabajar el<input type="date" name="vuelve" value="${addDays(min, 1) > b.hasta && !bajaSinFin(b) ? b.hasta : addDays(min, 1)}" min="${b.desde}" required></label>
+        <p class="small muted" style="margin:0">Desde ese día el motor vuelve a contar con ${esc(e.nombre)}. Los horarios ya hechos no cambian solos: regenéralos si quieres que trabaje en ellos.</p>
+        <div class="row end"><button type="button" class="btn" data-act="closeOverlay">Cancelar</button><button class="btn primary" type="submit">Dar el alta</button></div>
+      </form>`);
+  },
   addAbsence: () => {
     const e = state.draft.empleados.find((x) => x.activo);
     if (!e) { toast('Primero añade a alguien al equipo', true); return; }
@@ -2727,6 +2768,19 @@ document.addEventListener('submit', async (e) => {
       state.me = await api('POST', '/api/login', data);
       await boot();
     } catch (err) { $('#login-err').textContent = err.message; }
+  } else if (f.id === 'baja-form' || f.id === 'alta-form') {
+    const c = state.draft, emp = f.dataset.emp;
+    if (f.id === 'baja-form') {
+      const hasta = data.hasta || addDays(data.desde, BAJA_SIN_FIN);
+      if (hasta < data.desde) { toast('La baja no puede acabar antes de empezar', true); return; }
+      c.ausencias.push({ empleado_id: emp, desde: data.desde, hasta, motivo: 'baja' });
+    } else {
+      const b = c.ausencias.find((a) => a.empleado_id === emp && a.motivo === 'baja' && a.hasta >= todayIso());
+      const fin = addDays(data.vuelve, -1);
+      if (b) { if (fin < b.desde) c.ausencias.splice(c.ausencias.indexOf(b), 1); else b.hasta = fin; }
+    }
+    markDirty(); closeOverlay();
+    await saveConfig();
   } else if (f.id === 'user-form') {
     try { state.ajustes.users = await api('POST', '/api/usuarios', { usuario: data.usuario, password: data.password, nombre: data.nombre || null, rol: data.rol, empleado_id: data.rol === 'empleado' ? data.empleado_id : null }); toast('Cuenta guardada'); renderView(); } catch (err) { toast(err.message, true); }
   } else if (f.id === 'fb-form') {
