@@ -46,6 +46,7 @@ const state = {
   schedules: [], current: null, gen: null, ajustes: null, showPast: false, loading: false,
   mi: {}, miH: {}, inf: {}, sol: {}, web: {}, alg: {}, alf: { sev: null, cat: null }, fix: null,
   vista: 'semana', diaFecha: null, dia: null, diaEval: null,
+  cal: { modo: 'semana', ref: null, persona: '', data: {} },
 };
 
 async function api(method, url, body) {
@@ -198,7 +199,7 @@ function render() {
       <header class="topbar"><div class="topbar-inner">
         <a class="wordmark" href="#/" aria-label="Lopita & Co · Horarios"><b>LOPITA &amp; CO</b><span>Horarios</span></a>
         <nav class="tabs" id="tabs"></nav>
-        <div class="userbox"><span>${esc(state.me.nombre)}</span><button data-act="pwDialog">Contraseña</button><button data-act="logout">Salir</button></div>
+        <div class="userbox"><span>${esc(state.me.nombre)}</span><button data-act="feedback" class="fb-btn" title="Deja una sugerencia, un fallo o una duda">Comentarios</button><button data-act="pwDialog">Contraseña</button><button data-act="logout">Salir</button></div>
       </div></header>
       <main id="view"></main>
       <div id="savebar"></div>`;
@@ -207,8 +208,8 @@ function render() {
 }
 
 const NAV_ADMIN = [
-  ['horarios', 'Horarios'], ['alertas', 'Alertas'], ['solicitudes', 'Solicitudes'], ['informes', 'Informes'], ['equipo', 'Equipo'], ['turnos', 'Turnos'], ['demanda', 'Demanda'],
-  ['ausencias', 'Ausencias'], ['preferencias', 'Preferencias'], ['reglas', 'Reglas'], ['web', 'Web'], ['ajustes', 'Ajustes'],
+  ['horarios', 'Horarios'], ['calendario', 'Calendario'], ['alertas', 'Alertas'], ['solicitudes', 'Solicitudes'], ['informes', 'Informes'], ['equipo', 'Equipo'], ['funciones', 'Funciones'], ['turnos', 'Turnos'], ['demanda', 'Demanda'],
+  ['ausencias', 'Ausencias'], ['preferencias', 'Preferencias'], ['reglas', 'Reglas'], ['web', 'Web'], ['comentarios', 'Comentarios'], ['ajustes', 'Ajustes'],
 ];
 const NAV_WORKER = [['inicio', 'Inicio'], ['horas', 'Mis horas'], ['vacaciones', 'Vacaciones'], ['preferencias', 'Preferencias']];
 const isWorker = () => state.me && state.me.rol === 'empleado';
@@ -222,7 +223,7 @@ function tabsHtml(name) {
   const w = isWorker();
   const count = (n, label) => (n ? `<span class="tab-count" aria-label="${n} ${label}">${n}</span>` : '');
   const crit = !w && state.me.criticas ? `<span class="tab-count crit" aria-label="${state.me.criticas} alertas críticas">${state.me.criticas}</span>` : '';
-  const badge = { solicitudes: w ? '' : count(state.me.pendientes, 'pendientes'), alertas: w ? '' : crit + count(state.me.alertas - (state.me.criticas || 0), 'alertas importantes'), inicio: w ? count(state.me.avisos, 'avisos nuevos') : '', web: w ? '' : count(state.me.mensajes_web, 'mensajes nuevos') };
+  const badge = { solicitudes: w ? '' : count(state.me.pendientes, 'pendientes'), alertas: w ? '' : crit + count(state.me.alertas - (state.me.criticas || 0), 'alertas importantes'), inicio: w ? count(state.me.avisos, 'avisos nuevos') : '', web: w ? '' : count(state.me.mensajes_web, 'mensajes nuevos'), comentarios: w ? '' : count(state.me.comentarios, 'comentarios nuevos') };
   return (w ? NAV_WORKER : NAV_ADMIN).map(([k, label]) => `<a href="#/${k}" class="${name === k ? 'active' : ''}">${label}${badge[k] || ''}</a>`).join('');
 }
 
@@ -233,7 +234,7 @@ function renderView() {
   const w = isWorker();
   const views = w
     ? { inicio: viewMiInicio, horas: viewMisHoras, vacaciones: viewMisVacaciones, preferencias: viewMisPrefs }
-    : { horarios: r.arg ? () => viewDetalle(Number(r.arg)) : viewHorarios, alertas: viewAlertas, solicitudes: viewSolicitudes, informes: viewInformes, equipo: viewEquipo, turnos: viewTurnos, demanda: viewDemanda, ausencias: viewAusencias, preferencias: viewPreferencias, reglas: viewReglas, web: viewWeb, ajustes: viewAjustes };
+    : { horarios: r.arg ? () => viewDetalle(Number(r.arg)) : viewHorarios, calendario: viewCalendario, alertas: viewAlertas, solicitudes: viewSolicitudes, informes: viewInformes, equipo: viewEquipo, funciones: viewFunciones, turnos: viewTurnos, demanda: viewDemanda, ausencias: viewAusencias, preferencias: viewPreferencias, reglas: viewReglas, web: viewWeb, comentarios: viewComentarios, ajustes: viewAjustes };
   const name = views[r.name] ? r.name : (w ? 'inicio' : 'horarios');
   $('#tabs').innerHTML = tabsHtml(name);
   view.innerHTML = views[name]();
@@ -260,6 +261,21 @@ function head(title, lead, actions = '') {
 const empName = (id) => (state.draft.empleados.find((e) => e.id === id) || {}).nombre || id;
 const shiftById = (cfg, id) => cfg.turnos.find((s) => s.id === id);
 const PUESTOS = { sala: 'Sala', cocina: 'Cocina' };
+// Tipo de empleado: quien trabaja en sala es camarero/a y quien trabaja en cocina, cocinero/a.
+const TIPOS = { sala: 'Camarero/a', cocina: 'Cocinero/a' };
+const funcionesCfg = (cfg) => cfg.funciones || [];
+const funcById = (cfg, id) => funcionesCfg(cfg).find((f) => f.id === id);
+// Funciones de una persona: las fijas (abrir, cerrar, encargado) y las que define el encargado.
+function funcionesDe(cfg, e) {
+  const out = [];
+  if (e.puede_abrir) out.push({ nombre: 'Abre', color: '#B0904C' });
+  if (e.puede_cerrar) out.push({ nombre: 'Cierra', color: '#764A09' });
+  if (e.es_encargado) out.push({ nombre: 'Encargado/a', color: '#17130F' });
+  for (const id of e.funciones || []) { const f = funcById(cfg, id); if (f) out.push(f); }
+  return out;
+}
+const funcTags = (cfg, e) => funcionesDe(cfg, e).map((f) => `<span class="func-tag" style="--fc:${esc(f.color || '#764A09')}">${esc(f.nombre)}</span>`).join('');
+const tipoDe = (e) => (puestosDe(e).length > 1 ? 'Camarero/a y cocinero/a' : TIPOS[puestosDe(e)[0]]);
 const empById = (cfg, id) => cfg.empleados.find((e) => e.id === id);
 const puestosDe = (e) => (e && e.puestos && e.puestos.length ? e.puestos : ['sala', 'cocina']);
 const puestoDe = (cfg, a) => a.puesto || puestosDe(empById(cfg, a.empleado_id))[0];
@@ -392,14 +408,14 @@ function viewDetalle(id) {
     <div class="cov-legend"><span><i class="ok"></i>Cubierto</span><span><i class="short"></i>Falta gente</span><span><i class="extra"></i>Sobra gente</span><span>${ICON.lock} Cambio manual</span></div>
   </div>
   ${viewSwitch()}
-  ${state.vista === 'dia' ? dayView(cur) : `<p class="small muted no-print" style="margin:8px 0 0">Toca una casilla para cambiar el turno, o el nombre de un día para verlo y editarlo hora a hora. Los cambios manuales quedan bloqueados y se respetan al regenerar.</p>
+  ${state.vista === 'mes' ? `<p class="small muted no-print" style="margin:8px 0 0">Toca un día para verlo y editarlo hora a hora.</p>${monthOfSchedule(cur)}${summaryTable(h)}` : state.vista === 'dia' ? dayView(cur) : `<p class="small muted no-print" style="margin:8px 0 0">Toca una casilla para cambiar el turno, o el nombre de un día para verlo y editarlo hora a hora. Los cambios manuales quedan bloqueados y se respetan al regenerar.</p>
   ${weeksGrid(cur)}
   ${summaryTable(h)}`}`;
 }
 
 function viewSwitch() {
   const chip = (v, l) => `<button type="button" class="chip ${state.vista === v ? 'on' : ''}" data-act="setVista" data-v="${v}" aria-pressed="${state.vista === v}">${l}</button>`;
-  return `<div class="row section no-print view-switch" role="group" aria-label="Vista">${chip('semana', 'Semana')}${chip('dia', 'Día')}</div>`;
+  return `<div class="row section no-print view-switch" role="group" aria-label="Vista">${chip('dia', 'Día')}${chip('semana', 'Semana')}${chip('mes', 'Mes')}<span class="spacer"></span><a class="small" href="#/calendario">Ver todos los horarios en el calendario</a></div>`;
 }
 
 // Avisos de cabecera: si no vale (alertas críticas), si es un arreglo pendiente o si tiene uno, y si se publicó con críticas.
@@ -603,12 +619,152 @@ function weeksGrid(cur) {
         const label = `${e.nombre}, ${fmtLong(d)}: ${s ? `${s.nombre} ${hs.inicio}–${hs.fin}${conPuestos ? `, ${PUESTOS[puestoDe(cfg, a)]}` : ''}` : 'libre'}${lock ? ' (cambio manual)' : ''}`;
         return `<td><button class="cell ${errCells.has(key) ? 'has-error' : ''} ${fixedOff && !s ? 'fixed-off' : ''}" data-act="cell" data-emp="${esc(e.id)}" data-date="${d}" aria-label="${esc(label)}">${inner}${lock ? `<span class="lock">${ICON.lock}</span>` : ''}</button></td>`;
       }).join('');
-      return `<tr><td class="emp">${esc(e.nombre)}<small>${fmtH(e.horas_semanales)} h/sem${e.es_encargado ? ' · encargado' : ''}${conPuestos ? ` · ${puestosDe(e).map((p) => PUESTOS[p]).join(' y ')}` : ''}</small></td>${cells}<td class="tot">${fmtH(mins / 60)} h</td></tr>`;
+      return `<tr><td class="emp">${esc(e.nombre)}<small>${fmtH(e.horas_semanales)} h/sem · ${esc(tipoDe(e))}</small><span class="func-tags">${funcTags(cfg, e)}</span></td>${cells}<td class="tot">${fmtH(mins / 60)} h</td></tr>`;
     }).join('')}
     </tbody></table></div></div>`;
     start = addDays(start, 7);
   }
   return html;
+}
+
+// ------------------------------------------------------------------ VISTA MENSUAL
+// Rejilla de calendario (lunes a domingo) de cada mes entre desde y hasta. celda(fecha) devuelve el contenido de
+// los días con horario o null para los que no tiene.
+function monthGrid(desde, hasta, celda, { titulo = true } = {}) {
+  let html = '';
+  let m = `${desde.slice(0, 7)}-01`;
+  while (m <= hasta) {
+    const y = Number(m.slice(0, 4)), mo = Number(m.slice(5, 7));
+    const ultimo = iso(new Date(Date.UTC(y, mo, 0)));
+    let d = addDays(m, -weekday(m));
+    const fin = addDays(ultimo, 6 - weekday(ultimo));
+    const cells = [];
+    while (d <= fin) {
+      const enMes = d.slice(0, 7) === m.slice(0, 7);
+      const c = enMes ? celda(d) : null;
+      cells.push(`<div class="mcell${enMes ? '' : ' other'}${c === null ? ' empty' : ''}${d === todayIso() ? ' today' : ''}">${enMes ? `<div class="mnum">${dayNum(d)}</div>${c || ''}` : ''}</div>`);
+      d = addDays(d, 1);
+    }
+    html += `<div class="month section">${titulo ? `<h2 style="text-transform:capitalize">${monthName(m)} ${y}</h2>` : ''}
+      <div class="mgrid">${DAY_SHORT.map((x) => `<div class="mhead">${x}</div>`).join('')}${cells.join('')}</div></div>`;
+    m = addDays(ultimo, 1);
+  }
+  return html;
+}
+
+// Contenido de un día en la vista de mes: cobertura, quién trabaja (o el turno de una persona) y un aviso.
+function monthDayHtml(cfg, fecha, asigs, cob, { act, attrs = '', persona = '', alertas = 0, borrador = false }) {
+  const horasDe2 = (a) => horasDe(cfg, a);
+  const lista = asigs.filter((a) => shiftById(cfg, a.turno_id)).sort((a, b) => toMin(horasDe2(a).inicio) - toMin(horasDe2(b).inicio));
+  let body;
+  if (cob && cob.cerrado) body = '<div class="small muted">Cerrado</div>';
+  else if (persona) {
+    const a = lista.find((x) => x.empleado_id === persona);
+    const e = empById(cfg, persona);
+    const aus = cfg.ausencias.find((x) => x.empleado_id === persona && x.desde <= fecha && fecha <= x.hasta);
+    body = a ? `<span class="mchip big" style="background:${esc(shiftById(cfg, a.turno_id).color || '#eee')}">${esc(shiftById(cfg, a.turno_id).nombre)}<small>${horasDe2(a).inicio}–${horasDe2(a).fin}</small></span>`
+      : `<span class="small muted">${aus ? esc(MOTIVOS[aus.motivo] || 'Ausencia') : e && (e.libranzas_fijas || []).includes(DAYS[weekday(fecha)]) ? 'Libra' : 'Libre'}</span>`;
+  } else {
+    const max = 6;
+    body = lista.slice(0, max).map((a) => `<span class="mchip" style="background:${esc(shiftById(cfg, a.turno_id).color || '#eee')}" title="${esc(`${nameIn(cfg, a.empleado_id)} ${horasDe2(a).inicio}–${horasDe2(a).fin}`)}">${esc(nameIn(cfg, a.empleado_id))} <small>${horasDe2(a).inicio.slice(0, 5).replace(':00', '')}–${horasDe2(a).fin.replace(':00', '')}</small></span>`).join('')
+      + (lista.length > max ? `<span class="small muted">+${lista.length - max} más</span>` : '')
+      || '<span class="small muted">Nadie</span>';
+  }
+  const label = `${fmtLong(fecha)}: ${lista.length} ${lista.length === 1 ? 'persona' : 'personas'}${alertas ? `, ${alertas} alertas` : ''}. Abrir el día`;
+  return `<button type="button" class="mday" data-act="${act}" data-date="${fecha}" ${attrs} aria-label="${esc(label)}">
+    ${alertas || borrador ? `<span class="mflags">${borrador ? '<span class="badge borrador">Borrador</span>' : ''}${alertas ? `<span class="badge warn" title="Alertas de este día">${alertas}</span>` : ''}</span>` : ''}
+    <span class="mlist">${body}</span>${cob ? coverageBar(cob) : ''}</button>`;
+}
+
+function monthOfSchedule(cur) {
+  const cfg = state.config;
+  const h = cur.horario;
+  const porDia = new Map();
+  for (const a of h.asignaciones) { if (!porDia.has(a.fecha)) porDia.set(a.fecha, []); porDia.get(a.fecha).push(a); }
+  const alertasDe = (f) => cur.alertas_detalle.activas.filter((a) => a.fecha === f).length;
+  return monthGrid(h.desde, h.hasta, (f) => (f < h.desde || f > h.hasta ? null
+    : monthDayHtml(cfg, f, porDia.get(f) || [], cur.cobertura[f], { act: 'openDay', alertas: alertasDe(f) })));
+}
+
+// ------------------------------------------------------------------ CALENDARIO (todos los horarios juntos)
+// Semana a semana o mes a mes, con lo que manda cada día (el horario publicado o, si no hay, el borrador más
+// reciente). Tocar un día o un turno abre ese día en su horario para editarlo hora a hora.
+function calRango() {
+  const c = state.cal;
+  if (!c.ref) c.ref = todayIso();
+  if (c.modo === 'mes') {
+    const y = Number(c.ref.slice(0, 4)), m = Number(c.ref.slice(5, 7));
+    return [`${c.ref.slice(0, 7)}-01`, iso(new Date(Date.UTC(y, m, 0)))];
+  }
+  const lunes = addDays(c.ref, -weekday(c.ref));
+  return [lunes, addDays(lunes, 6)];
+}
+
+function viewCalendario() {
+  const c = state.cal;
+  const cfg = state.config;
+  const [desde, hasta] = calRango();
+  const chip = (v, l) => `<button type="button" class="chip ${c.modo === v ? 'on' : ''}" data-act="calModo" data-v="${v}" aria-pressed="${c.modo === v}">${l}</button>`;
+  const titulo = c.modo === 'mes' ? `<span style="text-transform:capitalize">${monthName(desde)}</span> ${desde.slice(0, 4)}` : `Semana del ${fmtRange(desde, hasta)}`;
+  const barra = `<div class="card cal-bar no-print"><div class="row" style="gap:10px;align-items:center">
+    <div class="chips" role="group" aria-label="Vista">${chip('dia', 'Día')}${chip('semana', 'Semana')}${chip('mes', 'Mes')}</div>
+    <div class="row" style="gap:6px"><button class="btn small" data-act="calMover" data-dir="-1" aria-label="Anterior">‹</button>
+      <button class="btn small" data-act="calHoy">Hoy</button>
+      <button class="btn small" data-act="calMover" data-dir="1" aria-label="Siguiente">›</button></div>
+    <h2 style="margin:0">${titulo}</h2><span class="spacer"></span>
+    <label class="field inline">Persona<select data-act-change="calPersona"><option value="">Todo el equipo</option>${cfg.empleados.filter((e) => e.activo).map((e) => `<option value="${esc(e.id)}" ${c.persona === e.id ? 'selected' : ''}>${esc(e.nombre)}</option>`).join('')}</select></label>
+  </div></div>`;
+  const head0 = head('Calendario', 'Todos los horarios juntos, día a día, semana a semana o mes a mes. Toca un día o un turno para abrirlo y cambiarlo.');
+  const key = `${desde}|${hasta}`;
+  const err = ensure(c.data, key, `/api/calendario?desde=${desde}&hasta=${hasta}`);
+  if (err) return head0 + barra + err;
+  const data = c.data[key];
+  const porDia = new Map();
+  for (const a of data.asignaciones) { if (!porDia.has(a.fecha)) porDia.set(a.fecha, []); porDia.get(a.fecha).push(a); }
+  const sinHorario = Object.keys(data.dias).length === 0;
+  const aviso = sinHorario ? '<div class="notice info section"><span>No hay ningún horario en estas fechas.</span><span class="spacer"></span><a class="btn small primary" href="#/horarios">Crear un horario</a></div>' : '';
+  const leyenda = `<div class="shift-legend section">${cfg.turnos.map((s) => `<span><i style="background:${esc(s.color || '#eee')}"></i>${esc(s.nombre)} ${s.inicio}–${s.fin}</span>`).join('')}</div>`;
+  if (c.modo === 'mes') {
+    return head0 + barra + aviso + leyenda + monthGrid(desde, hasta, (f) => {
+      const info = data.dias[f];
+      if (!info) return '<div class="small muted mnone">Sin horario</div>';
+      return monthDayHtml(cfg, f, porDia.get(f) || [], info, { act: 'calDia', persona: c.persona, borrador: info.estado !== 'publicado' });
+    }, { titulo: false });
+  }
+  return head0 + barra + aviso + leyenda + calSemana(desde, data, porDia);
+}
+
+function calSemana(lunes, data, porDia) {
+  const cfg = state.config;
+  const c = state.cal;
+  const dias = Array.from({ length: 7 }, (_, i) => addDays(lunes, i));
+  const emps = cfg.empleados.filter((e) => (c.persona ? e.id === c.persona : e.activo || data.asignaciones.some((a) => a.empleado_id === e.id)));
+  const filas = emps.map((e) => {
+    let mins = 0;
+    const cells = dias.map((d) => {
+      const info = data.dias[d];
+      if (!info) return '<td class="out"></td>';
+      const a = (porDia.get(d) || []).find((x) => x.empleado_id === e.id);
+      const s = a && shiftById(cfg, a.turno_id);
+      const aus = cfg.ausencias.find((x) => x.empleado_id === e.id && x.desde <= d && d <= x.hasta);
+      const libra = (e.libranzas_fijas || []).includes(DAYS[weekday(d)]);
+      let inner;
+      if (s) {
+        const hs = horasDe(cfg, a);
+        mins += toMin(hs.fin) - toMin(hs.inicio);
+        inner = `<span class="pill${a.inicio ? ' custom' : ''}" style="background:${esc(s.color || '#eee')}">${esc(s.id)}${usaPuestos(cfg) ? puestoTag(puestoDe(cfg, a)) : ''}<small>${hs.inicio}–${hs.fin}</small></span>`;
+      } else inner = `<span class="${aus ? 'abs' : 'off'}">${aus ? esc(MOTIVOS[aus.motivo] || 'Ausencia') : libra ? 'libra' : 'libre'}</span>`;
+      const lock = info.bloqueos.includes(e.id);
+      return `<td><button class="cell" data-act="calDia" data-date="${d}" aria-label="${esc(`${e.nombre}, ${fmtLong(d)}: ${s ? `${s.nombre}` : 'libre'}. Abrir el día`)}">${inner}${lock ? `<span class="lock">${ICON.lock}</span>` : ''}</button></td>`;
+    }).join('');
+    return `<tr><td class="emp">${esc(e.nombre)}<small>${esc(tipoDe(e))}</small><span class="func-tags">${funcTags(cfg, e)}</span></td>${cells}<td class="tot">${fmtH(mins / 60)} h</td></tr>`;
+  }).join('');
+  return `<div class="sched-wrap section"><table class="sched"><thead><tr><th class="emp">Equipo</th>
+    ${dias.map((d) => {
+      const info = data.dias[d];
+      return info ? `<th><button class="dname dlink" data-act="calDia" data-date="${d}" title="Abrir el día">${DAY_SHORT[weekday(d)]} ${dayNum(d)}</button><div class="dtype">${esc(info.tipo || '')}${info.estado !== 'publicado' ? ' · borrador' : ''}</div>${coverageBar(info)}</th>`
+        : `<th class="out"><div class="dname muted">${DAY_SHORT[weekday(d)]} ${dayNum(d)}</div><div class="dtype">sin horario</div></th>`;
+    }).join('')}<th class="tot">Horas</th></tr></thead><tbody>${filas}</tbody></table></div>`;
 }
 
 // ------------------------------------------------------------------ VISTA DIARIA (diagrama de Gantt editable)
@@ -677,6 +833,12 @@ function diaCobertura(cur, d) {
   for (const [p, arr] of Object.entries(day.puestos || {})) {
     filas.push({ clave: p, nombre: PUESTOS[p], req: new Map(arr.map(([t, r]) => [t, r])), cuenta: (paso) => d.tramos.filter((t) => t.puesto === p && cubre(t, paso)).length });
   }
+  for (const [fid, arr] of Object.entries(day.funciones || {})) {
+    const f = funcById(state.config, fid);
+    if (!f) continue;
+    const con = new Set(state.config.empleados.filter((e) => (e.funciones || []).includes(fid)).map((e) => e.id));
+    filas.push({ clave: `f:${fid}`, nombre: f.nombre, req: new Map(arr.map(([t, r]) => [t, r])), cuenta: (paso) => d.tramos.filter((t) => con.has(t.empleado_id) && cubre(t, paso)).length, soloRegla: true });
+  }
   return { res, filas, cerrado: day.cerrado };
 }
 
@@ -715,7 +877,8 @@ function dayView(cur) {
     const faltan = [];
     for (let t = from; t < to; t += cob.res) {
       const req = f.req.get(t) || 0, n = f.cuenta(t);
-      const cls = n < req ? 'short' : n > req ? 'extra' : req ? 'ok' : 'none';
+      const cls = n < req ? 'short' : f.soloRegla ? (req ? 'ok' : 'none') : n > req ? 'extra' : req ? 'ok' : 'none';
+      if (f.soloRegla && !req) { cells.push(''); continue; }
       if (n < req) faltan.push(`${fmtMin(t)} (${req - n})`);
       cells.push(`<i class="${cls}" style="left:${pct(t)};width:${(cob.res / span) * 100}%" title="${fmtMin(t)}–${fmtMin(t + cob.res)}: ${n} de ${req}">${req || n ? `<b>${n}</b>` : ''}</i>`);
     }
@@ -740,7 +903,7 @@ function dayView(cur) {
         <span class="g-txt">${conPuestos ? puestoTag(t.puesto) : ''}<b>${t.inicio}–${t.fin}</b><small>${fmtH(durH)} h</small></span>
         ${ro ? '' : '<span class="g-h r" data-h="r" aria-hidden="true"></span>'}</div>`;
     }
-    return `<div class="g-row${nota ? ' unavailable' : ''}"><div class="g-name">${esc(e.nombre)}<small>${conPuestos ? puestosDe(e).map((p) => PUESTOS[p]).join(' · ') : `${fmtH(e.horas_semanales)} h/sem`}${nota ? ` · <span class="warn-text">${esc(nota)}</span>` : ''}</small></div>
+    return `<div class="g-row${nota ? ' unavailable' : ''}"><div class="g-name">${esc(e.nombre)}<small>${esc(tipoDe(e))}${nota ? ` · <span class="warn-text">${esc(nota)}</span>` : ''}</small><span class="func-tags">${funcTags(cfg, e)}</span></div>
       <div class="g-track${ro ? '' : ' editable'}" data-emp="${esc(e.id)}" ${t || ro ? '' : `title="Toca para añadir un turno a ${esc(e.nombre)}"`}>${bar}</div></div>`;
   }).join('');
   const n = cambiados.size;
@@ -847,6 +1010,24 @@ function diaAnadir(empId, minuto) {
   renderView();
 }
 
+// Ajustes rápidos de un turno: alargar o acortar por un extremo, o desplazarlo entero.
+const AJUSTES = [
+  ['Alargar', [['fin', 30, '+30 min al final'], ['fin', 60, '+1 h al final'], ['ini', -30, '+30 min al principio'], ['ini', -60, '+1 h al principio']]],
+  ['Acortar', [['fin', -30, '−30 min al final'], ['fin', -60, '−1 h al final'], ['ini', 30, '−30 min al principio'], ['ini', 60, '−1 h al principio']]],
+  ['Desplazar', [['mover', -60, '← 1 h antes'], ['mover', -30, '← 30 min'], ['mover', 30, '30 min →'], ['mover', 60, '1 h después →']]],
+];
+function quickAdjustHtml(act, attrs) {
+  return `<div class="quick-adj">${AJUSTES.map(([titulo, ops]) => `<div class="qa-row"><span>${titulo}</span>${ops.map(([k, dm, l]) => `<button type="button" data-act="${act}" ${attrs} data-k="${k}" data-dm="${dm}">${l}</button>`).join('')}</div>`).join('')}</div>`;
+}
+// Aplica un ajuste a un tramo {inicio, fin}; devuelve false si no cabe (antes de las 00:00, después de las 24:00 o sin duración).
+function ajustarTramo(t, k, dm) {
+  let a = toMin(t.inicio), b = toMin(t.fin);
+  if (k === 'ini') a += dm; else if (k === 'fin') b += dm; else { a += dm; b += dm; }
+  if (a < 0 || b > 24 * 60 || b - a < 30) return false;
+  t.inicio = fmtMin(a); t.fin = fmtMin(b);
+  return true;
+}
+
 function openBarMenu(empId, anchor) {
   closeMenu();
   const cfg = state.config;
@@ -862,6 +1043,7 @@ function openBarMenu(empId, anchor) {
     <div class="bar-times"><label class="field">Entra<input type="time" step="900" id="bar-ini" value="${t.inicio}"></label>
       <label class="field">Sale<input type="time" step="900" id="bar-fin" value="${t.fin === '24:00' ? '23:59' : t.fin}"></label>
       <button class="btn small primary" data-act="barTimes" data-emp="${esc(empId)}">Aplicar</button></div>
+    ${quickAdjustHtml('barAdj', `data-emp="${esc(empId)}"`)}
     ${puestosDe(e).length > 1 ? `<hr>${puestosDe(e).map((p) => `<button class="${t.puesto === p ? 'current' : ''}" data-act="barPuesto" data-emp="${esc(empId)}" data-p="${p}">${puestoTag(p)} En ${PUESTOS[p].toLowerCase()}</button>`).join('')}` : ''}
     <hr><div class="ph" style="border:none;margin:0;padding-bottom:2px">Poner las horas de un turno</div>
     ${turnosPosibles(e, d.fecha).map((s) => `<button data-act="barShift" data-emp="${esc(empId)}" data-shift="${esc(s.id)}"><i style="background:${esc(s.color || '#eee')}"></i>${esc(s.nombre)} <small>${s.inicio}–${s.fin}</small></button>`).join('')}
@@ -964,6 +1146,7 @@ function openCellMenu(btn) {
     ${cfg.turnos.map((s) => `<button role="menuitem" class="${cur && cur.turno_id === s.id ? 'current' : ''}" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="${esc(s.id)}"><i style="background:${esc(s.color || '#eee')}"></i>${esc(s.nombre)} <small>${s.inicio}–${s.fin}${note(s) ? ` · <span class="warn-note">${note(s)}</span>` : ''}</small></button>`).join('')}
     <hr><button role="menuitem" class="${!cur ? 'current' : ''}" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="">Libre</button>
     ${cur && puestosDe(emp).length > 1 ? `<hr>${puestosDe(emp).map((p) => `<button role="menuitem" class="${puestoDe(cfg, cur) === p ? 'current' : ''}" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="${esc(cur.turno_id)}" data-puesto="${p}">${puestoTag(p)} En ${PUESTOS[p].toLowerCase()} <small>mismo turno</small></button>`).join('')}` : ''}
+    ${cur && shiftById(cfg, cur.turno_id) ? `<hr><div class="ph" style="border:none;margin:0;padding-bottom:2px">Ajustar las horas <small class="muted">(se revisa en la vista del día)</small></div>${quickAdjustHtml('cellAdj', `data-emp="${esc(emp.id)}" data-date="${d}"`)}` : ''}
     ${lock ? `<button role="menuitem" data-act="unlockCell" data-emp="${esc(emp.id)}" data-date="${d}">Quitar bloqueo <small>que decida el motor</small></button>` : ''}`;
   document.body.appendChild(m);
   const r = btn.getBoundingClientRect();
@@ -980,7 +1163,7 @@ function closeMenu() { document.querySelectorAll('.popover').forEach((p) => p.re
 // ------------------------------------------------------------------ EQUIPO
 function viewEquipo() {
   const emps = state.draft.empleados;
-  return `${head('Equipo', 'Quién trabaja en Lopita, sus horas de contrato, qué puede hacer y qué días libra habitualmente.', `<button class="btn primary" data-act="addEmp">${ICON.plus} Añadir persona</button>`)}
+  return `${head('Equipo', 'Quién trabaja en Lopita, sus horas de contrato, si es camarero/a o cocinero/a, sus funciones y qué días libra habitualmente.', `<button class="btn primary" data-act="addEmp">${ICON.plus} Añadir persona</button>`)}
   ${emps.length ? `<div class="grid">${emps.map((e, i) => `<div class="card" style="${e.activo ? '' : 'opacity:.6'}">
     <div class="row" style="flex-wrap:nowrap"><input class="title-input" type="text" value="${esc(e.nombre)}" data-bind="empleados.${i}.nombre" aria-label="Nombre"><button class="icon-btn" data-act="delEmp" data-i="${i}" title="Eliminar">${ICON.trash}</button></div>
     <div class="fields" style="margin-top:10px">
@@ -990,11 +1173,9 @@ function viewEquipo() {
     <label class="field" style="margin-top:12px">Email<span class="hint">Si no hay usuario de Slack, se busca por email</span><input type="email" value="${esc(e.email || '')}" data-type="nullstr" data-bind="empleados.${i}.email"></label>
     ${puestosField(i, e)}
     <div class="stack" style="gap:8px;margin-top:14px">
-      ${toggle(`empleados.${i}.puede_abrir`, e.puede_abrir, 'Puede abrir')}
-      ${toggle(`empleados.${i}.puede_cerrar`, e.puede_cerrar, 'Puede cerrar')}
-      ${toggle(`empleados.${i}.es_encargado`, e.es_encargado, 'Es encargado/a')}
       ${toggle(`empleados.${i}.activo`, e.activo, 'En plantilla')}
     </div>
+    ${funcionesField(i, e)}
     <div style="margin-top:14px"><div class="small muted" style="font-weight:600;margin-bottom:6px">Días que libra</div>${dayChips(`empleados.${i}.libranzas_fijas`, e.libranzas_fijas, 'El motor elige sus días libres')}</div>
   </div>`).join('')}</div>` : '<div class="card empty">No hay nadie en el equipo todavía.</div>'}`;
 }
@@ -1002,9 +1183,65 @@ function viewEquipo() {
 // Cocina, sala o ambos; con los dos, el primero es el principal (adonde va si la demanda no pide otro).
 function puestosField(i, e) {
   const ps = puestosDe(e);
-  return `<div style="margin-top:14px"><div class="small muted" style="font-weight:600;margin-bottom:6px">Puestos</div>
-    <div class="row" style="gap:10px"><div class="chips" role="group" aria-label="Puestos">${Object.keys(PUESTOS).map((p) => `<button type="button" class="chip ${ps.includes(p) ? 'on' : ''}" data-act="togglePuesto" data-i="${i}" data-p="${p}" aria-pressed="${ps.includes(p)}">${PUESTOS[p]}</button>`).join('')}</div>
-    ${ps.length > 1 ? `<label class="field inline">Principal<select data-act-change="puestoPrincipal" data-i="${i}">${ps.map((p) => `<option value="${p}" ${ps[0] === p ? 'selected' : ''}>${PUESTOS[p]}</option>`).join('')}</select></label>` : ''}</div></div>`;
+  return `<div style="margin-top:14px"><div class="small muted" style="font-weight:600;margin-bottom:6px">Tipo de empleado</div>
+    <div class="row" style="gap:10px"><div class="chips" role="group" aria-label="Tipo de empleado">${Object.keys(TIPOS).map((p) => `<button type="button" class="chip ${ps.includes(p) ? 'on' : ''}" data-act="togglePuesto" data-i="${i}" data-p="${p}" aria-pressed="${ps.includes(p)}" title="Trabaja en ${PUESTOS[p].toLowerCase()}">${TIPOS[p]}</button>`).join('')}</div>
+    ${ps.length > 1 ? `<label class="field inline">Sobre todo<select data-act-change="puestoPrincipal" data-i="${i}">${ps.map((p) => `<option value="${p}" ${ps[0] === p ? 'selected' : ''}>${TIPOS[p]}</option>`).join('')}</select></label>` : ''}</div>
+    <div class="hint small muted" style="margin-top:4px">${ps.length > 1 ? 'Hace las dos cosas: va a sala o a cocina según lo que pida la demanda.' : ps[0] === 'cocina' ? 'Solo trabaja en cocina.' : 'Solo trabaja en sala.'}</div></div>`;
+}
+
+// Funciones de la persona: las fijas (abrir, cerrar, encargado) y las que añade el encargado en Funciones.
+function funcionesField(i, e) {
+  const propias = funcionesCfg(state.draft);
+  const tiene = new Set(e.funciones || []);
+  return `<div style="margin-top:14px"><div class="row" style="margin-bottom:6px"><span class="small muted" style="font-weight:600">Funciones</span><span class="spacer"></span><a class="small" href="#/funciones">Gestionar funciones</a></div>
+    <div class="stack" style="gap:8px">
+      ${toggle(`empleados.${i}.puede_abrir`, e.puede_abrir, 'Puede abrir')}
+      ${toggle(`empleados.${i}.puede_cerrar`, e.puede_cerrar, 'Puede cerrar')}
+      ${toggle(`empleados.${i}.es_encargado`, e.es_encargado, 'Es encargado/a')}
+    </div>
+    ${propias.length ? `<div class="chips" role="group" aria-label="Otras funciones" style="margin-top:10px">${propias.map((f) => `<button type="button" class="chip ${tiene.has(f.id) ? 'on' : ''}" data-act="toggleFuncion" data-i="${i}" data-f="${esc(f.id)}" aria-pressed="${tiene.has(f.id)}">${esc(f.nombre)}</button>`).join('')}</div>` : ''}</div>`;
+}
+
+// ------------------------------------------------------------------ FUNCIONES (categorías de empleado con reglas)
+function funcionReglasTexto(f) {
+  if (!f.reglas.length) return 'Sin reglas: solo sirve para saber quién la tiene.';
+  return f.reglas.map((r) => `${r.dias && r.dias.length ? r.dias.map((d) => DAY_SHORT[DAYS.indexOf(d)]).join(', ') : 'Todos los días'} de ${r.inicio} a ${r.fin}: al menos ${r.personas} ${r.personas > 1 ? 'personas' : 'persona'}`).join(' · ');
+}
+
+function viewFunciones() {
+  const c = state.draft;
+  const fs = funcionesCfg(c);
+  const activos = c.empleados.filter((e) => e.activo);
+  const quien = (pred) => { const l = activos.filter(pred).map((e) => esc(e.nombre)); return l.length ? l.join(', ') : '<span class="bad-text">nadie</span>'; };
+  const fijas = [
+    ['Abrir', 'puede_abrir', 'Solo estas personas hacen los turnos de apertura, y al abrir tiene que haber al menos una (si no, el horario no vale).'],
+    ['Cerrar', 'puede_cerrar', 'Solo estas personas hacen los turnos de cierre, y al cerrar tiene que quedarse al menos una (si no, el horario no vale).'],
+    ['Encargado/a', 'es_encargado', c.reglas.encargado_siempre ? 'El motor intenta que siempre haya un encargado en el local (Reglas → Cobertura).' : 'Ahora no se exige un encargado siempre; se activa en Reglas → Cobertura.'],
+  ];
+  const fila = (f, i) => `<div class="card" style="--fc:${esc(f.color || '#764A09')}">
+    <div class="row" style="flex-wrap:nowrap;gap:8px"><input type="color" value="${esc(f.color || '#764A09')}" data-bind="funciones.${i}.color" aria-label="Color" class="color-input" data-rerender>
+      <input class="title-input" type="text" value="${esc(f.nombre)}" data-bind="funciones.${i}.nombre" aria-label="Nombre de la función" data-rerender>
+      <button class="icon-btn" data-act="delFuncion" data-i="${i}" title="Eliminar la función">${ICON.trash}</button></div>
+    <div style="margin-top:12px"><div class="small muted" style="font-weight:600;margin-bottom:6px">Quién la tiene</div>
+      <div class="chips" role="group" aria-label="Personas con ${esc(f.nombre)}">${c.empleados.map((e, k) => `<button type="button" class="chip ${(e.funciones || []).includes(f.id) ? 'on' : ''}" data-act="toggleFuncion" data-i="${k}" data-f="${esc(f.id)}" aria-pressed="${(e.funciones || []).includes(f.id)}" style="${e.activo ? '' : 'opacity:.55'}">${esc(e.nombre)}</button>`).join('')}</div></div>
+    <div style="margin-top:14px"><div class="row"><span class="small muted" style="font-weight:600">Reglas</span><span class="spacer"></span><button class="btn small" data-act="addReglaFuncion" data-i="${i}">${ICON.plus} Añadir regla</button></div>
+      ${f.reglas.length ? f.reglas.map((r, j) => `<div class="regla-funcion">
+        <div class="fields">
+          <label class="field">Desde<input type="time" step="900" value="${r.inicio}" data-bind="funciones.${i}.reglas.${j}.inicio" data-rerender></label>
+          <label class="field">Hasta<input type="time" step="900" value="${r.fin === '24:00' ? '23:59' : r.fin}" data-bind="funciones.${i}.reglas.${j}.fin" data-rerender></label>
+          <label class="field">Mínimo de personas<input type="number" min="1" max="20" value="${r.personas}" data-type="int" data-bind="funciones.${i}.reglas.${j}.personas" data-rerender></label>
+          <button class="icon-btn" style="align-self:flex-end" data-act="delReglaFuncion" data-i="${i}" data-j="${j}" title="Quitar la regla">${ICON.trash}</button>
+        </div>
+        <div style="margin-top:8px">${dayChips(`funciones.${i}.reglas.${j}.dias`, r.dias, 'Todos los días que abre')}</div></div>`).join('')
+        : '<p class="small muted" style="margin:6px 0 0">Sin reglas: solo sirve para saber quién la tiene. Añade una para que el motor ponga a alguien con esta función en un tramo.</p>'}
+      <p class="small muted" style="margin:8px 0 0">${esc(funcionReglasTexto(f))}</p>
+    </div></div>`;
+  return `${head('Funciones', 'Lo que solo hacen algunas personas: abrir, cerrar, ser encargado/a o lo que añadas (preparar pinchos, hacer caja, recibir pedidos…). Cada función puede llevar reglas: «de 10:00 a 12:00 tiene que haber alguien que prepare pinchos». El motor las cumple si puede y, si no, avisa.', `<button class="btn primary" data-act="addFuncion">${ICON.plus} Añadir función</button>`)}
+  <div class="card"><h2>Funciones fijas</h2><div class="table-wrap"><table class="list"><thead><tr><th>Función</th><th>Quién la tiene</th><th>Regla</th></tr></thead><tbody>
+    ${fijas.map(([n, campo, regla]) => `<tr><td><b>${n}</b></td><td>${quien((e) => e[campo])}</td><td class="small">${regla}</td></tr>`).join('')}
+  </tbody></table></div><p class="small muted" style="margin-bottom:0">Se cambian en Equipo, en la ficha de cada persona.</p></div>
+  <div class="section"><h2>Tus funciones</h2>
+  ${fs.length ? `<div class="func-grid">${fs.map(fila).join('')}</div>` : '<div class="card empty">Aún no hay ninguna. Por ejemplo, «Preparar pinchos»: añádela, marca quién sabe hacerlo y pon de qué hora a qué hora hace falta.</div>'}</div>`;
 }
 
 // ------------------------------------------------------------------ TURNOS
@@ -1235,6 +1472,7 @@ function viewReglas() {
     <div class="fields two">
       ${numField('pesos.falta_cobertura', 'Falta de cobertura', '', w.falta_cobertura, 1, 1)}
       ${numField('pesos.falta_encargado', 'Falta de encargado', '', w.falta_encargado, 1, 1)}
+      ${numField('pesos.falta_funcion', 'Falta de alguien con una función', 'Por cada tramo sin quien prepare pinchos (o la función que sea)', w.falta_funcion ?? 800, 1, 0)}
       ${numField('pesos.horas_extra', 'Horas extra', '', w.horas_extra, 1, 0)}
       ${numField('pesos.horas_por_debajo_contrato', 'Horas por debajo del contrato', '', w.horas_por_debajo_contrato, 1, 0)}
       ${numField('pesos.exceso_cobertura', 'Personal de más', '', w.exceso_cobertura, 1, 0)}
@@ -1501,6 +1739,47 @@ function viewWeb() {
   <p class="small muted section">Los CV y mensajes son datos personales: bórralos cuando ya no hagan falta.</p>`;
 }
 
+// ------------------------------------------------------------------ COMENTARIOS (feedback sobre la app)
+const FB_TIPOS = { sugerencia: 'Sugerencia', error: 'Algo no funciona', duda: 'Duda' };
+const FB_ESTADOS = { nuevo: ['warn', 'Nuevo'], en_curso: ['borrador', 'En curso'], hecho: ['publicado', 'Hecho'], descartado: ['neutral', 'Descartado'] };
+const fbEstado = (e) => { const [c, l] = FB_ESTADOS[e] || ['neutral', e]; return `<span class="badge ${c}">${l}</span>`; };
+const pantallaActual = () => { const r = route(); const tab = [...NAV_ADMIN, ...NAV_WORKER].find(([k]) => k === r.name); return `${tab ? tab[1] : r.name}${r.arg ? ` ${r.arg}` : ''}${r.name === 'horarios' && r.arg ? ` · vista ${state.vista}` : ''}`; };
+
+function feedbackDialog(mios) {
+  const lista = (mios || []).slice(0, 5);
+  return `<form id="fb-form" style="display:grid;gap:12px">
+    <h2 style="margin:0">Comentarios sobre la app</h2>
+    <p class="small muted" style="margin:0">Cuéntanos qué cambiarías, qué falla o qué no entiendes. Se guarda en la app con la pantalla en la que estás (<b>${esc(pantallaActual())}</b>) y te responderemos aquí mismo.</p>
+    <div class="chips" role="radiogroup" aria-label="Tipo">${Object.entries(FB_TIPOS).map(([k, l], i) => `<label class="chip radio-chip"><input type="radio" name="tipo" value="${k}" ${i === 0 ? 'checked' : ''}> ${l}</label>`).join('')}</div>
+    <label class="field">Comentario<textarea name="texto" rows="5" maxlength="4000" required placeholder="Por ejemplo: en la vista de mes me gustaría ver también las horas de cada persona"></textarea></label>
+    <div class="row end"><button type="button" class="btn" data-act="closeOverlay">Cancelar</button><button class="btn primary" type="submit">Enviar comentario</button></div>
+    ${lista.length ? `<div><h3 style="margin:6px 0">Tus últimos comentarios</h3><ul class="fb-mios">${lista.map((c) => `<li><div class="row" style="gap:6px">${fbEstado(c.estado)}<span class="small muted">${fmtStamp(c.created_at)}</span></div><div class="small fb-texto">${esc(c.texto)}</div>${c.respuesta ? `<div class="small fb-resp"><b>Respuesta:</b> ${esc(c.respuesta)}</div>` : ''}</li>`).join('')}</ul></div>` : ''}
+  </form>`;
+}
+
+function viewComentarios() {
+  const s = state.fb || (state.fb = { filtro: 'abiertos' });
+  const top = head('Comentarios', 'Lo que deja el equipo con el botón «Comentarios» (arriba a la derecha): sugerencias, fallos y dudas, con la pantalla desde la que se enviaron. Cambia el estado según avances y responde: quien lo envió verá la respuesta.', '<a class="btn" href="/api/comentarios.csv">Descargar CSV</a>');
+  const err = ensure(s, 'data', '/api/comentarios');
+  if (err) return top + err;
+  const chip = (k, l) => `<button type="button" class="chip ${s.filtro === k ? 'on' : ''}" data-act="fbFiltro" data-f="${k}">${l}</button>`;
+  const abiertos = (c) => c.estado === 'nuevo' || c.estado === 'en_curso';
+  const lista = s.data.filter((c) => (s.filtro === 'todos' ? true : s.filtro === 'abiertos' ? abiertos(c) : c.estado === s.filtro));
+  const n = (f) => s.data.filter(f).length;
+  const tarjetas = lista.length ? `<div class="stack" style="gap:12px">${lista.map((c) => `<div class="card fb-card">
+      <div class="row" style="gap:8px"><b>#${c.id} · ${esc(c.nombre)}</b><span class="badge neutral">${FB_TIPOS[c.tipo] || esc(c.tipo)}</span>${fbEstado(c.estado)}<span class="spacer"></span><span class="small muted">${fmtStamp(c.created_at)}${c.pantalla ? ` · en ${esc(c.pantalla)}` : ''}</span></div>
+      <p style="margin:10px 0;white-space:pre-wrap">${esc(c.texto)}</p>
+      <div class="fields" style="grid-template-columns:180px 1fr auto;align-items:end">
+        <label class="field">Estado<select data-act-change="fbEstado" data-id="${c.id}">${Object.entries(FB_ESTADOS).map(([k, [, l]]) => `<option value="${k}" ${c.estado === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+        <label class="field">Respuesta o nota de lo que se ha hecho<input type="text" maxlength="4000" value="${esc(c.respuesta || '')}" id="fb-resp-${c.id}" placeholder="Por ejemplo: hecho en la versión del 3 de noviembre"></label>
+        <button class="btn small" data-act="fbResponder" data-id="${c.id}">Guardar</button>
+      </div>
+      ${c.respondido_por ? `<div class="small muted" style="margin-top:6px">Respondido por ${esc(c.respondido_por)} · ${fmtStamp(c.updated_at)}</div>` : ''}
+    </div>`).join('')}</div>`
+    : `<div class="card empty">${s.filtro === 'abiertos' ? 'No hay comentarios pendientes.' : 'No hay comentarios.'}</div>`;
+  return `${top}<div class="chips" style="margin-bottom:14px">${chip('abiertos', `Pendientes (${n(abiertos)})`)}${chip('hecho', `Hechos (${n((c) => c.estado === 'hecho')})`)}${chip('descartado', 'Descartados')}${chip('todos', `Todos (${s.data.length})`)}</div>${tarjetas}`;
+}
+
 const fileToBase64 = (file) => new Promise((resolve, reject) => {
   const r = new FileReader();
   r.onload = () => resolve(String(r.result).split(',')[1] || '');
@@ -1519,20 +1798,49 @@ async function uploadWebDoc(input) {
 // ------------------------------------------------------------------ INFORMES DE HORAS (encargados)
 function viewInformes() {
   const h = state.inf; if (!h.desde) [h.desde, h.hasta] = monthBounds(0);
-  const q = `desde=${h.desde}&hasta=${h.hasta}`;
-  const title = head('Informes de horas', 'Horas previstas (horarios publicados) y ajustadas (con las correcciones aprobadas) de cada persona.', `<a class="btn" href="/api/informes/horas.csv?${q}">Descargar CSV</a>`);
+  const q = `desde=${h.desde}&hasta=${h.hasta}${h.borradores ? '&borradores=true' : ''}`;
+  const title = head('Informes de horas', 'Cuánto ha trabajado cada persona en el periodo que elijas: horas, objetivo de contrato, horas extra, días, fines de semana, aperturas y cierres. Las horas ajustadas incluyen las correcciones aprobadas.', `<a class="btn" href="/api/informes/horas.csv?${q}">Descargar CSV</a>`);
+  const anio = todayIso().slice(0, 4);
+  const barra = `<div class="card"><div class="row" style="align-items:flex-end;gap:12px">
+    <label class="field">Desde<input type="date" value="${h.desde}" data-act-change="periodo" data-h="inf" data-k="desde"></label>
+    <label class="field">Hasta<input type="date" value="${h.hasta}" data-act-change="periodo" data-h="inf" data-k="hasta"></label>
+    <button class="chip" data-act="periodoRapido" data-h="inf" data-off="0">Este mes</button>
+    <button class="chip" data-act="periodoRapido" data-h="inf" data-off="-1">Mes anterior</button>
+    <button class="chip" data-act="periodoRango" data-desde="${monthBounds(-2)[0]}" data-hasta="${monthBounds(0)[1]}">Últimos 3 meses</button>
+    <button class="chip" data-act="periodoRango" data-desde="${anio}-01-01" data-hasta="${anio}-12-31">Este año</button>
+    <label class="toggle" style="margin-left:auto"><input type="checkbox" data-act-change="infBorradores" ${h.borradores ? 'checked' : ''}> Contar también los borradores</label>
+  </div></div>`;
   const err = ensure(h, 'data', `/api/informes/horas?${q}`);
-  if (err) return title + periodBar(h, 'inf') + err;
+  if (err) return title + barra + err;
   const rows = h.data.empleados;
-  return `${title}${periodBar(h, 'inf')}
-  <div class="card section" style="padding:0"><div class="table-wrap"><table class="list">
-    <thead><tr><th>Persona</th><th class="num">Previstas</th><th class="num">Ajustadas</th><th class="num">Diferencia</th><th class="num">Pendientes</th><th></th></tr></thead><tbody>
-    ${rows.map((e) => `<tr><td><b>${esc(e.nombre)}</b></td><td class="num">${fmtH(e.previstas)}</td><td class="num"><b>${fmtH(e.ajustadas)}</b></td>
-      <td class="num">${e.diferencia ? `<span class="badge warn">${signed(e.diferencia)}</span>` : '0'}</td>
-      <td class="num">${e.pendientes ? `<span class="badge bad">${e.pendientes}</span>` : '0'}</td>
+  const sum = (k) => rows.reduce((t, e) => t + (e[k] || 0), 0);
+  const meses = rows.length ? rows[0].meses.map((m) => m.mes) : [];
+  const mesTxt = (m) => `${monthName(`${m}-01`).slice(0, 3)} ${m.slice(2, 4)}`;
+  const extraBadge = (x) => (x >= 0.5 ? `<span class="badge warn">${fmtH(x)}</span>` : '—');
+  const menosBadge = (x) => (x >= 0.5 ? `<span class="badge neutral">${fmtH(x)}</span>` : '—');
+  const maxH = Math.max(1, ...rows.map((e) => Math.max(e.ajustadas, e.objetivo)));
+  const barraH = (e) => `<div class="hbar" title="${fmtH(e.ajustadas)} h de ${fmtH(e.objetivo)} h"><i style="width:${(e.ajustadas / maxH) * 100}%" class="${e.extra >= 0.5 ? 'over' : e.de_menos >= 0.5 ? 'under' : ''}"></i><b style="left:${(e.objetivo / maxH) * 100}%"></b></div>`;
+  const totales = `<div class="stats">
+    <div class="stat"><b>${fmtH(Math.round(sum('ajustadas') * 10) / 10)} h</b><span>trabajadas en total</span></div>
+    <div class="stat"><b>${fmtH(Math.round(sum('objetivo') * 10) / 10)} h</b><span>de contrato en esas fechas</span></div>
+    <div class="stat ${sum('extra') >= 0.5 ? 'warn' : ''}"><b>${fmtH(Math.round(sum('extra') * 10) / 10)} h</b><span>horas extra</span></div>
+    <div class="stat"><b>${sum('dias_trabajados')}</b><span>jornadas</span></div>
+  </div>`;
+  const tabla = `<div class="card section" style="padding:0"><div class="table-wrap"><table class="list">
+    <thead><tr><th>Persona</th><th style="min-width:140px">Horas frente al contrato</th><th class="num">Trabajadas</th><th class="num">Contrato</th><th class="num">Extra</th><th class="num">De menos</th><th class="num">Días</th><th class="num">Fines de semana</th><th class="num">Festivos</th><th class="num">Aperturas</th><th class="num">Cierres</th><th class="num">Correcciones</th><th></th></tr></thead><tbody>
+    ${rows.map((e) => `<tr><td><b>${esc(e.nombre)}</b></td><td>${barraH(e)}</td>
+      <td class="num"><b>${fmtH(e.ajustadas)}</b>${e.diferencia ? `<div class="small muted">previstas ${fmtH(e.previstas)}</div>` : ''}</td><td class="num">${fmtH(e.objetivo)}</td>
+      <td class="num">${extraBadge(e.extra)}</td><td class="num">${menosBadge(e.de_menos)}</td>
+      <td class="num">${e.dias_trabajados}</td><td class="num">${e.fines_de_semana}</td><td class="num">${e.festivos}</td><td class="num">${e.aperturas}</td><td class="num">${e.cierres}</td>
+      <td class="num">${e.pendientes ? `<span class="badge bad" title="Pendientes de aprobar">${e.pendientes}</span>` : e.diferencia ? signed(e.diferencia) : '—'}</td>
       <td style="text-align:right"><button class="btn small" data-act="infDetalle" data-e="${esc(e.empleado_id)}">Detalle</button></td></tr>`).join('')}
-    </tbody></table></div></div>
-  <p class="small muted">Las correcciones pendientes no cuentan hasta que las apruebes en Solicitudes.</p>`;
+    </tbody></table></div></div>`;
+  const porMes = meses.length > 1 ? `<div class="section"><h2>Mes a mes</h2><div class="card" style="padding:0"><div class="table-wrap"><table class="list">
+    <thead><tr><th>Persona</th>${meses.map((m) => `<th class="num">${mesTxt(m)}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>
+    ${rows.map((e) => `<tr><td><b>${esc(e.nombre)}</b></td>${e.meses.map((m) => `<td class="num">${m.objetivo || m.ajustadas ? `<b>${fmtH(m.ajustadas)}</b><div class="small ${m.extra >= 0.5 ? 'warn-text' : 'muted'}">${m.extra >= 0.5 ? `+${fmtH(m.extra)} extra` : m.de_menos >= 0.5 ? `−${fmtH(m.de_menos)}` : `de ${fmtH(m.objetivo)}`}</div>` : '<span class="muted">—</span>'}</td>`).join('')}<td class="num"><b>${fmtH(e.ajustadas)}</b></td></tr>`).join('')}
+    </tbody></table></div></div><p class="small muted">Cada casilla: horas trabajadas y, debajo, las horas extra o las que faltan frente al contrato de ese mes.</p></div>` : '';
+  return `${title}${barra}${totales}${tabla}${porMes}
+  <p class="small muted">«Contrato» son las horas de contrato prorrateadas en los días que tienen horario${h.borradores ? '' : ' publicado'}, sin contar ausencias. Las correcciones pendientes no cuentan hasta que las apruebes en Solicitudes.</p>`;
 }
 
 function corrDetail(clase, turnos, pre = {}) {
@@ -1651,6 +1959,49 @@ const actions = {
     state.current = await api('DELETE', `/api/horarios/${state.current.id}/bloqueos`); renderView();
   },
   cell: (el) => openCellMenu(el),
+  feedback: async () => {
+    overlay(feedbackDialog([]));
+    try { const mios = await api('GET', '/api/comentarios'); if ($('#fb-form')) { const t = $('#fb-form textarea').value; overlay(feedbackDialog(isWorker() ? mios : mios.filter((c) => c.autor === state.me.username))); $('#fb-form textarea').value = t; } } catch { /* sin lista no pasa nada */ }
+    const ta = $('#fb-form textarea'); if (ta) ta.focus();
+  },
+  fbFiltro: (el) => { state.fb.filtro = el.dataset.f; renderView(); },
+  fbResponder: async (el) => {
+    const id = Number(el.dataset.id);
+    try {
+      const c = await api('PATCH', `/api/comentarios/${id}`, { respuesta: $(`#fb-resp-${id}`).value });
+      Object.assign(state.fb.data.find((x) => x.id === id), c); toast('Respuesta guardada'); renderView();
+    } catch (e) { toast(e.message, true); }
+  },
+  calModo: (el) => {
+    if (el.dataset.v === 'dia') { actions.calDia({ dataset: { date: state.cal.ref || todayIso() } }); return; }
+    state.cal.modo = el.dataset.v; renderView();
+  },
+  calMover: (el) => {
+    const c = state.cal; const dir = Number(el.dataset.dir);
+    if (c.modo === 'mes') {
+      let y = Number(c.ref.slice(0, 4)), m = Number(c.ref.slice(5, 7)) + dir;
+      if (m < 1) { m = 12; y--; } if (m > 12) { m = 1; y++; }
+      c.ref = `${y}-${pad2(m)}-01`;
+    } else c.ref = addDays(c.ref, 7 * dir);
+    renderView();
+  },
+  calHoy: () => { state.cal.ref = todayIso(); renderView(); },
+  calDia: (el) => {
+    const f = el.dataset.date;
+    const [desde, hasta] = calRango();
+    const data = state.cal.data[`${desde}|${hasta}`];
+    let info = data && data.dias && data.dias[f];
+    if (!info) {
+      const s = state.schedules.filter((x) => x.desde <= f && f <= x.hasta).sort((a, b) => (a.estado === 'publicado' ? 0 : 1) - (b.estado === 'publicado' ? 0 : 1))[0];
+      info = s && { horario_id: s.id };
+    }
+    if (!info) { toast('No hay ningún horario para ese día. Créalo en Horarios.', true); return; }
+    state.cal.ref = f;
+    state.vista = 'dia'; state.diaFecha = f; state.dia = null;
+    if (!state.current || state.current.id !== info.horario_id) state.current = null;
+    location.hash = `#/horarios/${info.horario_id}`;
+    renderView();
+  },
   setVista: (el) => {
     if (el.dataset.v === state.vista) return;
     if (state.vista === 'dia' && !diaDescartable()) return;
@@ -1669,6 +2020,26 @@ const actions = {
     const ini = $('#bar-ini').value, fin = $('#bar-fin').value === '23:59' ? '24:00' : $('#bar-fin').value;
     if (!ini || !fin || toMin(fin) <= toMin(ini)) { toast('La salida tiene que ser después de la entrada', true); return; }
     t.inicio = ini; t.fin = fin; closeMenu(); renderView();
+  },
+  barAdj: (el) => {
+    const emp = el.dataset.emp;
+    const t = state.dia.tramos.find((x) => x.empleado_id === emp);
+    if (!ajustarTramo(t, el.dataset.k, Number(el.dataset.dm))) { toast('Así no cabe en el día', true); return; }
+    closeMenu(); renderView();
+    const bar = document.querySelector(`.g-bar[data-emp="${CSS.escape(emp)}"]`);
+    if (bar) openBarMenu(emp, bar);  // el menú sigue abierto para encadenar ajustes
+  },
+  cellAdj: (el) => {
+    closeMenu();
+    const cur = state.current;
+    if (diaSoloLectura(cur)) { toast('Este horario tiene un arreglo pendiente: haz los cambios en él', true); return; }
+    if (state.vista === 'dia' && !diaDescartable()) return;
+    state.vista = 'dia'; state.diaFecha = el.dataset.date; state.dia = null;
+    renderView();
+    const t = state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp);
+    if (!t || !ajustarTramo(t, el.dataset.k, Number(el.dataset.dm))) { toast('Así no cabe en el día', true); renderView(); return; }
+    renderView(); window.scrollTo(0, 0);
+    toast('Ajuste preparado en la vista del día: revisa y pulsa «Confirmar cambios»');
   },
   barPuesto: (el) => { state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp).puesto = el.dataset.p; closeMenu(); renderView(); },
   barShift: (el) => {
@@ -1798,6 +2169,7 @@ const actions = {
     state.mi.perfil = await api('DELETE', `/api/mi/solicitudes/${el.dataset.id}`);
     state.miH.data = undefined; renderView();
   },
+  periodoRango: (el) => { const h = state.inf; h.desde = el.dataset.desde; h.hasta = el.dataset.hasta; h.data = undefined; renderView(); },
   periodoRapido: (el) => {
     const h = state[el.dataset.h]; [h.desde, h.hasta] = monthBounds(Number(el.dataset.off)); h.data = undefined; renderView();
   },
@@ -1844,7 +2216,7 @@ const actions = {
   toggleDay: (el) => {
     const path = el.dataset.path; let arr = getPath(state.draft, path) || [];
     arr = arr.includes(el.dataset.day) ? arr.filter((d) => d !== el.dataset.day) : DAYS.filter((d) => d === el.dataset.day || arr.includes(d));
-    setPath(state.draft, path, path.startsWith('turnos') || path.startsWith('preferencias') || path.startsWith('tareas') ? (arr.length ? arr : null) : arr);
+    setPath(state.draft, path, path.startsWith('turnos') || path.startsWith('preferencias') || path.startsWith('tareas') || path.startsWith('funciones') ? (arr.length ? arr : null) : arr);
     markDirty(); renderView();
   },
   toggleShift: (el) => {
@@ -1859,9 +2231,32 @@ const actions = {
     e.puestos = ps.includes(p) ? ps.filter((x) => x !== p) : [...ps, p];
     markDirty(); renderView();
   },
+  toggleFuncion: (el) => {
+    const e = state.draft.empleados[Number(el.dataset.i)];
+    const fs = e.funciones || [], f = el.dataset.f;
+    e.funciones = fs.includes(f) ? fs.filter((x) => x !== f) : [...fs, f];
+    markDirty(); renderView();
+  },
+  addFuncion: () => {
+    const c = state.draft; c.funciones = c.funciones || [];
+    const nombre = window.prompt('Nombre de la función (por ejemplo, Preparar pinchos):', '');
+    if (!nombre || !nombre.trim()) return;
+    const colores = ['#C9733B', '#4F7A5A', '#3E6A8A', '#8A4F7D', '#A88B2C', '#5E5E8F'];
+    c.funciones.push({ id: uid(nombre, c.funciones.map((f) => f.id)), nombre: nombre.trim(), color: colores[c.funciones.length % colores.length], reglas: [] });
+    markDirty(); renderView();
+  },
+  delFuncion: (el) => {
+    const c = state.draft; const f = c.funciones[Number(el.dataset.i)];
+    if (!window.confirm(`¿Eliminar la función «${f.nombre}»? Se quitará a todas las personas que la tienen.`)) return;
+    c.funciones.splice(Number(el.dataset.i), 1);
+    c.empleados.forEach((e) => { e.funciones = (e.funciones || []).filter((x) => x !== f.id); });
+    markDirty(); renderView();
+  },
+  addReglaFuncion: (el) => { state.draft.funciones[Number(el.dataset.i)].reglas.push({ inicio: '10:00', fin: '12:00', personas: 1, dias: null }); markDirty(); renderView(); },
+  delReglaFuncion: (el) => { state.draft.funciones[Number(el.dataset.i)].reglas.splice(Number(el.dataset.j), 1); markDirty(); renderView(); },
   addEmp: () => {
     const ids = state.draft.empleados.map((e) => e.id);
-    state.draft.empleados.push({ id: uid(`persona-${ids.length + 1}`, ids), nombre: 'Nueva persona', horas_semanales: 30, puede_abrir: false, puede_cerrar: false, es_encargado: false, puestos: ['sala', 'cocina'], libranzas_fijas: [], slack_user_id: null, email: null, activo: true });
+    state.draft.empleados.push({ id: uid(`persona-${ids.length + 1}`, ids), nombre: 'Nueva persona', horas_semanales: 30, puede_abrir: false, puede_cerrar: false, es_encargado: false, puestos: ['sala', 'cocina'], funciones: [], libranzas_fijas: [], slack_user_id: null, email: null, activo: true });
     markDirty(); renderView(); window.scrollTo(0, document.body.scrollHeight);
   },
   delEmp: (el) => {
@@ -1986,6 +2381,17 @@ const changeActions = {
     state.dia = null; state.diaFecha = el.value; renderView();
   },
   corrClase: (el) => { $('#corr-detail').innerHTML = corrDetail(el.value, state.mi.perfil.turnos); },
+  infBorradores: (el) => { state.inf.borradores = el.checked; state.inf.data = undefined; renderView(); },
+  fbEstado: async (el) => {
+    const id = Number(el.dataset.id);
+    try {
+      const c = await api('PATCH', `/api/comentarios/${id}`, { estado: el.value });
+      Object.assign(state.fb.data.find((x) => x.id === id), c);
+      state.me.comentarios = state.fb.data.filter((x) => x.estado === 'nuevo').length;
+      renderView(); toast('Estado cambiado');
+    } catch (e) { toast(e.message, true); }
+  },
+  calPersona: (el) => { state.cal.persona = el.value; renderView(); },
   periodo: (el) => { const h = state[el.dataset.h]; h[el.dataset.k] = el.value; if (h.hasta && h.desde && h.hasta >= h.desde) { h.data = undefined; } renderView(); },
   userRol: (el) => { $('#user-emp').hidden = el.value !== 'empleado'; },
 };
@@ -2071,6 +2477,13 @@ document.addEventListener('submit', async (e) => {
     } catch (err) { $('#login-err').textContent = err.message; }
   } else if (f.id === 'user-form') {
     try { state.ajustes.users = await api('POST', '/api/usuarios', { usuario: data.usuario, password: data.password, nombre: data.nombre || null, rol: data.rol, empleado_id: data.rol === 'empleado' ? data.empleado_id : null }); toast('Cuenta guardada'); renderView(); } catch (err) { toast(err.message, true); }
+  } else if (f.id === 'fb-form') {
+    try {
+      await api('POST', '/api/comentarios', { tipo: data.tipo || 'sugerencia', texto: data.texto, pantalla: pantallaActual() });
+      closeOverlay(); toast('¡Gracias! Tu comentario ha quedado guardado');
+      if (state.fb) state.fb.data = undefined;
+      if (!isWorker()) { state.me.comentarios = (state.me.comentarios || 0) + 1; renderView(); }
+    } catch (err) { toast(err.message, true); }
   } else if (f.id === 'pw-form') {
     if (data.nueva !== data.repite) { $('#pw-err').textContent = 'Las contraseñas nuevas no coinciden'; return; }
     try {
@@ -2111,7 +2524,7 @@ document.addEventListener('submit', async (e) => {
   }
 });
 window.addEventListener('scroll', closeMenu, true);
-window.addEventListener('hashchange', () => { closeMenu(); if (route().name !== 'horarios' || !route().arg) state.current = state.current; if (route().name === 'web') state.web.data = undefined; renderView(); window.scrollTo(0, 0); });
+window.addEventListener('hashchange', () => { closeMenu(); if (route().name === 'calendario') state.cal.data = {}; if (route().name !== 'horarios' || !route().arg) state.current = state.current; if (route().name === 'web') state.web.data = undefined; renderView(); window.scrollTo(0, 0); });
 window.addEventListener('beforeunload', (e) => { if (state.dirty || (state.dia && diaCambios(state.dia).length)) { e.preventDefault(); e.returnValue = ''; } });
 
 async function importConfig(file) {
