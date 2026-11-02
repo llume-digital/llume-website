@@ -34,8 +34,9 @@
 
 # Demo de la app de horarios: Python en el navegador (Pyodide) necesita compilar WebAssembly.
 # El botón «Dictar» de la app usa el micrófono: se permite solo en esta ruta.
+# «Entrar con Google»: el script y el botón de Google (accounts.google.com/gsi) y sus claves públicas (googleapis).
 /lopita/horarios/*
   ! Content-Security-Policy
   ! Permissions-Policy
   Permissions-Policy: camera=(), microphone=(self), geolocation=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://accounts.google.com/gsi/client; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://accounts.google.com/gsi/ https://www.googleapis.com/oauth2/v3/certs; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'

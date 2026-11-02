@@ -98,6 +98,7 @@ async function showNotifications() {
       ${n.detalle.turnos && n.detalle.turnos.length ? `<ul class="small notif-turnos">${n.detalle.turnos.map((t) => `<li><b>${esc(fmtLong(t.fecha))}</b> · ${esc(t.turno)} ${esc(t.inicio)}–${esc(t.fin)} <span class="muted">(horario ${esc(t.periodo)}${t.estado === 'publicado' ? ', publicado' : ', borrador'})</span></li>`).join('')}</ul>` : ''}
       <p class="small muted">${esc(fmtStamp(n.created_at))}</p>
       ${n.schedule_id ? `<div class="row end"><button class="btn small primary" data-act="openNotification" data-id="${n.id}" data-sid="${n.schedule_id}">Abrir horario</button></div>` : ''}
+      ${n.tipo === 'acceso_pedido' ? `<div class="row end"><button class="btn small primary" data-act="verAccesos" data-id="${n.id}">Ver registros</button></div>` : ''}
     </article>`;
   overlay(`<h2>${list.some((n) => n.detalle && n.detalle.valido === false) ? 'Hay alertas críticas' : 'Avisos'}</h2>
     <div class="stack" style="gap:12px">${list.map(item).join('')}</div>
@@ -196,14 +197,14 @@ function onBind(e) {
 // ------------------------------------------------------------------ pintado general
 function render() {
   const app = $('#app');
-  if (!state.me) { app.innerHTML = viewLogin(); return; }
+  if (!state.me) { app.innerHTML = viewLogin(); botonGoogle($('#g-login'), entrarConGoogle); return; }
   if (state.me.cambiar_clave) { app.innerHTML = viewForcePw(); return; }
   if (!$('.topbar')) {
     app.innerHTML = `
       <header class="topbar"><div class="topbar-inner">
         <a class="wordmark" href="#/" aria-label="Lopita & Co · Horarios"><b>LOPITA &amp; CO</b><span>Horarios</span></a>
         <nav class="tabs" id="tabs"></nav>
-        <div class="userbox"><span>${esc(state.me.nombre)}</span><button data-act="goGuia" title="Cómo funciona la app">Guía</button><button data-act="feedback" class="fb-btn" title="Deja una sugerencia, un fallo o una duda">Comentarios</button><button data-act="pwDialog">Contraseña</button><button data-act="logout">Salir</button></div>
+        <div class="userbox"><span>${esc(state.me.nombre)}</span><button data-act="goGuia" title="Cómo funciona la app">Guía</button><button data-act="feedback" class="fb-btn" title="Deja una sugerencia, un fallo o una duda">Comentarios</button><button data-act="cuentaDialog">Mi cuenta</button><button data-act="logout">Salir</button></div>
       </div></header>
       <main id="view"></main>
       <div id="savebar"></div>`;
@@ -227,7 +228,7 @@ function tabsHtml(name) {
   const w = isWorker();
   const count = (n, label) => (n ? `<span class="tab-count" aria-label="${n} ${label}">${n}</span>` : '');
   const crit = !w && state.me.criticas ? `<span class="tab-count crit" aria-label="${state.me.criticas} alertas críticas">${state.me.criticas}</span>` : '';
-  const badge = { solicitudes: w ? '' : count(state.me.pendientes, 'pendientes'), alertas: w ? '' : crit + count(state.me.alertas - (state.me.criticas || 0), 'alertas importantes'), inicio: w ? count(state.me.avisos, 'avisos nuevos') : '', web: w ? '' : count(state.me.mensajes_web, 'mensajes nuevos'), comentarios: w ? '' : count(state.me.comentarios, 'comentarios nuevos') };
+  const badge = { solicitudes: w ? '' : count(state.me.pendientes, 'pendientes'), alertas: w ? '' : crit + count(state.me.alertas - (state.me.criticas || 0), 'alertas importantes'), inicio: w ? count(state.me.avisos, 'avisos nuevos') : '', web: w ? '' : count(state.me.mensajes_web, 'mensajes nuevos'), comentarios: w ? '' : count(state.me.comentarios, 'comentarios nuevos'), ajustes: w ? '' : count(state.me.accesos, 'registros pendientes') };
   return (w ? NAV_WORKER : NAV_ADMIN).map(([k, label]) => `<a href="#/${k}" class="${name === k ? 'active' : ''}">${label}${badge[k] || ''}</a>`).join('');
 }
 
@@ -358,11 +359,13 @@ function viewLogin() {
     <div class="login-art"><div class="mark">LOPITA &amp; CO</div><div class="rule"></div><div class="tag">Horarios del equipo</div></div>
     <div class="login-form"><form id="login-form">
       <h1>Entrar</h1>
-      <p class="muted" style="margin:0">Acceso para encargados.</p>
+      <p class="muted" style="margin:0">Acceso para el equipo de Lopita.</p>
       <label class="field">Usuario<input type="text" name="usuario" autocomplete="username" required></label>
       <label class="field">Contraseña<input type="password" name="password" autocomplete="current-password" required></label>
       <div class="err small" id="login-err" style="color:var(--bad)" role="alert"></div>
       <button class="btn primary" type="submit" style="justify-content:center">Entrar</button>
+      ${state.acceso && state.acceso.google_client_id ? `<div class="g-sep"><span>o</span></div><div id="g-login" class="g-btn"></div>
+      <p class="small muted" style="margin:0">Con Google entras si tu correo está en tu cuenta. Si aún no tienes cuenta, te registras y un encargado te da acceso.</p>` : ''}
     </form></div>
   </div>`;
 }
@@ -1582,12 +1585,13 @@ function viewReglas() {
 // ------------------------------------------------------------------ AJUSTES
 function viewAjustes() {
   if (!state.ajustes) {
-    Promise.all([api('GET', '/api/usuarios'), api('GET', '/api/config/historial'), api('GET', '/api/slack')])
-      .then(([users, history, slack]) => { state.ajustes = { users, history, slack }; renderView(); })
+    Promise.all([api('GET', '/api/usuarios'), api('GET', '/api/config/historial'), api('GET', '/api/slack'), api('GET', '/api/accesos'), api('GET', '/api/ajustes/google')])
+      .then(([users, history, slack, accesos, google]) => { state.ajustes = { users, history, slack, accesos, google }; renderView(); })
       .catch((e) => toast(e.message, true));
     return '<div class="empty">Cargando…</div>';
   }
-  const { users, history, slack } = state.ajustes;
+  const { users, history, slack, accesos, google } = state.ajustes;
+  const empsLibres = state.draft.empleados.filter((e) => e.activo && !users.some((u) => u.empleado_id === e.id));
   return `${head('Ajustes', '')}
   <div class="grid">
     <div class="card"><h2>Negocio</h2><label class="field">Nombre que aparece en los horarios<input type="text" value="${esc(state.draft.negocio)}" data-bind="negocio"></label></div>
@@ -1595,12 +1599,27 @@ function viewAjustes() {
       ${slack.configurado ? (slack.ok ? `<div class="notice ok">Conectado a <b>${esc(slack.equipo || '')}</b> como ${esc(slack.bot || '')}. Canal: <b>${esc(slack.canal || 'sin canal')}</b>.</div>` : `<div class="notice warn">El token de Slack no funciona: ${esc(slack.error || 'error desconocido')}.</div>`)
       : '<div class="notice info">Slack no está conectado. Mientras tanto, al publicar verás los mensajes que se enviarían (modo simulación).</div>'}
       <p class="small muted">Se configura en el servidor con <code>SLACK_BOT_TOKEN</code> y <code>SLACK_CHANNEL</code>. Para los mensajes privados, rellena el usuario de Slack o el email de cada persona en Equipo.</p></div>
+    <div class="card"><h2>Entrar con Google</h2>
+      ${google.client_id ? '<div class="notice ok small">Activado: en la pantalla de entrada sale el botón de Google.</div>' : '<div class="notice info small">Desactivado. Pega el ID de cliente de Google para activarlo.</div>'}
+      <form id="google-form" class="stack" style="gap:10px;margin-top:10px">
+        <label class="field">ID de cliente de Google<span class="hint">Acaba en .apps.googleusercontent.com (Google Cloud → Credenciales → ID de cliente de OAuth, tipo «Aplicación web»).</span><input type="text" name="client_id" value="${esc(google.client_id || '')}" ${google.desde_entorno ? 'disabled' : ''} placeholder="123456789-abc.apps.googleusercontent.com" autocomplete="off"></label>
+        ${google.desde_entorno ? '<p class="small muted" style="margin:0">Viene de la configuración del servidor (LOPITA_GOOGLE_CLIENT_ID).</p>' : '<div class="row end"><button class="btn" type="submit">Guardar</button></div>'}
+      </form>
+      <p class="small muted">Quien entra con Google entra en la cuenta que tenga ese correo. Si no tiene cuenta, queda como registro pendiente aquí abajo hasta que le des acceso.</p></div>
   </div>
   <div class="grid section">
     <div class="card"><h2>Cuentas de acceso</h2>
-      <table class="list"><tbody>${users.map((u) => `<tr><td><b>${esc(u.nombre || u.username)}</b><div class="small muted">${esc(u.username)} · ${u.rol === 'admin' ? 'Encargado' : `Trabajador · ${esc(empName(u.empleado_id))}`}${u.cambiar_clave ? ' · aún no ha entrado' : ''}</div></td><td style="width:40px">${u.username !== state.me.username ? `<button class="icon-btn" data-act="delUser" data-u="${esc(u.username)}" title="Quitar acceso">${ICON.trash}</button>` : '<span class="small muted">tú</span>'}</td></tr>`).join('')}</tbody></table>
+      <table class="list"><tbody>${users.map((u) => `<tr><td><b>${esc(u.nombre || u.username)}</b>${u.google ? ' <span class="badge neutral">Google</span>' : ''}<div class="small muted">${esc(u.username)} · ${u.rol === 'admin' ? 'Encargado' : `Trabajador · ${esc(empName(u.empleado_id))}`}${u.cambiar_clave ? ' · contraseña temporal' : ''}</div><div class="small muted">${u.email ? esc(u.email) : 'sin correo'}</div>
+        <div class="user-acts">${u.username !== state.me.username ? `<button class="btn small" data-act="emailUser" data-u="${esc(u.username)}">Correo</button><button class="btn small" data-act="resetUser" data-u="${esc(u.username)}">Contraseña</button><button class="icon-btn" data-act="delUser" data-u="${esc(u.username)}" title="Quitar acceso">${ICON.trash}</button>` : '<button class="btn small" data-act="cuentaDialog">Mi cuenta</button>'}</div></td></tr>`).join('')}</tbody></table>
+      ${accesos.length ? `<div class="accesos"><h3 style="margin:16px 0 6px">Registros con Google pendientes</h3>${accesos.map((a) => `<form id="acceso-form" class="acceso card" data-id="${a.id}">
+        <div><b>${esc(a.nombre || a.email)}</b><div class="small muted">${esc(a.email)} · ${fmtStamp(a.created_at)}</div></div>
+        <div class="fields two"><label class="field">Usuario<input type="text" name="usuario" required value="${esc(a.email.split('@')[0].toLowerCase().replace(/[^a-z0-9._-]/g, ''))}"></label><label class="field">Nombre<input type="text" name="nombre" value="${esc(a.nombre || '')}"></label></div>
+        <label class="field">Tipo de cuenta<select name="rol" data-act-change="accesoRol"><option value="empleado">Trabajador</option><option value="admin">Encargado</option></select></label>
+        <label class="field acceso-emp">Persona del equipo<select name="empleado_id">${empsLibres.map((e) => `<option value="${esc(e.id)}">${esc(e.nombre)}</option>`).join('')}</select></label>
+        <div class="row end"><button type="button" class="btn" data-act="rechazarAcceso" data-id="${a.id}">Rechazar</button><button class="btn primary" type="submit">Dar acceso</button></div>
+      </form>`).join('')}</div>` : ''}
       <form id="user-form" class="stack" style="gap:10px;margin-top:14px">
-        <div class="small muted" style="font-weight:600">Crear cuenta o cambiar contraseña</div>
+        <div class="small muted" style="font-weight:600">Crear cuenta</div>
         <div class="fields two"><label class="field">Usuario<input type="text" name="usuario" required autocomplete="off"></label><label class="field">Nombre<input type="text" name="nombre"></label></div>
         <label class="field">Tipo de cuenta<select name="rol" data-act-change="userRol"><option value="empleado">Trabajador (ve sus horas y hace solicitudes)</option><option value="admin">Encargado (control total)</option></select></label>
         <label class="field" id="user-emp">Persona del equipo<select name="empleado_id">${state.draft.empleados.filter((e) => e.activo).map((e) => `<option value="${esc(e.id)}">${esc(e.nombre)}</option>`).join('')}</select></label>
@@ -1922,12 +1941,19 @@ const GUIA_ADMIN = [
     'Quien lo envió ve la respuesta en su ventana de comentarios.',
   ] },
   { id: 'ajustes', titulo: 'Ajustes', para: 'Cuentas de acceso, Slack, copias e historial de la configuración.', pasos: [
-    '<b>Cuentas de acceso</b>: crea una cuenta de trabajador para cada persona (con contraseña temporal) o de encargado.',
+    '<b>Cuentas de acceso</b>: crea una cuenta de trabajador para cada persona (con contraseña temporal) o de encargado. En cada cuenta, <b>Correo</b> le asocia su correo y <b>Contraseña</b> le pone una temporal si la ha olvidado.',
+    '<b>Entrar con Google</b>: pega el ID de cliente de Google y en la entrada saldrá el botón. Quien entra con Google entra en la cuenta con su correo; si no tiene cuenta, aparece en <b>Registros con Google pendientes</b> y tú le das acceso (encargado o trabajador) o lo rechazas.',
+    '<b>Mi cuenta</b> (arriba a la derecha): tu nombre, tu correo, vincular Google y cambiar tu contraseña.',
     '<b>Versiones</b>: cada guardado crea una versión; puedes restaurar cualquiera.',
     '<b>Exportar</b> o <b>Cargar archivo</b> la configuración completa.',
   ] },
 ];
 const GUIA_WORKER = [
+  { id: 'cuenta', ir: null, titulo: 'Mi cuenta', para: 'Tu correo, entrar con Google y tu contraseña.', pasos: [
+    'Pulsa <b>Mi cuenta</b> arriba a la derecha.',
+    'Pon tu correo: si es el de tu cuenta de Google, podrás entrar con el botón de Google sin contraseña (o pulsa el botón de Google para vincularla).',
+    'Si olvidas la contraseña, entra con Google o pide a tu encargado una temporal.',
+  ] },
   { id: 'inicio', titulo: 'Inicio', para: 'Tus próximos turnos y los avisos de cambios.', pasos: [
     'Arriba ves tus turnos de los próximos días.',
     'Si tu horario cambia, sale un aviso con lo que ha cambiado; márcalo como visto.',
@@ -1969,7 +1995,7 @@ function viewGuia() {
     const ir = g.ir === undefined ? g.id : g.ir;
     return `<section class="card guia-sec" id="guia-${g.id}">
       <div class="row" style="align-items:baseline"><h2 style="margin:0">${esc(g.titulo)}</h2><span class="spacer"></span>
-        ${ir ? `<a class="btn small primary" href="#/${ir}">Ir a ${esc(nombreTab(ir) || g.titulo)} →</a>` : `<button class="btn small primary" data-act="feedback">Abrir comentarios</button>`}</div>
+        ${ir ? `<a class="btn small primary" href="#/${ir}">Ir a ${esc(nombreTab(ir) || g.titulo)} →</a>` : g.id === 'cuenta' ? '<button class="btn small primary" data-act="cuentaDialog">Abrir Mi cuenta</button>' : `<button class="btn small primary" data-act="feedback">Abrir comentarios</button>`}</div>
       <p class="lead" style="margin:6px 0 10px">${esc(g.para)}</p>
       <ol class="guia-lista">${g.pasos.map((p) => `<li>${p}</li>`).join('')}</ol>
     </section>`;
@@ -2108,11 +2134,75 @@ function openCorrection(pre = {}) {
     </form>`);
 }
 
-function pwForm(forced) {
+// ------------------------------------------------------------------ CUENTA y GOOGLE
+function claveTemporal() {
+  const abc = 'abcdefghjkmnpqrstuvwxyz23456789';
+  const r = new Uint32Array(10); crypto.getRandomValues(r);
+  return Array.from(r, (x) => abc[x % abc.length]).join('');
+}
+// El botón de Google (Google Identity Services) se carga solo si hay ID de cliente configurado en Ajustes.
+let gisCarga = null;
+function cargarGoogle() {
+  if (window.google && window.google.accounts && window.google.accounts.id) return Promise.resolve();
+  if (!gisCarga) {
+    gisCarga = new Promise((ok, ko) => {
+      const sc = document.createElement('script');
+      sc.src = 'https://accounts.google.com/gsi/client'; sc.async = true;
+      sc.onload = ok; sc.onerror = () => { gisCarga = null; ko(new Error('No se ha podido cargar el botón de Google.')); };
+      document.head.appendChild(sc);
+    });
+  }
+  return gisCarga;
+}
+async function botonGoogle(el, alPulsar, texto = 'signin_with') {
+  const cid = (state.acceso && state.acceso.google_client_id) || (state.me && state.me.google_client_id);
+  if (!el || !cid) return;
+  try { await cargarGoogle(); } catch (e) { el.innerHTML = `<p class="small muted">${esc(e.message)}</p>`; return; }
+  if (!el.isConnected) return;
+  window.google.accounts.id.initialize({ client_id: cid, callback: (r) => alPulsar(r.credential), ux_mode: 'popup' });
+  window.google.accounts.id.renderButton(el, { theme: 'outline', size: 'large', text: texto, shape: 'pill', locale: 'es', width: Math.min(320, el.clientWidth || 320) });
+}
+async function entrarConGoogle(credential) {
+  const msg = $('#login-err');
+  try {
+    const r = await api('POST', '/api/login/google', { credential });
+    if (r.pendiente) {
+      msg.style.color = 'var(--ink)';
+      msg.innerHTML = `<div class="notice info small">Registro recibido para <b>${esc(r.email)}</b>. Un encargado tiene que darte acceso; cuando lo haga, vuelve a entrar con Google.</div>`;
+      return;
+    }
+    await boot();
+  } catch (e) { msg.style.color = 'var(--bad)'; msg.textContent = e.message; }
+}
+function cuentaDialog() {
+  const m = state.me;
+  const cid = m.google_client_id;
+  overlay(`<h2>Mi cuenta</h2>
+    <form id="cuenta-form" class="stack" style="gap:12px">
+      <div class="fields two"><label class="field">Usuario<input type="text" value="${esc(m.username)}" disabled></label>
+        <label class="field">Nombre<input type="text" name="nombre" value="${esc(m.nombre || '')}" maxlength="100"></label></div>
+      <label class="field">Correo electrónico<span class="hint">Si es el de tu cuenta de Google, podrás entrar con Google.</span><input type="email" name="email" value="${esc(m.email || '')}" autocomplete="email" placeholder="nombre@gmail.com"></label>
+      <div class="small" id="cuenta-err" style="color:var(--bad)" role="alert"></div>
+      <div class="row end"><button class="btn primary" type="submit">Guardar</button></div>
+    </form>
+    <div class="section cuenta-google"><h3 style="margin:0 0 6px">Google</h3>
+      ${m.google ? `<div class="row"><span class="badge publicado">Vinculada</span><span class="small muted">Puedes entrar con el botón de Google.</span><span class="spacer"></span><button class="btn small" data-act="desvincularGoogle">Desvincular</button></div>`
+        : cid ? '<p class="small muted" style="margin:0 0 8px">Vincula tu cuenta de Google para entrar sin contraseña:</p><div id="g-vincular" class="g-btn"></div>'
+          : '<p class="small muted" style="margin:0">Entrar con Google aún no está activado (lo activa un encargado en Ajustes).</p>'}</div>
+    <div class="section">${pwForm(false, true)}</div>`);
+  if (!m.google && cid) botonGoogle($('#g-vincular'), vincularGoogle, 'continue_with');
+}
+async function vincularGoogle(credential) {
+  try { state.me = { ...state.me, ...(await api('POST', '/api/mi/google', { credential })) }; toast('Cuenta de Google vinculada'); cuentaDialog(); } catch (e) { toast(e.message, true); }
+}
+
+function pwForm(forced, enCuenta = false) {
+  const sinActual = !forced && state.me && state.me.via_google;
+  const h = enCuenta ? 3 : forced ? 1 : 2;
   return `<form id="pw-form" class="${forced ? '' : 'stack'}" style="display:grid;gap:12px">
-    <h${forced ? 1 : 2}>${forced ? 'Elige tu contraseña' : 'Cambiar contraseña'}</h${forced ? 1 : 2}>
+    <h${h}${enCuenta ? ' style="margin:0"' : ''}>${forced ? 'Elige tu contraseña' : 'Cambiar contraseña'}</h${h}>
     ${forced ? '<p class="muted" style="margin:0">Es tu primer acceso: cambia la contraseña temporal por una tuya (mínimo 8 caracteres).</p>' : ''}
-    <label class="field">Contraseña ${forced ? 'temporal' : 'actual'}<input type="password" name="actual" autocomplete="current-password" required></label>
+    ${sinActual ? '<p class="small muted" style="margin:0">Has entrado con Google: no hace falta la contraseña anterior.</p>' : `<label class="field">Contraseña ${forced ? 'temporal' : 'actual'}<input type="password" name="actual" autocomplete="current-password" required></label>`}
     <label class="field">Nueva contraseña<input type="password" name="nueva" minlength="8" autocomplete="new-password" required></label>
     <label class="field">Repite la nueva contraseña<input type="password" name="repite" minlength="8" autocomplete="new-password" required></label>
     <div class="small" id="pw-err" style="color:var(--bad)" role="alert"></div>
@@ -2127,7 +2217,7 @@ function viewForcePw() {
 const confirmLeave = () => !state.dirty || window.confirm('Tienes cambios sin guardar. ¿Descartarlos?');
 
 const actions = {
-  logout: async () => { await api('POST', '/api/logout'); state.me = null; state.config = state.draft = null; state.dirty = false; state.mi = {}; state.miH = {}; state.inf = {}; state.sol = {}; state.web = {}; state.ajustes = null; state.current = null; render(); },
+  logout: async () => { await api('POST', '/api/logout'); state.me = null; state.config = state.draft = null; state.dirty = false; state.mi = {}; state.miH = {}; state.inf = {}; state.sol = {}; state.web = {}; state.ajustes = null; state.current = null; try { state.acceso = await api('GET', '/api/acceso'); } catch { state.acceso = {}; } render(); },
   save: () => saveConfig(),
   discard: () => { state.draft = clone(state.config); state.dirty = false; state.saveError = null; renderView(); },
 
@@ -2427,6 +2517,35 @@ const actions = {
     const h = state[el.dataset.h]; [h.desde, h.hasta] = monthBounds(Number(el.dataset.off)); h.data = undefined; renderView();
   },
   pwDialog: () => overlay(pwForm(false)),
+  cuentaDialog: () => cuentaDialog(),
+  desvincularGoogle: async () => {
+    try { state.me = { ...state.me, ...(await api('DELETE', '/api/mi/google')) }; toast('Cuenta de Google desvinculada'); cuentaDialog(); } catch (e) { toast(e.message, true); }
+  },
+  resetUser: (el) => {
+    const u = el.dataset.u;
+    overlay(`<h2>Nueva contraseña para ${esc(u)}</h2>
+      <form id="reset-form" class="stack" style="gap:12px" data-u="${esc(u)}">
+        <p class="small muted" style="margin:0">Es temporal: al entrar con ella tendrá que cambiarla por una suya. Si tiene Google vinculado, también puede entrar con Google.</p>
+        <label class="field">Contraseña temporal<input type="text" name="password" minlength="8" required autocomplete="off" value="${esc(claveTemporal())}"></label>
+        <div class="row end"><button type="button" class="btn" data-act="closeOverlay">Cancelar</button><button class="btn primary" type="submit">Guardar</button></div>
+      </form>`);
+  },
+  emailUser: (el) => {
+    const u = state.ajustes.users.find((x) => x.username === el.dataset.u);
+    overlay(`<h2>Correo de ${esc(u.nombre || u.username)}</h2>
+      <form id="email-form" class="stack" style="gap:12px" data-u="${esc(u.username)}">
+        <p class="small muted" style="margin:0">Con su correo de Google podrá entrar con Google.</p>
+        <label class="field">Correo electrónico<input type="email" name="email" value="${esc(u.email || '')}" placeholder="nombre@gmail.com"></label>
+        <div class="row end"><button type="button" class="btn" data-act="closeOverlay">Cancelar</button><button class="btn primary" type="submit">Guardar</button></div>
+      </form>`);
+  },
+  rechazarAcceso: async (el) => {
+    try { const r = await api('POST', `/api/accesos/${el.dataset.id}/rechazar`); state.ajustes.accesos = r.accesos; state.me.accesos = r.accesos.length; toast('Registro rechazado'); renderView(); } catch (e) { toast(e.message, true); }
+  },
+  verAccesos: async (el) => {
+    try { await api('POST', '/api/notificaciones/leer', { ids: [Number(el.dataset.id)] }); } catch { /* se verá otra vez, sin más */ }
+    state.notifPending = false; closeOverlay(); state.ajustes = null; location.hash = '#/ajustes';
+  },
 
   // ---- solicitudes e informes (encargados)
   solFiltro: (el) => { state.sol.filtro = el.dataset.f; renderView(); },
@@ -2686,6 +2805,7 @@ const changeActions = {
   calPersona: (el) => { state.cal.persona = el.value; renderView(); },
   periodo: (el) => { const h = state[el.dataset.h]; h[el.dataset.k] = el.value; if (h.hasta && h.desde && h.hasta >= h.desde) { h.data = undefined; } renderView(); },
   userRol: (el) => { $('#user-emp').hidden = el.value !== 'empleado'; },
+  accesoRol: (el) => { el.closest('form').querySelector('.acceso-emp').hidden = el.value !== 'empleado'; },
 };
 
 function renameRefs(kind, i, value) {
@@ -2790,11 +2910,33 @@ document.addEventListener('submit', async (e) => {
       if (state.fb) state.fb.data = undefined;
       if (!isWorker()) { state.me.comentarios = (state.me.comentarios || 0) + 1; renderView(); }
     } catch (err) { toast(err.message, true); }
+  } else if (f.id === 'cuenta-form') {
+    try {
+      state.me = { ...state.me, ...(await api('PUT', '/api/mi/cuenta', { email: data.email || null, nombre: data.nombre || null })) };
+      toast('Cuenta guardada'); cuentaDialog();
+      const nb = $('.userbox span'); if (nb) nb.textContent = state.me.nombre;
+    } catch (err) { $('#cuenta-err').textContent = err.message; }
+  } else if (f.id === 'reset-form') {
+    try { state.ajustes.users = await api('POST', `/api/usuarios/${encodeURIComponent(f.dataset.u)}/clave`, { password: data.password }); closeOverlay(); toast(`Contraseña temporal guardada. Pásasela a ${f.dataset.u}.`); renderView(); } catch (err) { toast(err.message, true); }
+  } else if (f.id === 'email-form') {
+    try { state.ajustes.users = await api('PUT', `/api/usuarios/${encodeURIComponent(f.dataset.u)}/email`, { email: data.email || null }); closeOverlay(); toast('Correo guardado'); renderView(); } catch (err) { toast(err.message, true); }
+  } else if (f.id === 'acceso-form') {
+    try {
+      const r = await api('POST', `/api/accesos/${f.dataset.id}/aprobar`, { usuario: data.usuario, nombre: data.nombre || null, rol: data.rol, empleado_id: data.rol === 'empleado' ? data.empleado_id : null });
+      state.ajustes.accesos = r.accesos; state.ajustes.users = r.usuarios; state.me.accesos = r.accesos.length;
+      toast(`Acceso dado a ${data.usuario}: ya puede entrar con Google`); renderView();
+    } catch (err) { toast(err.message, true); }
+  } else if (f.id === 'google-form') {
+    try {
+      state.ajustes.google = await api('PUT', '/api/ajustes/google', { client_id: data.client_id || null });
+      state.me.google_client_id = state.ajustes.google.client_id;
+      toast(state.ajustes.google.client_id ? 'Entrar con Google activado' : 'Entrar con Google desactivado'); renderView();
+    } catch (err) { toast(err.message, true); }
   } else if (f.id === 'pw-form') {
     if (data.nueva !== data.repite) { $('#pw-err').textContent = 'Las contraseñas nuevas no coinciden'; return; }
     try {
       const forced = state.me.cambiar_clave;
-      state.me = { ...state.me, ...(await api('POST', '/api/mi/clave', { actual: data.actual, nueva: data.nueva })) };
+      state.me = { ...state.me, ...(await api('POST', '/api/mi/clave', { actual: data.actual || '', nueva: data.nueva })) };
       closeOverlay(); toast('Contraseña cambiada');
       if (forced) await boot();
     } catch (err) { $('#pw-err').textContent = err.message; }
@@ -2846,6 +2988,7 @@ async function importConfig(file) {
 
 async function boot() {
   try { state.me = await api('GET', '/api/me'); } catch { state.me = null; }
+  if (!state.me) { try { state.acceso = await api('GET', '/api/acceso'); } catch { state.acceso = {}; } }
   state.mi = {}; state.miH = {}; state.inf = {}; state.sol = {};
   if (state.me && !state.me.cambiar_clave && state.me.rol === 'admin') { await loadConfig(); await refreshList(); }
   $('#app').innerHTML = '';
