@@ -31,3 +31,8 @@
 /lopita/*
   X-Robots-Tag: noindex, nofollow
   Cache-Control: no-cache
+
+# Demo de la app de horarios: Python en el navegador (Pyodide) necesita compilar WebAssembly
+/lopita/horarios/*
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'
