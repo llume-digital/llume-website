@@ -4,13 +4,15 @@
 // Con «nube» (config.js) la base de datos además se comparte: se baja al arrancar y antes de atender una petición
 // si hace rato que no se mira, y se sube tras cada cambio. La versión la lleva el servidor (ETag "v<n>"): si otro
 // subió antes, la subida falla con 412 y se recargan sus datos.
+// Tras cada subida, si han cambiado, se suben también los calendarios .ics de cada persona (`<nube>/cal`), que el
+// Worker sirve públicamente por su enlace secreto para que Google Calendar o el iPhone se suscriban.
 import { loadPyodide } from './pyodide/pyodide.mjs';
 
 const DATOS = '/datos';
 let py = null;
 let servidor = null;
 let cola = Promise.resolve(); // las peticiones se atienden de una en una, como un servidor de un hilo
-let nube = null; // { url, clave, version, mirado }
+let nube = null; // { url, clave, version, mirado, calendarios }
 const DB = `${DATOS}/lopita.db`;
 const MIRAR_CADA_MS = 15_000;
 
@@ -53,6 +55,21 @@ async function subir() {
   if (!r.ok) throw new ErrorNube(`No se pudo guardar en el servidor (${r.status})`);
   nube.version = versionDe(r);
   nube.mirado = Date.now();
+  await subirCalendarios();
+}
+
+// Los calendarios no deben impedir guardar: si fallan, se reintentan en la siguiente subida.
+async function subirCalendarios() {
+  try {
+    const json = servidor.calendarios();
+    if (json === nube.calendarios) return;
+    const r = await fetch(new URL('cal', nube.base).href, { method: 'PUT', cache: 'no-store', body: json,
+      headers: { Authorization: `Bearer ${nube.clave}`, 'Content-Type': 'application/json' } });
+    if (r.ok) nube.calendarios = json;
+    else console.warn('No se pudieron subir los calendarios', r.status);
+  } catch (e) {
+    console.warn('No se pudieron subir los calendarios', e);
+  }
 }
 
 function guardar() {
@@ -76,14 +93,16 @@ async function arrancar(paquetes, configNube) {
 
   let nueva = false;
   if (configNube) {
-    nube = { url: new URL(configNube.ruta, self.location.href).href, clave: configNube.clave, version: 0, mirado: 0 };
+    const url = new URL(configNube.ruta, self.location.href).href;
+    nube = { url, base: new URL('./', url).href, clave: configNube.clave, version: 0, mirado: 0, calendarios: null };
     avisar('Bajando los datos compartidos…');
     nueva = !(await bajar());
   }
 
   py.runPython("import sys; sys.path.insert(0, '/lopita')");
   servidor = py.pyimport('lopita_offline');
-  const demo = servidor.iniciar(DATOS).toJs({ dict_converter: Object.fromEntries });
+  const demo = servidor.iniciar(DATOS, 60, nube ? nube.base : undefined, nube ? nube.clave : undefined)
+    .toJs({ dict_converter: Object.fromEntries });
   await guardar();
   if (nueva) await subir(); // primera vez: los datos de ejemplo pasan a ser los compartidos
   return demo;
