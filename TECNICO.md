@@ -142,8 +142,11 @@ Los prototipos de webs para empresas (que enseñamos antes de cerrar trato) no t
 | Carpeta | Cliente | Qué es |
 |---|---|---|
 | `public/elpuertoluanco/` | Cafetería El Puerto (Luanco, Asturias) | Web de una página y carta digital para QR en `carta/` |
+| `public/lopita/` | Lopita & Co (Oviedo) | Web nueva de lopita.es. Se genera desde `Serralom/lopita-horarios` con `python herramientas/exportar_vista_previa.py <ruta a este repo>/public/lopita`: no se edita aquí. Formularios en modo vista previa (no envían) y carta enlazada a los PDF de lopita.es |
 
 Pendiente en `elpuertoluanco`: fotos propias (las actuales son provisionales), vinos y alérgenos por plato en `carta/carta.json`, horario confirmado, historia real del bar, más reseñas de Google hasta 20 en `resenas.json`, QR de la carta y de reseñas, versión en inglés, y quitar el `noindex` al cerrar el acuerdo (destino previsto: `elpuertoluanco.es`).
+
+Las fotos de `lopita/recursos/img/` vienen de lopita.es (se bajan con `herramientas/descargar_recursos_web.sh` en `lopita-horarios`; desde servidores lopita.es responde 403). Al regenerar con el exportador se conservan si están en `web/recursos/img`. Destino previsto: `lopita.es`.
 
 ## 11. Auditoría de octubre de 2026
 
