@@ -45,7 +45,7 @@ const ICON = {
 const state = {
   me: null, config: null, draft: null, version: null, dirty: false, saveError: null,
   schedules: [], current: null, gen: null, ajustes: null, showPast: false, loading: false,
-  mi: {}, miH: {}, inf: {}, sol: {}, web: {}, alg: {}, alf: { sev: null, cat: null }, fix: null,
+  mi: {}, miH: {}, inf: {}, sol: {}, web: {}, alg: {}, calT: {}, alf: { sev: null, cat: null }, fix: null,
   vista: 'semana', diaFecha: null, dia: null, diaEval: null,
   cal: { modo: 'semana', ref: null, persona: '', data: {} },
 };
@@ -1598,7 +1598,8 @@ function viewAjustes() {
     <div class="card"><h2>Slack</h2>
       ${slack.configurado ? (slack.ok ? `<div class="notice ok">Conectado a <b>${esc(slack.equipo || '')}</b> como ${esc(slack.bot || '')}. Canal: <b>${esc(slack.canal || 'sin canal')}</b>.</div>` : `<div class="notice warn">El token de Slack no funciona: ${esc(slack.error || 'error desconocido')}.</div>`)
       : '<div class="notice info">Slack no está conectado. Mientras tanto, al publicar verás los mensajes que se enviarían (modo simulación).</div>'}
-      <p class="small muted">Se configura en el servidor con <code>SLACK_BOT_TOKEN</code> y <code>SLACK_CHANNEL</code>. Para los mensajes privados, rellena el usuario de Slack o el email de cada persona en Equipo.</p></div>
+      <p class="small muted">${slack.relevo ? 'En esta versión el token no se guarda en la app: se configura en Cloudflare (secreto <code>SLACK_BOT_TOKEN</code> y variable <code>SLACK_CHANNEL</code> del Worker).' : 'Se configura en el servidor con <code>SLACK_BOT_TOKEN</code> y <code>SLACK_CHANNEL</code>.'} Para los mensajes privados, rellena el usuario de Slack o el email de cada persona en Equipo.</p></div>
+    ${teamCalendarsCard()}
     <div class="card"><h2>Entrar con Google</h2>
       ${google.client_id ? '<div class="notice ok small">Activado: en la pantalla de entrada sale el botón de Google.</div>' : '<div class="notice info small">Desactivado. Pega el ID de cliente de Google para activarlo.</div>'}
       <form id="google-form" class="stack" style="gap:10px;margin-top:10px">
@@ -1716,7 +1717,46 @@ function viewMiInicio() {
       <p class="small muted" style="margin-bottom:0">Tus turnos aparecen resaltados.</p>
     </div>
   </div>
+  ${myCalendarCard()}
   <div class="card section"><h2>Mis solicitudes${pend ? ` <span class="badge warn">${pend} pendiente${pend > 1 ? 's' : ''}</span>` : ''}</h2>${myRequests(p)}</div>`;
+}
+
+// Suscripción al calendario: el enlace es fijo y Google o el iPhone lo vuelven a leer solos.
+function calButtons(en, copyAct) {
+  return `<div class="row" style="gap:8px;flex-wrap:wrap">
+    <a class="btn primary small" href="${esc(en.google)}" target="_blank" rel="noopener">Añadir a Google Calendar</a>
+    <a class="btn small" href="${esc(en.webcal)}">Añadir a iPhone o Mac</a>
+    <button class="btn small" data-act="${copyAct}" data-url="${esc(en.url)}">Copiar enlace</button>
+  </div>`;
+}
+
+function myCalendarCard() {
+  if (state.mi.cal === undefined) {
+    state.mi.cal = null;
+    api('GET', '/api/mi/calendario').then((v) => { state.mi.cal = v; renderView(); }).catch(() => { state.mi.cal = { disponible: false }; });
+  }
+  const c = state.mi.cal;
+  if (!c || !c.disponible) return '';
+  return `<div class="card section" id="mi-calendario"><h2>Tus turnos en tu calendario</h2>
+    <p class="small muted">Suscríbete una vez y tus turnos aparecerán en Google Calendar o en el calendario del iPhone, junto a tus otras citas. Cuando se publique o cambie un horario, se actualiza solo (Google puede tardar unas horas en refrescarlo).</p>
+    ${c.enlaces ? `${calButtons(c.enlaces, 'copyCal')}
+      <details class="small" style="margin-top:12px"><summary class="muted" style="cursor:pointer">Otros calendarios y privacidad</summary>
+        <p>En Outlook u otras apps, usa «Suscribirse desde la web» o «Añadir calendario por URL» y pega el enlace. En Android, añádelo desde Google Calendar en el ordenador y activa la sincronización de ese calendario en el móvil.</p>
+        <p>Quien tenga el enlace puede ver tus turnos. Si lo has compartido sin querer, cámbialo: el anterior deja de funcionar y tendrás que suscribirte de nuevo.</p>
+        <button class="btn small" data-act="renewCal">Cambiar el enlace</button></details>`
+    : '<button class="btn primary" data-act="createCal">Crear mi enlace de calendario</button>'}
+  </div>`;
+}
+
+function teamCalendarsCard() {
+  const err = ensure(state.calT, 'data', '/api/calendarios'); if (err) return '';
+  const d = state.calT.data;
+  if (!d.disponible) return '';
+  return `<div class="card"><h2>Calendarios del equipo</h2>
+    <p class="small muted">Cada persona puede suscribirse a sus turnos desde Google Calendar o el iPhone (lo hace sola desde su Inicio, y el enlace también va en su mensaje de Slack). Desde aquí puedes crear o copiar el enlace para mandárselo por otra vía.</p>
+    <table class="list"><tbody>${d.personas.map((p) => `<tr><td><b>${esc(p.nombre)}</b></td><td style="text-align:right">${p.enlaces
+      ? `<button class="btn small" data-act="copyCal" data-url="${esc(p.enlaces.url)}">Copiar enlace</button>`
+      : `<button class="btn small" data-act="createTeamCal" data-id="${esc(p.empleado_id)}">Crear enlace</button>`}</td></tr>`).join('')}</tbody></table></div>`;
 }
 
 function viewMisHoras() {
@@ -1957,6 +1997,7 @@ const GUIA_WORKER = [
   { id: 'inicio', titulo: 'Inicio', para: 'Tus próximos turnos y los avisos de cambios.', pasos: [
     'Arriba ves tus turnos de los próximos días.',
     'Si tu horario cambia, sale un aviso con lo que ha cambiado; márcalo como visto.',
+    'En <b>Tus turnos en tu calendario</b>, suscríbete desde Google Calendar o el iPhone: tus turnos salen en tu calendario y se actualizan solos.',
   ] },
   { id: 'horas', titulo: 'Mis horas', para: 'Las horas que has trabajado y corregir un día que fue distinto.', pasos: [
     'Elige el periodo para ver tus horas previstas y ajustadas.',
@@ -2217,7 +2258,7 @@ function viewForcePw() {
 const confirmLeave = () => !state.dirty || window.confirm('Tienes cambios sin guardar. ¿Descartarlos?');
 
 const actions = {
-  logout: async () => { await api('POST', '/api/logout'); state.me = null; state.config = state.draft = null; state.dirty = false; state.mi = {}; state.miH = {}; state.inf = {}; state.sol = {}; state.web = {}; state.ajustes = null; state.current = null; try { state.acceso = await api('GET', '/api/acceso'); } catch { state.acceso = {}; } render(); },
+  logout: async () => { await api('POST', '/api/logout'); state.me = null; state.config = state.draft = null; state.dirty = false; state.mi = {}; state.miH = {}; state.inf = {}; state.sol = {}; state.web = {}; state.ajustes = null; state.calT = {}; state.current = null; try { state.acceso = await api('GET', '/api/acceso'); } catch { state.acceso = {}; } render(); },
   save: () => saveConfig(),
   discard: () => { state.draft = clone(state.config); state.dirty = false; state.saveError = null; renderView(); },
 
@@ -2279,6 +2320,15 @@ const actions = {
     const a = state.draft.alertas, c = el.dataset.code;
     a.desactivadas = a.desactivadas.includes(c) ? a.desactivadas.filter((x) => x !== c) : [...a.desactivadas, c];
     markDirty(); renderView();
+  },
+  createCal: async () => { state.mi.cal = await api('POST', '/api/mi/calendario', {}); renderView(); toast('Enlace creado'); },
+  renewCal: async () => {
+    if (!window.confirm('El enlace actual dejará de funcionar y tendrás que volver a suscribirte. ¿Cambiarlo?')) return;
+    state.mi.cal = await api('POST', '/api/mi/calendario', { renovar: true }); renderView(); toast('Enlace cambiado');
+  },
+  createTeamCal: async (el) => { await api('POST', `/api/calendarios/${encodeURIComponent(el.dataset.id)}`, {}); state.calT.data = undefined; renderView(); toast('Enlace creado'); },
+  copyCal: async (el) => {
+    try { await navigator.clipboard.writeText(el.dataset.url); toast('Enlace copiado'); } catch { window.prompt('Copia el enlace:', el.dataset.url); }
   },
   readNotices: async () => {
     state.mi.perfil = await api('POST', '/api/mi/avisos/leer', {});

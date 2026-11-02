@@ -20,6 +20,9 @@
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["LopitaDatos"] }],
   "vars": {
     // sha256 de la clave de acceso a los datos de Lopita (la clave no está en el repo)
-    "LOPITA_CLAVE_SHA256": "6ee72bf395616d1c96c79e8a64811a73c3bec78b9dde0389db5b8e618cb9bb8d"
+    "LOPITA_CLAVE_SHA256": "6ee72bf395616d1c96c79e8a64811a73c3bec78b9dde0389db5b8e618cb9bb8d",
+    // Canal de Slack donde la app de horarios anuncia cada horario publicado. El token del bot NO va aquí: es un
+    // secreto (`npx wrangler secret put SLACK_BOT_TOKEN`); mientras no exista, la app trabaja en modo simulación.
+    "SLACK_CHANNEL": "#horarios"
   }
 }
