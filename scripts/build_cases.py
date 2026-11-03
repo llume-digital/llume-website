@@ -44,6 +44,12 @@ BREADCRUMB = {"es": "Ruta de navegación", "en": "Breadcrumb", "pt": "Caminho de
 HOME_NAME = {"es": "Inicio", "en": "Home", "pt": "Início"}
 CASES_NAME = {"es": "Casos", "en": "Case studies", "pt": "Casos"}
 
+CLIENTS = {
+    "clevercar": ("Clevercar", "https://www.clevercar.pt/", "/assets/partners/clevercar.svg"),
+    "proactive": ("Proactive Future", "https://proactivefuture.eu/", "/assets/partners/proactive-future.webp"),
+    "corradi": ("Corradi", "https://mapa.proactivefuture.eu/", "/assets/partners/corradi.svg"),
+}
+
 ARTICLE = re.compile(r'<article class="cx[^"]*" id="caso-(\w+)" data-case="\w+">(.*?)</article>', re.S)
 
 def between(text, start, end):
@@ -74,9 +80,11 @@ def render(c, cases, L, code, available):
     desc = text_of(c["solution"])
     title = text_of(c["title"])
     home = f"https://llumedigital.com{L['home']}"
+    client = CLIENTS.get(c["slug"])
+    client_schema = {"about": {"@type": "Organization", "name": client[0], "url": client[1]}} if client else {}
     schema = {"@context": "https://schema.org", "@graph": [
         {"@type": "Article", "headline": title, "description": desc, "inLanguage": L["html_lang"], "image": "https://llumedigital.com/assets/og.png",
-         "mainEntityOfPage": url, "author": {"@type": "Organization", "name": "llume", "url": home},
+         "mainEntityOfPage": url, **client_schema, "author": {"@type": "Organization", "name": "llume", "url": home},
          "publisher": {"@type": "Organization", "name": "llume", "logo": {"@type": "ImageObject", "url": "https://llumedigital.com/assets/og.png"}}},
         {"@type": "BreadcrumbList", "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": HOME_NAME[code], "item": home},
@@ -92,6 +100,7 @@ def render(c, cases, L, code, available):
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="{url}">
 {alternates}
+  <link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/{c['slug']}">
   <meta property="og:type" content="article">
   <meta property="og:locale" content="{L['og']}">
   <meta property="og:site_name" content="llume">
@@ -99,6 +108,7 @@ def render(c, cases, L, code, available):
   <meta property="og:title" content="{html.escape(text_of(c['title']))}">
   <meta property="og:description" content="{html.escape(desc)}">
   <meta property="og:image" content="https://llumedigital.com/assets/og.png">
+  <meta property="og:image:alt" content="llume">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#07070a">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">

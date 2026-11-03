@@ -160,7 +160,10 @@ if (dialog) {
     history.replaceState(null, "", location.pathname + location.search);
   });
   // The whole card opens the case; its button keeps it reachable by keyboard
-  document.querySelectorAll(".cx").forEach((card) => card.addEventListener("click", () => openCase(card)));
+  document.querySelectorAll(".cx").forEach((card) => card.addEventListener("click", (event) => {
+    if (event.target.closest("a")) return;
+    openCase(card);
+  }));
   // "See case" links elsewhere on the page
   document.querySelectorAll("[data-open-case]").forEach((btn) =>
     btn.addEventListener("click", (e) => {

@@ -951,3 +951,66 @@ html:has(dialog[open]) { overflow-y: hidden; }
 .quote-rotating { transition: opacity .55s ease, filter .55s ease; min-height: 4.5em; }
 .quote-rotating.is-fading { opacity: 0; filter: blur(8px); }
 @media (prefers-reduced-motion: reduce) { .quote-rotating { transition: none; } }
+
+/* Client identity stays visible in cards, dialogs and case pages. */
+.case-brand { position: absolute; z-index: 4; right: 18px; bottom: 18px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 50px; max-width: calc(100% - 36px); padding: 9px 13px; border: 1px solid rgba(255,255,255,.2); border-radius: 10px; background: rgba(5,12,21,.9); box-shadow: 0 8px 30px rgba(0,0,0,.32); backdrop-filter: blur(12px); transition: transform .2s, border-color .2s; }
+.case-brand:hover { transform: translateY(-2px); border-color: var(--amber); }
+.case-brand img { display: block; width: auto; max-width: 145px; height: 26px; object-fit: contain; }
+.case-brand-corradi img { height: 32px; }
+.case-brand-clevercar img { height: 24px; }
+.case-brand span { color: var(--amber); font-size: 16px; line-height: 1; }
+.case-page .case-brand { right: 24px; bottom: 24px; }
+.case-page .case-brand img, .cd-media .case-brand img { max-width: 180px; height: 34px; }
+
+/* Clevercar: a larger, calmer product view with a readable process overview. */
+.media-crm { background: radial-gradient(circle at 68% 14%, rgba(49,151,208,.32), transparent 40%), linear-gradient(145deg,#052238,#07111b 75%); }
+.crm { left: 5%; right: 5%; top: 9%; bottom: 19%; border: 1px solid rgba(255,255,255,.22); border-radius: 13px; box-shadow: 0 22px 55px rgba(0,0,0,.46); }
+.crm-top { min-height: 36px; padding: 8px 14px; }
+.crm-top img { height: 15px; }
+.crm-search { max-width: 45%; padding: 5px 11px; }
+.crm-user { width: 22px; height: 22px; }
+.crm-summary { display: flex; gap: 10px; padding: 10px 12px 2px; background: #f4f6f8; }
+.crm-summary span { display: flex; align-items: center; justify-content: space-between; flex: 1; padding: 6px 8px; border: 1px solid #dfe6ec; border-radius: 5px; background: #fff; color: #506276; font-size: 8px; }
+.crm-summary b { color: #0b4166; font-size: 12px; }
+.crm-cols { gap: 8px; padding: 10px 12px 12px; }
+.crm-col { gap: 7px; padding: 8px; }
+.crm-card { min-height: 34px; padding: 7px; }
+.crm-card strong { font-size: 9px; }
+.crm-card small { font-size: 8px; }
+
+/* About: clear rhythm between the introduction, service grid, team and CTA. */
+.about-page > h2 { margin-top: clamp(72px, 9vw, 108px); margin-bottom: 16px; max-width: 720px; }
+.about-page > h2 + p { max-width: 720px; color: var(--muted); font-size: 17px; }
+.about-page .grid-4 { margin-top: 28px; }
+.about-page .mission { margin-top: 32px; }
+.about-section { margin-top: clamp(88px, 11vw, 140px); }
+.about-section-heading { max-width: 700px; margin-bottom: 34px; }
+.about-section-heading h2 { margin-bottom: 14px; }
+.about-section-heading > p:last-child { color: var(--muted); font-size: 17px; }
+.team-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.team-card { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
+.team-photo { aspect-ratio: 4 / 4.3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; background: radial-gradient(circle at 75% 20%,rgba(242,192,138,.18),transparent 42%), linear-gradient(155deg,#1c222d,#101014 70%); border-bottom: 1px solid var(--line); }
+.team-photo > span { display: grid; place-items: center; width: 96px; height: 96px; border: 1px solid rgba(242,192,138,.4); border-radius: 50%; color: var(--amber); font-size: 48px; font-weight: 300; }
+.team-photo small { color: var(--muted); font: 400 10px var(--mono); letter-spacing: .13em; text-transform: uppercase; }
+.team-photo small { max-width: 100%; padding: 0 8px; text-align: center; overflow-wrap: anywhere; }
+.team-card-info { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px; }
+.team-card-info h3 { font-size: 21px; }
+.team-card-info a { color: var(--amber); font-size: 12px; text-align: right; }
+.team-card-info a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.about-page > .offer { margin-top: clamp(80px, 10vw, 120px); }
+@media (max-width: 700px) {
+  .team-grid { grid-template-columns: 1fr; }
+  .team-card { display: grid; grid-template-columns: 38% 1fr; }
+  .team-photo { aspect-ratio: 1; min-height: 170px; }
+  .team-photo > span { width: 68px; height: 68px; font-size: 34px; }
+  .team-photo small { font-size: 8px; letter-spacing: .08em; }
+  .team-card-info { flex-direction: column; align-items: flex-start; justify-content: center; }
+  .team-card-info a { text-align: left; }
+  .cx-media.media-crm { aspect-ratio: 4 / 3; }
+  .crm { top: 7%; bottom: 34%; }
+  .media-crm .case-brand { bottom: 9px; min-height: 38px; padding: 6px 10px; }
+  .media-crm .case-brand img, .case-page .media-crm .case-brand img { height: 20px; max-width: 130px; }
+  .crm-summary { display: none; }
+}
+.cx-page-link { align-self: flex-start; color: var(--muted); font-size: 12px; text-decoration: underline; text-underline-offset: 4px; }
+.cx-page-link:hover { color: var(--amber); }
