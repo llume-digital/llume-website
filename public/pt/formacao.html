@@ -69,6 +69,29 @@
     <p class="t-tools">É independente da ferramenta: trabalhamos com ChatGPT, Claude, Gemini, Microsoft Copilot ou a que usarem.</p>
     <p class="law-note">Além disso, o Regulamento europeu da IA obriga as empresas que usam IA a adotar medidas para que o seu pessoal tenha um nível suficiente de literacia em IA (artigo 4.º).</p>
 
+    <section id="calculadora" class="train-calc" aria-labelledby="calc-title">
+      <p class="eyebrow">Calculadora</p>
+      <h2 id="calc-title">Quanto lhe custam<br>as tarefas repetitivas?</h2>
+      <p class="sub">Faça as contas em dez segundos. É uma estimativa, mas costuma surpreender.</p>
+      <div class="calc" id="calc" data-locale="pt-PT" data-msg="Segundo a calculadora, dedicamos cerca de {hours} horas por ano a tarefas repetitivas ({cost}) e poderíamos recuperar cerca de {saved} horas ({savedCost}). Gostaríamos de perceber como.">
+        <div class="calc-in">
+          <label><span>Pessoas que fazem a tarefa <output data-for="people">3</output></span><input type="range" name="people" min="1" max="50" value="3"></label>
+          <label><span>Horas por semana por pessoa <output data-for="hours">5</output></span><input type="range" name="hours" min="1" max="40" value="5"></label>
+          <label><span>Custo por hora <output data-for="rate" data-suffix=" €">25 €</output></span><input type="range" name="rate" min="10" max="100" step="5" value="25"></label>
+          <label><span>Parte que se pode automatizar <output data-for="share" data-suffix=" %">50 %</output></span><input type="range" name="share" min="10" max="90" step="5" value="50"></label>
+        </div>
+        <div class="calc-out" aria-live="polite">
+          <p class="calc-k">A sua equipa dedica hoje</p>
+          <p class="calc-now"><b data-out="hoursYear">690</b> horas por ano · <b data-out="costYear">17 250 €</b></p>
+          <p class="calc-k">Podia recuperar</p>
+          <p class="calc-big"><b data-out="savedHours">345</b> horas</p>
+          <p class="calc-money"><b data-out="savedCost">8625 €</b> por ano</p>
+          <a href="/pt/#contacto" class="btn btn-light" data-calc-cta>Quero recuperar esse tempo <span aria-hidden="true">→</span></a>
+          <small>Cálculo: pessoas × horas × 46 semanas de trabalho × custo por hora × parte automatizável.</small>
+        </div>
+      </div>
+    </section>
+
     <div class="offer">
       <div>
         <h3>Formamos a sua equipa?</h3>

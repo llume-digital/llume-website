@@ -802,6 +802,9 @@ input::placeholder, textarea::placeholder { color: #a39c92; opacity: 1; }
 .guide .card-list { margin: 0; }
 .train-page .sessions { margin-top: 0; }
 .train-page .law-note { margin-top: 14px; }
+.train-calc { margin-top: clamp(72px, 9vw, 112px); padding-top: clamp(40px, 6vw, 72px); border-top: 1px solid var(--line); }
+.train-calc h2 { font-size: clamp(32px, 4.5vw, 52px); max-width: 760px; }
+.train-calc .sub { max-width: 720px; }
 @media (max-width: 1000px) { .sessions { grid-template-columns: 1fr; } .guide { grid-template-columns: 1fr; } }
 
 /* footer social */

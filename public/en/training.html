@@ -69,6 +69,29 @@
     <p class="t-tools">It is tool-independent: we work with ChatGPT, Claude, Gemini, Microsoft Copilot or whichever you use.</p>
     <p class="law-note">What is more, the EU AI Act requires companies that use AI to take measures to ensure a sufficient level of AI literacy among their staff (Article 4).</p>
 
+    <section id="calculadora" class="train-calc" aria-labelledby="calc-title">
+      <p class="eyebrow">Calculator</p>
+      <h2 id="calc-title">How much do repetitive<br>tasks cost you?</h2>
+      <p class="sub">Do the maths in ten seconds. It&#x27;s an estimate, but it usually surprises people.</p>
+      <div class="calc" id="calc" data-locale="en-GB" data-msg="According to the calculator, we spend about {hours} hours a year on repetitive tasks ({cost}) and could get back about {saved} hours ({savedCost}). We&#x27;d like to see how.">
+        <div class="calc-in">
+          <label><span>People doing the task <output data-for="people">3</output></span><input type="range" name="people" min="1" max="50" value="3"></label>
+          <label><span>Hours per week per person <output data-for="hours">5</output></span><input type="range" name="hours" min="1" max="40" value="5"></label>
+          <label><span>Cost per hour <output data-for="rate" data-prefix="€">€25</output></span><input type="range" name="rate" min="10" max="100" step="5" value="25"></label>
+          <label><span>Share that can be automated <output data-for="share" data-suffix=" %">50 %</output></span><input type="range" name="share" min="10" max="90" step="5" value="50"></label>
+        </div>
+        <div class="calc-out" aria-live="polite">
+          <p class="calc-k">Your team spends today</p>
+          <p class="calc-now"><b data-out="hoursYear">690</b> hours a year · <b data-out="costYear">€17,250</b></p>
+          <p class="calc-k">You could get back</p>
+          <p class="calc-big"><b data-out="savedHours">345</b> hours</p>
+          <p class="calc-money"><b data-out="savedCost">€8,625</b> a year</p>
+          <a href="/en/#contacto" class="btn btn-light" data-calc-cta>I want that time back <span aria-hidden="true">→</span></a>
+          <small>Calculation: people × hours × 46 working weeks × cost per hour × share that can be automated.</small>
+        </div>
+      </div>
+    </section>
+
     <div class="offer">
       <div>
         <h3>Shall we train your team?</h3>

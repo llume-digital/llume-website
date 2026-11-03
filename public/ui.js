@@ -219,6 +219,16 @@ if (form && waSend) {
   });
 }
 
+// The calculator lives on Training; carry its estimate to the contact form.
+const estimate = new URLSearchParams(location.search).get("estimate");
+const contactMessage = form?.querySelector('textarea[name="mensaje"]');
+if (estimate && contactMessage && !contactMessage.value.trim()) {
+  contactMessage.value = estimate;
+  const cleanUrl = new URL(location.href);
+  cleanUrl.searchParams.delete("estimate");
+  history.replaceState(null, "", cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+}
+
 /* ---------- footer year ---------- */
 document.querySelectorAll("[data-year]").forEach((el) => (el.textContent = new Date().getFullYear()));
 
@@ -245,13 +255,14 @@ if (calc) {
   calc.addEventListener("input", update);
   update();
 
-  // "I want that time back" carries the estimate into the contact form
-  const msg = document.querySelector('#contact-form textarea[name="mensaje"]');
-  let prefilled = "";
-  calc.querySelector("[data-calc-cta]")?.addEventListener("click", () => {
-    if (!msg || !calc.dataset.msg || (msg.value.trim() && msg.value !== prefilled)) return;
-    prefilled = calc.dataset.msg.replace(/\{(\w+)\}/g, (_, k) => ({ hours: out.hoursYear, cost: out.costYear, saved: out.savedHours, savedCost: out.savedCost })[k] ?? "");
-    msg.value = prefilled;
+  // The button opens the home contact form with this estimate prefilled.
+  const cta = calc.querySelector("[data-calc-cta]");
+  cta?.addEventListener("click", () => {
+    if (!calc.dataset.msg) return;
+    const prefilled = calc.dataset.msg.replace(/\{(\w+)\}/g, (_, k) => ({ hours: out.hoursYear, cost: out.costYear, saved: out.savedHours, savedCost: out.savedCost })[k] ?? "");
+    const url = new URL(cta.href, location.href);
+    url.searchParams.set("estimate", prefilled);
+    cta.href = url.pathname + url.search + url.hash;
   });
 }
 

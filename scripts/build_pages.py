@@ -219,6 +219,60 @@ TRAINING = {
     },
 }
 
+CALCULATOR = {
+    "es": {
+        "title": "¿Cuánto te cuestan<br>las tareas repetitivas?", "intro": "Haz la cuenta en diez segundos. Es una estimación, pero suele sorprender.",
+        "msg": "Según la calculadora, dedicamos unas {hours} horas al año a tareas repetitivas ({cost}) y podríamos recuperar unas {saved} horas ({savedCost}). Nos gustaría ver cómo.",
+        "fields": ["Personas que hacen la tarea", "Horas a la semana por persona", "Coste por hora", "Parte que se puede automatizar"],
+        "today": "Tu equipo dedica hoy", "hours": "horas al año", "recover": "Podrías recuperar", "hour": "horas", "year": "al año",
+        "cta": "Quiero recuperar ese tiempo", "formula": "Cálculo: personas × horas × 46 semanas laborables × coste por hora × parte automatizable.",
+        "locale": "es-ES", "rate": "25 €", "cost": "17.250 €", "saved_cost": "8.625 €", "money_output": 'data-suffix=" €"',
+    },
+    "en": {
+        "title": "How much do repetitive<br>tasks cost you?", "intro": "Do the maths in ten seconds. It's an estimate, but it usually surprises people.",
+        "msg": "According to the calculator, we spend about {hours} hours a year on repetitive tasks ({cost}) and could get back about {saved} hours ({savedCost}). We'd like to see how.",
+        "fields": ["People doing the task", "Hours per week per person", "Cost per hour", "Share that can be automated"],
+        "today": "Your team spends today", "hours": "hours a year", "recover": "You could get back", "hour": "hours", "year": "a year",
+        "cta": "I want that time back", "formula": "Calculation: people × hours × 46 working weeks × cost per hour × share that can be automated.",
+        "locale": "en-GB", "rate": "€25", "cost": "€17,250", "saved_cost": "€8,625", "money_output": 'data-prefix="€"',
+    },
+    "pt": {
+        "title": "Quanto lhe custam<br>as tarefas repetitivas?", "intro": "Faça as contas em dez segundos. É uma estimativa, mas costuma surpreender.",
+        "msg": "Segundo a calculadora, dedicamos cerca de {hours} horas por ano a tarefas repetitivas ({cost}) e poderíamos recuperar cerca de {saved} horas ({savedCost}). Gostaríamos de perceber como.",
+        "fields": ["Pessoas que fazem a tarefa", "Horas por semana por pessoa", "Custo por hora", "Parte que se pode automatizar"],
+        "today": "A sua equipa dedica hoje", "hours": "horas por ano", "recover": "Podia recuperar", "hour": "horas", "year": "por ano",
+        "cta": "Quero recuperar esse tempo", "formula": "Cálculo: pessoas × horas × 46 semanas de trabalho × custo por hora × parte automatizável.",
+        "locale": "pt-PT", "rate": "25 €", "cost": "17 250 €", "saved_cost": "8625 €", "money_output": 'data-suffix=" €"',
+    },
+}
+
+
+def calculator(code):
+    C, S = CALCULATOR[code], SITE[code]
+    fields = C["fields"]
+    return f'''    <section id="calculadora" class="train-calc" aria-labelledby="calc-title">
+      <p class="eyebrow">{html.escape({"es": "Calculadora", "en": "Calculator", "pt": "Calculadora"}[code])}</p>
+      <h2 id="calc-title">{C["title"]}</h2>
+      <p class="sub">{html.escape(C["intro"])}</p>
+      <div class="calc" id="calc" data-locale="{C["locale"]}" data-msg="{html.escape(C["msg"], quote=True)}">
+        <div class="calc-in">
+          <label><span>{fields[0]} <output data-for="people">3</output></span><input type="range" name="people" min="1" max="50" value="3"></label>
+          <label><span>{fields[1]} <output data-for="hours">5</output></span><input type="range" name="hours" min="1" max="40" value="5"></label>
+          <label><span>{fields[2]} <output data-for="rate" {C["money_output"]}>{C["rate"]}</output></span><input type="range" name="rate" min="10" max="100" step="5" value="25"></label>
+          <label><span>{fields[3]} <output data-for="share" data-suffix=" %">50 %</output></span><input type="range" name="share" min="10" max="90" step="5" value="50"></label>
+        </div>
+        <div class="calc-out" aria-live="polite">
+          <p class="calc-k">{C["today"]}</p>
+          <p class="calc-now"><b data-out="hoursYear">690</b> {C["hours"]} · <b data-out="costYear">{C["cost"]}</b></p>
+          <p class="calc-k">{C["recover"]}</p>
+          <p class="calc-big"><b data-out="savedHours">345</b> {C["hour"]}</p>
+          <p class="calc-money"><b data-out="savedCost">{C["saved_cost"]}</b> {C["year"]}</p>
+          <a href="{S["home"]}#contacto" class="btn btn-light" data-calc-cta>{C["cta"]} <span aria-hidden="true">→</span></a>
+          <small>{C["formula"]}</small>
+        </div>
+      </div>
+    </section>'''
+
 
 def head(code, title, desc, slug, schema):
     S = SITE[code]
@@ -308,6 +362,8 @@ def training(code):
 
     <p class="t-tools">{T['tools']}</p>
     <p class="law-note">{T['law']}</p>
+
+{calculator(code)}
 
     <div class="offer">
       <div>
