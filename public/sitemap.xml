@@ -4,6 +4,7 @@
     <loc>https://llumedigital.com/</loc>
     <lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/"/>
   </url>
@@ -11,6 +12,7 @@
     <loc>https://llumedigital.com/en/</loc>
     <lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/"/>
   </url>
@@ -18,6 +20,7 @@
     <loc>https://llumedigital.com/pt/</loc>
     <lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/"/>
   </url>
@@ -25,6 +28,7 @@
     <loc>https://llumedigital.com/nosotros</loc>
     <lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/nosotros"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/nosotros"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/about"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/sobre-nos"/>
   </url>
@@ -32,6 +36,7 @@
     <loc>https://llumedigital.com/en/about</loc>
     <lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/nosotros"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/nosotros"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/about"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/sobre-nos"/>
   </url>
@@ -39,6 +44,7 @@
     <loc>https://llumedigital.com/pt/sobre-nos</loc>
     <lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/nosotros"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/nosotros"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/about"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/sobre-nos"/>
   </url>
@@ -46,6 +52,7 @@
     <loc>https://llumedigital.com/casos/nube</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/nube"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/nube"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/nube"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/nube"/>
   </url>
@@ -53,6 +60,7 @@
     <loc>https://llumedigital.com/en/cases/nube</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/nube"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/nube"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/nube"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/nube"/>
   </url>
@@ -60,6 +68,7 @@
     <loc>https://llumedigital.com/pt/casos/nube</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/nube"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/nube"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/nube"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/nube"/>
   </url>
@@ -67,6 +76,7 @@
     <loc>https://llumedigital.com/casos/presupuestos</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/presupuestos"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/presupuestos"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/presupuestos"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/presupuestos"/>
   </url>
@@ -74,6 +84,7 @@
     <loc>https://llumedigital.com/en/cases/presupuestos</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/presupuestos"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/presupuestos"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/presupuestos"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/presupuestos"/>
   </url>
@@ -81,6 +92,7 @@
     <loc>https://llumedigital.com/pt/casos/presupuestos</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/presupuestos"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/presupuestos"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/presupuestos"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/presupuestos"/>
   </url>
@@ -88,6 +100,7 @@
     <loc>https://llumedigital.com/casos/seguridad</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/seguridad"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/seguridad"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/seguridad"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/seguridad"/>
   </url>
@@ -95,6 +108,7 @@
     <loc>https://llumedigital.com/en/cases/seguridad</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/seguridad"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/seguridad"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/seguridad"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/seguridad"/>
   </url>
@@ -102,6 +116,7 @@
     <loc>https://llumedigital.com/pt/casos/seguridad</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/seguridad"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/seguridad"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/seguridad"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/seguridad"/>
   </url>
@@ -109,6 +124,7 @@
     <loc>https://llumedigital.com/casos/corradi</loc>
     <lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/corradi"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/corradi"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/corradi"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/corradi"/>
   </url>
@@ -116,6 +132,7 @@
     <loc>https://llumedigital.com/en/cases/corradi</loc>
     <lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/corradi"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/corradi"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/corradi"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/corradi"/>
   </url>
@@ -123,6 +140,7 @@
     <loc>https://llumedigital.com/pt/casos/corradi</loc>
     <lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/corradi"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/corradi"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/corradi"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/corradi"/>
   </url>
@@ -130,6 +148,7 @@
     <loc>https://llumedigital.com/casos/proactive</loc>
     <lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/proactive"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/proactive"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/proactive"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/proactive"/>
   </url>
@@ -137,6 +156,7 @@
     <loc>https://llumedigital.com/en/cases/proactive</loc>
     <lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/proactive"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/proactive"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/proactive"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/proactive"/>
   </url>
@@ -144,6 +164,7 @@
     <loc>https://llumedigital.com/pt/casos/proactive</loc>
     <lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/proactive"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/proactive"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/proactive"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/proactive"/>
   </url>
@@ -151,6 +172,7 @@
     <loc>https://llumedigital.com/casos/clevercar</loc>
     <lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/clevercar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/clevercar"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/clevercar"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/clevercar"/>
   </url>
@@ -158,6 +180,7 @@
     <loc>https://llumedigital.com/en/cases/clevercar</loc>
     <lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/clevercar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/clevercar"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/clevercar"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/clevercar"/>
   </url>
@@ -165,6 +188,7 @@
     <loc>https://llumedigital.com/pt/casos/clevercar</loc>
     <lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/clevercar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/clevercar"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/clevercar"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/clevercar"/>
   </url>
@@ -172,6 +196,7 @@
     <loc>https://llumedigital.com/aviso-legal</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/aviso-legal"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/aviso-legal"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/legal-notice"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/aviso-legal"/>
   </url>
@@ -179,6 +204,7 @@
     <loc>https://llumedigital.com/en/legal-notice</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/aviso-legal"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/aviso-legal"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/legal-notice"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/aviso-legal"/>
   </url>
@@ -186,6 +212,7 @@
     <loc>https://llumedigital.com/pt/aviso-legal</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/aviso-legal"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/aviso-legal"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/legal-notice"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/aviso-legal"/>
   </url>
@@ -193,6 +220,7 @@
     <loc>https://llumedigital.com/privacidad</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/privacidad"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/privacidad"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/privacy"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/privacidade"/>
   </url>
@@ -200,6 +228,7 @@
     <loc>https://llumedigital.com/en/privacy</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/privacidad"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/privacidad"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/privacy"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/privacidade"/>
   </url>
@@ -207,6 +236,7 @@
     <loc>https://llumedigital.com/pt/privacidade</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/privacidad"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/privacidad"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/privacy"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/privacidade"/>
   </url>
@@ -214,6 +244,7 @@
     <loc>https://llumedigital.com/cookies</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/cookies"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/cookies"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cookies"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/cookies"/>
   </url>
@@ -221,6 +252,7 @@
     <loc>https://llumedigital.com/en/cookies</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/cookies"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/cookies"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cookies"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/cookies"/>
   </url>
@@ -228,6 +260,7 @@
     <loc>https://llumedigital.com/pt/cookies</loc>
     <lastmod>2026-10-13</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/cookies"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/cookies"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cookies"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/cookies"/>
   </url>
@@ -235,6 +268,7 @@
     <loc>https://llumedigital.com/casos/vision</loc>
     <lastmod>2026-10-15</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/vision"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/vision"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/vision"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/vision"/>
   </url>
@@ -242,6 +276,7 @@
     <loc>https://llumedigital.com/en/cases/vision</loc>
     <lastmod>2026-10-15</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/vision"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/vision"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/vision"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/vision"/>
   </url>
@@ -249,6 +284,7 @@
     <loc>https://llumedigital.com/pt/casos/vision</loc>
     <lastmod>2026-10-15</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/casos/vision"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/casos/vision"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/cases/vision"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/casos/vision"/>
   </url>
@@ -256,6 +292,7 @@
     <loc>https://llumedigital.com/formacion</loc>
     <lastmod>2026-10-15</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/formacion"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/formacion"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/training"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/formacao"/>
   </url>
@@ -263,6 +300,7 @@
     <loc>https://llumedigital.com/en/training</loc>
     <lastmod>2026-10-15</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/formacion"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/formacion"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/training"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/formacao"/>
   </url>
@@ -270,6 +308,7 @@
     <loc>https://llumedigital.com/pt/formacao</loc>
     <lastmod>2026-10-15</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/formacion"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/formacion"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/training"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/formacao"/>
   </url>
@@ -277,6 +316,7 @@
     <loc>https://llumedigital.com/preguntas</loc>
     <lastmod>2026-10-15</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/preguntas"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/preguntas"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/faq"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/perguntas"/>
   </url>
@@ -284,6 +324,7 @@
     <loc>https://llumedigital.com/en/faq</loc>
     <lastmod>2026-10-15</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/preguntas"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/preguntas"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/faq"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/perguntas"/>
   </url>
@@ -291,6 +332,7 @@
     <loc>https://llumedigital.com/pt/perguntas</loc>
     <lastmod>2026-10-15</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/preguntas"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/preguntas"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/faq"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/perguntas"/>
   </url>
