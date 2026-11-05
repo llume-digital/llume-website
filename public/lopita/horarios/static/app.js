@@ -37,6 +37,11 @@ const fmtStamp = (s) => { if (!s) return ''; const d = new Date(s); return d.toL
 const ICON = {
   lock: '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 9V7a5 5 0 0 0-10 0v2H5v13h14V9h-2Zm-8-2a3 3 0 0 1 6 0v2H9V7Z"/></svg>',
   trash: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  // Iconos de la barra de cuenta: en el móvil sustituyen al texto para que la barra quepa en una línea.
+  guia: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/></svg>',
+  comentar: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z"/></svg>',
+  cuenta: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+  salir: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10"/></svg>',
   mic: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
   plus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
 };
@@ -79,8 +84,39 @@ function queueBadges() {
       state.me.notificaciones = me.notificaciones; state.me.mensajes_web = me.mensajes_web;
       const tabs = $('#tabs'); if (tabs) tabs.innerHTML = tabsHtml(route().name);
       if (me.notificaciones) showNotifications();
+      if (me.arreglos_pendientes) arreglarPendientes();
     } catch { /* la insignia es informativa: si falla no pasa nada */ }
   }, 400);
+}
+
+// Sin servidor, guardar una ausencia o una baja responde al momento y el arreglo de los horarios afectados
+// (que en el móvil puede tardar un rato) se pide aparte, con un aviso fijo mientras dura.
+let arreglando = null;
+function arreglarPendientes() {
+  if (arreglando) return arreglando;
+  const aviso = document.createElement('div');
+  aviso.className = 'toast fijo';
+  aviso.setAttribute('role', 'status');
+  aviso.textContent = 'Ajustando los horarios afectados por el cambio… Puede tardar un poco; lo guardado ya está a salvo.';
+  document.body.appendChild(aviso);
+  arreglando = (async () => {
+    try {
+      const r = await api('POST', '/api/arreglos');
+      if (state.me) state.me.arreglos_pendientes = false;
+      if (r.arreglos.length) {
+        state.current = null;
+        await refreshList();
+        if (!state.dirty) renderView();
+        showNotifications();
+      }
+    } catch (e) {
+      toast(`No se pudieron ajustar los horarios: ${e.message}`, true);
+    } finally {
+      aviso.remove();
+      arreglando = null;
+    }
+  })();
+  return arreglando;
 }
 
 // Avisos al encargado (generación que no vale, arreglo preparado tras una ausencia): salen en una ventana
@@ -106,7 +142,7 @@ async function showNotifications() {
 }
 
 function toast(msg, bad = false) {
-  document.querySelectorAll('.toast').forEach((t) => t.remove());
+  document.querySelectorAll('.toast:not(.fijo)').forEach((t) => t.remove());
   const t = document.createElement('div');
   t.className = `toast${bad ? ' bad' : ''}`;
   t.setAttribute('role', 'status');
@@ -179,6 +215,7 @@ function coerce(el) {
   if (t === 'num') { const v = parseFloat(String(el.value).replace(',', '.')); return Number.isFinite(v) ? v : 0; }
   if (t === 'int') { const v = parseInt(el.value, 10); return Number.isFinite(v) ? v : 0; }
   if (t === 'nullstr') return el.value.trim() === '' ? null : el.value.trim();
+  if (t === 'nullnum') { const v = parseFloat(String(el.value).replace(',', '.')); return Number.isFinite(v) ? v : null; }
   return el.value;
 }
 function markDirty() { state.dirty = true; state.saveError = null; renderSavebar(); }
@@ -195,17 +232,23 @@ function onBind(e) {
 }
 
 // ------------------------------------------------------------------ pintado general
+// Botón de la barra de cuenta: icono y texto; en el móvil solo el icono, así que el nombre va en aria-label.
+const botonCuenta = (act, icono, texto, titulo, extra = '') =>
+  `<button data-act="${act}"${extra} title="${titulo}" aria-label="${texto}">${ICON[icono]}<span class="ub-txt">${texto}</span></button>`;
+
 function render() {
   const app = $('#app');
   if (!state.me) { app.innerHTML = viewLogin(); botonGoogle($('#g-login'), entrarConGoogle); return; }
   if (state.me.cambiar_clave) { app.innerHTML = viewForcePw(); return; }
   if (!$('.topbar')) {
     app.innerHTML = `
-      <header class="topbar"><div class="topbar-inner">
-        <a class="wordmark" href="#/" aria-label="Lopita & Co · Horarios"><b>LOPITA &amp; CO</b><span>Horarios</span></a>
-        <nav class="tabs" id="tabs"></nav>
-        <div class="userbox"><span>${esc(state.me.nombre)}</span><button data-act="goGuia" title="Cómo funciona la app">Guía</button><button data-act="feedback" class="fb-btn" title="Deja una sugerencia, un fallo o una duda">Comentarios</button><button data-act="cuentaDialog">Mi cuenta</button><button data-act="logout">Salir</button></div>
-      </div></header>
+      <header class="topbar">
+        <div class="topbar-inner">
+          <a class="wordmark" href="#/" aria-label="Lopita & Co · Horarios"><b>LOPITA &amp; CO</b><span>Horarios</span></a>
+          <div class="userbox"><span>${esc(state.me.nombre)}</span>${botonCuenta('goGuia', 'guia', 'Guía', 'Cómo funciona la app', ' id="guia-btn"')}${botonCuenta('feedback', 'comentar', 'Comentarios', 'Deja una sugerencia, un fallo o una duda', ' class="fb-btn"')}${botonCuenta('cuentaDialog', 'cuenta', 'Mi cuenta', 'Tu correo, Google y tu contraseña')}${botonCuenta('logout', 'salir', 'Salir', 'Cerrar la sesión')}</div>
+        </div>
+        <div class="tabsbar"><nav class="tabs" id="tabs" aria-label="Secciones"></nav></div>
+      </header>
       <main id="view"></main>
       <div id="savebar"></div>`;
   }
@@ -214,9 +257,9 @@ function render() {
 
 const NAV_ADMIN = [
   ['horarios', 'Horarios'], ['calendario', 'Calendario'], ['alertas', 'Alertas'], ['solicitudes', 'Solicitudes'], ['informes', 'Informes'], ['equipo', 'Equipo'], ['funciones', 'Funciones'], ['turnos', 'Turnos'], ['demanda', 'Demanda'],
-  ['ausencias', 'Ausencias'], ['preferencias', 'Preferencias'], ['reglas', 'Reglas'], ['web', 'Web'], ['comentarios', 'Comentarios'], ['ajustes', 'Ajustes'], ['guia', 'Guía'],
+  ['ausencias', 'Ausencias'], ['preferencias', 'Preferencias'], ['reglas', 'Reglas'], ['web', 'Web'], ['comentarios', 'Comentarios'], ['ajustes', 'Ajustes'],
 ];
-const NAV_WORKER = [['inicio', 'Inicio'], ['horas', 'Mis horas'], ['vacaciones', 'Vacaciones'], ['preferencias', 'Preferencias'], ['guia', 'Guía']];
+const NAV_WORKER = [['inicio', 'Inicio'], ['horas', 'Mis horas'], ['vacaciones', 'Vacaciones'], ['preferencias', 'Preferencias']];
 const isWorker = () => state.me && state.me.rol === 'empleado';
 
 function route() {
@@ -229,7 +272,15 @@ function tabsHtml(name) {
   const count = (n, label) => (n ? `<span class="tab-count" aria-label="${n} ${label}">${n}</span>` : '');
   const crit = !w && state.me.criticas ? `<span class="tab-count crit" aria-label="${state.me.criticas} alertas críticas">${state.me.criticas}</span>` : '';
   const badge = { solicitudes: w ? '' : count(state.me.pendientes, 'pendientes'), alertas: w ? '' : crit + count(state.me.alertas - (state.me.criticas || 0), 'alertas importantes'), inicio: w ? count(state.me.avisos, 'avisos nuevos') : '', web: w ? '' : count(state.me.mensajes_web, 'mensajes nuevos'), comentarios: w ? '' : count(state.me.comentarios, 'comentarios nuevos'), ajustes: w ? '' : count(state.me.accesos, 'registros pendientes') };
-  return (w ? NAV_WORKER : NAV_ADMIN).map(([k, label]) => `<a href="#/${k}" class="${name === k ? 'active' : ''}">${label}${badge[k] || ''}</a>`).join('');
+  return (w ? NAV_WORKER : NAV_ADMIN).map(([k, label]) => `<a href="#/${k}" class="${name === k ? 'active' : ''}"${name === k ? ' aria-current="page"' : ''}>${label}${badge[k] || ''}</a>`).join('');
+}
+
+// La guía vive en la barra de cuenta (no es una sección): su botón se marca cuando estás en ella.
+function marcarGuia(name) {
+  const b = $('#guia-btn');
+  if (!b) return;
+  b.classList.toggle('active', name === 'guia');
+  if (name === 'guia') b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
 }
 
 function renderView() {
@@ -246,8 +297,10 @@ function renderView() {
   const foco = document.activeElement && document.activeElement.closest && document.activeElement.closest('.g-bar');
   const focoEmp = foco && foco.dataset.emp;
   $('#tabs').innerHTML = tabsHtml(name);
+  marcarGuia(name);
   view.innerHTML = views[name]();
   renderSavebar();
+  seguirAnclas();  // un menú abierto sigue abierto si su casilla sigue en la vista
   if (focoEmp) { const b = view.querySelector(`.g-bar[data-emp="${CSS.escape(focoEmp)}"]`); if (b) b.focus({ preventScroll: true }); }
   if (name === 'guia' && r.arg && state.guiaVista !== r.arg) {
     state.guiaVista = r.arg;
@@ -260,13 +313,18 @@ function renderView() {
 function renderSavebar() {
   const bar = $('#savebar');
   if (!bar) return;
-  if (!state.dirty) { bar.innerHTML = ''; return; }
-  bar.innerHTML = `<div class="savebar"><div class="savebar-inner">
+  if (!state.dirty) { bar.innerHTML = ''; bar.dataset.html = ''; return; }
+  const html = `<div class="savebar"><div class="savebar-inner">
     <span>Tienes cambios sin guardar en la configuración.</span><span class="spacer"></span>
     <button class="btn" data-act="discard">Descartar</button>
     <button class="btn primary" data-act="save">Guardar cambios</button>
     ${state.saveError ? `<div class="err" role="alert">No se ha guardado: ${esc(state.saveError)}${state.saveError.includes('ha cambiado') ? ' <button class="btn small" data-act="reloadConfig">Recargar configuración</button>' : ''}</div>` : ''}
   </div></div>`;
+  // Sin cambios no se repinta: al salir de un campo para pulsar «Guardar» salta su «change», y rehacer la barra
+  // entre el mousedown y el mouseup del botón se comía el clic.
+  if (bar.dataset.html === html && bar.firstChild) return;
+  bar.dataset.html = html;
+  bar.innerHTML = html;
 }
 
 function head(title, lead, actions = '') {
@@ -295,6 +353,21 @@ function funcionesDe(cfg, e) {
 }
 const funcTags = (cfg, e) => funcionesDe(cfg, e).map((f) => `<span class="func-tag" style="--fc:${esc(f.color || '#764A09')}">${esc(f.nombre)}</span>`).join('');
 const tipoDe = (e) => (puestosDe(e).length > 1 ? 'Camarero/a y cocinero/a' : TIPOS[puestosDe(e)[0]]);
+// Un comodín no tiene contrato: solo cubre huecos, con un mínimo y un máximo semanales opcionales.
+function horasPersona(e) {
+  if (!e.comodin) return `${fmtH(e.horas_semanales)} h/sem`;
+  const min = e.horas_min_semana, max = e.horas_max_semana;
+  if (min && max != null) return `Comodín · ${fmtH(min)}–${fmtH(max)} h/sem`;
+  if (max != null) return `Comodín · hasta ${fmtH(max)} h/sem`;
+  if (min) return `Comodín · mínimo ${fmtH(min)} h/sem`;
+  return 'Comodín';
+}
+const slackField = (i, e) => `<label class="field">Usuario de Slack<input type="text" placeholder="U01ABC…" value="${esc(e.slack_user_id || '')}" data-type="nullstr" data-bind="empleados.${i}.slack_user_id"></label>`;
+function horasField(i, e) {
+  if (!e.comodin) return `<label class="field">Horas por semana<input type="number" min="1" max="60" step="0.5" value="${e.horas_semanales}" data-bind="empleados.${i}.horas_semanales"></label>`;
+  const num = (campo, label, hint) => `<label class="field">${label}<span class="hint">${hint}</span><input type="number" min="0" max="60" step="0.5" placeholder="Sin ${label.toLowerCase().split(' ')[0]}" value="${e[campo] ?? ''}" data-type="nullnum" data-bind="empleados.${i}.${campo}"></label>`;
+  return `${num('horas_min_semana', 'Mínimo por semana', 'Vacío: solo si hace falta')}${num('horas_max_semana', 'Máximo por semana', 'Vacío: sin tope')}`;
+}
 const empById = (cfg, id) => cfg.empleados.find((e) => e.id === id);
 const puestosDe = (e) => (e && e.puestos && e.puestos.length ? e.puestos : ['sala', 'cocina']);
 const puestoDe = (cfg, a) => a.puesto || puestosDe(empById(cfg, a.empleado_id))[0];
@@ -304,6 +377,11 @@ const usaPuestos = (cfg) => cfg.empleados.some((e) => puestosDe(e).length === 1)
   || (cfg.excepciones_fecha || []).some((o) => (o.franjas || []).some((f) => f.cocina || f.sala))
   || (cfg.tareas || []).some((t) => t.puesto);
 const puestoTag = (p) => `<span class="puesto-tag ${p}" title="${PUESTOS[p]}">${PUESTOS[p][0]}</span>`;
+// Roles de un puesto (caja, cafetera, sala, lava para los camareros): cada persona hace uno en su turno.
+const esRol = (f) => Boolean(f && f.puesto);
+const rolesDe = (cfg, e, p) => (e.funciones || []).filter((id) => { const f = funcById(cfg, id); return f && f.puesto === p; });
+const rolDe = (cfg, a) => { const f = a && a.funcion && funcById(cfg, a.funcion); return esRol(f) ? f : null; };
+const rolTag = (f) => (f ? `<span class="rol-tag" style="--fc:${esc(f.color || '#764A09')}" title="${esc(f.nombre)}">${esc(f.nombre)}</span>` : '');
 // Horas reales de una asignación: las del turno o, si es un turno a medida, las suyas.
 const horasDe = (cfg, a) => { const s = shiftById(cfg, a.turno_id); return s ? { inicio: a.inicio || s.inicio, fin: a.fin || s.fin } : null; };
 const empOptions = (sel) => state.draft.empleados.map((e) => `<option value="${esc(e.id)}" ${e.id === sel ? 'selected' : ''}>${esc(e.nombre)}${e.activo ? '' : ' (inactivo)'}</option>`).join('');
@@ -501,6 +579,12 @@ function scheduleNotices(cur) {
 }
 
 const nameIn = (cfg, id) => (cfg.empleados.find((e) => e.id === id) || {}).nombre || id;
+// Horas de una persona antes y después de un cambio, en rojo si se alejan de su contrato (un comodín no tiene).
+function horasFila(cfg, x) {
+  const comodin = (cfg.empleados.find((e) => e.id === x.empleado_id) || {}).comodin;
+  const tag = (v) => `<span class="${!comodin && Math.abs(v - x.objetivo) > cfg.reglas.margen_periodo_horas ? 'fix-off' : ''}">${fmtH(v)}</span>`;
+  return `<tr><td><b>${esc(nameIn(cfg, x.empleado_id))}</b></td><td class="num">${comodin ? '<span class="muted">Comodín</span>' : fmtH(x.objetivo)}</td><td class="num">${tag(x.antes)} → ${tag(x.despues)}</td></tr>`;
+}
 
 // ------------------------------------------------------------------ ALERTAS DEL ENCARGADO
 const SEV = { critica: 'Crítica', alta: 'Alta', media: 'Media', baja: 'Baja' };
@@ -577,11 +661,7 @@ function fixDialog(p) {
       <div class="row end" style="margin-top:16px"><button class="btn primary" data-act="closeOverlay">Entendido</button></div>`;
   }
   const n = p.cambios.length;
-  const horas = p.horas.map((x) => {
-    const dif = (v) => v - x.objetivo;
-    const tag = (v) => `<span class="${Math.abs(dif(v)) > cfg.reglas.margen_periodo_horas ? 'fix-off' : ''}">${fmtH(v)}</span>`;
-    return `<tr><td><b>${esc(nameIn(cfg, x.empleado_id))}</b></td><td class="num">${fmtH(x.objetivo)}</td><td class="num">${tag(x.antes)} → ${tag(x.despues)}</td></tr>`;
-  }).join('');
+  const horas = p.horas.map((x) => horasFila(cfg, x)).join('');
   const errores = p.errores_antes || p.errores_despues
     ? `<p class="small" style="margin:6px 0 0">Reglas incumplidas: <b>${p.errores_antes}</b> → <b>${p.errores_despues}</b></p>` : '';
   return `<h2>Solucionar problemas</h2>
@@ -668,15 +748,15 @@ function weeksGrid(cur) {
         let inner;
         if (s) {
           mins += toMin(hs.fin) - toMin(hs.inicio);
-          inner = `<span class="pill${a.inicio ? ' custom' : ''}" style="background:${esc(s.color || '#eee')}">${esc(s.id)}${conPuestos ? puestoTag(puestoDe(cfg, a)) : ''}<small>${hs.inicio}–${hs.fin}</small></span>`;
+          inner = `<span class="pill${a.inicio ? ' custom' : ''}" style="background:${esc(s.color || '#eee')}">${esc(s.id)}${conPuestos ? puestoTag(puestoDe(cfg, a)) : ''}<small>${hs.inicio}–${hs.fin}</small>${rolTag(rolDe(cfg, a))}</span>`;
         }
         else if (sid) inner = `<span class="abs">${esc(sid)}?</span>`;
         else if (absence) inner = `<span class="abs">${esc(MOTIVOS[absence.motivo] || absence.motivo)}</span>`;
         else inner = `<span class="off">${fixedOff ? 'libra' : 'libre'}</span>`;
-        const label = `${e.nombre}, ${fmtLong(d)}: ${s ? `${s.nombre} ${hs.inicio}–${hs.fin}${conPuestos ? `, ${PUESTOS[puestoDe(cfg, a)]}` : ''}` : 'libre'}${lock ? ' (cambio manual)' : ''}`;
+        const label = `${e.nombre}, ${fmtLong(d)}: ${s ? `${s.nombre} ${hs.inicio}–${hs.fin}${conPuestos ? `, ${PUESTOS[puestoDe(cfg, a)]}` : ''}${rolDe(cfg, a) ? `, ${rolDe(cfg, a).nombre}` : ''}` : 'libre'}${lock ? ' (cambio manual)' : ''}`;
         return `<td><button class="cell ${errCells.has(key) ? 'has-error' : ''} ${fixedOff && !s ? 'fixed-off' : ''}" data-act="cell" data-emp="${esc(e.id)}" data-date="${d}" aria-label="${esc(label)}">${inner}${lock ? `<span class="lock">${ICON.lock}</span>` : ''}</button></td>`;
       }).join('');
-      return `<tr><td class="emp">${esc(e.nombre)}<small>${fmtH(e.horas_semanales)} h/sem · ${esc(tipoDe(e))}</small><span class="func-tags">${funcTags(cfg, e)}</span></td>${cells}<td class="tot">${fmtH(mins / 60)} h</td></tr>`;
+      return `<tr><td class="emp">${esc(e.nombre)}<small>${esc(horasPersona(e))} · ${esc(tipoDe(e))}</small><span class="func-tags">${funcTags(cfg, e)}</span></td>${cells}<td class="tot">${fmtH(mins / 60)} h</td></tr>`;
     }).join('')}
     </tbody></table></div></div>`;
     start = addDays(start, 7);
@@ -809,7 +889,7 @@ function calSemana(lunes, data, porDia) {
       if (s) {
         const hs = horasDe(cfg, a);
         mins += toMin(hs.fin) - toMin(hs.inicio);
-        inner = `<span class="pill${a.inicio ? ' custom' : ''}" style="background:${esc(s.color || '#eee')}">${esc(s.id)}${usaPuestos(cfg) ? puestoTag(puestoDe(cfg, a)) : ''}<small>${hs.inicio}–${hs.fin}</small></span>`;
+        inner = `<span class="pill${a.inicio ? ' custom' : ''}" style="background:${esc(s.color || '#eee')}">${esc(s.id)}${usaPuestos(cfg) ? puestoTag(puestoDe(cfg, a)) : ''}<small>${hs.inicio}–${hs.fin}</small>${rolTag(rolDe(cfg, a))}</span>`;
       } else inner = `<span class="${aus ? 'abs' : 'off'}">${aus ? esc(MOTIVOS[aus.motivo] || 'Ausencia') : libra ? 'libra' : 'libre'}</span>`;
       const lock = info.bloqueos.includes(e.id);
       return `<td><button class="cell" data-act="calDia" data-date="${d}" aria-label="${esc(`${e.nombre}, ${fmtLong(d)}: ${s ? `${s.nombre}` : 'libre'}. Abrir el día`)}">${inner}${lock ? `<span class="lock">${ICON.lock}</span>` : ''}</button></td>`;
@@ -835,7 +915,7 @@ const DIA_PASO = () => Math.min(30, state.config.reglas.resolucion_minutos);
 function tramosDe(cfg, h, fecha) {
   return h.asignaciones.filter((a) => a.fecha === fecha && shiftById(cfg, a.turno_id)).map((a) => {
     const hs = horasDe(cfg, a);
-    return { empleado_id: a.empleado_id, inicio: hs.inicio, fin: hs.fin, puesto: puestoDe(cfg, a), turno_id: a.turno_id };
+    return { empleado_id: a.empleado_id, inicio: hs.inicio, fin: hs.fin, puesto: puestoDe(cfg, a), funcion: a.funcion || null, turno_id: a.turno_id };
   });
 }
 
@@ -857,7 +937,7 @@ function diaEstado(cur) {
   return state.dia;
 }
 
-const tramoClave = (t) => (t ? `${t.inicio}|${t.fin}|${t.puesto}` : '');
+const tramoClave = (t) => (t ? `${t.inicio}|${t.fin}|${t.puesto}|${t.funcion || ''}` : '');
 function diaCambios(d) {
   const a = new Map(d.orig.map((t) => [t.empleado_id, t]));
   const b = new Map(d.tramos.map((t) => [t.empleado_id, t]));
@@ -893,8 +973,11 @@ function diaCobertura(cur, d) {
   for (const [fid, arr] of Object.entries(day.funciones || {})) {
     const f = funcById(state.config, fid);
     if (!f) continue;
+    // Un rol solo lo cubre quien lo tiene asignado ese día; una tarea de apoyo, cualquiera que sepa hacerla.
     const con = new Set(state.config.empleados.filter((e) => (e.funciones || []).includes(fid)).map((e) => e.id));
-    filas.push({ clave: `f:${fid}`, nombre: f.nombre, req: new Map(arr.map(([t, r]) => [t, r])), cuenta: (paso) => d.tramos.filter((t) => con.has(t.empleado_id) && cubre(t, paso)).length, soloRegla: true });
+    const cuenta = esRol(f) ? (paso) => d.tramos.filter((t) => t.funcion === fid && cubre(t, paso)).length
+      : (paso) => d.tramos.filter((t) => con.has(t.empleado_id) && cubre(t, paso)).length;
+    filas.push({ clave: `f:${fid}`, nombre: f.nombre, req: new Map(arr.map(([t, r]) => [t, r])), tope: new Map(arr.filter((x) => x[3] != null).map(([t, , , m]) => [t, m])), cuenta, soloRegla: true });
   }
   return { res, filas, cerrado: day.cerrado };
 }
@@ -946,15 +1029,23 @@ function dayView(cur) {
   const cobFila = (f) => {
     const cells = [];
     const faltan = [];
+    const sobran = [];
     for (let t = from; t < to; t += cob.res) {
       const req = f.req.get(t) || 0, n = f.cuenta(t);
-      const cls = n < req ? 'short' : f.soloRegla ? (req ? 'ok' : 'none') : n > req ? 'extra' : req ? 'ok' : 'none';
-      if (f.soloRegla && !req) { cells.push(''); continue; }
+      const tope = f.tope ? f.tope.get(t) : undefined;
+      const conRegla = req > 0 || tope !== undefined;
+      const cls = n < req || (tope !== undefined && n > tope) ? 'short' : f.soloRegla ? (conRegla ? 'ok' : 'none') : n > req ? 'extra' : req ? 'ok' : 'none';
+      if (f.soloRegla && !conRegla) { cells.push(''); continue; }
       if (n < req) faltan.push(`${fmtMin(t)} (${req - n})`);
-      cells.push(`<i class="${cls}" style="left:${pct(t)};width:${(cob.res / span) * 100}%" title="${fmtMin(t)}–${fmtMin(t + cob.res)}: ${n} de ${req}">${req || n ? `<b>${n}</b>` : ''}</i>`);
+      if (tope !== undefined && n > tope) sobran.push(`${fmtMin(t)} (${n - tope})`);
+      const regla = tope === undefined ? `${n} de ${req}` : `${n}, ${req ? `mínimo ${req}, ` : ''}máximo ${tope}`;
+      cells.push(`<i class="${cls}" style="left:${pct(t)};width:${(cob.res / span) * 100}%" title="${fmtMin(t)}–${fmtMin(t + cob.res)}: ${regla}">${req || n ? `<b>${n}</b>` : ''}</i>`);
     }
-    const resumen = faltan.length ? `Falta gente: ${faltan.slice(0, 4).join(', ')}${faltan.length > 4 ? '…' : ''}` : 'Cubierto';
-    return `<div class="g-row g-cov"><div class="g-name">${esc(f.nombre)}<small class="${faltan.length ? 'bad-text' : ''}">${esc(resumen)}</small></div>
+    const lista = (l) => `${l.slice(0, 4).join(', ')}${l.length > 4 ? '…' : ''}`;
+    const resumen = faltan.length || sobran.length
+      ? [faltan.length ? `Falta gente: ${lista(faltan)}` : '', sobran.length ? `Sobra gente: ${lista(sobran)}` : ''].filter(Boolean).join(' · ')
+      : 'Cubierto';
+    return `<div class="g-row g-cov"><div class="g-name">${esc(f.nombre)}<small class="${faltan.length || sobran.length ? 'bad-text' : ''}">${esc(resumen)}</small></div>
       <div class="g-track" aria-label="${esc(`${f.nombre}: ${resumen}`)}">${cells.join('')}</div></div>`;
   };
   // Ordenadas por hora de entrada: primero quien entra antes; después, quien no trabaja ese día.
@@ -970,11 +1061,12 @@ function dayView(cur) {
     if (t) {
       const s = shiftById(cfg, t.turno_id);
       const durH = (toMin(t.fin) - toMin(t.inicio)) / 60;
+      const rol = t.funcion ? funcById(cfg, t.funcion) : null;
       bar = `<div class="g-bar${conPuestos ? ` ${t.puesto}` : ''}${cambiados.has(e.id) ? ' changed' : ''}" data-emp="${esc(e.id)}" tabindex="0" role="button"
         style="left:${pct(toMin(t.inicio))};width:${((toMin(t.fin) - toMin(t.inicio)) / span) * 100}%;--c:${esc((s && s.color) || '#E8D5B0')}"
-        aria-label="${esc(`${e.nombre}: de ${t.inicio} a ${t.fin}${conPuestos ? `, ${PUESTOS[t.puesto]}` : ''}. Arrastra para mover; bordes para alargar o acortar; Intro para más opciones.`)}">
+        aria-label="${esc(`${e.nombre}: de ${t.inicio} a ${t.fin}${conPuestos ? `, ${PUESTOS[t.puesto]}` : ''}${esRol(rol) ? `, ${rol.nombre}` : ''}. Arrastra para mover; bordes para alargar o acortar; Intro para más opciones.`)}">
         ${ro ? '' : '<span class="g-h l" data-h="l" aria-hidden="true"></span>'}
-        <span class="g-txt">${conPuestos ? puestoTag(t.puesto) : ''}<b>${t.inicio}–${t.fin}</b><small>${fmtH(durH)} h</small></span>
+        <span class="g-txt">${conPuestos ? puestoTag(t.puesto) : ''}<b>${t.inicio}–${t.fin}</b><small>${fmtH(durH)} h</small>${rolTag(esRol(rol) ? rol : null)}</span>
         ${ro ? '' : '<span class="g-h r" data-h="r" aria-hidden="true"></span>'}</div>`;
     }
     return `<div class="g-row${nota ? ' unavailable' : ''}"><div class="g-name">${esc(e.nombre)}<small>${esc(tipoDe(e))}${nota ? ` · <span class="warn-text">${esc(nota)}</span>` : ''}</small><span class="func-tags">${funcTags(cfg, e)}</span></div>
@@ -1080,7 +1172,7 @@ function diaAnadir(empId, minuto) {
   // El turno que contiene la hora tocada y empieza más cerca de ella; si ninguno la contiene, el que empieza más cerca.
   const dist = (s) => Math.abs(toMin(s.inicio) - minuto) + (toMin(s.inicio) <= minuto && minuto < toMin(s.fin) ? 0 : 24 * 60);
   const s = opciones.reduce((m, x) => (dist(x) < dist(m) ? x : m));
-  d.tramos.push({ empleado_id: empId, inicio: s.inicio, fin: s.fin, puesto: puestosDe(e)[0], turno_id: s.id });
+  d.tramos.push({ empleado_id: empId, inicio: s.inicio, fin: s.fin, puesto: puestosDe(e)[0], funcion: null, turno_id: s.id });
   renderView();
 }
 
@@ -1102,6 +1194,14 @@ function ajustarTramo(t, k, dm) {
   return true;
 }
 
+// Botones para elegir el rol (caja, cafetera...) de un turno: los roles de su puesto que sabe hacer y «sin rol».
+function rolesMenu(cfg, e, puesto, actual, act, attrs) {
+  const roles = rolesDe(cfg, e, puesto).map((id) => funcById(cfg, id));
+  if (!roles.length) return '';
+  const boton = (f) => `<button type="button" role="menuitemradio" aria-checked="${(actual || null) === (f ? f.id : null)}" class="rol-opt${(actual || null) === (f ? f.id : null) ? ' current' : ''}" data-act="${act}" ${attrs} data-funcion="${f ? esc(f.id) : ''}">${f ? `<i style="background:${esc(f.color || '#764A09')}"></i>${esc(f.nombre)}` : 'Sin rol'}</button>`;
+  return `<hr><div class="ph" style="border:none;margin:0;padding-bottom:2px">Qué hace en el turno</div><div class="rol-opts">${roles.map(boton).join('')}${boton(null)}</div>`;
+}
+
 function openBarMenu(empId, anchor) {
   closeMenu();
   const cfg = state.config;
@@ -1111,6 +1211,7 @@ function openBarMenu(empId, anchor) {
   if (!t || !e) return;
   const m = document.createElement('div');
   m.className = 'popover bar-menu';
+  m.tabIndex = -1;
   m.setAttribute('role', 'dialog');
   m.setAttribute('aria-label', `Turno de ${e.nombre}`);
   m.innerHTML = `<div class="ph"><b>${esc(e.nombre)}</b> · ${esc(fmtLong(d.fecha))}</div>
@@ -1119,18 +1220,51 @@ function openBarMenu(empId, anchor) {
       <button class="btn small primary" data-act="barTimes" data-emp="${esc(empId)}">Aplicar</button></div>
     ${quickAdjustHtml('barAdj', `data-emp="${esc(empId)}"`)}
     ${puestosDe(e).length > 1 ? `<hr>${puestosDe(e).map((p) => `<button class="${t.puesto === p ? 'current' : ''}" data-act="barPuesto" data-emp="${esc(empId)}" data-p="${p}">${puestoTag(p)} En ${PUESTOS[p].toLowerCase()}</button>`).join('')}` : ''}
+    ${rolesMenu(cfg, e, t.puesto, t.funcion, 'barRol', `data-emp="${esc(empId)}"`)}
     <hr><div class="ph" style="border:none;margin:0;padding-bottom:2px">Poner las horas de un turno</div>
     ${turnosPosibles(e, d.fecha).map((s) => `<button data-act="barShift" data-emp="${esc(empId)}" data-shift="${esc(s.id)}"><i style="background:${esc(s.color || '#eee')}"></i>${esc(s.nombre)} <small>${s.inicio}–${s.fin}</small></button>`).join('')}
     <hr><button data-act="barRemove" data-emp="${esc(empId)}" class="danger-text">${ICON.trash} Quitar el turno (libra)</button>`;
   document.body.appendChild(m);
-  const r = anchor.getBoundingClientRect();
-  const mw = m.offsetWidth, mh = m.offsetHeight;
-  let top = r.bottom + 4;
-  if (top + mh > window.innerHeight - 8) top = Math.max(8, r.top - mh - 4);
-  m.style.left = `${Math.max(8, Math.min(r.left, window.innerWidth - mw - 8))}px`;
-  m.style.top = `${top}px`;
-  m.querySelector('#bar-ini').focus();
+  placePopover(m, `.g-bar[data-emp="${CSS.escape(empId)}"]`);
+  // En pantallas táctiles no se enfoca la hora: abriría el teclado, que tapa el menú y desplaza la página.
+  enfocar(esTactil() ? m : m.querySelector('#bar-ini'));
+  return m;
 }
+
+const esTactil = () => window.matchMedia('(pointer: coarse)').matches;
+const enfocar = (el) => el.focus({ preventScroll: true });
+
+// Un menú flotante se ancla a su casilla o barra por un selector, no por el elemento: la vista se vuelve a
+// pintar por detrás (p. ej. al llegar las alertas) y el elemento cambia, pero la casilla sigue siendo la misma.
+const MENU_MARGEN = 8, MENU_HUECO = 4;
+const altoVisible = () => (window.visualViewport ? window.visualViewport.height : window.innerHeight);
+
+// Coloca el menú junto a su ancla, en el lado (abajo o arriba) con más sitio, y limita su alto a ese sitio para
+// que nunca se salga de la pantalla: lo que no quepa se ve desplazando el propio menú.
+function placePopover(m, ancla) {
+  m.dataset.ancla = ancla;
+  const r = document.querySelector(ancla).getBoundingClientRect();
+  const abajo = altoVisible() - r.bottom - MENU_HUECO - MENU_MARGEN;
+  const arriba = r.top - MENU_HUECO - MENU_MARGEN;
+  const mh = m.scrollHeight;
+  m.dataset.lado = mh <= abajo || abajo >= arriba ? 'abajo' : 'arriba';
+  m.style.maxHeight = `${Math.max(120, Math.min(mh, m.dataset.lado === 'abajo' ? abajo : arriba))}px`;
+  seguirAncla(m);
+}
+
+// Vuelve a pegar el menú a su ancla (tras desplazar la página o redibujar la vista). Si el ancla ya no existe
+// o ha salido de la pantalla, el menú se cierra: ya no se sabría a qué casilla se refiere.
+function seguirAncla(m) {
+  const ancla = document.querySelector(m.dataset.ancla);
+  const r = ancla && ancla.getBoundingClientRect();
+  const alto = altoVisible();
+  if (!r || r.bottom < 0 || r.top > alto || r.right < 0 || r.left > window.innerWidth) { m.remove(); return; }
+  const mh = m.offsetHeight;
+  const top = m.dataset.lado === 'abajo' ? r.bottom + MENU_HUECO : r.top - MENU_HUECO - mh;
+  m.style.top = `${Math.max(MENU_MARGEN, Math.min(top, alto - MENU_MARGEN - mh))}px`;
+  m.style.left = `${Math.max(MENU_MARGEN, Math.min(r.left, window.innerWidth - m.offsetWidth - MENU_MARGEN))}px`;
+}
+const seguirAnclas = () => document.querySelectorAll('.popover[data-ancla]').forEach(seguirAncla);
 
 // Teclado: con una barra enfocada, flechas para moverla (Mayús + flechas, para alargarla o acortarla) e Intro para el menú.
 document.addEventListener('keydown', (e) => {
@@ -1157,10 +1291,7 @@ function dayEvalDialog(ev) {
   const cfg = state.config;
   const lista = (titulo, items, cls = '') => (items.length ? `<details class="alert-more"${cls ? ' open' : ''}><summary>${titulo} (${items.length})</summary>
     <ul class="fix-alerts ${cls}">${items.map((a) => `<li><span class="sev-badge ${a.severidad}">${SEV[a.severidad]}</span> ${esc(a.detalle)}</li>`).join('')}</ul></details>` : '');
-  const horas = ev.horas.map((x) => {
-    const tag = (v) => `<span class="${Math.abs(v - x.objetivo) > cfg.reglas.margen_periodo_horas ? 'fix-off' : ''}">${fmtH(v)}</span>`;
-    return `<tr><td><b>${esc(nameIn(cfg, x.empleado_id))}</b></td><td class="num">${fmtH(x.objetivo)}</td><td class="num">${tag(x.antes)} → ${tag(x.despues)}</td></tr>`;
-  }).join('');
+  const horas = ev.horas.map((x) => horasFila(cfg, x)).join('');
   const bloquea = ev.errores_despues > 0;
   const sinReglas = (list) => list.filter((a) => a.categoria !== 'reglas' && a.severidad !== 'critica');  // ya salen arriba
   const arreglo = ev.destino === 'arreglo';
@@ -1188,12 +1319,16 @@ function summaryTable(h) {
     <thead><tr><th>Persona</th><th class="num">Horas</th><th class="num">Objetivo</th><th class="num">Arrastra</th><th class="num">Extra</th><th class="num">Días</th><th class="num">Fines de semana</th><th class="num">Aperturas</th><th class="num">Cierres</th></tr></thead>
     <tbody>${h.resumen.map((r) => {
       const diff = r.horas - r.horas_objetivo;
+      if (r.comodin) {
+        return `<tr><td><b>${esc(nameIn(cfg, r.empleado_id))}</b> <span class="badge neutral">Comodín</span></td><td class="num">${fmtH(r.horas)}</td><td class="num muted">—</td><td class="num muted">—</td><td class="num">—</td>
+        <td class="num">${r.dias_trabajados}</td><td class="num">${r.fines_de_semana}</td><td class="num">${r.aperturas}</td><td class="num">${r.cierres}</td></tr>`;
+      }
       return `<tr><td><b>${esc(nameIn(cfg, r.empleado_id))}</b></td><td class="num">${fmtH(r.horas)}</td><td class="num">${fmtH(r.horas_objetivo)}</td>
       <td class="num muted">${r.saldo_anterior ? (r.saldo_anterior > 0 ? '+' : '') + fmtH(r.saldo_anterior) : '—'}</td>
       <td class="num">${r.horas_extra >= 0.5 ? `<span class="badge warn">${fmtH(r.horas_extra)}</span>` : diff < -cfg.reglas.margen_periodo_horas ? `<span class="badge neutral">${fmtH(diff)}</span>` : '—'}</td>
       <td class="num">${r.dias_trabajados}</td><td class="num">${r.fines_de_semana}</td><td class="num">${r.aperturas}</td><td class="num">${r.cierres}</td></tr>`;
     }).join('')}</tbody></table></div></div>
-    <p class="small muted">«Arrastra» son las horas de más (+) o de menos (−) del periodo anterior que se compensan en este. Objetivo = contrato prorrateado sin contar ausencias, menos lo arrastrado.</p></div>`;
+    <p class="small muted">«Arrastra» son las horas de más (+) o de menos (−) del periodo anterior que se compensan en este. Objetivo = contrato prorrateado sin contar ausencias, menos lo arrastrado. Los comodines no tienen objetivo: solo cubren lo que falta.</p></div>`;
 }
 
 // menú de una casilla
@@ -1211,6 +1346,8 @@ function openCellMenu(btn) {
     if (s.tipo === 'apertura' && !emp.puede_abrir) return 'no abre';
     if (s.tipo === 'cierre' && !emp.puede_cerrar) return 'no cierra';
     if (s.dias && s.dias.length && !s.dias.includes(DAYS[weekday(d)])) return 'no ese día';
+    const [desde, hasta] = franjaDe(emp, d);
+    if (aMin(s.inicio) < desde || aMin(s.fin) > hasta) return 'fuera de su horario';
     return '';
   };
   const m = document.createElement('div');
@@ -1218,32 +1355,38 @@ function openCellMenu(btn) {
   m.setAttribute('role', 'menu');
   m.innerHTML = `<div class="ph"><b>${esc(emp.nombre)}</b> · ${fmtLong(d)}${absence ? `<br><span style="color:var(--warn)">${esc(MOTIVOS[absence.motivo])}</span>` : fixedOff ? '<br>Es su día de libranza' : ''}</div>
     ${cfg.turnos.map((s) => `<button role="menuitem" class="${cur && cur.turno_id === s.id ? 'current' : ''}" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="${esc(s.id)}"><i style="background:${esc(s.color || '#eee')}"></i>${esc(s.nombre)} <small>${s.inicio}–${s.fin}${note(s) ? ` · <span class="warn-note">${note(s)}</span>` : ''}</small></button>`).join('')}
-    <hr><button role="menuitem" class="${!cur ? 'current' : ''}" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="">Libre</button>
+    <hr>${cur
+      ? `<button role="menuitem" class="danger-text" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="">${ICON.trash} Quitar el turno <small>ese día libra</small></button>`
+      : '<button role="menuitem" class="current" disabled>Libre <small>no tiene turno</small></button>'}
     ${cur && puestosDe(emp).length > 1 ? `<hr>${puestosDe(emp).map((p) => `<button role="menuitem" class="${puestoDe(cfg, cur) === p ? 'current' : ''}" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="${esc(cur.turno_id)}" data-puesto="${p}">${puestoTag(p)} En ${PUESTOS[p].toLowerCase()} <small>mismo turno</small></button>`).join('')}` : ''}
+    ${cur && shiftById(cfg, cur.turno_id) ? rolesMenu(cfg, emp, puestoDe(cfg, cur), cur.funcion, 'setCell', `data-emp="${esc(emp.id)}" data-date="${d}" data-shift="${esc(cur.turno_id)}" data-puesto="${puestoDe(cfg, cur)}"`) : ''}
     ${cur && shiftById(cfg, cur.turno_id) ? `<hr><div class="ph" style="border:none;margin:0;padding-bottom:2px">Ajustar las horas <small class="muted">(se revisa en la vista del día)</small></div>${quickAdjustHtml('cellAdj', `data-emp="${esc(emp.id)}" data-date="${d}"`)}` : ''}
     ${lock ? `<button role="menuitem" data-act="unlockCell" data-emp="${esc(emp.id)}" data-date="${d}">Quitar bloqueo <small>que decida el motor</small></button>` : ''}`;
   document.body.appendChild(m);
-  const r = btn.getBoundingClientRect();
-  const mw = m.offsetWidth, mh = m.offsetHeight;
-  let left = Math.min(r.left, window.innerWidth - mw - 8);
-  let top = r.bottom + 4;
-  if (top + mh > window.innerHeight - 8) top = Math.max(8, r.top - mh - 4);
-  m.style.left = `${Math.max(8, left)}px`;
-  m.style.top = `${top}px`;
-  (m.querySelector('button.current') || m.querySelector('button')).focus();
+  placePopover(m, `[data-act="cell"][data-emp="${CSS.escape(emp.id)}"][data-date="${d}"]`);
+  enfocar(m.querySelector('button.current') || m.querySelector('button'));
 }
 function closeMenu() { document.querySelectorAll('.popover').forEach((p) => p.remove()); }
+// Al desplazar la página o una tabla, el menú acompaña a su casilla (y se cierra si sale de la pantalla); al
+// desplazar el propio menú para ver las opciones que no caben, no se toca.
+function menuOnScroll(e) {
+  if (e.target instanceof Element && e.target.closest('.popover')) return;
+  seguirAnclas();
+}
 
 // ------------------------------------------------------------------ EQUIPO
 function viewEquipo() {
   const emps = state.draft.empleados;
-  return `${head('Equipo', 'Quién trabaja en Lopita, sus horas de contrato, si es camarero/a o cocinero/a, sus funciones y qué días libra habitualmente.', `<button class="btn primary" data-act="addEmp">${ICON.plus} Añadir persona</button>`)}
+  return `${head('Equipo', 'Quién trabaja en Lopita, sus horas de contrato, si es camarero/a o cocinero/a, sus funciones y qué días libra habitualmente. Los comodines no tienen horas de contrato: el generador solo les da turnos para cubrir lo que el resto no llega a cubrir.', `<button class="btn" data-act="addComodin">${ICON.plus} Añadir comodín</button><button class="btn primary" data-act="addEmp">${ICON.plus} Añadir persona</button>`)}
   ${emps.length ? `<div class="grid">${emps.map((e, i) => `<div class="card" style="${e.activo ? '' : 'opacity:.6'}">
     <div class="row" style="flex-wrap:nowrap"><input class="title-input" type="text" value="${esc(e.nombre)}" data-bind="empleados.${i}.nombre" aria-label="Nombre"><button class="icon-btn" data-act="delEmp" data-i="${i}" title="Eliminar">${ICON.trash}</button></div>
+    <label class="toggle" style="margin-top:10px"><input type="checkbox" data-act-change="comodin" data-i="${i}" ${e.comodin ? 'checked' : ''}> Comodín</label>
+    ${e.comodin ? '<p class="small muted" style="margin:6px 0 0">Sin horas de contrato: el generador solo le da turnos cuando el resto no llega a cubrir la demanda.</p>' : ''}
     <div class="fields" style="margin-top:10px">
-      <label class="field">Horas por semana<input type="number" min="1" max="60" step="0.5" value="${e.horas_semanales}" data-bind="empleados.${i}.horas_semanales"></label>
-      <label class="field">Usuario de Slack<input type="text" placeholder="U01ABC…" value="${esc(e.slack_user_id || '')}" data-type="nullstr" data-bind="empleados.${i}.slack_user_id"></label>
+      ${horasField(i, e)}
+      ${e.comodin ? '' : slackField(i, e)}
     </div>
+    ${e.comodin ? `<div class="fields" style="margin-top:10px">${slackField(i, e)}</div>` : ''}
     <label class="field" style="margin-top:12px">Email<span class="hint">Si no hay usuario de Slack, se busca por email</span><input type="email" value="${esc(e.email || '')}" data-type="nullstr" data-bind="empleados.${i}.email"></label>
     ${puestosField(i, e)}
     <div class="stack" style="gap:8px;margin-top:14px">
@@ -1252,6 +1395,7 @@ function viewEquipo() {
     ${bajaField(e)}
     ${funcionesField(i, e)}
     <div style="margin-top:14px"><div class="small muted" style="font-weight:600;margin-bottom:6px">Días que libra</div>${dayChips(`empleados.${i}.libranzas_fijas`, e.libranzas_fijas, 'El motor elige sus días libres')}</div>
+    ${franjasField(i, e)}
   </div>`).join('')}</div>` : '<div class="card empty">No hay nadie en el equipo todavía.</div>'}`;
 }
 
@@ -1283,24 +1427,73 @@ function puestosField(i, e) {
 // Funciones de la persona: las fijas (abrir, cerrar, encargado) y las que añade el encargado en Funciones.
 // «Preparar pinchos» sale siempre junto a abrir y cerrar; si aún no existe la función, se crea al marcarla.
 const PINCHOS = { id: 'preparar-pinchos', nombre: 'Preparar pinchos', color: '#C9733B', reglas: [] };
+// Restricciones horarias: «esos días solo puede trabajar de X a Y». Vacío = sin límite por ese lado.
+const aMin = (hhmm) => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; };
+function franjaDe(e, d) {
+  let desde = 0, hasta = 24 * 60;
+  for (const r of e.restricciones_horarias || []) {
+    if (r.dias && r.dias.length && !r.dias.includes(DAYS[weekday(d)])) continue;
+    if (r.desde) desde = Math.max(desde, aMin(r.desde));
+    if (r.hasta) hasta = Math.min(hasta, aMin(r.hasta));
+  }
+  return [desde, hasta];
+}
+function franjaTexto(r) {
+  if (r.desde && r.hasta) return `Solo de ${r.desde} a ${r.hasta}`;
+  if (r.desde) return `No antes de las ${r.desde}`;
+  if (r.hasta) return `No después de las ${r.hasta}`;
+  return 'Pon al menos una hora';
+}
+function franjasField(i, e) {
+  const rs = e.restricciones_horarias || [];
+  return `<div style="margin-top:14px"><div class="row" style="margin-bottom:6px"><span class="small muted" style="font-weight:600">Horas en que puede trabajar</span><span class="spacer"></span><button class="btn small" data-act="addFranja" data-i="${i}">${ICON.plus} Añadir</button></div>
+    ${rs.length ? rs.map((r, j) => `<div class="regla-funcion">
+      <div class="fields">
+        <label class="field">No antes de<input type="time" step="900" value="${esc(r.desde || '')}" data-type="nullstr" data-bind="empleados.${i}.restricciones_horarias.${j}.desde" data-rerender></label>
+        <label class="field">No después de<input type="time" step="900" value="${r.hasta === '24:00' ? '23:59' : esc(r.hasta || '')}" data-type="nullstr" data-bind="empleados.${i}.restricciones_horarias.${j}.hasta" data-rerender></label>
+        <button class="icon-btn" style="align-self:flex-end" data-act="delFranja" data-i="${i}" data-j="${j}" title="Quitar la restricción">${ICON.trash}</button>
+      </div>
+      <div style="margin-top:8px">${dayChips(`empleados.${i}.restricciones_horarias.${j}.dias`, r.dias, 'Todos los días')}</div>
+      <p class="small muted" style="margin:6px 0 0">${esc(franjaTexto(r))}${r.dias && r.dias.length ? ` los ${r.dias.map((d) => DAY_LABEL[DAYS.indexOf(d)].toLowerCase().replace(/([^s])$/, '$1s')).join(', ')}` : ' todos los días'}. El generador solo le da turnos que caben enteros.</p></div>`).join('')
+      : '<p class="small muted" style="margin:0">Sin límite: puede hacer cualquier turno. Añade una si, por ejemplo, no puede entrar antes de las 10:00 o salir después de las 18:00.</p>'}</div>`;
+}
 function funcionesField(i, e) {
-  const cfgFs = funcionesCfg(state.draft);
-  const propias = cfgFs.some((f) => f.id === PINCHOS.id || /pincho/i.test(f.nombre)) ? cfgFs : [PINCHOS, ...cfgFs];
+  const cfg = state.draft;
+  const cfgFs = funcionesCfg(cfg);
+  const apoyo = cfgFs.filter((f) => !esRol(f));
+  const propias = apoyo.some((f) => f.id === PINCHOS.id || /pincho/i.test(f.nombre)) ? apoyo : [PINCHOS, ...apoyo];
   const tiene = new Set(e.funciones || []);
+  const check = (f) => `<label class="toggle"><input type="checkbox" data-act-change="funcCheck" data-i="${i}" data-f="${esc(f.id)}" ${tiene.has(f.id) ? 'checked' : ''}> ${esc(f.nombre)}</label>`;
+  // Roles de cada puesto que hace: qué puede hacer y, si son varios, cuál hace normalmente.
+  const roles = puestosDe(e).map((p) => {
+    const delPuesto = cfgFs.filter((f) => f.puesto === p);
+    if (!delPuesto.length) return '';
+    const suyos = rolesDe(cfg, e, p);
+    return `<div style="margin-top:12px"><div class="small muted" style="font-weight:600;margin-bottom:6px">Como ${TIPOS[p].toLowerCase()} puede hacer</div>
+      <div class="chips" role="group" aria-label="Roles de ${TIPOS[p].toLowerCase()}">${delPuesto.map((f) => `<label class="toggle"><input type="checkbox" data-act-change="funcCheck" data-i="${i}" data-f="${esc(f.id)}" ${tiene.has(f.id) ? 'checked' : ''}> ${esc(f.nombre)}</label>`).join('')}</div>
+      ${suyos.length > 1 ? `<label class="field inline" style="margin-top:6px">Normalmente<select data-act-change="rolPrincipal" data-i="${i}">${suyos.map((id) => `<option value="${esc(id)}" ${suyos[0] === id ? 'selected' : ''}>${esc(funcById(cfg, id).nombre)}</option>`).join('')}</select></label>` : ''}</div>`;
+  }).join('');
   return `<div style="margin-top:14px"><div class="row" style="margin-bottom:6px"><span class="small muted" style="font-weight:600">Funciones</span><span class="spacer"></span><a class="small" href="#/funciones">Gestionar funciones</a></div>
     <div class="stack" style="gap:8px">
       ${toggle(`empleados.${i}.puede_abrir`, e.puede_abrir, 'Puede abrir')}
       ${toggle(`empleados.${i}.puede_cerrar`, e.puede_cerrar, 'Puede cerrar')}
       ${toggle(`empleados.${i}.es_encargado`, e.es_encargado, 'Es encargado/a')}
-      ${propias.map((f) => `<label class="toggle"><input type="checkbox" data-act-change="funcCheck" data-i="${i}" data-f="${esc(f.id)}" ${tiene.has(f.id) ? 'checked' : ''}> ${esc(f.nombre)}</label>`).join('')}
-    </div></div>`;
+      ${propias.map(check).join('')}
+    </div>${roles}</div>`;
 }
 
 // ------------------------------------------------------------------ FUNCIONES (categorías de empleado con reglas)
+const personasTxt = (n) => `${n} ${n === 1 ? 'persona' : 'personas'}`;
 function funcionReglasTexto(f) {
-  if (!f.reglas.length) return 'Sin reglas: solo sirve para saber quién la tiene.';
-  return f.reglas.map((r) => `${r.dias && r.dias.length ? r.dias.map((d) => DAY_SHORT[DAYS.indexOf(d)]).join(', ') : 'Todos los días'} de ${r.inicio} a ${r.fin}: al menos ${r.personas} ${r.personas > 1 ? 'personas' : 'persona'}`).join(' · ');
+  if (!f.reglas.length) return esRol(f) ? 'Sin reglas: el motor solo reparte los roles los días en que alguna regla de los roles de este puesto lo pide.' : 'Sin reglas: solo sirve para saber quién la tiene.';
+  return f.reglas.map((r) => {
+    const cuantos = [r.personas > 0 ? `al menos ${personasTxt(r.personas)}` : '', r.maximo != null ? `como mucho ${personasTxt(r.maximo)}` : ''].filter(Boolean).join(' y ') || 'indica un mínimo o un máximo';
+    return `${r.dias && r.dias.length ? r.dias.map((d) => DAY_SHORT[DAYS.indexOf(d)]).join(', ') : 'Todos los días'} de ${r.inicio} a ${r.fin}: ${cuantos}`;
+  }).join(' · ');
 }
+// Roles que propone la app para los camareros; el encargado los puede renombrar, quitar o añadir más.
+const ROLES_CAMARERO = [['Caja', '#2F6F4E'], ['Cafetera', '#7A4B2A'], ['Sala', '#B0904C'], ['Lava', '#3D6A8C']];
+const CLASES_FUNCION = { '': 'Tarea de apoyo', sala: 'Rol de camarero/a', cocina: 'Rol de cocinero/a' };
 
 function viewFunciones() {
   const c = state.draft;
@@ -1316,26 +1509,38 @@ function viewFunciones() {
     <div class="row" style="flex-wrap:nowrap;gap:8px"><input type="color" value="${esc(f.color || '#764A09')}" data-bind="funciones.${i}.color" aria-label="Color" class="color-input" data-rerender>
       <input class="title-input" type="text" value="${esc(f.nombre)}" data-bind="funciones.${i}.nombre" aria-label="Nombre de la función" data-rerender>
       <button class="icon-btn" data-act="delFuncion" data-i="${i}" title="Eliminar la función">${ICON.trash}</button></div>
-    <div style="margin-top:12px"><div class="small muted" style="font-weight:600;margin-bottom:6px">Quién la tiene</div>
-      <div class="chips" role="group" aria-label="Personas con ${esc(f.nombre)}">${c.empleados.map((e, k) => `<button type="button" class="chip ${(e.funciones || []).includes(f.id) ? 'on' : ''}" data-act="toggleFuncion" data-i="${k}" data-f="${esc(f.id)}" aria-pressed="${(e.funciones || []).includes(f.id)}" style="${e.activo ? '' : 'opacity:.55'}">${esc(e.nombre)}</button>`).join('')}</div></div>
+    <label class="field" style="margin-top:10px;max-width:280px">Clase<select data-act-change="funcionClase" data-i="${i}">${Object.entries(CLASES_FUNCION).map(([k, v]) => `<option value="${k}" ${(f.puesto || '') === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
+      <span class="hint">${esRol(f) ? `Cada ${f.puesto === 'sala' ? 'camarero/a' : 'cocinero/a'} hace uno de sus roles durante todo el turno; solo cuenta quien lo tiene asignado.` : 'Cuenta cualquiera que sepa hacerla y esté trabajando.'}</span></label>
+    <div style="margin-top:12px"><div class="small muted" style="font-weight:600;margin-bottom:6px">${esRol(f) ? 'Quién puede hacerlo' : 'Quién la tiene'}</div>
+      <div class="chips" role="group" aria-label="Personas con ${esc(f.nombre)}">${c.empleados.filter((e) => !esRol(f) || puestosDe(e).includes(f.puesto)).map((e) => { const k = c.empleados.indexOf(e); return `<button type="button" class="chip ${(e.funciones || []).includes(f.id) ? 'on' : ''}" data-act="toggleFuncion" data-i="${k}" data-f="${esc(f.id)}" aria-pressed="${(e.funciones || []).includes(f.id)}" style="${e.activo ? '' : 'opacity:.55'}">${esc(e.nombre)}</button>`; }).join('')}</div></div>
     <div style="margin-top:14px"><div class="row"><span class="small muted" style="font-weight:600">Reglas</span><span class="spacer"></span><button class="btn small" data-act="addReglaFuncion" data-i="${i}">${ICON.plus} Añadir regla</button></div>
       ${f.reglas.length ? f.reglas.map((r, j) => `<div class="regla-funcion">
         <div class="fields">
           <label class="field">Desde<input type="time" step="900" value="${r.inicio}" data-bind="funciones.${i}.reglas.${j}.inicio" data-rerender></label>
           <label class="field">Hasta<input type="time" step="900" value="${r.fin === '24:00' ? '23:59' : r.fin}" data-bind="funciones.${i}.reglas.${j}.fin" data-rerender></label>
-          <label class="field">Mínimo de personas<input type="number" min="1" max="20" value="${r.personas}" data-type="int" data-bind="funciones.${i}.reglas.${j}.personas" data-rerender></label>
+          <label class="field">${esRol(f) ? 'Al menos' : 'Mínimo de personas'}<input type="number" min="${esRol(f) ? 0 : 1}" max="20" value="${r.personas}" data-type="int" data-bind="funciones.${i}.reglas.${j}.personas" data-rerender></label>
+          ${esRol(f) ? `<label class="field">Como mucho<input type="number" min="0" max="20" placeholder="Sin máximo" value="${r.maximo ?? ''}" data-type="nullnum" data-bind="funciones.${i}.reglas.${j}.maximo" data-rerender></label>` : ''}
           <button class="icon-btn" style="align-self:flex-end" data-act="delReglaFuncion" data-i="${i}" data-j="${j}" title="Quitar la regla">${ICON.trash}</button>
         </div>
         <div style="margin-top:8px">${dayChips(`funciones.${i}.reglas.${j}.dias`, r.dias, 'Todos los días que abre')}</div></div>`).join('')
-        : '<p class="small muted" style="margin:6px 0 0">Sin reglas: solo sirve para saber quién la tiene. Añade una para que el motor ponga a alguien con esta función en un tramo.</p>'}
-      <p class="small muted" style="margin:8px 0 0">${esc(funcionReglasTexto(f))}</p>
+        : `<p class="small muted" style="margin:6px 0 0">${esRol(f) ? 'Sin reglas. Por ejemplo: «de 9:00 a 21:00, al menos 1 en caja» o «como mucho 1 en lava». Los roles solo se reparten los días en que alguna regla de los roles de este puesto se aplica.' : 'Sin reglas: solo sirve para saber quién la tiene. Añade una para que el motor ponga a alguien con esta función en un tramo.'}</p>`}
+      ${f.reglas.length ? `<p class="small muted" style="margin:8px 0 0">${esc(funcionReglasTexto(f))}</p>` : ''}
     </div></div>`;
-  return `${head('Funciones', 'Lo que solo hacen algunas personas: abrir, cerrar, ser encargado/a o lo que añadas (preparar pinchos, hacer caja, recibir pedidos…). Cada función puede llevar reglas: «de 10:00 a 12:00 tiene que haber alguien que prepare pinchos». El motor las cumple si puede y, si no, avisa.', `<button class="btn primary" data-act="addFuncion">${ICON.plus} Añadir función</button>`)}
+  const grupo = (titulo, intro, pred, vacio) => {
+    const lista = fs.map((f, i) => [f, i]).filter(([f]) => pred(f));
+    return `<div class="section"><h2>${titulo}</h2><p class="small muted" style="margin-top:-4px">${intro}</p>
+      ${lista.length ? `<div class="func-grid">${lista.map(([f, i]) => fila(f, i)).join('')}</div>` : `<div class="card empty">${vacio}</div>`}</div>`;
+  };
+  const hayRolesCamarero = fs.some((f) => f.puesto === 'sala');
+  return `${head('Funciones', 'Lo que solo hacen algunas personas. Los roles de camarero (caja, cafetera, sala, lava…) se reparten en cada turno: cada camarero hace uno, solo quien sepa hacerlo, y las reglas dicen cuántos hacen falta («de 9:00 a 21:00, al menos 1 en caja»). Las tareas de apoyo (preparar pinchos…) las cubre cualquiera que sepa hacerlas. El motor cumple las reglas si puede y, si no, avisa.', `${hayRolesCamarero ? '' : `<button class="btn" data-act="addRolesCamarero">${ICON.plus} Roles de camarero</button>`}<button class="btn primary" data-act="addFuncion">${ICON.plus} Añadir función</button>`)}
   <div class="card"><h2>Funciones fijas</h2><div class="table-wrap"><table class="list"><thead><tr><th>Función</th><th>Quién la tiene</th><th>Regla</th></tr></thead><tbody>
     ${fijas.map(([n, campo, regla]) => `<tr><td><b>${n}</b></td><td>${quien((e) => e[campo])}</td><td class="small">${regla}</td></tr>`).join('')}
   </tbody></table></div><p class="small muted" style="margin-bottom:0">Se cambian en Equipo, en la ficha de cada persona.</p></div>
-  <div class="section"><h2>Tus funciones</h2>
-  ${fs.length ? `<div class="func-grid">${fs.map(fila).join('')}</div>` : '<div class="card empty">Aún no hay ninguna. Por ejemplo, «Preparar pinchos»: añádela, marca quién sabe hacerlo y pon de qué hora a qué hora hace falta.</div>'}</div>`;
+  ${grupo('Roles de camarero', 'Cada camarero/a hace uno de sus roles durante el turno; lo elige el motor según las reglas y lo puedes cambiar en el horario.', (f) => f.puesto === 'sala',
+    `Aún no hay roles. Pulsa «Roles de camarero» para crear caja, cafetera, sala y lava, o añade una función y elige «Rol de camarero/a».`)}
+  ${fs.some((f) => f.puesto === 'cocina') ? grupo('Roles de cocinero', 'Igual que los de camarero, para quien trabaja en cocina.', (f) => f.puesto === 'cocina', '') : ''}
+  ${grupo('Tareas de apoyo', 'Las cubre cualquiera que sepa hacerlas y esté trabajando en ese momento.', (f) => !esRol(f),
+    'Aún no hay ninguna. Por ejemplo, «Preparar pinchos»: añádela, marca quién sabe hacerlo y pon de qué hora a qué hora hace falta.')}`;
 }
 
 // ------------------------------------------------------------------ TURNOS
@@ -1566,9 +1771,11 @@ function viewReglas() {
     <div class="fields two">
       ${numField('pesos.falta_cobertura', 'Falta de cobertura', '', w.falta_cobertura, 1, 1)}
       ${numField('pesos.falta_encargado', 'Falta de encargado', '', w.falta_encargado, 1, 1)}
-      ${numField('pesos.falta_funcion', 'Falta de alguien con una función', 'Por cada tramo sin quien prepare pinchos (o la función que sea)', w.falta_funcion ?? 800, 1, 0)}
+      ${numField('pesos.falta_funcion', 'Falta de alguien con una función', 'Por cada tramo sin nadie en caja, sin quien prepare pinchos (o la función que sea)', w.falta_funcion ?? 800, 1, 0)}
+      ${numField('pesos.exceso_funcion', 'Gente de más en un rol', 'Por cada tramo con más gente en un rol de la que permite su regla (p. ej. dos en lava)', w.exceso_funcion ?? 400, 1, 0)}
       ${numField('pesos.horas_extra', 'Horas extra', '', w.horas_extra, 1, 0)}
       ${numField('pesos.horas_por_debajo_contrato', 'Horas por debajo del contrato', '', w.horas_por_debajo_contrato, 1, 0)}
+      ${numField('pesos.uso_comodin', 'Cada minuto de un comodín', 'Menos que las horas extra: el comodín cubre los huecos antes de que alguien haga horas de más', w.uso_comodin, 1, 0)}
       ${numField('pesos.exceso_cobertura', 'Personal de más', '', w.exceso_cobertura, 1, 0)}
       ${numField('pesos.preferencia', 'Preferencias', '', w.preferencia, 1, 0)}
       ${numField('pesos.reparto_desigual', 'Reparto desigual de fines de semana y cierres', '', w.reparto_desigual, 1, 0)}
@@ -1896,7 +2103,7 @@ const GUIA_ADMIN = [
   { id: 'horarios', titulo: 'Horarios', para: 'Crear, revisar y publicar el horario de una semana, un mes o unas fechas.', pasos: [
     'Elige el periodo (semana, mes o fechas) y pulsa <b>Generar</b>. El motor reparte los turnos cumpliendo las reglas y cubriendo la demanda.',
     'Abre el horario. Arriba ves los avisos y la cobertura de cada día; abajo, el cuadrante y las horas de cada persona.',
-    'Toca una casilla para cambiar un turno. Los cambios a mano quedan bloqueados (candado) y se respetan si regeneras.',
+    'Toca una casilla para cambiar un turno o, con <b>Quitar el turno</b>, dejar a esa persona libre ese día. Los cambios a mano quedan bloqueados (candado) y se respetan si regeneras.',
     'Con <b>Día · Semana · Mes</b> cambias de vista. En la de día puedes arrastrar los turnos hora a hora.',
     '<b>Solucionar problemas</b> propone los mínimos cambios para quitar alertas. <b>Publicar y enviar a Slack</b> lo hace visible al equipo.',
   ] },
@@ -1934,16 +2141,19 @@ const GUIA_ADMIN = [
   ] },
   { id: 'equipo', titulo: 'Equipo', para: 'Las personas: horas de contrato, si son camareros o cocineros, sus funciones y qué días libran.', pasos: [
     '<b>Añadir persona</b> y rellena su nombre y horas por semana.',
+    '<b>Añadir comodín</b> (o marca «Comodín» en una ficha) para alguien sin horas de contrato que solo trabaja cuando falta gente: si al resto le faltan 30 horas para cubrir la demanda, se le pueden dar esas 30; si no falta nadie, no tiene turnos. Puedes ponerle un <b>mínimo</b> y un <b>máximo</b> de horas por semana, o dejarlos vacíos.',
     '<b>Tipo de empleado</b>: Camarero/a (sala), Cocinero/a (cocina) o los dos.',
     '<b>Funciones</b>: puede abrir, puede cerrar, encargado/a y las que hayas creado (p. ej. preparar pinchos).',
     'Marca sus <b>días que libra</b> fijos. Si deja la empresa, desactiva «En plantilla» en vez de borrarla.',
     'Pulsa <b>Guardar cambios</b> abajo.',
     '<b>Marcar baja</b> (en la ficha de cada persona): desde cuándo y, si se sabe, hasta cuándo. Si ya tenía turnos asignados, te sale un aviso con los que no va a hacer, una alerta en el horario y un arreglo preparado como borrador. Con <b>Dar el alta</b> indicas el día que vuelve.',
   ] },
-  { id: 'funciones', titulo: 'Funciones', para: 'Lo que solo hacen algunas personas (abrir, cerrar, encargado o lo que añadas) y las reglas que deben cumplirse.', pasos: [
-    '<b>Añadir función</b>, por ejemplo «Preparar pinchos», y marca quién la tiene.',
-    '<b>Añadir regla</b>: de qué hora a qué hora hace falta, cuántas personas y qué días.',
-    'El motor pondrá a alguien con esa función en ese tramo y, si no puede, salta una alerta con sugerencias.',
+  { id: 'funciones', titulo: 'Funciones', para: 'Lo que solo hacen algunas personas (abrir, cerrar, encargado, los roles de camarero o lo que añadas) y las reglas que deben cumplirse.', pasos: [
+    '<b>Roles de camarero</b> crea caja, cafetera, sala y lava (los puedes renombrar, quitar o añadir más). Marca quién puede hacer cada uno.',
+    'Cada camarero hace <b>uno</b> de sus roles en todo el turno. Las reglas dicen cuántos hacen falta: «de 9:00 a 21:00, al menos 1 en caja» o «como mucho 1 en lava».',
+    'El rol de cada turno sale en el horario; para cambiarlo, toca la casilla o el turno en la vista del día.',
+    'Las <b>tareas de apoyo</b> (p. ej. «Preparar pinchos») las cubre cualquiera que sepa hacerlas y esté trabajando.',
+    'El motor cumple las reglas si puede y, si no, salta una alerta con sugerencias.',
     'Pulsa <b>Guardar cambios</b> y regenera los horarios que quieras actualizar.',
   ] },
   { id: 'turnos', titulo: 'Turnos', para: 'Los turnos posibles (apertura, mañana, tarde, cierre…) con sus horas.', pasos: [
@@ -2050,7 +2260,7 @@ function viewGuia() {
 const FB_TIPOS = { sugerencia: 'Sugerencia', error: 'Algo no funciona', duda: 'Duda' };
 const FB_ESTADOS = { nuevo: ['warn', 'Nuevo'], en_curso: ['borrador', 'En curso'], hecho: ['publicado', 'Hecho'], descartado: ['neutral', 'Descartado'] };
 const fbEstado = (e) => { const [c, l] = FB_ESTADOS[e] || ['neutral', e]; return `<span class="badge ${c}">${l}</span>`; };
-const pantallaActual = () => { const r = route(); const tab = [...NAV_ADMIN, ...NAV_WORKER].find(([k]) => k === r.name); return `${tab ? tab[1] : r.name}${r.arg ? ` ${r.arg}` : ''}${r.name === 'horarios' && r.arg ? ` · vista ${state.vista}` : ''}`; };
+const pantallaActual = () => { const r = route(); const tab = [...NAV_ADMIN, ...NAV_WORKER, ['guia', 'Guía']].find(([k]) => k === r.name); return `${tab ? tab[1] : r.name}${r.arg ? ` ${r.arg}` : ''}${r.name === 'horarios' && r.arg ? ` · vista ${state.vista}` : ''}`; };
 
 function feedbackDialog(mios) {
   const lista = (mios || []).slice(0, 5);
@@ -2144,7 +2354,7 @@ function viewInformes() {
     </tbody></table></div></div>`;
   const porMes = meses.length > 1 ? `<div class="section"><h2>Mes a mes</h2><div class="card" style="padding:0"><div class="table-wrap"><table class="list">
     <thead><tr><th>Persona</th>${meses.map((m) => `<th class="num">${mesTxt(m)}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>
-    ${rows.map((e) => `<tr><td><b>${esc(e.nombre)}</b></td>${e.meses.map((m) => `<td class="num">${m.objetivo || m.ajustadas ? `<b>${fmtH(m.ajustadas)}</b><div class="small ${m.extra >= 0.5 ? 'warn-text' : 'muted'}">${m.extra >= 0.5 ? `+${fmtH(m.extra)} extra` : m.de_menos >= 0.5 ? `−${fmtH(m.de_menos)}` : `de ${fmtH(m.objetivo)}`}</div>` : '<span class="muted">—</span>'}</td>`).join('')}<td class="num"><b>${fmtH(e.ajustadas)}</b></td></tr>`).join('')}
+    ${rows.map((e) => `<tr><td><b>${esc(e.nombre)}</b></td>${e.meses.map((m) => `<td class="num">${m.objetivo || m.ajustadas ? `<b>${fmtH(m.ajustadas)}</b><div class="small ${m.extra >= 0.5 ? 'warn-text' : 'muted'}">${m.extra >= 0.5 ? `+${fmtH(m.extra)} extra` : m.de_menos >= 0.5 ? `−${fmtH(m.de_menos)}` : m.objetivo ? `de ${fmtH(m.objetivo)}` : ''}</div>` : '<span class="muted">—</span>'}</td>`).join('')}<td class="num"><b>${fmtH(e.ajustadas)}</b></td></tr>`).join('')}
     </tbody></table></div></div><p class="small muted">Cada casilla: horas trabajadas y, debajo, las horas extra o las que faltan frente al contrato de ese mes.</p></div>` : '';
   return `${title}${barra}${totales}${tabla}${porMes}
   <p class="small muted">«Contrato» son las horas de contrato prorrateadas en los días que tienen horario${h.borradores ? '' : ' publicado'}, sin contar ausencias. Las correcciones pendientes no cuentan hasta que las apruebes en Solicitudes.</p>`;
@@ -2418,9 +2628,11 @@ const actions = {
     const emp = el.dataset.emp;
     const t = state.dia.tramos.find((x) => x.empleado_id === emp);
     if (!ajustarTramo(t, el.dataset.k, Number(el.dataset.dm))) { toast('Así no cabe en el día', true); return; }
+    const desplazado = el.closest('.popover').scrollTop;
     closeMenu(); renderView();
     const bar = document.querySelector(`.g-bar[data-emp="${CSS.escape(emp)}"]`);
-    if (bar) openBarMenu(emp, bar);  // el menú sigue abierto para encadenar ajustes
+    const m = bar && openBarMenu(emp, bar);  // sigue abierto, en el mismo sitio, para encadenar ajustes
+    if (m) m.scrollTop = desplazado;
   },
   cellAdj: (el) => {
     closeMenu();
@@ -2434,7 +2646,12 @@ const actions = {
     renderView(); window.scrollTo(0, 0);
     toast('Ajuste preparado en la vista del día: revisa y pulsa «Confirmar cambios»');
   },
-  barPuesto: (el) => { state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp).puesto = el.dataset.p; closeMenu(); renderView(); },
+  barPuesto: (el) => {
+    const t = state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp);
+    if (t.puesto !== el.dataset.p) Object.assign(t, { puesto: el.dataset.p, funcion: null }); // la app le da su rol de ese puesto
+    closeMenu(); renderView();
+  },
+  barRol: (el) => { state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp).funcion = el.dataset.funcion || ''; closeMenu(); renderView(); },
   barShift: (el) => {
     const t = state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp);
     const sh = shiftById(state.config, el.dataset.shift);
@@ -2467,6 +2684,7 @@ const actions = {
     try {
       const body = { empleado_id: el.dataset.emp, fecha: el.dataset.date, turno_id: el.dataset.shift || null, bloquear: true };
       if (el.dataset.puesto) Object.assign(body, { puesto: el.dataset.puesto, conservar_horas: true });
+      if (el.dataset.funcion !== undefined) body.funcion = el.dataset.funcion; // '' = sin rol
       state.current = await api('PATCH', `/api/horarios/${state.current.id}/celda`, body);
       renderView();
       const errs = state.current.horario.incidencias.filter((i) => i.nivel === 'error' && i.empleado_id === el.dataset.emp && i.fecha === el.dataset.date);
@@ -2476,7 +2694,7 @@ const actions = {
   unlockCell: async (el) => {
     closeMenu();
     const a = state.current.horario.asignaciones.find((x) => x.empleado_id === el.dataset.emp && x.fecha === el.dataset.date);
-    state.current = await api('PATCH', `/api/horarios/${state.current.id}/celda`, { empleado_id: el.dataset.emp, fecha: el.dataset.date, turno_id: a ? a.turno_id : null, puesto: a ? a.puesto : null, conservar_horas: true, bloquear: false });
+    state.current = await api('PATCH', `/api/horarios/${state.current.id}/celda`, { empleado_id: el.dataset.emp, fecha: el.dataset.date, turno_id: a ? a.turno_id : null, puesto: a ? a.puesto : null, funcion: a ? a.funcion || '' : null, conservar_horas: true, bloquear: false });
     renderView();
   },
   publish: async (el) => {
@@ -2683,11 +2901,33 @@ const actions = {
     c.empleados.forEach((e) => { e.funciones = (e.funciones || []).filter((x) => x !== f.id); });
     markDirty(); renderView();
   },
-  addReglaFuncion: (el) => { state.draft.funciones[Number(el.dataset.i)].reglas.push({ inicio: '10:00', fin: '12:00', personas: 1, dias: null }); markDirty(); renderView(); },
+  addReglaFuncion: (el) => {
+    const f = state.draft.funciones[Number(el.dataset.i)];
+    f.reglas.push(esRol(f) ? { inicio: '09:00', fin: '21:00', personas: 1, maximo: null, dias: null } : { inicio: '10:00', fin: '12:00', personas: 1, dias: null });
+    markDirty(); renderView();
+  },
+  addRolesCamarero: () => {
+    const c = state.draft; c.funciones = c.funciones || [];
+    for (const [nombre, color] of ROLES_CAMARERO) {
+      c.funciones.push({ id: uid(nombre, c.funciones.map((f) => f.id)), nombre, color, puesto: 'sala', reglas: [] });
+    }
+    markDirty(); renderView();
+    toast('Roles creados: marca quién puede hacer cada uno y añade sus reglas, y guarda');
+  },
+  addFranja: (el) => { const e = state.draft.empleados[Number(el.dataset.i)]; (e.restricciones_horarias ||= []).push({ dias: [], desde: '10:00', hasta: null }); markDirty(); renderView(); },
+  delFranja: (el) => { state.draft.empleados[Number(el.dataset.i)].restricciones_horarias.splice(Number(el.dataset.j), 1); markDirty(); renderView(); },
   delReglaFuncion: (el) => { state.draft.funciones[Number(el.dataset.i)].reglas.splice(Number(el.dataset.j), 1); markDirty(); renderView(); },
   addEmp: () => {
     const ids = state.draft.empleados.map((e) => e.id);
-    state.draft.empleados.push({ id: uid(`persona-${ids.length + 1}`, ids), nombre: 'Nueva persona', horas_semanales: 30, puede_abrir: false, puede_cerrar: false, es_encargado: false, puestos: ['sala', 'cocina'], funciones: [], libranzas_fijas: [], slack_user_id: null, email: null, activo: true });
+    state.draft.empleados.push({ id: uid(`persona-${ids.length + 1}`, ids), nombre: 'Nueva persona', horas_semanales: 30, puede_abrir: false, puede_cerrar: false, es_encargado: false, puestos: ['sala', 'cocina'], funciones: [], libranzas_fijas: [], restricciones_horarias: [], slack_user_id: null, email: null, activo: true });
+    markDirty(); renderView(); window.scrollTo(0, document.body.scrollHeight);
+  },
+  addComodin: () => {
+    const emps = state.draft.empleados;
+    const usados = new Set(emps.map((e) => e.nombre.trim().toUpperCase()));
+    let n = 1;
+    while (usados.has(`X${n}`)) n++;
+    emps.push({ id: uid(`comodin-${n}`, emps.map((e) => e.id)), nombre: `X${n}`, horas_semanales: 0, comodin: true, horas_min_semana: null, horas_max_semana: null, puede_abrir: false, puede_cerrar: false, es_encargado: false, puestos: ['sala', 'cocina'], funciones: [], libranzas_fijas: [], restricciones_horarias: [], slack_user_id: null, email: null, activo: true });
     markDirty(); renderView(); window.scrollTo(0, document.body.scrollHeight);
   },
   delEmp: (el) => {
@@ -2808,6 +3048,16 @@ const actions = {
 
 // cambios de <select> que no son un simple data-bind
 const changeActions = {
+  comodin: (el) => {
+    const e = state.draft.empleados[Number(el.dataset.i)];
+    e.comodin = el.checked;
+    if (!e.comodin) {
+      // El mínimo y el máximo solo valen para los comodines; sin contrato no se puede guardar a alguien normal.
+      e.horas_min_semana = null; e.horas_max_semana = null;
+      if (!(e.horas_semanales > 0)) e.horas_semanales = 30;
+    }
+    markDirty(); renderView();
+  },
   // Función propia marcada o desmarcada en la ficha de la persona (igual que «Puede abrir»).
   funcCheck: (el) => {
     const c = state.draft;
@@ -2816,6 +3066,7 @@ const changeActions = {
     const fs = (e.funciones || []).filter((x) => x !== el.dataset.f);
     e.funciones = el.checked ? [...fs, el.dataset.f] : fs;
     markDirty();
+    if (esRol(funcById(c, el.dataset.f))) renderView(); // para el selector «Normalmente»
   },
   toggleConfirm: (el) => { const b = $('#confirm-publish'); if (b) b.disabled = !el.checked; },
   specialMode: (el) => {
@@ -2834,6 +3085,19 @@ const changeActions = {
   puestoPrincipal: (el) => {
     const e = state.draft.empleados[Number(el.dataset.i)];
     e.puestos = [el.value, ...puestosDe(e).filter((p) => p !== el.value)];
+    markDirty(); renderView();
+  },
+  // Rol que hace normalmente: va el primero de sus funciones (el motor lo prefiere cuando da igual).
+  rolPrincipal: (el) => {
+    const e = state.draft.empleados[Number(el.dataset.i)];
+    e.funciones = [el.value, ...(e.funciones || []).filter((x) => x !== el.value)];
+    markDirty(); renderView();
+  },
+  funcionClase: (el) => {
+    const f = state.draft.funciones[Number(el.dataset.i)];
+    f.puesto = el.value || null;
+    // En una tarea de apoyo no hay máximo, y el mínimo es de al menos una persona.
+    if (!f.puesto) f.reglas = f.reglas.map((r) => ({ ...r, maximo: null, personas: Math.max(1, r.personas || 0) }));
     markDirty(); renderView();
   },
   dayPick: (el) => {
@@ -3021,7 +3285,8 @@ document.addEventListener('submit', async (e) => {
     } catch (err) { toast(err.message, true); }
   }
 });
-window.addEventListener('scroll', closeMenu, true);
+window.addEventListener('scroll', menuOnScroll, true);
+if (window.visualViewport) window.visualViewport.addEventListener('resize', seguirAnclas);  // p. ej. al abrirse el teclado
 window.addEventListener('hashchange', () => { closeMenu(); if (route().name === 'calendario') state.cal.data = {}; if (route().name !== 'horarios' || !route().arg) state.current = state.current; if (route().name === 'web') state.web.data = undefined; renderView(); if (!(route().name === 'guia' && route().arg)) window.scrollTo(0, 0); });
 window.addEventListener('beforeunload', (e) => { if (state.dirty || (state.dia && diaCambios(state.dia).length)) { e.preventDefault(); e.returnValue = ''; } });
 
@@ -3044,6 +3309,7 @@ async function boot() {
   $('#app').innerHTML = '';
   render();
   if (state.me && state.me.rol === 'admin' && state.me.notificaciones) showNotifications();
+  if (state.me && state.me.rol === 'admin' && state.me.arreglos_pendientes) arreglarPendientes();
 }
 document.addEventListener('visibilitychange', async () => {
   if (document.visibilityState !== 'visible' || !state.me || state.me.cambiar_clave) return;
