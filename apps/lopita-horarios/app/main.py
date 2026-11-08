@@ -7,6 +7,8 @@ import json
 import os
 import secrets
 import sys
+import threading
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Literal, Optional
 
@@ -243,6 +245,23 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         if u["rol"] != "empleado" or not u["empleado_id"]:
             raise HTTPException(403, "Esta sección es para trabajadores")
         return u
+
+    en_calculo: set[str] = set()
+    cerrojo_calculo = threading.Lock()
+
+    @contextmanager
+    def calculando(clave: str):
+        """Un mismo cálculo (generar este periodo, regenerar este horario) no corre dos veces a la vez: un doble clic
+        o un reintento tras un corte de red no crea horarios repetidos ni gasta el motor dos veces."""
+        with cerrojo_calculo:
+            if clave in en_calculo:
+                raise HTTPException(409, "Ya se está calculando este horario; espera a que termine.")
+            en_calculo.add(clave)
+        try:
+            yield
+        finally:
+            with cerrojo_calculo:
+                en_calculo.discard(clave)
 
     def config_now() -> Config:
         return store.current_config()[0]
@@ -569,11 +588,12 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
             raise HTTPException(400, "La fecha final es anterior a la inicial")
         if (body.hasta - body.desde).days > 62:
             raise HTTPException(400, "El periodo máximo es de 9 semanas")
-        res = arreglos.generar(store, config_now(), body.desde, body.hasta, segundos=seconds)
-        h = res.horario
-        if not h.asignaciones:
-            raise HTTPException(409, h.incidencias[0].mensaje if h.incidencias else "No se pudo generar")
-        sid = store.create_schedule(h, u["username"])
+        with calculando(f"generar:{body.desde}:{body.hasta}"):
+            res = arreglos.generar(store, config_now(), body.desde, body.hasta, segundos=seconds)
+            h = res.horario
+            if not h.asignaciones:
+                raise HTTPException(409, h.incidencias[0].mensaje if h.incidencias else "No se pudo generar")
+            sid = store.create_schedule(h, u["username"])
         arreglos.notificar_generacion(store, sid, res)
         return {**detail(store.get_schedule(sid), request), "generacion": arreglos.informe(res)}
 
@@ -590,8 +610,9 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         if desde is not None and not old.desde <= desde <= old.hasta:
             raise HTTPException(400, "La fecha desde la que regenerar está fuera del periodo del horario")
         congelados = congelar_antes(config, old, desde) if desde and desde > old.desde else []
-        res = arreglos.generar(store, config, old.desde, old.hasta, segundos=seconds, excluir=sid, bloqueos=old.bloqueos,
-                               congelados=congelados, cambiable_desde=desde)
+        with calculando(f"regenerar:{sid}"):
+            res = arreglos.generar(store, config, old.desde, old.hasta, segundos=seconds, excluir=sid,
+                                   bloqueos=old.bloqueos, congelados=congelados, cambiable_desde=desde)
         h = res.horario
         if not h.asignaciones:
             raise HTTPException(409, h.incidencias[0].mensaje if h.incidencias else "No se pudo generar")
