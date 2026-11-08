@@ -1,0 +1,12 @@
+# Intranet detrás de un túnel de Cloudflare: el servidor no abre puertos ni gestiona certificados, y Cloudflare Access
+# decide quién llega. Se usa encima de docker-compose.yml, sin Caddy:
+#   docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml up -d --build lopita copias cloudflared
+# Pasos completos en deploy/demo/README.md («Variante Cloudflare»).
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:2024.12.2
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?Falta CLOUDFLARE_TUNNEL_TOKEN en .env}
+    depends_on: [lopita]
+    restart: unless-stopped

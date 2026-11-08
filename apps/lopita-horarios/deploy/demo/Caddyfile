@@ -1,0 +1,39 @@
+# Demo privada: la web nueva de Lopita y la app de horarios, en dos direcciones de nuestro dominio.
+# - LOPITA_WEB_DOMINIO: la web. Pide usuario y contraseña (acceso-web.caddy, ver herramientas/crear_acceso_web.sh).
+#   Sus formularios y la carta los sirve la app (/api/web/*), y las fuentes también (/fonts/*).
+# - LOPITA_DOMINIO: la app. Tiene su propio inicio de sesión; no lleva contraseña del navegador encima porque en el
+#   iPhone una app añadida a la pantalla de inicio no la gestiona bien.
+# Ninguna de las dos se deja indexar.
+(cabeceras) {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "same-origin"
+		X-Robots-Tag "noindex, nofollow"
+		-Server
+	}
+	respond /robots.txt `User-agent: *
+Disallow: /` 200
+}
+
+{$LOPITA_WEB_DOMINIO} {
+	import cabeceras
+	import /etc/caddy/acceso-web.caddy
+	handle /api/web/* {
+		reverse_proxy lopita:8000
+	}
+	handle /fonts/* {
+		reverse_proxy lopita:8000
+	}
+	handle {
+		root * /srv/web
+		file_server
+	}
+}
+
+{$LOPITA_DOMINIO} {
+	import cabeceras
+	reverse_proxy lopita:8000
+}

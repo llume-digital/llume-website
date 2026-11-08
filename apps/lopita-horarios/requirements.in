@@ -1,0 +1,9 @@
+# Dependencias directas del servidor, con los rangos aceptados. Las versiones exactas están en requirements.txt,
+# que se genera a partir de este archivo:
+#   uv pip compile requirements.in -o requirements.txt --python-version 3.14
+ortools>=9.15,<10
+pydantic>=2.13,<3
+fastapi>=0.143,<1
+uvicorn[standard]>=0.53
+httpx>=0.28,<1
+itsdangerous>=2.2,<3

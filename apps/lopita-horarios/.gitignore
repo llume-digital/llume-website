@@ -1,0 +1,8 @@
+salida/
+__pycache__/
+.pytest_cache/
+.env
+datos/*.db
+.venv/
+web/recursos/cartas/
+deploy/demo/acceso-web.caddy

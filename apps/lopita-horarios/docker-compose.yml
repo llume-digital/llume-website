@@ -1,0 +1,39 @@
+# Web app completa: la app (FastAPI) detrás de Caddy, que pone HTTPS con certificado automático.
+# Uso: copia .env.example como .env, rellénalo (LOPITA_DOMINIO apuntando a esta máquina) y `docker compose up -d`.
+services:
+  lopita:
+    build: .
+    image: lopita-horarios
+    # build: { context: ., args: { WITH_PDF: "1" } }   # para exportar PDF desde el servidor
+    env_file: .env
+    environment:
+      LOPITA_HTTPS: "1"
+      FORWARDED_ALLOW_IPS: "*"  # la app no se publica fuera: solo le llega tráfico de Caddy por la red interna
+    volumes: ["lopita-datos:/data"]
+    expose: ["8000"]
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2.10
+    env_file: .env
+    ports: ["80:80", "443:443", "443:443/udp"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-datos:/data
+    depends_on: [lopita]
+    restart: unless-stopped
+
+  # Copia diaria de la base de datos en el mismo volumen (se guardan 30 días). Para tener copias fuera de la
+  # máquina, sincroniza /data/copias con otro sitio (o usa Litestream).
+  copias:
+    image: lopita-horarios  # la misma imagen que construye el servicio «lopita»
+    pull_policy: never
+    healthcheck: { disable: true }  # la de la imagen comprueba la web, que aquí no se ejecuta
+    volumes: ["lopita-datos:/data"]
+    entrypoint: ["sh", "-c", "while true; do python -m app.cli copia /data/copias/lopita-$$(date +%F).db && find /data/copias -name '*.db' -mtime +30 -delete; sleep 86400; done"]
+    depends_on: [lopita]
+    restart: unless-stopped
+
+volumes:
+  lopita-datos:
+  caddy-datos:

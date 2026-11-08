@@ -1,0 +1,9 @@
+{
+  "appId": "es.lopita.horarios.demo",
+  "appName": "Horarios demo",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#17130F",
+    "webContentsDebuggingEnabled": true
+  }
+}

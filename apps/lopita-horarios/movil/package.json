@@ -1,0 +1,15 @@
+{
+  "name": "lopita-horarios-movil",
+  "private": true,
+  "description": "Envoltorio de Android (Capacitor) para la app offline de demostración",
+  "scripts": {
+    "android": "cap add android && cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}

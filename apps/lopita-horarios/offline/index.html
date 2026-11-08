@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17130F">
+  <title>Horarios · Lopita &amp; Co (demo)</title>
+  <link rel="icon" href="static/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="static/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Horarios demo">
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="static/styles.css">
+  <style>
+    .offline-cargando { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px 16px; text-align: center; background: var(--black); color: #fff; }
+    .offline-cargando b { font-family: var(--display); font-weight: 300; letter-spacing: .2em; font-size: 22px; color: var(--gold); }
+    .offline-cargando small { color: #c9bda9; max-width: 32em; }
+    .offline-rueda { width: 28px; height: 28px; border: 3px solid rgba(176,144,76,.3); border-top-color: var(--gold); border-radius: 50%; animation: offline-giro 0.9s linear infinite; }
+    @keyframes offline-giro { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .offline-rueda { animation: none; } }
+    .offline-demo { position: fixed; left: 8px; bottom: 8px; z-index: 35; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; max-width: calc(100vw - 16px); padding: 6px 8px 6px 12px; border-radius: 999px; background: var(--black); color: #fff; font-size: 12px; box-shadow: var(--shadow); }
+    .offline-demo[hidden] { display: none; }
+    .offline-demo details { cursor: pointer; }
+    .offline-demo summary { list-style: none; color: var(--gold); font-weight: 600; letter-spacing: .04em; }
+    .offline-demo summary::-webkit-details-marker { display: none; }
+    .offline-demo details[open] { padding: 4px 0; }
+    .offline-demo p { margin: 6px 0; max-width: 26em; }
+    .offline-demo button { border: 1px solid var(--gold); background: transparent; color: #fff; border-radius: 999px; padding: 6px 12px; font: inherit; cursor: pointer; }
+    @media print { .offline-demo { display: none; } }
+  </style>
+  <script src="config.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div class="offline-cargando" role="status" aria-live="polite">
+      <b>LOPITA &amp; CO</b>
+      <div class="offline-rueda" aria-hidden="true"></div>
+      <span id="cargando-texto">Preparando la app…</span>
+      <small>Versión de demostración: todo funciona dentro de este móvil y sin conexión. La primera vez tarda un poco más.</small>
+    </div>
+  </div>
+  <div class="offline-demo" id="demo" hidden>
+    <details>
+      <summary>Demo sin conexión</summary>
+      <p id="demo-texto">Los datos se guardan solo en este móvil. Nada se envía a Slack ni a ningún servidor.</p>
+      <p id="demo-acceso"></p>
+      <button type="button" id="demo-reiniciar">Volver a los datos de ejemplo</button>
+    </details>
+  </div>
+  <script src="arranque.js" type="module"></script>
+</body>
+</html>

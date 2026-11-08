@@ -25,6 +25,8 @@ llume-web/
 ├── scripts/build_cases.py  Genera las páginas de cada caso a partir de las portadas
 ├── scripts/build_legal.py  Genera las páginas legales en los tres idiomas (datos del titular arriba del todo)
 ├── scripts/build_pages.py  Genera Formación y Preguntas frecuentes en los tres idiomas
+├── apps/lopita-horarios/   Código de la app de horarios de Lopita y de la web de lopita.es, con sus tests (no se publica)
+├── .github/workflows/      CI de la app de horarios (solo corre cuando cambia apps/lopita-horarios/)
 └── public/              Lo único que se publica
     ├── index.html       Página en español
     ├── en/index.html    Página en inglés (misma estructura)
@@ -142,12 +144,12 @@ Los prototipos de webs para empresas (que enseñamos antes de cerrar trato) no t
 | Carpeta | Cliente | Qué es |
 |---|---|---|
 | `public/elpuertoluanco/` | Cafetería El Puerto (Luanco, Asturias) | Web de una página y carta digital para QR en `carta/` |
-| `public/lopita/` | Lopita & Co (Oviedo) | Web nueva de lopita.es. Se genera desde `Serralom/lopita-horarios` con `python herramientas/exportar_vista_previa.py <ruta a este repo>/public/lopita`: no se edita aquí. Formularios en modo vista previa (no envían) y carta enlazada a los PDF de lopita.es |
-| `public/lopita/horarios/` | Lopita & Co | App de horarios sin servidor para que el cliente la pruebe: Python en el navegador (Pyodide) calcula el horario y la base de datos SQLite se comparte en un Durable Object (`src/worker.js`, ruta `nube/db`, con versión para no pisar cambios). Se entra con un enlace que lleva la clave (`#clave=…`, solo está su sha256 en `wrangler.jsonc`); dentro, usuario `admin` / `lopita` la primera vez. Es el artefacto `lopita-offline` de `Serralom/lopita-horarios` construido con `--nube nube/db`, más el `noindex`. Necesita `'wasm-unsafe-eval'` en la CSP (bloque propio en `_headers`). Calendarios: la app sube el `.ics` de cada persona a `nube/cal` tras cada cambio y el Worker los sirve sin clave en `nube/cal/<token>.ics` (el token es el secreto) para suscribirse desde Google Calendar o el iPhone. Slack: la app llama a `nube/slack/<método>` con la clave y el Worker pone el token del bot (secreto `SLACK_BOT_TOKEN`, `npx wrangler secret put SLACK_BOT_TOKEN`) y el canal (`SLACK_CHANNEL` en `wrangler.jsonc`); sin token, la app sigue en modo simulación |
+| `public/lopita/` | Lopita & Co (Oviedo) | Web nueva de lopita.es. Se genera desde el código de `apps/lopita-horarios/` con `python apps/lopita-horarios/herramientas/exportar_vista_previa.py public/lopita`: no se edita a mano. Formularios en modo vista previa (no envían) y carta enlazada a los PDF de lopita.es |
+| `public/lopita/horarios/` | Lopita & Co | App de horarios sin servidor para que el cliente la pruebe: Python en el navegador (Pyodide) calcula el horario y la base de datos SQLite se comparte en un Durable Object (`src/worker.js`, ruta `nube/db`, con versión para no pisar cambios). Se entra con un enlace que lleva la clave (`#clave=…`, solo está su sha256 en `wrangler.jsonc`); dentro, usuario `admin` / `lopita` la primera vez. Es el artefacto `lopita-offline` (workflow «Lopita · App offline», código en `apps/lopita-horarios/`) construido con `--nube nube/db`, más el `noindex`. Necesita `'wasm-unsafe-eval'` en la CSP (bloque propio en `_headers`). Calendarios: la app sube el `.ics` de cada persona a `nube/cal` tras cada cambio y el Worker los sirve sin clave en `nube/cal/<token>.ics` (el token es el secreto) para suscribirse desde Google Calendar o el iPhone. Slack: la app llama a `nube/slack/<método>` con la clave y el Worker pone el token del bot (secreto `SLACK_BOT_TOKEN`, `npx wrangler secret put SLACK_BOT_TOKEN`) y el canal (`SLACK_CHANNEL` en `wrangler.jsonc`); sin token, la app sigue en modo simulación |
 
 Pendiente en `elpuertoluanco`: fotos propias (las actuales son provisionales), vinos y alérgenos por plato en `carta/carta.json`, horario confirmado, historia real del bar, más reseñas de Google hasta 20 en `resenas.json`, QR de la carta y de reseñas, versión en inglés, y quitar el `noindex` al cerrar el acuerdo (destino previsto: `elpuertoluanco.es`).
 
-Las fotos de `lopita/recursos/img/` vienen de lopita.es (se bajan con `herramientas/descargar_recursos_web.sh` en `lopita-horarios`; desde servidores lopita.es responde 403). Al regenerar con el exportador se conservan si están en `web/recursos/img`. Destino previsto: `lopita.es`.
+Las fotos de `lopita/recursos/img/` vienen de lopita.es (se bajan con `apps/lopita-horarios/herramientas/descargar_recursos_web.sh`; desde servidores lopita.es responde 403). Al regenerar con el exportador se conservan si están en `web/recursos/img`. Destino previsto: `lopita.es`.
 
 ## 11. Auditoría de octubre de 2026
 
