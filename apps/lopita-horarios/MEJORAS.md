@@ -47,7 +47,7 @@ Prioridad: **P1** antes de salir a producción · **P2** pronto · **P3** deseab
 ## Calidad de código y pruebas
 
 - **P2 · `app/main.py` tiene 800 líneas** con modelos, reglas y rutas juntos. Separar en routers (`horarios`, `portal`, `solicitudes`, `usuarios`) y mover la lógica a servicios.
-- **P2 · `app/static/app.js` (1.460 líneas, un solo archivo).** Partir por pantallas o pasar a módulos ES; añadir comprobación automática de que toda cadena dinámica pasa por `esc()`.
+- **P2 · ~~`app/static/app.js` en un solo archivo~~** (partido en módulos ES en noviembre de 2026). Queda añadir comprobación automática de que toda cadena dinámica pasa por `esc()`.
 - **P2 · Cubrir con tests lo que falta:** límites de tamaño, `cambiar_clave`, CSRF/Origin, concurrencia entre dos encargados, reinicio de sesión tras cambio de clave, borrado de empleados con datos asociados, y horarios de 9 semanas (rendimiento del solver).
 - **P2 · Tiempo del solver:** el límite por defecto es 30 s en un hilo de petición; con varias generaciones simultáneas se bloquea el servidor. Ejecutarlo en segundo plano con estado «generando…».
 - **P3 · CI** (GitHub Actions: tests + linter `ruff`) y fijado de versiones en `requirements.txt` (hoy `>=`).

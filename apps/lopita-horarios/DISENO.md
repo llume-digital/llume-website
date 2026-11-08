@@ -6,7 +6,7 @@ Recoge lo más útil de los prompts y skills de diseño que comparte la comunida
 
 ## 1. Identidad (no se cambia)
 
-Los valores viven en las variables de `:root` de `app/static/styles.css`. Usa siempre la variable, nunca el valor suelto; si hace falta un valor nuevo, se crea como variable. `tests/test_tokens_diseno.py` falla si aparece un `#hex` fuera de `:root` o en un `style="…"` de app.js; los colores que elige el encargado (turnos, funciones) son datos y no cuentan.
+Los valores viven en las variables de `:root` de `app/static/styles.css`. Usa siempre la variable, nunca el valor suelto; si hace falta un valor nuevo, se crea como variable. `tests/test_tokens_diseno.py` falla si aparece un `#hex` fuera de `:root` o en un `style="…"` del JavaScript de la interfaz; los colores que elige el encargado (turnos, funciones) son datos y no cuentan.
 
 | Uso | Variable | Valor |
 | --- | --- | --- |
@@ -67,7 +67,7 @@ Los valores viven en las variables de `:root` de `app/static/styles.css`. Usa si
 
 **Datos**
 - Horas, contadores y saldos con `font-variant-numeric: tabular-nums` para que las columnas no bailen.
-- Fechas y horas con `Intl.DateTimeFormat` o `toLocale…` en `es-ES`, como hacen ya `fmtStamp` y `fmtFechaLarga` en `app.js`.
+- Fechas y horas con `Intl.DateTimeFormat` o `toLocale…` en `es-ES`, como hacen ya `fmtStamp` y `fmtFechaLarga` en `js/nucleo/util.js` y `js/pantallas/novedades.js`.
 - Los textos largos (nombres, notas, motivos) no rompen la maquetación: se recortan con elipsis o pasan de línea.
 
 **Estados**
