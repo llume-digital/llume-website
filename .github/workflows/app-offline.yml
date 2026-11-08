@@ -1,31 +1,9 @@
 name: Lopita · App offline
 
+# Pausado mientras no probamos la app offline ni la de Android: es lo que más tarda en la integración continua.
+# Se lanza a mano desde Actions («Run workflow») el día que queramos verificarla; los cambios se siguen haciendo.
+# Para reactivarlo en cada PR, recuperar los disparadores push y pull_request del historial de este archivo.
 on:
-  push:
-    branches: [main]
-    paths:
-      - "apps/lopita-horarios/offline/**"
-      - "apps/lopita-horarios/app/**"
-      - "apps/lopita-horarios/lopita_horarios/**"
-      - "apps/lopita-horarios/datos/ejemplo.json"
-      - "apps/lopita-horarios/herramientas/construir_offline.py"
-      - "apps/lopita-horarios/movil/**"
-      - "apps/lopita-horarios/tests/test_offline*.py"
-      - "apps/lopita-horarios/tests/test_cp_highs.py"
-      - "apps/lopita-horarios/requirements*.txt"
-      - ".github/workflows/app-offline.yml"
-  pull_request:
-    paths:
-      - "apps/lopita-horarios/offline/**"
-      - "apps/lopita-horarios/app/**"
-      - "apps/lopita-horarios/lopita_horarios/**"
-      - "apps/lopita-horarios/datos/ejemplo.json"
-      - "apps/lopita-horarios/herramientas/construir_offline.py"
-      - "apps/lopita-horarios/movil/**"
-      - "apps/lopita-horarios/tests/test_offline*.py"
-      - "apps/lopita-horarios/tests/test_cp_highs.py"
-      - "apps/lopita-horarios/requirements*.txt"
-      - ".github/workflows/app-offline.yml"
   workflow_dispatch:
 
 permissions:
@@ -121,10 +99,10 @@ jobs:
           disable-animations: true
           script: sh apps/lopita-horarios/movil/probar_apk.sh lopita-horarios-demo.apk
 
-  # En main, el .apk probado se publica en la release «demo» para descargarlo directamente desde el móvil, sin zip.
+  # Lanzado sobre main, el .apk probado se publica en la release «demo» para descargarlo directamente desde el móvil, sin zip.
   publicar:
     needs: apk-prueba
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write

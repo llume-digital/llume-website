@@ -6,7 +6,7 @@ Recoge lo más útil de los prompts y skills de diseño que comparte la comunida
 
 ## 1. Identidad (no se cambia)
 
-Los valores viven en las variables de `:root` de `app/static/styles.css`. Usa siempre la variable, nunca el valor suelto; si hace falta un valor nuevo, se crea como variable.
+Los valores viven en las variables de `:root` de `app/static/styles.css`. Usa siempre la variable, nunca el valor suelto; si hace falta un valor nuevo, se crea como variable. `tests/test_tokens_diseno.py` falla si aparece un `#hex` fuera de `:root` o en un `style="…"` de app.js; los colores que elige el encargado (turnos, funciones) son datos y no cuentan.
 
 | Uso | Variable | Valor |
 | --- | --- | --- |
@@ -21,8 +21,13 @@ Los valores viven en las variables de `:root` de `app/static/styles.css`. Usa si
 | Texto de poco peso («libre», «libra») | `--faint` | `#786B5F` (4,6:1 sobre las tarjetas) |
 | Anillo de foco | `--focus` | `--brown` sobre fondo claro; `--gold` en la barra negra |
 | Movimiento | `--dur-fast`, `--dur`, `--ease` | `120ms`, `180ms`, sin rebote |
+| Superficies secundarias | `--surface-2`, `--hover`, `--track` | cabeceras, fila al pasar, pistas y fondos neutros |
+| Bordes de los avisos | `--bad-line`, `--warn-line`, `--ok-line`, `--gold-line` | el borde de cada fondo `-soft` |
+| Barras de datos | `--cov-ok`, `--cov-extra`, `--warn-strong`, `--bar-low`, `--absence` | cobertura, horas y ausencias |
+| Barra oscura | `--night-2`, `--night-edge`, `--night-line`, `--night-text`, `--night-muted`, `--night-bad` | pestañas y barra de guardar |
 
 - **Tipografía**: `--display` (Oswald) en mayúsculas espaciadas solo para la marca, la navegación, los `h1`/`h2` y las cabeceras de días; `--text` (Raleway) para todo lo demás. No se añaden otras fuentes.
+- **Escala**: tamaños solo con `--text-2xs` (11 px, solo etiquetas densas del cuadrante y del mes), `--text-xs` 12, `--text-sm` 13, `--text-md` 14, `--text-base` 15 (cuerpo), `--text-lg` 17 (h2), `--text-xl` 20, `--text-2xl` 24 y `--text-3xl` 28 (h1); los campos del móvil van a 16 px. Pesos 400, 600 y 700 en Raleway y 300/400 en Oswald. Interlineado `--leading` (1,45) para el cuerpo y `--leading-tight` (1,2) para títulos y cifras. Las cifras de los resúmenes van en Raleway 700 con `tabular-nums lining-nums`, no en Oswald.
 - El dorado es el único acento. Los colores de estado se reservan para estados reales (una alerta, un error, algo correcto), nunca para decorar.
 
 ## 2. Principios
