@@ -43,7 +43,14 @@ EXTRA = [("itsdangerous-2.2.0-py3-none-any.whl",
           "https://files.pythonhosted.org/packages/04/96/92447566d16df59b2a776c0fb82dbc4d9e07cd95062562af01e408583fc4/"
           "itsdangerous-2.2.0-py3-none-any.whl",
           "c6242fc49e35958c8b15141343aa660db5fc54d4f13a1db01a3f5891b98700ef")]
-ESTATICOS = ["app.js", "styles.css", "favicon.svg", "icono-192.png", "icono-512.png", "apple-touch-icon.png"]
+# La interfaz es todo app/static menos lo que solo tiene sentido con el servidor: se recorre, no se lista a mano.
+SOLO_SERVIDOR = {"index.html", "sw.js", "recarga.js", "manifest.webmanifest"}
+
+
+def estaticos() -> list[str]:
+    raiz = RAIZ / "app" / "static"
+    return sorted(p.relative_to(raiz).as_posix() for p in raiz.rglob("*")
+                  if p.is_file() and p.name not in SOLO_SERVIDOR and "__pycache__" not in p.parts)
 SHELL = ["index.html", "arranque.js", "motor.worker.js", "manifest.webmanifest"]
 
 
@@ -117,8 +124,8 @@ def construir(salida: Path, pyodide_local: Path | None, nube: str | None = None)
         (salida / "pyodide" / nombre).write_bytes(datos)
         extra.append(f"pyodide/{nombre}")
 
-    (salida / "static").mkdir()
-    for nombre in ESTATICOS:
+    for nombre in estaticos():
+        (salida / "static" / nombre).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(RAIZ / "app" / "static" / nombre, salida / "static" / nombre)
     fuentes = RAIZ / "lopita_horarios" / "assets" / "fonts"
     shutil.copytree(fuentes, salida / "fonts")
