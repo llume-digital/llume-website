@@ -30,7 +30,7 @@ from lopita_horarios.sugerencias import sugerir
 from lopita_horarios.validator import compute_stats, validate
 
 from . import alertas as alertas_app
-from . import arreglos, avisos, calendario, comentarios, cuentas, horas, linea_tiempo
+from . import arreglos, avisos, calendario, comentarios, cuentas, horas, linea_tiempo, revision
 from . import web as web_publica
 from .db import Store, default_db_path
 from .seguridad import LimiteIntentos, MismoOrigen
@@ -149,6 +149,9 @@ class ReadIn(BaseModel):
 
 class PublishIn(BaseModel):
     confirmar_criticas: bool = Field(default=False, description="Publicar aunque tenga alertas críticas (el horario no vale tal cual)")
+    confirmar_pasado: bool = Field(default=False, description="Publicar aunque cambie días que ya han pasado")
+    conservar: list[Lock] = Field(default_factory=list, max_length=2000,
+                                  description="Ediciones a mano y bloqueos de lo publicado que el borrador debe respetar")
 
 
 class ReadNotificationsIn(BaseModel):
@@ -745,13 +748,49 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         store.update_schedule(sid, refresh(config_now(), h, sid))
         return detail(load(sid), request)
 
+    def revision_json(config: Config, rev: dict) -> dict:
+        nombres = {e.id: e.nombre for e in config.empleados}
+        turno = lambda firmas: avisos._turno(config, firmas) if firmas else None  # noqa: E731
+        pasado = set(rev["pasado"])
+        return {
+            "cambios": [{"empleado_id": c.empleado_id, "nombre": nombres.get(c.empleado_id, c.empleado_id),
+                         "fecha": c.fecha.isoformat(), "antes": turno(c.antes), "despues": turno(c.despues),
+                         "pasado": c.fecha in pasado} for c in rev["cambios"]],
+            "dias_publicados": rev["dias_publicados"], "dias_nuevos": rev["dias_nuevos"],
+            "sustituye": [{**x, "desde": x["desde"].isoformat(), "hasta": x["hasta"].isoformat()} for x in rev["sustituye"]],
+            "conservables": [{"horario": x["horario"], "nombre": nombres.get(x["bloqueo"].empleado_id, x["bloqueo"].empleado_id),
+                              "bloqueo": x["bloqueo"].model_dump(mode="json"),
+                              "turno": turno(revision.firma(a)) if (a := revision.como_asignacion(x["bloqueo"])) else None}
+                             for x in rev["conservables"]],
+            "pasado": [d.isoformat() for d in rev["pasado"]],
+        }
+
+    @app.get("/api/horarios/{sid}/revision")
+    def review(sid: int, u=Depends(admin)):
+        """Qué cambia para el equipo si se publica este horario: diferencias con lo publicado, ediciones a mano y
+        bloqueos de lo publicado que se perderían (para poder conservarlos) y días pasados que cambian."""
+        row = load(sid)
+        return revision_json(config_now(), revision.revisar(store.list_schedules(), row, dt.date.today()))
+
     @app.post("/api/horarios/{sid}/publicar")
     def publish(sid: int, request: Request, body: PublishIn | None = None, u=Depends(admin)):
         row = load(sid)
         config = config_now()
+        if body and body.conservar:
+            h0 = row["horario"]
+            if any(not h0.desde <= b.fecha <= h0.hasta for b in body.conservar):
+                raise HTTPException(400, "Hay ediciones para conservar fuera de las fechas del horario")
+            row["horario"] = revision.conservar(h0, body.conservar)
         h = refresh(config, row["horario"], sid)
         if any(i.nivel == "error" for i in h.incidencias):
             raise HTTPException(409, "El horario tiene errores (reglas incumplidas). Corrígelos antes de publicar.")
+        rev = revision.revisar(store.list_schedules(), {**row, "horario": h}, dt.date.today())
+        if rev["pasado"] and not (body and body.confirmar_pasado):
+            n = len(rev["pasado"])
+            return JSONResponse(status_code=409, content={
+                "detail": f"Publicarlo cambia {n} día{'s' if n > 1 else ''} que ya ha{'n' if n > 1 else ''} pasado. "
+                          "Confirma que quieres cambiar lo que consta como trabajado.",
+                "codigo": "pasado", "pasado": [d.isoformat() for d in rev["pasado"]]})
         criticas = criticas_de(row, config)
         if criticas and not (body and body.confirmar_criticas):
             n = len(criticas)
