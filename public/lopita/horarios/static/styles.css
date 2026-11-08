@@ -478,6 +478,11 @@ table.sched .emp .cap-tags { display: flex; flex-wrap: wrap; margin: 2px 0 0; }
 .guia-sec { scroll-margin-top: 120px; }
 .guia-sec.flash { animation: guia-flash 1.6s ease-out; }
 @keyframes guia-flash { from { box-shadow: 0 0 0 3px var(--gold); } to { box-shadow: var(--shadow); } }
+.novedades { gap: 14px; }
+.novedad h2 { margin: 4px 0 8px; }
+.novedad p { margin: 0 0 8px; line-height: 1.5; }
+.novedad .btn { margin-top: 4px; }
+.novedad-cab { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
 .guia-lista { margin: 0; padding-left: 20px; display: grid; gap: 5px; }
 
 .zoom-ctl { display: inline-flex; gap: 4px; flex: none; }
