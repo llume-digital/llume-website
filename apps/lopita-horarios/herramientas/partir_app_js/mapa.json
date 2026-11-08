@@ -1,0 +1,8 @@
+[[1,"js/nucleo/util.js"],[49,"js/nucleo/estado.js"],[227,"js/nucleo/enlace.js"],[262,"js/nucleo/pintado.js"],
+[486,"js/pantallas/acceso.js"],[503,"js/pantallas/horarios.js"],[559,"js/pantallas/cuadrante.js"],[648,"js/pantallas/alertas.js"],
+[826,"js/pantallas/mes.js"],[885,"js/pantallas/calendario.js"],[980,"js/pantallas/persona.js"],[1165,"js/pantallas/dia.js"],
+[1642,"js/pantallas/equipo.js"],[1750,"js/pantallas/funciones.js"],[1811,"js/pantallas/turnos.js"],[1842,"js/pantallas/demanda.js"],
+[1931,"js/pantallas/ausencias.js"],[1969,"js/pantallas/preferencias.js"],[1990,"js/pantallas/reglas.js"],[2057,"js/pantallas/ajustes.js"],
+[2111,"js/pantallas/portal.js"],[2300,"js/pantallas/solicitudes.js"],[2326,"js/pantallas/web.js"],[2364,"js/pantallas/guia.js"],
+[2525,"js/pantallas/novedades.js"],[2572,"js/pantallas/comentarios.js"],[2628,"js/pantallas/informes.js"],[2701,"js/pantallas/cuenta.js"],
+[2780,"js/acciones.js"],[3489,"app.js"]]

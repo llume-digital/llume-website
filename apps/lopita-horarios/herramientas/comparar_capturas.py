@@ -4,7 +4,7 @@
 
 Arranca un único servidor con datos de ejemplo y un horario publicado, y recorre las mismas pantallas que
 `tests/test_pantallas_navegador.py` (encargado y trabajadora, a 390 y 1280 px) dos veces: una sirviendo `app/static`
-de la base y otra la de esta carpeta. Como el servidor, los datos y el reloj del navegador son los mismos, cualquier
+de la base (intercepta /i/<huella>/* y /static/*) y otra la de esta carpeta. Como el servidor, los datos y el reloj del navegador son los mismos, cualquier
 diferencia entre las dos capturas la ha causado el cambio de la interfaz. No compara con imágenes guardadas en el
 repositorio: así no depende del sistema en que se generaron ni hay que regenerarlas.
 
@@ -40,15 +40,17 @@ def _servidor():
 
 
 def _servir_base(ctx, estaticos: Path):
-    """Sirve /static/* desde la carpeta de la base (si el archivo existe allí) y bloquea el service worker."""
+    """Sirve la interfaz (/i/<huella>/* y /static/*) desde la carpeta de la base, si el archivo existe allí."""
     def responder(route):
-        nombre = route.request.url.split("/static/", 1)[1].split("?", 1)[0]
+        url = route.request.url.split("?", 1)[0]
+        nombre = url.split("/static/", 1)[1] if "/static/" in url else url.split("/i/", 1)[1].split("/", 1)[1]
         archivo = estaticos / nombre
         if not archivo.is_file():
             return route.continue_()
         tipo = mimetypes.guess_type(archivo.name)[0] or "application/octet-stream"
         route.fulfill(body=archivo.read_bytes(), content_type=tipo)
     ctx.route("**/static/**", responder)
+    ctx.route("**/i/*/**", responder)
 
 
 def _capturar(browser, T, datos, tamaño, usuario, clave, rutas, base, reloj):
