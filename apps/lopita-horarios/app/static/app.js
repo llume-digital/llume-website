@@ -2005,7 +2005,7 @@ function alertSettingsCard() {
       ${numField('alertas.exceso_personal_horas_dia', 'Personal de más (horas-persona al día)', '', a.exceso_personal_horas_dia, 0.5)}
       ${numField('alertas.plantilla_sobra_pct', 'Plantilla sobrante (%)', 'Cuánto pueden superar los contratos a la demanda de una semana antes de avisar', a.plantilla_sobra_pct, 1)}
     </div>
-    <h3 style="margin:18px 0 6px;font-size:15px">Qué alertas recibir</h3>
+    <h3 style="margin:18px 0 6px;font-size:var(--text-base)">Qué alertas recibir</h3>
     <div class="chips">${cat.map((c) => `<button type="button" class="chip ${a.desactivadas.includes(c.codigo) ? '' : 'on'}" data-act="toggleAlertCode" data-code="${esc(c.codigo)}" aria-pressed="${!a.desactivadas.includes(c.codigo)}">${esc(c.descripcion)}</button>`).join('')}</div>
     <p class="small muted" style="margin-bottom:0">Las reglas incumplidas, las ausencias que no se reflejan en el horario y los avisos de contexto no se pueden silenciar.</p>
   </div>`;
@@ -2313,7 +2313,7 @@ function viewSolicitudes() {
     let impact = '';
     if (r.tipo === 'correccion') { const diff = d.minutos / 60 - shiftHours(turnos, d.turno_previsto); impact = `<span class="badge ${diff ? 'warn' : 'neutral'}">${signed(diff)}</span>`; }
     return `<div class="card">
-      <div class="row" style="flex-wrap:nowrap"><b style="font-size:16px">${esc(r.nombre)}</b><span class="spacer"></span>${r.estado === 'pendiente' ? '' : reqBadge(r.estado)}</div>
+      <div class="row" style="flex-wrap:nowrap"><b style="font-size:var(--text-lg)">${esc(r.nombre)}</b><span class="spacer"></span>${r.estado === 'pendiente' ? '' : reqBadge(r.estado)}</div>
       <div style="margin-top:8px">${reqSummary(r, turnos)} ${impact}</div>
       ${r.motivo ? `<p class="small" style="margin:10px 0 0">«${esc(r.motivo)}»</p>` : ''}
       <div class="small muted" style="margin-top:8px">Enviada ${fmtStamp(r.created_at)}</div>
@@ -2339,7 +2339,7 @@ function viewWeb() {
     const d = m.datos || {};
     const extra = m.tipo === 'catering' ? [d.fecha ? `Para el ${fmtLong(d.fecha)}` : '', d.personas ? `${d.personas} personas` : ''].filter(Boolean).join(' · ') : '';
     return `<div class="card">
-      <div class="row" style="flex-wrap:nowrap"><b style="font-size:16px">${esc(m.nombre)}</b><span class="spacer"></span><span class="badge neutral">${WEB_TIPOS[m.tipo] || esc(m.tipo)}</span>${m.estado === 'nuevo' ? '<span class="badge warn">Nuevo</span>' : ''}</div>
+      <div class="row" style="flex-wrap:nowrap"><b style="font-size:var(--text-lg)">${esc(m.nombre)}</b><span class="spacer"></span><span class="badge neutral">${WEB_TIPOS[m.tipo] || esc(m.tipo)}</span>${m.estado === 'nuevo' ? '<span class="badge warn">Nuevo</span>' : ''}</div>
       <div class="small" style="margin-top:6px"><a href="mailto:${esc(m.email)}">${esc(m.email)}</a>${m.telefono ? ` · <a href="tel:${esc(m.telefono.replace(/\s+/g, ''))}">${esc(m.telefono)}</a>` : ''}</div>
       ${extra ? `<div class="small" style="margin-top:6px">${esc(extra)}</div>` : ''}
       ${d.mensaje ? `<p class="small" style="margin:10px 0 0;white-space:pre-wrap">${esc(d.mensaje)}</p>` : ''}

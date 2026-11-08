@@ -39,3 +39,13 @@ def test_cada_var_usada_esta_definida():
     definidas = set(re.findall(r"(--[\w-]+)\s*:", css + js))
     usadas = set(re.findall(r"var\((--[\w-]+)", css + js))
     assert usadas - definidas == set()
+
+
+def test_tamaños_y_pesos_de_la_escala():
+    """Tamaños solo con `--text-*` (los campos del móvil, a 16 px, son la excepción) y pesos 300, 400, 600 y 700."""
+    css = _css().replace(_root(_css()), "")
+    js = (STATIC / "app.js").read_text()
+    tamaños = re.findall(r"font-size:\s*([^;}\"]+)", css + js)
+    assert [t for t in tamaños if not t.strip().startswith("var(--text-") and t.strip() != "max(16px, 1em)"] == []
+    pesos = set(re.findall(r"font-weight:\s*(\d+)", css + js))
+    assert pesos <= {"300", "400", "600", "700"}

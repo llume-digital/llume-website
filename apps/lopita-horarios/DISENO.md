@@ -27,6 +27,7 @@ Los valores viven en las variables de `:root` de `app/static/styles.css`. Usa si
 | Barra oscura | `--night-2`, `--night-edge`, `--night-line`, `--night-text`, `--night-muted`, `--night-bad` | pestañas y barra de guardar |
 
 - **Tipografía**: `--display` (Oswald) en mayúsculas espaciadas solo para la marca, la navegación, los `h1`/`h2` y las cabeceras de días; `--text` (Raleway) para todo lo demás. No se añaden otras fuentes.
+- **Escala**: tamaños solo con `--text-2xs` (11 px, solo etiquetas densas del cuadrante y del mes), `--text-xs` 12, `--text-sm` 13, `--text-md` 14, `--text-base` 15 (cuerpo), `--text-lg` 17 (h2), `--text-xl` 20, `--text-2xl` 24 y `--text-3xl` 28 (h1); los campos del móvil van a 16 px. Pesos 400, 600 y 700 en Raleway y 300/400 en Oswald. Interlineado `--leading` (1,45) para el cuerpo y `--leading-tight` (1,2) para títulos y cifras. Las cifras de los resúmenes van en Raleway 700 con `tabular-nums lining-nums`, no en Oswald.
 - El dorado es el único acento. Los colores de estado se reservan para estados reales (una alerta, un error, algo correcto), nunca para decorar.
 
 ## 2. Principios
