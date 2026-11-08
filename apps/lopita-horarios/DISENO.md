@@ -88,14 +88,15 @@ Los valores viven en las variables de `:root` de `app/static/styles.css`. Usa si
 1. **Criticar antes de tocar.** Lista los 5 problemas de más impacto de la pantalla para la persona que la usa (encargado o trabajador) y para qué la usa. No cambies código hasta acordar cuáles se arreglan.
 2. **Una capa cada vez**: jerarquía y maquetación, después tipografía, después color, después componentes y, por último, movimiento.
 3. **Si la maquetación no convence**, propone dos alternativas con sus pros y contras en vez de retocar al azar.
-4. **Mirar el resultado.** Haz capturas con Playwright a 390px y a 1280px y revísalas antes de dar el trabajo por terminado. Antes de cerrar, quita un elemento que sobre.
+4. **Mirar el resultado.** Haz capturas con Playwright a 390px y a 1280px y revísalas antes de dar el trabajo por terminado. `tests/test_pantallas_navegador.py` recorre todas las pantallas a esos dos anchos y `tests/test_accesibilidad_navegador.py` las pasa por axe (WCAG 2.2 AA): una pantalla nueva se añade a sus listas de rutas. Antes de cerrar, quita un elemento que sobre.
 
 ## 7. Pendiente conocido
 
 Cosas de esta guía que la interfaz aún no cumple (revisado el 08/11/2026):
 
 - No hay ninguna regla `prefers-reduced-motion` en `styles.css`.
-- Los campos de formulario heredan los 15px del `body`, por debajo de los 16px que evitan el zoom en el iPhone.
+- Los campos de formulario salen a 13px (heredan el tamaño de `label.field`), por debajo de los 16px que evitan el zoom en el iPhone. `tests/test_pantallas_navegador.py` lo comprueba como fallo conocido.
+- Lo que axe encuentra hoy está en `EXCEPCIONES` de `tests/test_accesibilidad_navegador.py`, con la propuesta que lo arregla.
 
 ## Fuentes
 

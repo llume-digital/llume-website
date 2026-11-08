@@ -11,7 +11,7 @@ import time
 import pytest
 
 from tests.test_feedback_cliente_navegador import _entrar
-from tests.test_vista_diaria_navegador import PW, browser  # noqa: F401  (fixture)
+from tests.navegador import PW
 
 pytest.importorskip("playwright.sync_api")
 uvicorn = pytest.importorskip("uvicorn")

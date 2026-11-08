@@ -2,49 +2,12 @@
 
 Necesita Playwright con Chromium (o la ruta de otro Chromium en LOPITA_CHROMIUM); si no está, se salta.
 """
-import os
-import socket
-import threading
-import time
 
 import pytest
 
+from tests.navegador import PW
+
 sync_api = pytest.importorskip("playwright.sync_api")
-uvicorn = pytest.importorskip("uvicorn")
-
-PW = "contraseña-segura"
-
-
-@pytest.fixture(scope="module")
-def url(tmp_path_factory):
-    from app.main import create_app
-    from app.slack import Slack
-
-    app = create_app(str(tmp_path_factory.mktemp("db") / "t.db"), slack=Slack(token="", channel="#h"),
-                     secret="test", solve_seconds=8)
-    app.state.store.upsert_user("admin", PW, "Administrador")
-    with socket.socket() as s:
-        s.bind(("127.0.0.1", 0))
-        port = s.getsockname()[1]
-    server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning"))
-    threading.Thread(target=server.run, daemon=True).start()
-    for _ in range(100):
-        if server.started:
-            break
-        time.sleep(0.05)
-    yield f"http://127.0.0.1:{port}"
-    server.should_exit = True
-
-
-@pytest.fixture(scope="module")
-def browser():
-    with sync_api.sync_playwright() as p:
-        try:
-            b = p.chromium.launch(executable_path=os.environ.get("LOPITA_CHROMIUM") or None)
-        except Exception as exc:  # sin Chromium instalado
-            pytest.skip(f"Chromium no disponible: {exc}")
-        yield b
-        b.close()
 
 
 @pytest.mark.parametrize("movil", [False, True], ids=["escritorio", "movil"])

@@ -8,24 +8,11 @@ import datetime as dt
 
 import pytest
 
-from tests.test_vista_diaria_navegador import PW, browser, url  # noqa: F401  (fixtures)
+from tests.navegador import entrar as _entrar  # otros tests lo importan con este nombre
 
 pytest.importorskip("playwright.sync_api")
 
 
-def _entrar(browser, url, movil=False):  # noqa: F811
-    opciones = {"viewport": {"width": 390, "height": 844}, "has_touch": True, "is_mobile": True} if movil else \
-        {"viewport": {"width": 1360, "height": 900}}
-    ctx = browser.new_context(**opciones)
-    page = ctx.new_page()
-    errores = []
-    page.on("pageerror", lambda e: errores.append(str(e)))
-    page.goto(url)
-    page.fill("input[name=usuario]", "admin")
-    page.fill("input[name=password]", PW)
-    page.click("button[type=submit]")
-    page.wait_for_selector("[data-act=generate]")
-    return ctx, page, errores
 
 
 def test_dia_sin_horario_orden_y_zoom(url, browser):  # noqa: F811
