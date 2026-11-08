@@ -30,7 +30,7 @@ from lopita_horarios.sugerencias import sugerir
 from lopita_horarios.validator import compute_stats, validate
 
 from . import alertas as alertas_app
-from . import arreglos, avisos, calendario, comentarios, cuentas, horas
+from . import arreglos, avisos, calendario, comentarios, cuentas, horas, linea_tiempo
 from . import web as web_publica
 from .db import Store, default_db_path
 from .seguridad import LimiteIntentos, MismoOrigen
@@ -307,8 +307,8 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         publicados = {r["id"] for r in filas if r["estado"] == "publicado"}
         for r in filas:
             h: Schedule = r["horario"]
-            if h.hasta < hoy or r.get("reemplaza") in publicados:
-                continue  # terminado, o arreglo pendiente de un publicado (sus alertas ya salen en el publicado)
+            if h.hasta < hoy or r.get("reemplaza") in publicados or linea_tiempo.sustituido(r):
+                continue  # terminado, arreglo pendiente de un publicado (sus alertas ya salen en el publicado) o sustituido
             rep = alert_report(r, config, filas, ctx)
             horarios.append({"id": r["id"], "desde": h.desde.isoformat(), "hasta": h.hasta.isoformat(), "estado": r["estado"],
                              "resumen": rep["resumen"], "regenerar_desde": rep["regenerar_desde"]})
@@ -336,6 +336,9 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
             "huecos": sum(1 for i in h.incidencias if i.codigo == "falta_cobertura"),
             "turnos": len(h.asignaciones), "bloqueos": len(h.bloqueos),
             "cambios_pendientes": row["cambios_pendientes"], "token": row["token"], "reemplaza": row.get("reemplaza"),
+            # Publicado: en cuántas de sus fechas manda (las demás las ha ocupado otro publicado después)
+            "dias_vigentes": len(list(linea_tiempo.fechas(row))) if row["estado"] == "publicado" else None,
+            "sustituido": linea_tiempo.sustituido(row),
             "creado": row["created_at"], "actualizado": row["updated_at"], "publicado": row["published_at"],
             "version": version_of(row),
             "autor": row["autor"],
@@ -513,17 +516,9 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         if (hasta - desde).days > 62:
             raise HTTPException(400, "El calendario enseña como mucho dos meses a la vez")
         config = config_now()
-        mejor: dict[dt.date, dict] = {}
-        for r in store.list_schedules():
-            h: Schedule = r["horario"]
-            rank = (r["estado"] == "publicado", r["updated_at"])
-            d = max(h.desde, desde)
-            while d <= min(h.hasta, hasta):
-                if d not in mejor or rank > (mejor[d]["estado"] == "publicado", mejor[d]["updated_at"]):
-                    mejor[d] = r
-                d += dt.timedelta(days=1)
+        mejor = linea_tiempo.por_dia(store.list_schedules(), desde, hasta)
         dias, asignaciones = {}, []
-        for d, r in sorted(mejor.items()):
+        for d, r in mejor.items():
             h: Schedule = r["horario"]
             del_dia = [a for a in h.asignaciones if a.fecha == d]
             cob = coverage(config, Schedule(desde=d, hasta=d, asignaciones=del_dia))[d.isoformat()]
@@ -1005,7 +1000,8 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
                                  "puesto": config.puesto_de(a).value,
                                  "rol": rol.nombre if (rol := config.rol_de(a)) else None})
         pubs = [{"id": r["id"], "desde": r["horario"].desde, "hasta": r["horario"].hasta,
-                 "url": view_url(request, r["token"]) + f"?e={emp.id}"} for r in rows if r["estado"] == "publicado"]
+                 "url": view_url(request, r["token"]) + f"?e={emp.id}"} for r in rows
+                if r["estado"] == "publicado" and not linea_tiempo.sustituido(r)]
         return {
             "empleado": {"id": emp.id, "nombre": emp.nombre, "horas_semanales": emp.horas_semanales,
                          "libranzas_fijas": emp.libranzas_fijas},
@@ -1192,7 +1188,9 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         row = store.get_schedule_by_token(token)
         if not row:
             return HTMLResponse("<h1>Horario no disponible</h1><p>Puede que se haya retirado o que el enlace no sea correcto.</p>", 404)
-        return render_html(config_now(), row["horario"], publico=True, resaltar=e)
+        # Un enlace viejo enseña lo que vale hoy en sus fechas (la línea de tiempo), no los turnos que otro publicado
+        # posterior ya ha sustituido.
+        return render_html(config_now(), linea_tiempo.vigente(store.list_schedules(), row["horario"]), publico=True, resaltar=e)
 
     # El enlace es secreto (como el de «dirección secreta» de Google Calendar): Google y Apple lo leen sin sesión.
     @app.get("/cal/{nombre}", include_in_schema=False)

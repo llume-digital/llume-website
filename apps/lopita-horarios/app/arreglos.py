@@ -16,7 +16,7 @@ from lopita_horarios.models import Config, Lock, Schedule
 from lopita_horarios.solucionador import congelar_antes
 from lopita_horarios.solver import SolveOptions
 
-from . import horas
+from . import horas, linea_tiempo
 from .db import Store
 
 _DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
@@ -98,8 +98,9 @@ def arreglar_tras_ausencias(store: Store, config: Config, hoy: dt.date, segundos
     hechos = []
     for row in filas:
         h: Schedule = row["horario"]
-        if h.hasta < hoy or (row["estado"] != "publicado" and row.get("reemplaza") in publicados):
-            continue  # ya terminado, o arreglo pendiente de un publicado (se trata junto a él)
+        if h.hasta < hoy or (row["estado"] != "publicado" and row.get("reemplaza") in publicados) \
+                or linea_tiempo.sustituido(row):
+            continue  # ya terminado, arreglo pendiente de un publicado (se trata junto a él) o sustituido por otro
         publicado = row["estado"] == "publicado"
         pendiente = store.replacement_of(row["id"]) if publicado else None
         base_row = pendiente or row
@@ -156,8 +157,9 @@ def turnos_perdidos(store: Store, antes: Config, despues: Config, hoy: dt.date) 
         h: Schedule = row["horario"]
         if h.hasta < hoy or (row["estado"] != "publicado" and row.get("reemplaza") in publicados):
             continue
+        manda = set(linea_tiempo.fechas(row))  # de un publicado, solo los días en que manda: los demás ya no valen
         for a in sorted(h.asignaciones, key=lambda x: (x.fecha, x.empleado_id)):
-            if a.fecha < hoy or antes.is_absent(a.empleado_id, a.fecha):
+            if a.fecha < hoy or a.fecha not in manda or antes.is_absent(a.empleado_id, a.fecha):
                 continue
             ausencia = despues.is_absent(a.empleado_id, a.fecha)
             if not ausencia:

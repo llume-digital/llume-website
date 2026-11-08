@@ -16,6 +16,8 @@ from pathlib import Path
 
 from lopita_horarios.models import Config, Schedule
 
+from . import linea_tiempo
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS config_versions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -167,7 +169,29 @@ CREATE TABLE IF NOT EXISTS calendarios (
     token TEXT NOT NULL UNIQUE,
     created_at TEXT NOT NULL
 );
+-- Línea de tiempo de lo publicado (app/linea_tiempo.py): el horario publicado que manda en cada fecha
+CREATE TABLE IF NOT EXISTS dias_publicados (
+    fecha TEXT PRIMARY KEY,
+    schedule_id INTEGER NOT NULL,
+    desde_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_dias_publicados_horario ON dias_publicados (schedule_id);
+-- Quién mandaba antes en cada fecha y quién lo sustituyó (NULL si el día se quedó sin horario publicado)
+CREATE TABLE IF NOT EXISTS dias_historial (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    fecha TEXT NOT NULL,
+    schedule_id INTEGER NOT NULL,
+    sustituido_por INTEGER,
+    motivo TEXT NOT NULL,
+    desde_at TEXT NOT NULL,
+    hasta_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_dias_historial_fecha ON dias_historial (fecha, id);
 """
+
+# Versión del esquema (PRAGMA user_version). 1: línea de tiempo de lo publicado, creada a partir de los horarios ya
+# publicados la primera vez que se abre la base (Store._migrar_linea_tiempo).
+VERSION_ESQUEMA = 1
 
 
 def now() -> str:
@@ -220,6 +244,9 @@ class Store:
             if "reemplaza" not in {r["name"] for r in c.execute("PRAGMA table_info(schedules)")}:
                 # Borrador que, al publicarse, sustituye a un horario publicado (un arreglo pendiente)
                 c.execute("ALTER TABLE schedules ADD COLUMN reemplaza INTEGER")
+            if c.execute("PRAGMA user_version").fetchone()[0] < 1:
+                self._migrar_linea_tiempo(c)
+                c.execute(f"PRAGMA user_version = {VERSION_ESQUEMA}")
 
     @contextmanager
     def conn(self):
@@ -278,11 +305,115 @@ class Store:
         return Config.model_validate_json(row["data"]) if row else None
 
     # ------------------------------------------------------------ horarios
-    def _row_to_dict(self, row) -> dict:
+    def _row_to_dict(self, row, vigentes: dict[int, set[dt.date]] | None = None) -> dict:
         d = dict(row)
         d["horario"] = Schedule.model_validate_json(d.pop("data"))
         d["cambios_pendientes"] = json.loads(d["cambios_pendientes"])
+        if d["estado"] == "publicado" and vigentes is not None:
+            d["vigentes"] = frozenset(vigentes.get(d["id"], ()))
         return d
+
+    @staticmethod
+    def _vigentes(c, sid: int | None = None) -> dict[int, set[dt.date]]:
+        """Fechas en las que manda cada horario publicado (de uno solo si se da 'sid')."""
+        q, args = "SELECT fecha, schedule_id FROM dias_publicados", ()
+        if sid is not None:
+            q, args = q + " WHERE schedule_id=?", (sid,)
+        out: dict[int, set[dt.date]] = {}
+        for r in c.execute(q, args):
+            out.setdefault(r["schedule_id"], set()).add(dt.date.fromisoformat(r["fecha"]))
+        return out
+
+    # ------------------------------------------------------------ línea de tiempo de lo publicado
+    @staticmethod
+    def _ocupar(c, sid: int, desde: dt.date, hasta: dt.date, motivo: str, ts: str) -> list[tuple[str, int]]:
+        """El horario 'sid' pasa a mandar en todas sus fechas. Lo que mandaba antes en ellas va al historial.
+
+        Devuelve (fecha, horario que mandaba) de cada fecha que tenía otro horario."""
+        pisados = []
+        d = desde
+        while d <= hasta:
+            f = d.isoformat()
+            prev = c.execute("SELECT schedule_id, desde_at FROM dias_publicados WHERE fecha=?", (f,)).fetchone()
+            if prev and prev["schedule_id"] != sid:
+                c.execute("INSERT INTO dias_historial (fecha, schedule_id, sustituido_por, motivo, desde_at, hasta_at) "
+                          "VALUES (?,?,?,?,?,?)", (f, prev["schedule_id"], sid, motivo, prev["desde_at"], ts))
+                pisados.append((f, prev["schedule_id"]))
+            if not prev or prev["schedule_id"] != sid:
+                c.execute("INSERT INTO dias_publicados (fecha, schedule_id, desde_at) VALUES (?,?,?) "
+                          "ON CONFLICT(fecha) DO UPDATE SET schedule_id=excluded.schedule_id, desde_at=excluded.desde_at",
+                          (f, sid, ts))
+            d += dt.timedelta(days=1)
+        return pisados
+
+    @staticmethod
+    def _liberar(c, sid: int, ts: str) -> None:
+        """El horario 'sid' deja de mandar (se borra). En cada fecha suya vuelve a mandar el último horario publicado
+        que aún existe y la cubre, como pasaba antes de la línea de tiempo; si no queda ninguno, la fecha se queda sin
+        horario publicado."""
+        for r in c.execute("SELECT fecha, desde_at FROM dias_publicados WHERE schedule_id=?", (sid,)).fetchall():
+            f = r["fecha"]
+            vuelve = c.execute(
+                "SELECT h.schedule_id FROM dias_historial h JOIN schedules s ON s.id = h.schedule_id "
+                "WHERE h.fecha=? AND s.estado='publicado' AND s.id != ? AND s.desde <= ? AND s.hasta >= ? "
+                "ORDER BY h.id DESC LIMIT 1", (f, sid, f, f)).fetchone()
+            nuevo = vuelve["schedule_id"] if vuelve else None
+            c.execute("INSERT INTO dias_historial (fecha, schedule_id, sustituido_por, motivo, desde_at, hasta_at) "
+                      "VALUES (?,?,?,?,?,?)", (f, sid, nuevo, "retirada", r["desde_at"], ts))
+            if nuevo is None:
+                c.execute("DELETE FROM dias_publicados WHERE fecha=?", (f,))
+            else:
+                c.execute("UPDATE dias_publicados SET schedule_id=?, desde_at=? WHERE fecha=?", (nuevo, ts, f))
+
+    def _migrar_linea_tiempo(self, c) -> None:
+        """Crea la línea de tiempo con los horarios ya publicados, del publicado antes al publicado después: donde dos
+        se solapan manda el último publicado y el otro queda en el historial.
+
+        Hasta ahora mandaba el modificado más tarde, que no siempre es el mismo; si hay solapes se deja una
+        notificación al encargado con las fechas, y marcadas las que cambian de horario."""
+        if c.execute("SELECT 1 FROM dias_publicados LIMIT 1").fetchone():
+            return
+        filas = c.execute("SELECT id, desde, hasta, updated_at, published_at, created_at FROM schedules "
+                          "WHERE estado='publicado' ORDER BY COALESCE(published_at, created_at), id").fetchall()
+        antes: dict[str, tuple[str, int]] = {}  # fecha → (updated_at, id) del que mandaba hasta ahora
+        solapes: dict[str, set[int]] = {}
+        ts = now()
+        for r in filas:
+            desde, hasta = dt.date.fromisoformat(r["desde"]), dt.date.fromisoformat(r["hasta"])
+            for f, prev in self._ocupar(c, r["id"], desde, hasta, "migracion", ts):
+                solapes.setdefault(f, {prev}).add(r["id"])
+            d = desde
+            while d <= hasta:
+                f = d.isoformat()
+                if f not in antes or (r["updated_at"], r["id"]) > antes[f]:
+                    antes[f] = (r["updated_at"], r["id"])
+                d += dt.timedelta(days=1)
+        if not solapes:
+            return
+        manda = {r["fecha"]: r["schedule_id"] for r in c.execute("SELECT fecha, schedule_id FROM dias_publicados")}
+        dias = [{"fecha": f, "horarios": sorted(ids), "manda": manda[f], "antes": antes[f][1]}
+                for f, ids in sorted(solapes.items())]
+        cambian = [d["fecha"] for d in dias if d["manda"] != d["antes"]]
+        texto = (f"Había {len(dias)} día{'s' if len(dias) != 1 else ''} con más de un horario publicado. Ahora cada día "
+                 "tiene uno solo: el último que se publicó.")
+        if cambian:
+            texto += (f" En {len(cambian)} de ellos el equipo veía otro (el modificado más tarde): revisa "
+                      f"{', '.join(cambian[:5])}{'…' if len(cambian) > 5 else ''}.")
+        c.execute("INSERT INTO notificaciones (tipo, schedule_id, titulo, texto, detalle, created_at) VALUES (?,?,?,?,?,?)",
+                  ("linea_tiempo_migrada", None, "Horarios publicados solapados", texto,
+                   json.dumps({"dias": dias, "cambian": cambian}), ts))
+
+    def timeline(self) -> dict[dt.date, int]:
+        """Fecha → horario publicado que manda en ella."""
+        with self.conn() as c:
+            return {dt.date.fromisoformat(r["fecha"]): r["schedule_id"]
+                    for r in c.execute("SELECT fecha, schedule_id FROM dias_publicados ORDER BY fecha")}
+
+    def day_history(self, fecha: dt.date) -> list[dict]:
+        """Quién mandó antes en una fecha, del cambio más reciente al más antiguo."""
+        with self.conn() as c:
+            return [dict(r) for r in c.execute("SELECT * FROM dias_historial WHERE fecha=? ORDER BY id DESC",
+                                               (fecha.isoformat(),))]
 
     def create_schedule(self, schedule: Schedule, autor: str | None, reemplaza: int | None = None) -> int:
         ts = now()
@@ -303,6 +434,8 @@ class Store:
 
     def update_schedule(self, sid: int, schedule: Schedule, cambios: list[str] | None = None) -> None:
         with self.conn() as c:
+            if schedule.estado != "publicado":
+                self._liberar(c, sid, now())  # despublicado: deja de mandar en sus fechas
             if cambios is None:
                 c.execute("UPDATE schedules SET data=?, estado=?, updated_at=? WHERE id=?",
                           (schedule.model_dump_json(), schedule.estado, now(), sid))
@@ -311,14 +444,19 @@ class Store:
                           (schedule.model_dump_json(), schedule.estado, now(), json.dumps(sorted(set(cambios))), sid))
 
     def publish_schedule(self, sid: int, schedule: Schedule) -> str:
+        """Publica el horario. La primera vez pasa a mandar en todas sus fechas de la línea de tiempo; volver a
+        publicar uno ya publicado no le devuelve las fechas que le haya quitado otro publicado después."""
+        ts = now()
         with self.conn() as c:
-            row = c.execute("SELECT token FROM schedules WHERE id=?", (sid,)).fetchone()
+            row = c.execute("SELECT token, estado FROM schedules WHERE id=?", (sid,)).fetchone()
             token = row["token"] or secrets.token_urlsafe(16)
             c.execute(
                 "UPDATE schedules SET data=?, estado='publicado', token=?, published_at=?, updated_at=?, "
                 "cambios_pendientes='[]' WHERE id=?",
-                (schedule.model_dump_json(), token, now(), now(), sid),
+                (schedule.model_dump_json(), token, ts, ts, sid),
             )
+            if row["estado"] != "publicado":
+                self._ocupar(c, sid, schedule.desde, schedule.hasta, "publicacion", ts)
             return token
 
     def clear_changes(self, sid: int) -> None:
@@ -328,20 +466,24 @@ class Store:
     def get_schedule(self, sid: int) -> dict | None:
         with self.conn() as c:
             row = c.execute("SELECT * FROM schedules WHERE id=?", (sid,)).fetchone()
-        return self._row_to_dict(row) if row else None
+            vigentes = self._vigentes(c, sid) if row else None
+        return self._row_to_dict(row, vigentes) if row else None
 
     def get_schedule_by_token(self, token: str) -> dict | None:
         with self.conn() as c:
             row = c.execute("SELECT * FROM schedules WHERE token=? AND estado='publicado'", (token,)).fetchone()
-        return self._row_to_dict(row) if row else None
+            vigentes = self._vigentes(c, row["id"]) if row else None
+        return self._row_to_dict(row, vigentes) if row else None
 
     def list_schedules(self) -> list[dict]:
         with self.conn() as c:
             rows = c.execute("SELECT * FROM schedules ORDER BY desde DESC, id DESC").fetchall()
-        return [self._row_to_dict(r) for r in rows]
+            vigentes = self._vigentes(c)
+        return [self._row_to_dict(r, vigentes) for r in rows]
 
     def delete_schedule(self, sid: int) -> None:
         with self.conn() as c:
+            self._liberar(c, sid, now())
             c.execute("DELETE FROM schedules WHERE id=?", (sid,))
             c.execute("DELETE FROM alertas_reconocidas WHERE schedule_id=?", (sid,))
             c.execute("DELETE FROM avisos WHERE schedule_id=? AND leido_at IS NULL AND tipo!='retirado'", (sid,))
@@ -350,34 +492,26 @@ class Store:
 
     def assignments_before(self, desde: dt.date, days: int = 7, exclude: int | None = None,
                            filas: list[dict] | None = None):
-        """Asignaciones de los 'days' días previos a 'desde', tomadas del horario más fiable de cada fecha
-        (publicado antes que borrador; el más reciente en caso de empate). None si no hay ninguno.
+        """Asignaciones de los 'days' días previos a 'desde', tomadas del horario que manda en cada fecha (el
+        publicado de la línea de tiempo; si no hay, el borrador más reciente). None si no hay ninguno.
 
         filas: los horarios ya leídos con `list_schedules`, para no volver a leerlos todos en cada llamada."""
         start = desde - dt.timedelta(days=days)
-        best: dict[dt.date, tuple] = {}
-        for s in self.list_schedules() if filas is None else filas:
-            if s["id"] == exclude:
-                continue
-            h = s["horario"]
-            if h.hasta < start or h.desde >= desde:
-                continue
-            rank = (1 if s["estado"] == "publicado" else 0, s["updated_at"])
-            d = max(h.desde, start)
-            while d < desde and d <= h.hasta:
-                if d not in best or rank > best[d][0]:
-                    best[d] = (rank, [a for a in h.asignaciones if a.fecha == d])
-                d += dt.timedelta(days=1)
-        if not best:
+        rows = self.list_schedules() if filas is None else filas
+        mandan = linea_tiempo.por_dia(rows, start, desde - dt.timedelta(days=1), excluir=exclude)
+        if not mandan:
             return None
-        return [a for _, (_, items) in sorted(best.items()) for a in items]
+        return [a for d, r in mandan.items() for a in r["horario"].asignaciones if a.fecha == d]
 
     def previous_contiguous(self, desde: dt.date, exclude: int | None = None,
                             filas: list[dict] | None = None) -> Schedule | None:
-        """Horario (publicado preferentemente) que termina justo el día anterior a 'desde'."""
+        """Horario que termina justo el día anterior a 'desde': el publicado que manda ese día y, si no, el borrador
+        más reciente."""
+        dia = desde - dt.timedelta(days=1)
         cands = [s for s in (self.list_schedules() if filas is None else filas)
-                 if s["id"] != exclude and s["horario"].hasta == desde - dt.timedelta(days=1)]
-        cands.sort(key=lambda s: (s["estado"] == "publicado", s["updated_at"]), reverse=True)
+                 if s["id"] != exclude and s["horario"].hasta == dia]
+        cands.sort(key=lambda s: (s["estado"] == "publicado", dia in linea_tiempo.fechas(s) if s["estado"] == "publicado"
+                                  else False, s["updated_at"]), reverse=True)
         return cands[0]["horario"] if cands else None
 
     # ------------------------------------------------------------ usuarios
