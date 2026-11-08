@@ -2,7 +2,6 @@
 
 Necesita Playwright con Chromium (o la ruta de otro Chromium en LOPITA_CHROMIUM); si no está, se salta.
 """
-import os
 import socket
 import sys
 import threading
@@ -17,7 +16,7 @@ uvicorn = pytest.importorskip("uvicorn")
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "herramientas"))
 from servir_web import WebYApp  # noqa: E402
 
-PW = "contraseña-segura"
+from tests.navegador import PW  # noqa: E402
 
 
 def _servir(asgi):
@@ -45,17 +44,6 @@ def urls(tmp_path_factory):
     intranet, url_app = _servir(app)
     yield url_web, url_app
     web.should_exit = intranet.should_exit = True
-
-
-@pytest.fixture(scope="module")
-def browser():
-    with sync_api.sync_playwright() as p:
-        try:
-            b = p.chromium.launch(executable_path=os.environ.get("LOPITA_CHROMIUM") or None)
-        except Exception as exc:  # sin Chromium instalado
-            pytest.skip(f"Chromium no disponible: {exc}")
-        yield b
-        b.close()
 
 
 @pytest.mark.parametrize("movil", [False, True], ids=["escritorio", "movil"])

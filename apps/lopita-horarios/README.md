@@ -264,6 +264,12 @@ python -m app.cli usuario ana --nombre "Ana"   # crea un usuario o cambia su con
 python -m pytest -q
 ```
 
+Los tests `*_navegador.py` usan Playwright con Chromium (`python -m playwright install chromium`, o la ruta de otro
+Chromium en `LOPITA_CHROMIUM`) y comparten los fixtures de `tests/conftest.py` y `tests/navegador.py`. Dos de ellos
+son la red de seguridad de la interfaz: `test_pantallas_navegador.py` abre todas las pantallas a 390 y 1280 px (sin
+errores de JavaScript ni scroll horizontal) y `test_accesibilidad_navegador.py` las revisa con axe (WCAG 2.2 AA).
+El JavaScript se comprueba con `npx eslint@10.13.0 .` (configuración en `eslint.config.mjs`).
+
 ## Pendiente de decidir con datos reales
 
 - Validar con la gestoría las reglas del convenio de hostelería de Asturias (Reglas).

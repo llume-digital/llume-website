@@ -7,7 +7,6 @@ import datetime as dt
 import pytest
 
 from tests.test_feedback_cliente_navegador import _entrar
-from tests.test_vista_diaria_navegador import browser, url  # noqa: F401  (fixtures)
 
 pytest.importorskip("playwright.sync_api")
 

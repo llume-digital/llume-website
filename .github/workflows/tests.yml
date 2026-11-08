@@ -31,6 +31,11 @@ jobs:
           python-version: "3.14"  # la misma que la imagen Docker y que Pyodide 314
           cache: pip
           cache-dependency-path: apps/lopita-horarios/requirements*.txt
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      - name: JavaScript de la interfaz sin variables sin declarar ni restos sin usar (ESLint)
+        run: npx -y eslint@10.13.0 .
       - run: python -m pip install -r requirements-dev.txt
       - name: Las versiones fijadas siguen cuadrando con requirements.in
         run: |

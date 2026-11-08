@@ -1,7 +1,7 @@
 """La guía de uso en Chromium: cada sección lleva a su pantalla y cada pantalla enlaza a su sección."""
 import pytest
 
-from tests.test_vista_diaria_navegador import PW, browser, url  # noqa: F401  (fixtures)
+from tests.navegador import PW
 
 pytest.importorskip("playwright.sync_api")
 

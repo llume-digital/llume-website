@@ -4,7 +4,7 @@ Necesita Playwright con Chromium (ver test_vista_diaria_navegador.py); si no est
 """
 import pytest
 
-from tests.test_vista_diaria_navegador import PW, browser, url  # noqa: F401  (fixtures)
+from tests.navegador import PW
 
 pytest.importorskip("playwright.sync_api")
 

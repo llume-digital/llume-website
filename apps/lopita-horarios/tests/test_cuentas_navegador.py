@@ -10,7 +10,6 @@ import pytest
 from app import google
 from tests.test_cuentas import CID, JWK, token
 from tests.test_feedback_cliente_navegador import _entrar
-from tests.test_vista_diaria_navegador import PW, browser, url  # noqa: F401  (fixtures)
 
 pytest.importorskip("playwright.sync_api")
 
