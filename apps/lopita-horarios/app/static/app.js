@@ -1,5 +1,5 @@
 import { $, addDays, clone, todayIso } from './js/nucleo/util.js';
-import { api, arreglarPendientes, closeOverlay, loadConfig, saveConfig, showNotifications, state, toast } from './js/nucleo/estado.js';
+import { api, arreglarPendientes, closeOverlay, confirmar, loadConfig, saveConfig, showNotifications, state, toast } from './js/nucleo/estado.js';
 import { markDirty, onBind } from './js/nucleo/enlace.js';
 import { isWorker, pararDictado, render, renderView, route, tabsHtml } from './js/nucleo/pintado.js';
 import { refreshList } from './js/pantallas/horarios.js';
@@ -133,7 +133,7 @@ async function importConfig(file) {
   if (!file) return;
   try {
     const cfg = JSON.parse(await file.text());
-    if (!window.confirm('Se sustituirá toda la configuración por la del archivo (se guarda como una versión nueva). ¿Seguir?')) return;
+    if (!(await confirmar({ titulo: '¿Cargar la configuración del archivo?', texto: 'Se sustituirá toda la configuración por la del archivo (se guarda como una versión nueva).', verbo: 'Cargar configuración', peligro: true }))) return;
     const r = await api('PUT', '/api/config', { config: cfg.config || cfg, base: state.version, nota: `Importado de ${file.name}` });
     state.config = r.config; state.version = r.version; state.draft = clone(r.config); state.dirty = false; state.ajustes = null;
     toast('Configuración cargada'); renderView();

@@ -1,5 +1,5 @@
 import { DAYS, DAY_LABEL, ICON, MOTIVOS, addDays, clone, dayNum, esc, fmtH, fmtLong, fmtMin, fmtRange, monthName, toMin, todayIso, weekday } from '../nucleo/util.js';
-import { state, toast } from '../nucleo/estado.js';
+import { confirmar, state, toast } from '../nucleo/estado.js';
 import { PUESTOS, abreviaturas, capTags, empById, esRol, funcById, funcionesDe, horasDe, puestoDe, puestoTag, puestosDe, renderView, rolTag, rolesDe, shiftById, tipoDe, usaPuestos } from '../nucleo/pintado.js';
 import { horasFila, nameIn } from './cuadrante.js';
 import { SEV, SEV_ORDER, alertCard, sevBadges } from './alertas.js';
@@ -390,8 +390,8 @@ document.addEventListener('keydown', (e) => {
   if (again) again.focus();
 });
 
-export const diaDescartable = () => !state.dia || !diaCambios(state.dia).length
-  || window.confirm('Tienes cambios del día sin confirmar. ¿Descartarlos?');
+export const diaDescartable = async () => !state.dia || !diaCambios(state.dia).length
+  || confirmar({ titulo: '¿Descartar los cambios del día?', texto: 'Tienes cambios del día sin confirmar.', verbo: 'Descartar cambios', peligro: true });
 
 // Lo que cambian los cambios del día: reglas, horas y alertas, antes de guardarlos.
 export function dayEvalDialog(ev) {

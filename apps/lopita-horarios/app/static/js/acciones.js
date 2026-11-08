@@ -1,5 +1,5 @@
 import { $, DAYS, addDays, clone, esc, fmtH, fmtLong, fmtMin, fmtRange, fmtShort, toMin, todayIso, uid } from './nucleo/util.js';
-import { api, closeOverlay, loadConfig, overlay, saveConfig, state, toast, withBusy } from './nucleo/estado.js';
+import { api, closeOverlay, confirmar, deshacer, loadConfig, overlay, saveConfig, state, toast, withBusy } from './nucleo/estado.js';
 import { getPath, markDirty, setPath } from './nucleo/enlace.js';
 import { dictar, empById, esRol, funcById, isWorker, mic, puestosDe, render, renderView, shiftById } from './nucleo/pintado.js';
 import { genPeriod, refreshList } from './pantallas/horarios.js';
@@ -14,12 +14,22 @@ import { feedbackDialog } from './pantallas/comentarios.js';
 import { corrDetail, openCorrection } from './pantallas/informes.js';
 import { claveTemporal, cuentaDialog, pwForm } from './pantallas/cuenta.js';
 // ------------------------------------------------------------------ acciones
-const confirmLeave = () => !state.dirty || window.confirm('Tienes cambios sin guardar. ¿Descartarlos?');
+const confirmLeave = async () => !state.dirty || confirmar({ titulo: '¿Descartar los cambios sin guardar?', verbo: 'Descartar cambios', peligro: true });
+
+// Para borrar algo del borrador: sin preguntar, con «Deshacer» (el borrador no se guarda hasta pulsar Guardar).
+function conDeshacer(msg) {
+  const antes = clone(state.draft), sucio = state.dirty;
+  return () => deshacer(msg, () => { state.draft = antes; state.dirty = sucio; if (sucio) markDirty(); renderView(); });
+}
 
 export const actions = {
   logout: async () => { await api('POST', '/api/logout'); state.me = null; state.config = state.draft = null; state.dirty = false; state.mi = {}; state.miH = {}; state.inf = {}; state.sol = {}; state.web = {}; state.ajustes = null; state.calT = {}; state.current = null; try { state.acceso = await api('GET', '/api/acceso'); } catch { state.acceso = {}; } render(); },
   save: () => saveConfig(),
-  discard: () => { state.draft = clone(state.config); state.dirty = false; state.saveError = null; renderView(); },
+  discard: () => {
+    const antes = state.draft;
+    state.draft = clone(state.config); state.dirty = false; state.saveError = null; renderView();
+    deshacer('Cambios descartados', () => { state.draft = antes; markDirty(); renderView(); });
+  },
 
   genMode: (el) => { state.gen.modo = el.dataset.mode; renderView(); },
   open: (el) => { location.hash = `#/horarios/${el.dataset.id}`; },
@@ -37,7 +47,7 @@ export const actions = {
     const n = state.current.horario.bloqueos.length;
     const desde = el && el.dataset ? el.dataset.desde : null;
     const alcance = desde ? `a partir del ${fmtLong(desde)} (los días anteriores no cambian)` : 'entero';
-    if (!window.confirm(`Se recalculará el horario ${alcance} con la configuración actual${n ? `, respetando tus ${n} cambios manuales` : ''}. ¿Seguir?`)) return;
+    if (!(await confirmar({ titulo: 'Regenerar el horario', texto: `Se recalculará el horario ${alcance} con la configuración actual${n ? `, respetando tus ${n} cambios manuales` : ''}.`, verbo: 'Regenerar' }))) return;
     if (state.dirty && !(await saveConfig())) return;
     try {
       state.current = await withBusy('Recalculando…', () => api('POST', `/api/horarios/${state.current.id}/regenerar`, desde ? { desde } : {}));
@@ -82,7 +92,7 @@ export const actions = {
   },
   createCal: async () => { state.mi.cal = await api('POST', '/api/mi/calendario', {}); renderView(); toast('Enlace creado'); },
   renewCal: async () => {
-    if (!window.confirm('El enlace actual dejará de funcionar y tendrás que volver a suscribirte. ¿Cambiarlo?')) return;
+    if (!(await confirmar({ titulo: '¿Cambiar el enlace del calendario?', texto: 'El enlace actual dejará de funcionar y tendrás que volver a suscribirte.', verbo: 'Cambiar el enlace', peligro: true }))) return;
     state.mi.cal = await api('POST', '/api/mi/calendario', { renovar: true }); renderView(); toast('Enlace cambiado');
   },
   createTeamCal: async (el) => { await api('POST', `/api/calendarios/${encodeURIComponent(el.dataset.id)}`, {}); state.calT.data = undefined; renderView(); toast('Enlace creado'); },
@@ -94,7 +104,7 @@ export const actions = {
     state.me.avisos = 0; renderView();
   },
   clearLocks: async () => {
-    if (!window.confirm('Se quitarán los bloqueos; los turnos actuales se mantienen hasta que regeneres. ¿Seguir?')) return;
+    if (!(await confirmar({ titulo: '¿Quitar los bloqueos?', texto: 'Los turnos actuales se mantienen hasta que regeneres.', verbo: 'Quitar bloqueos' }))) return;
     state.current = await api('DELETE', `/api/horarios/${state.current.id}/bloqueos`); renderView();
   },
   cell: (el) => openCellMenu(el),
@@ -156,19 +166,19 @@ export const actions = {
     location.hash = `#/horarios/${info.horario_id}`;
     renderView();
   },
-  setVista: (el) => {
+  setVista: async (el) => {
     if (el.dataset.v === state.vista) return;
-    if (state.vista === 'dia' && !diaDescartable()) return;
+    if (state.vista === 'dia' && !(await diaDescartable())) return;
     if (state.vista === 'dia') state.dia = null;
     state.vista = el.dataset.v; renderView();
   },
   openDay: (el) => { state.diaFecha = el.dataset.date; state.vista = 'dia'; state.dia = null; renderView(); window.scrollTo(0, 0); },
-  dayGo: (el) => {
-    if (!diaDescartable()) return;
+  dayGo: async (el) => {
+    if (!(await diaDescartable())) return;
     state.dia = null; state.diaFecha = el.dataset.date;
     if (el.dataset.sid) { state.current = null; location.hash = `#/horarios/${el.dataset.sid}`; } else renderView();
   },
-  dayDiscard: () => { if (!window.confirm('¿Descartar los cambios de este día?')) return; state.dia = null; renderView(); },
+  dayDiscard: () => { const antes = state.dia; state.dia = null; renderView(); deshacer('Cambios del día descartados', () => { state.dia = antes; renderView(); }); },
   barTimes: (el) => {
     const t = state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp);
     const ini = $('#bar-ini').value, fin = $('#bar-fin').value === '23:59' ? '24:00' : $('#bar-fin').value;
@@ -185,11 +195,11 @@ export const actions = {
     const m = bar && openBarMenu(emp, bar);  // sigue abierto, en el mismo sitio, para encadenar ajustes
     if (m) m.scrollTop = desplazado;
   },
-  cellAdj: (el) => {
+  cellAdj: async (el) => {
     closeMenu();
     const cur = state.current;
     if (diaSoloLectura(cur)) { toast('Este horario tiene un arreglo pendiente: haz los cambios en él', true); return; }
-    if (state.vista === 'dia' && !diaDescartable()) return;
+    if (state.vista === 'dia' && !(await diaDescartable())) return;
     state.vista = 'dia'; state.diaFecha = el.dataset.date; state.dia = null;
     renderView();
     const t = state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp);
@@ -277,7 +287,7 @@ export const actions = {
     } catch (e) { toast(e.message, true); }
   },
   unpublish: async () => {
-    if (!window.confirm('El horario dejará de verse en el enlace público hasta que lo vuelvas a publicar. ¿Seguir?')) return;
+    if (!(await confirmar({ titulo: '¿Volver a borrador?', texto: 'El horario dejará de verse en el enlace público hasta que lo vuelvas a publicar.', verbo: 'Volver a borrador', peligro: true }))) return;
     state.current = await api('POST', `/api/horarios/${state.current.id}/despublicar`); refreshList(); renderView();
   },
   print: () => window.open(`/api/horarios/${state.current.id}/html`, '_blank'),
@@ -295,7 +305,7 @@ export const actions = {
     try { await navigator.clipboard.writeText(state.current.url_publica); toast('Enlace copiado'); } catch { window.prompt('Copia el enlace:', state.current.url_publica); }
   },
   deleteSchedule: async () => {
-    if (!window.confirm('¿Eliminar este horario? No se puede deshacer.')) return;
+    if (!(await confirmar({ titulo: '¿Eliminar este horario?', texto: 'No se puede deshacer.', verbo: 'Eliminar horario', peligro: true }))) return;
     await api('DELETE', `/api/horarios/${state.current.id}`);
     state.current = null; await refreshList(); location.hash = '#/horarios';
   },
@@ -327,7 +337,7 @@ export const actions = {
   newCorr: () => openCorrection({}),
   corrRow: (el) => openCorrection({ fecha: el.dataset.date, turno_id: el.dataset.shift || '', clase: el.dataset.shift ? 'horas' : 'extra' }),
   cancelReq: async (el) => {
-    if (!window.confirm('¿Retirar esta solicitud?')) return;
+    if (!(await confirmar({ titulo: '¿Retirar esta solicitud?', verbo: 'Retirar solicitud', peligro: true }))) return;
     state.mi.perfil = await api('DELETE', `/api/mi/solicitudes/${el.dataset.id}`);
     state.miH.data = undefined; renderView();
   },
@@ -374,7 +384,7 @@ export const actions = {
     state.web.data = state.web.data.map((x) => (x.id === m.id ? m : x)); renderView();
   },
   webBorrar: async (el) => {
-    if (!window.confirm('¿Borrar este mensaje y su archivo? No se puede deshacer.')) return;
+    if (!(await confirmar({ titulo: '¿Borrar este mensaje y su archivo?', texto: 'No se puede deshacer.', verbo: 'Borrar mensaje', peligro: true }))) return;
     await api('DELETE', `/api/web/mensajes/${el.dataset.id}`);
     state.web.data = state.web.data.filter((x) => x.id !== Number(el.dataset.id)); renderView();
   },
@@ -400,7 +410,7 @@ export const actions = {
       <div class="row end" style="margin-top:16px"><button class="btn primary" data-act="closeOverlay">Cerrar</button></div>`);
   },
   reloadConfig: async () => {
-    if (state.dirty && !window.confirm('Se descartarán tus cambios sin guardar. ¿Seguir?')) return;
+    if (!(await confirmLeave())) return;
     await loadConfig(); state.ajustes = null; renderView();
   },
 
@@ -447,10 +457,10 @@ export const actions = {
   },
   delFuncion: (el) => {
     const c = state.draft; const f = c.funciones[Number(el.dataset.i)];
-    if (!window.confirm(`¿Eliminar la función «${f.nombre}»? Se quitará a todas las personas que la tienen.`)) return;
+    const avisar = conDeshacer(`Función «${f.nombre}» eliminada`);
     c.funciones.splice(Number(el.dataset.i), 1);
     c.empleados.forEach((e) => { e.funciones = (e.funciones || []).filter((x) => x !== f.id); });
-    markDirty(); renderView();
+    markDirty(); renderView(); avisar();
   },
   addReglaFuncion: (el) => {
     const f = state.draft.funciones[Number(el.dataset.i)];
@@ -483,12 +493,12 @@ export const actions = {
   },
   delEmp: (el) => {
     const c = state.draft; const e = c.empleados[Number(el.dataset.i)];
-    if (!window.confirm(`¿Eliminar a ${e.nombre}? También se borrarán sus ausencias, peticiones y preferencias.\nSi solo deja la plantilla, mejor desactiva «En plantilla».`)) return;
+    const avisar = conDeshacer(`${e.nombre} eliminada del equipo, con sus ausencias y preferencias`);
     c.empleados.splice(Number(el.dataset.i), 1);
     c.ausencias = c.ausencias.filter((a) => a.empleado_id !== e.id);
     c.excepciones_asignacion = c.excepciones_asignacion.filter((a) => a.empleado_id !== e.id);
     c.preferencias = c.preferencias.filter((a) => a.empleado_id !== e.id);
-    markDirty(); renderView();
+    markDirty(); renderView(); avisar();
   },
   addShift: () => {
     const ids = state.draft.turnos.map((s) => s.id);
@@ -498,12 +508,12 @@ export const actions = {
   },
   delShift: (el) => {
     const c = state.draft; const s = c.turnos[Number(el.dataset.i)];
-    if (!window.confirm(`¿Eliminar el turno ${s.nombre}? Se quitará de preferencias y peticiones. Los horarios ya creados con este turno dejarán de mostrarlo.`)) return;
+    const avisar = conDeshacer(`Turno ${s.nombre} eliminado`);
     c.turnos.splice(Number(el.dataset.i), 1);
     c.preferencias.forEach((p) => { p.turnos = p.turnos.filter((t) => t !== s.id); });
     c.preferencias = c.preferencias.filter((p) => p.turnos.length);
     c.excepciones_asignacion = c.excepciones_asignacion.filter((o) => o.turno_id !== s.id);
-    markDirty(); renderView();
+    markDirty(); renderView(); avisar();
   },
   addDayType: () => {
     const names = state.draft.tipos_dia.map((t) => t.nombre);
@@ -580,7 +590,7 @@ export const actions = {
   delRow: (el) => { state.draft[el.dataset.list].splice(Number(el.dataset.i), 1); markDirty(); renderView(); },
 
   delUser: async (el) => {
-    if (!window.confirm(`¿Quitar el acceso a ${el.dataset.u}?`)) return;
+    if (!(await confirmar({ titulo: `¿Quitar el acceso a ${el.dataset.u}?`, verbo: 'Quitar acceso', peligro: true }))) return;
     try { state.ajustes.users = await api('DELETE', `/api/usuarios/${encodeURIComponent(el.dataset.u)}`); renderView(); } catch (e) { toast(e.message, true); }
   },
   exportConfig: () => {
@@ -588,7 +598,7 @@ export const actions = {
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `lopita_config_v${state.version}.json`; a.click();
   },
   restore: async (el) => {
-    if (!confirmLeave() || !window.confirm(`¿Volver a la versión ${el.dataset.v}? Se guardará como una versión nueva.`)) return;
+    if (!(await confirmLeave()) || !(await confirmar({ titulo: `¿Volver a la versión ${el.dataset.v}?`, texto: 'Se guardará como una versión nueva.', verbo: `Restaurar versión ${el.dataset.v}` }))) return;
     try {
       const r = await api('POST', `/api/config/restaurar/${el.dataset.v}`);
       state.config = r.config; state.version = r.version; state.draft = clone(r.config); state.dirty = false;
@@ -651,9 +661,9 @@ export const changeActions = {
     if (!f.puesto) f.reglas = f.reglas.map((r) => ({ ...r, maximo: null, personas: Math.max(1, r.personas || 0) }));
     markDirty(); renderView();
   },
-  dayPick: (el) => {
+  dayPick: async (el) => {
     if (!el.value) return;
-    if (!diaDescartable()) { el.value = state.dia.fecha; return; }
+    if (!(await diaDescartable())) { el.value = state.dia.fecha; return; }
     state.dia = null; state.diaFecha = el.value; renderView();
   },
   corrClase: (el) => { $('#corr-detail').innerHTML = corrDetail(el.value, state.mi.perfil.turnos); },
