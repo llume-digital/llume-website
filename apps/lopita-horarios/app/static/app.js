@@ -373,13 +373,13 @@ const funcById = (cfg, id) => funcionesCfg(cfg).find((f) => f.id === id);
 // Funciones de una persona: las fijas (abrir, cerrar, encargado) y las que define el encargado.
 function funcionesDe(cfg, e) {
   const out = [];
-  if (e.puede_abrir) out.push({ nombre: 'Abre', color: '#B0904C' });
-  if (e.puede_cerrar) out.push({ nombre: 'Cierra', color: '#764A09' });
-  if (e.es_encargado) out.push({ nombre: 'Encargado/a', color: '#17130F' });
+  if (e.puede_abrir) out.push({ nombre: 'Abre', color: 'var(--gold)' });
+  if (e.puede_cerrar) out.push({ nombre: 'Cierra', color: 'var(--brown)' });
+  if (e.es_encargado) out.push({ nombre: 'Encargado/a', color: 'var(--black)' });
   for (const id of e.funciones || []) { const f = funcById(cfg, id); if (f) out.push(f); }
   return out;
 }
-const funcTags = (cfg, e) => funcionesDe(cfg, e).map((f) => `<span class="func-tag" style="--fc:${esc(f.color || '#764A09')}">${esc(f.nombre)}</span>`).join('');
+const funcTags = (cfg, e) => funcionesDe(cfg, e).map((f) => `<span class="func-tag" style="--fc:${esc(f.color || 'var(--brown)')}">${esc(f.nombre)}</span>`).join('');
 // Abreviatura de una etiqueta para que quepa dentro de la barra de un turno: «Abre» → Ab, «Preparar pinchos» → PP,
 // «Hace caja al cierre o apertura» → HCCA. Si dos coinciden, la segunda lleva un número.
 const ABREV_FIJAS = { Abre: 'Ab', Cierra: 'Ci', 'Encargado/a': 'Enc' };
@@ -403,7 +403,7 @@ function abreviaturas(cfg) {
   return out;
 }
 // Etiquetas de una persona en abreviatura, para dentro de la barra del turno (el nombre completo, al pasar por encima).
-const capTags = (lista, abrev) => (lista.length ? `<span class="cap-tags">${lista.map((f) => `<abbr class="cap-tag" style="--fc:${esc(f.color || '#764A09')}" title="${esc(f.nombre)}">${esc(abrev.get(f.nombre) || abreviar(f.nombre))}</abbr>`).join('')}</span>` : '');
+const capTags = (lista, abrev) => (lista.length ? `<span class="cap-tags">${lista.map((f) => `<abbr class="cap-tag" style="--fc:${esc(f.color || 'var(--brown)')}" title="${esc(f.nombre)}">${esc(abrev.get(f.nombre) || abreviar(f.nombre))}</abbr>`).join('')}</span>` : '');
 const tipoDe = (e) => (puestosDe(e).length > 1 ? 'Camarero/a y cocinero/a' : TIPOS[puestosDe(e)[0]]);
 // Un comodín no tiene contrato: solo cubre huecos, con un mínimo y un máximo semanales opcionales.
 function horasPersona(e) {
@@ -433,7 +433,7 @@ const puestoTag = (p) => `<span class="puesto-tag ${p}" title="${PUESTOS[p]}">${
 const esRol = (f) => Boolean(f && f.puesto);
 const rolesDe = (cfg, e, p) => (e.funciones || []).filter((id) => { const f = funcById(cfg, id); return f && f.puesto === p; });
 const rolDe = (cfg, a) => { const f = a && a.funcion && funcById(cfg, a.funcion); return esRol(f) ? f : null; };
-const rolTag = (f) => (f ? `<span class="rol-tag" style="--fc:${esc(f.color || '#764A09')}" title="${esc(f.nombre)}">${esc(f.nombre)}</span>` : '');
+const rolTag = (f) => (f ? `<span class="rol-tag" style="--fc:${esc(f.color || 'var(--brown)')}" title="${esc(f.nombre)}">${esc(f.nombre)}</span>` : '');
 // Horas reales de una asignación: las del turno o, si es un turno a medida, las suyas.
 const horasDe = (cfg, a) => { const s = shiftById(cfg, a.turno_id); return s ? { inicio: a.inicio || s.inicio, fin: a.fin || s.fin } : null; };
 const empOptions = (sel) => state.draft.empleados.map((e) => `<option value="${esc(e.id)}" ${e.id === sel ? 'selected' : ''}>${esc(e.nombre)}${e.activo ? '' : ' (inactivo)'}</option>`).join('');
@@ -598,7 +598,7 @@ function viewDetalle(id) {
   </div>
   ${state.vista === 'dia' ? '' : alertsPanel(cur)}
   <div class="section row" style="justify-content:space-between;align-items:flex-start">
-    <div class="shift-legend">${cfg.turnos.map((s) => `<span><i style="background:${esc(s.color || '#eee')}"></i><b>${esc(s.id)}</b> ${esc(s.nombre)} ${s.inicio}–${s.fin}</span>`).join('')}</div>
+    <div class="shift-legend">${cfg.turnos.map((s) => `<span><i style="background:${esc(s.color || 'var(--track)')}"></i><b>${esc(s.id)}</b> ${esc(s.nombre)} ${s.inicio}–${s.fin}</span>`).join('')}</div>
     <div class="cov-legend"><span><i class="ok"></i>Cubierto</span><span><i class="short"></i>Falta gente</span><span><i class="extra"></i>Sobra gente</span><span>${ICON.lock} Cambio manual</span></div>
   </div>
   ${viewSwitch()}
@@ -807,7 +807,7 @@ function weeksGrid(cur) {
         let inner;
         if (s) {
           mins += toMin(hs.fin) - toMin(hs.inicio);
-          inner = `<span class="pill${a.inicio ? ' custom' : ''}" style="background:${esc(s.color || '#eee')}">${esc(s.id)}${conPuestos ? puestoTag(puestoDe(cfg, a)) : ''}<small>${hs.inicio}–${hs.fin}</small>${rolTag(rolDe(cfg, a))}</span>`;
+          inner = `<span class="pill${a.inicio ? ' custom' : ''}" style="background:${esc(s.color || 'var(--track)')}">${esc(s.id)}${conPuestos ? puestoTag(puestoDe(cfg, a)) : ''}<small>${hs.inicio}–${hs.fin}</small>${rolTag(rolDe(cfg, a))}</span>`;
         }
         else if (sid) inner = `<span class="abs">${esc(sid)}?</span>`;
         else if (absence) inner = `<span class="abs">${esc(MOTIVOS[absence.motivo] || absence.motivo)}</span>`;
@@ -858,11 +858,11 @@ function monthDayHtml(cfg, fecha, asigs, cob, { act, attrs = '', persona = '', a
     const a = lista.find((x) => x.empleado_id === persona);
     const e = empById(cfg, persona);
     const aus = cfg.ausencias.find((x) => x.empleado_id === persona && x.desde <= fecha && fecha <= x.hasta);
-    body = a ? `<span class="mchip big" style="background:${esc(shiftById(cfg, a.turno_id).color || '#eee')}">${esc(shiftById(cfg, a.turno_id).nombre)}<small>${horasDe2(a).inicio}–${horasDe2(a).fin}</small></span>`
+    body = a ? `<span class="mchip big" style="background:${esc(shiftById(cfg, a.turno_id).color || 'var(--track)')}">${esc(shiftById(cfg, a.turno_id).nombre)}<small>${horasDe2(a).inicio}–${horasDe2(a).fin}</small></span>`
       : `<span class="small muted">${aus ? esc(MOTIVOS[aus.motivo] || 'Ausencia') : e && (e.libranzas_fijas || []).includes(DAYS[weekday(fecha)]) ? 'Libra' : 'Libre'}</span>`;
   } else {
     const max = 6;
-    body = lista.slice(0, max).map((a) => `<span class="mchip" style="background:${esc(shiftById(cfg, a.turno_id).color || '#eee')}" title="${esc(`${nameIn(cfg, a.empleado_id)} ${horasDe2(a).inicio}–${horasDe2(a).fin}`)}">${esc(nameIn(cfg, a.empleado_id))} <small>${horasDe2(a).inicio.slice(0, 5).replace(':00', '')}–${horasDe2(a).fin.replace(':00', '')}</small></span>`).join('')
+    body = lista.slice(0, max).map((a) => `<span class="mchip" style="background:${esc(shiftById(cfg, a.turno_id).color || 'var(--track)')}" title="${esc(`${nameIn(cfg, a.empleado_id)} ${horasDe2(a).inicio}–${horasDe2(a).fin}`)}">${esc(nameIn(cfg, a.empleado_id))} <small>${horasDe2(a).inicio.slice(0, 5).replace(':00', '')}–${horasDe2(a).fin.replace(':00', '')}</small></span>`).join('')
       + (lista.length > max ? `<span class="small muted">+${lista.length - max} más</span>` : '')
       || '<span class="small muted">Nadie</span>';
   }
@@ -933,7 +933,7 @@ function viewCalendario() {
   for (const a of data.asignaciones) { if (!porDia.has(a.fecha)) porDia.set(a.fecha, []); porDia.get(a.fecha).push(a); }
   const sinHorario = Object.keys(data.dias).length === 0;
   const aviso = sinHorario ? '<div class="notice info section"><span>No hay ningún horario en estas fechas.</span><span class="spacer"></span><a class="btn small primary" href="#/horarios">Crear un horario</a></div>' : '';
-  const leyenda = `<div class="shift-legend section">${cfg.turnos.map((s) => `<span><i style="background:${esc(s.color || '#eee')}"></i>${esc(s.nombre)} ${s.inicio}–${s.fin}</span>`).join('')}</div>`;
+  const leyenda = `<div class="shift-legend section">${cfg.turnos.map((s) => `<span><i style="background:${esc(s.color || 'var(--track)')}"></i>${esc(s.nombre)} ${s.inicio}–${s.fin}</span>`).join('')}</div>`;
   if (c.modo === 'mes') {
     return head0 + barra + aviso + leyenda + monthGrid(desde, hasta, (f) => {
       const info = data.dias[f];
@@ -962,7 +962,7 @@ function calSemana(lunes, data, porDia) {
       if (s) {
         const hs = horasDe(cfg, a);
         mins += toMin(hs.fin) - toMin(hs.inicio);
-        inner = `<span class="pill${a.inicio ? ' custom' : ''}" style="background:${esc(s.color || '#eee')}">${esc(s.id)}${usaPuestos(cfg) ? puestoTag(puestoDe(cfg, a)) : ''}<small>${hs.inicio}–${hs.fin}</small>${rolTag(rolDe(cfg, a))}</span>`;
+        inner = `<span class="pill${a.inicio ? ' custom' : ''}" style="background:${esc(s.color || 'var(--track)')}">${esc(s.id)}${usaPuestos(cfg) ? puestoTag(puestoDe(cfg, a)) : ''}<small>${hs.inicio}–${hs.fin}</small>${rolTag(rolDe(cfg, a))}</span>`;
       } else inner = `<span class="${aus ? 'abs' : 'off'}">${aus ? esc(MOTIVOS[aus.motivo] || 'Ausencia') : libra ? 'libra' : 'libre'}</span>`;
       const lock = info.bloqueos.includes(e.id);
       return `<td><button class="cell" data-act="calDia" data-date="${d}" aria-label="${esc(`${e.nombre}, ${fmtLong(d)}: ${s ? `${s.nombre}` : 'libre'}. Abrir el día`)}">${inner}${lock ? `<span class="lock">${ICON.lock}</span>` : ''}</button></td>`;
@@ -1025,7 +1025,7 @@ function calInforme(desde, hasta) {
 // Una casilla pequeña de la tira de turnos de la tarjeta.
 function tiraDia(dia) {
   const t = `${fmtShort(dia.fecha)}: ${dia.clase === 'turno' ? `${dia.s.nombre} ${dia.hs.inicio}–${dia.hs.fin}` : dia.texto}`;
-  return `<i class="tira-${dia.clase}${dia.libra ? ' libra' : ''}" title="${esc(t)}" ${dia.clase === 'turno' ? `style="background:${esc(dia.s.color || '#eee')}"` : ''}></i>`;
+  return `<i class="tira-${dia.clase}${dia.libra ? ' libra' : ''}" title="${esc(t)}" ${dia.clase === 'turno' ? `style="background:${esc(dia.s.color || 'var(--track)')}"` : ''}></i>`;
 }
 
 const horasFrenteContrato = (e, mins, inf) => {
@@ -1146,8 +1146,8 @@ function viewPersona(id) {
     const fecha = `<span class="pd-date"><b>${DAY_SHORT[weekday(x.fecha)]} ${dayNum(x.fecha)}</b>${x.fecha === hoy ? ' <span class="badge borrador">Hoy</span>' : ''}${mezcla && x.info && x.info.estado !== 'publicado' ? ' <span class="badge neutral">Borrador</span>' : ''}</span>`;
     let que, linea = '', horas = '';
     if (x.clase === 'turno') {
-      que = `<span class="pill${x.a.inicio ? ' custom' : ''}" style="background:${esc(x.s.color || '#eee')}">${esc(x.s.nombre)}${conPuestos ? ` ${puestoTag(puestoDe(cfg, x.a))}` : ''}</span>${rolTag(rolDe(cfg, x.a))} <span class="pd-hours">${x.hs.inicio}–${x.hs.fin}</span>${x.lock ? `<span class="lock" title="Cambio manual">${ICON.lock}</span>` : ''}`;
-      linea = `<i style="left:${pct(toMin(x.hs.inicio))};width:${((toMin(x.hs.fin) - toMin(x.hs.inicio)) / (v1 - v0)) * 100}%;background:${esc(x.s.color || '#eee')}"></i>`;
+      que = `<span class="pill${x.a.inicio ? ' custom' : ''}" style="background:${esc(x.s.color || 'var(--track)')}">${esc(x.s.nombre)}${conPuestos ? ` ${puestoTag(puestoDe(cfg, x.a))}` : ''}</span>${rolTag(rolDe(cfg, x.a))} <span class="pd-hours">${x.hs.inicio}–${x.hs.fin}</span>${x.lock ? `<span class="lock" title="Cambio manual">${ICON.lock}</span>` : ''}`;
+      linea = `<i style="left:${pct(toMin(x.hs.inicio))};width:${((toMin(x.hs.fin) - toMin(x.hs.inicio)) / (v1 - v0)) * 100}%;background:${esc(x.s.color || 'var(--track)')}"></i>`;
       horas = `${fmtH(Math.round(x.mins / 6) / 10)} h`;
     } else que = `<span class="pd-txt-${x.clase}">${esc(x.texto)}</span>${x.lock ? `<span class="lock" title="Cambio manual">${ICON.lock}</span>` : ''}`;
     const label = `${fmtLong(x.fecha)}: ${x.clase === 'turno' ? `${x.s.nombre} de ${x.hs.inicio} a ${x.hs.fin}` : x.texto}`;
@@ -1326,7 +1326,7 @@ function dayView(cur) {
       const caps = etiquetas.filter((f) => !(esRol(rol) && f.id === rol.id));
       caps.forEach((f) => enLeyenda.set(f.nombre, f));
       bar = `<div class="g-bar${conPuestos ? ` ${t.puesto}` : ''}${cambiados.has(e.id) ? ' changed' : ''}" data-emp="${esc(e.id)}" tabindex="0" role="button"
-        style="left:${pct(toMin(t.inicio))};width:${((toMin(t.fin) - toMin(t.inicio)) / span) * 100}%;--c:${esc((s && s.color) || '#E8D5B0')}"
+        style="left:${pct(toMin(t.inicio))};width:${((toMin(t.fin) - toMin(t.inicio)) / span) * 100}%;--c:${esc((s && s.color) || 'var(--shift-default)')}"
         aria-label="${esc(`${e.nombre}: de ${t.inicio} a ${t.fin}${conPuestos ? `, ${PUESTOS[t.puesto]}` : ''}${esRol(rol) ? `, ${rol.nombre}` : ''}${caps.length ? `. ${caps.map((f) => f.nombre).join(', ')}` : ''}. Arrastra para mover; bordes para alargar o acortar; Intro para más opciones.`)}">
         ${ro ? '' : '<span class="g-h l" data-h="l" aria-hidden="true"></span>'}
         <span class="g-txt">${conPuestos ? puestoTag(t.puesto) : ''}<b>${t.inicio}–${t.fin}</b><small>${fmtH(durH)} h</small>${rolTag(esRol(rol) ? rol : null)}${capTags(caps, abrev)}</span>
@@ -1463,7 +1463,7 @@ function ajustarTramo(t, k, dm) {
 function rolesMenu(cfg, e, puesto, actual, act, attrs) {
   const roles = rolesDe(cfg, e, puesto).map((id) => funcById(cfg, id));
   if (!roles.length) return '';
-  const boton = (f) => `<button type="button" role="menuitemradio" aria-checked="${(actual || null) === (f ? f.id : null)}" class="rol-opt${(actual || null) === (f ? f.id : null) ? ' current' : ''}" data-act="${act}" ${attrs} data-funcion="${f ? esc(f.id) : ''}">${f ? `<i style="background:${esc(f.color || '#764A09')}"></i>${esc(f.nombre)}` : 'Sin rol'}</button>`;
+  const boton = (f) => `<button type="button" role="menuitemradio" aria-checked="${(actual || null) === (f ? f.id : null)}" class="rol-opt${(actual || null) === (f ? f.id : null) ? ' current' : ''}" data-act="${act}" ${attrs} data-funcion="${f ? esc(f.id) : ''}">${f ? `<i style="background:${esc(f.color || 'var(--brown)')}"></i>${esc(f.nombre)}` : 'Sin rol'}</button>`;
   return `<hr><div class="ph" style="border:none;margin:0;padding-bottom:2px">Qué hace en el turno</div><div class="rol-opts">${roles.map(boton).join('')}${boton(null)}</div>`;
 }
 
@@ -1487,7 +1487,7 @@ function openBarMenu(empId, anchor) {
     ${puestosDe(e).length > 1 ? `<hr>${puestosDe(e).map((p) => `<button class="${t.puesto === p ? 'current' : ''}" data-act="barPuesto" data-emp="${esc(empId)}" data-p="${p}">${puestoTag(p)} En ${PUESTOS[p].toLowerCase()}</button>`).join('')}` : ''}
     ${rolesMenu(cfg, e, t.puesto, t.funcion, 'barRol', `data-emp="${esc(empId)}"`)}
     <hr><div class="ph" style="border:none;margin:0;padding-bottom:2px">Poner las horas de un turno</div>
-    ${turnosPosibles(e, d.fecha).map((s) => `<button data-act="barShift" data-emp="${esc(empId)}" data-shift="${esc(s.id)}"><i style="background:${esc(s.color || '#eee')}"></i>${esc(s.nombre)} <small>${s.inicio}–${s.fin}</small></button>`).join('')}
+    ${turnosPosibles(e, d.fecha).map((s) => `<button data-act="barShift" data-emp="${esc(empId)}" data-shift="${esc(s.id)}"><i style="background:${esc(s.color || 'var(--track)')}"></i>${esc(s.nombre)} <small>${s.inicio}–${s.fin}</small></button>`).join('')}
     <hr><button data-act="barRemove" data-emp="${esc(empId)}" class="danger-text">${ICON.trash} Quitar el turno (libra)</button>`;
   document.body.appendChild(m);
   placePopover(m, `.g-bar[data-emp="${CSS.escape(empId)}"]`);
@@ -1619,7 +1619,7 @@ function openCellMenu(btn) {
   m.className = 'popover';
   m.setAttribute('role', 'menu');
   m.innerHTML = `<div class="ph"><b>${esc(emp.nombre)}</b> · ${fmtLong(d)}${absence ? `<br><span style="color:var(--warn)">${esc(MOTIVOS[absence.motivo])}</span>` : fixedOff ? '<br>Es su día de libranza' : ''}</div>
-    ${cfg.turnos.map((s) => `<button role="menuitem" class="${cur && cur.turno_id === s.id ? 'current' : ''}" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="${esc(s.id)}"><i style="background:${esc(s.color || '#eee')}"></i>${esc(s.nombre)} <small>${s.inicio}–${s.fin}${note(s) ? ` · <span class="warn-note">${note(s)}</span>` : ''}</small></button>`).join('')}
+    ${cfg.turnos.map((s) => `<button role="menuitem" class="${cur && cur.turno_id === s.id ? 'current' : ''}" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="${esc(s.id)}"><i style="background:${esc(s.color || 'var(--track)')}"></i>${esc(s.nombre)} <small>${s.inicio}–${s.fin}${note(s) ? ` · <span class="warn-note">${note(s)}</span>` : ''}</small></button>`).join('')}
     <hr>${cur
       ? `<button role="menuitem" class="danger-text" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="">${ICON.trash} Quitar el turno <small>ese día libra</small></button>`
       : '<button role="menuitem" class="current" disabled>Libre <small>no tiene turno</small></button>'}
@@ -1770,7 +1770,7 @@ function viewFunciones() {
     ['Cerrar', 'puede_cerrar', 'Solo estas personas hacen los turnos de cierre, y al cerrar tiene que quedarse al menos una (si no, el horario no vale).'],
     ['Encargado/a', 'es_encargado', c.reglas.encargado_siempre ? 'El motor intenta que siempre haya un encargado en el local (Reglas → Cobertura).' : 'Ahora no se exige un encargado siempre; se activa en Reglas → Cobertura.'],
   ];
-  const fila = (f, i) => `<div class="card" style="--fc:${esc(f.color || '#764A09')}">
+  const fila = (f, i) => `<div class="card" style="--fc:${esc(f.color || 'var(--brown)')}">
     <div class="row" style="flex-wrap:nowrap;gap:8px"><input type="color" value="${esc(f.color || '#764A09')}" data-bind="funciones.${i}.color" aria-label="Color" class="color-input" data-rerender>
       <input class="title-input" type="text" value="${esc(f.nombre)}" data-bind="funciones.${i}.nombre" aria-label="Nombre de la función" data-rerender>
       <button class="icon-btn" data-act="delFuncion" data-i="${i}" title="Eliminar la función">${ICON.trash}</button></div>
@@ -1811,7 +1811,7 @@ function viewFunciones() {
 // ------------------------------------------------------------------ TURNOS
 function timeline(items, from = 6 * 60, to = 24 * 60) {
   const pct = (m) => `${((Math.min(Math.max(m, from), to) - from) / (to - from)) * 100}%`;
-  return `<div class="timeline">${items.map((s) => `<i style="left:${pct(toMin(s.inicio))};width:calc(${pct(toMin(s.fin))} - ${pct(toMin(s.inicio))});background:${esc(s.color || '#B0904C')}"></i>`).join('')}</div>
+  return `<div class="timeline">${items.map((s) => `<i style="left:${pct(toMin(s.inicio))};width:calc(${pct(toMin(s.fin))} - ${pct(toMin(s.inicio))});background:${esc(s.color || 'var(--gold)')}"></i>`).join('')}</div>
   <div class="timeline-axis"><span>06</span><span>09</span><span>12</span><span>15</span><span>18</span><span>21</span><span>24</span></div>`;
 }
 
@@ -1906,7 +1906,7 @@ function viewDemanda() {
       <label class="field" style="max-width:200px">Añadir festivo<input type="date" id="new-holiday"></label>
       <button class="btn" data-act="addHoliday">${ICON.plus} Añadir</button>
     </div>
-    <div class="chips" style="margin-top:12px">${[...c.festivos].sort().map((f) => `<span class="chip on" style="cursor:default">${fmtShort(f)} ${monthName(f)} ${f.slice(0, 4)} <button class="icon-btn" style="padding:0 0 0 6px;color:#fff" data-act="delHoliday" data-date="${f}" aria-label="Quitar">×</button></span>`).join('') || '<span class="muted small">Sin festivos.</span>'}</div>
+    <div class="chips" style="margin-top:12px">${[...c.festivos].sort().map((f) => `<span class="chip on" style="cursor:default">${fmtShort(f)} ${monthName(f)} ${f.slice(0, 4)} <button class="icon-btn" style="padding:0 0 0 6px;color:var(--white)" data-act="delHoliday" data-date="${f}" aria-label="Quitar">×</button></span>`).join('') || '<span class="muted small">Sin festivos.</span>'}</div>
   </div>
   <div class="card section"><div class="row"><h2 style="margin:0">Días especiales</h2><span class="spacer"></span><button class="btn small" data-act="addSpecial">${ICON.plus} Añadir día</button></div>
     <p class="small muted">Para una fecha concreta: otro tipo de día, cerrar o unas franjas propias (Nochebuena, una reforma, un evento…).</p>
