@@ -64,7 +64,9 @@ def test_anadir_comodin_y_verlo_en_el_horario(url, browser, movil):
     page.goto(f"{url}/#/horarios/{r.json()['id']}")
     page.wait_for_selector("td.emp")
     fila = page.locator("td.emp", has_text=nombre).first
-    assert "Comodín · hasta 12 h/sem" in fila.inner_text()
+    # Las semanas fuera de la pantalla no se pintan hasta que se ven (content-visibility): se espera a que aparezca.
+    fila.scroll_into_view_if_needed()
+    sync_api.expect(fila).to_contain_text("Comodín · hasta 12 h/sem")
     assert page.locator("tr", has_text=nombre).locator(".badge", has_text="Comodín").count() >= 1
     if os.environ.get("LOPITA_CAPTURAS"):
         page.goto(f"{url}/#/equipo")
