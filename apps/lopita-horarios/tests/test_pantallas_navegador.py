@@ -1,8 +1,8 @@
 """Recorrido de humo por todas las pantallas, como encargado y como trabajador, a 390 y 1280 px.
 
 Es la red de seguridad de la reestructuración de la interfaz: cada pantalla abre sin errores de JavaScript, termina
-de cargar y no provoca scroll horizontal de la página (DISENO.md §4). Los campos de 16 px en el móvil se comprueban
-aparte, marcados como fallo conocido hasta que llegue el arreglo de la base visual.
+de cargar y no provoca scroll horizontal de la página (DISENO.md §4). En el móvil, además, ningún campo baja de
+16 px, para que el iPhone no haga zoom al enfocarlo.
 
 Necesita Playwright con Chromium (o la ruta de otro Chromium en LOPITA_CHROMIUM); si no está, se salta.
 """
@@ -97,8 +97,6 @@ def test_pantallas_del_trabajador(browser, datos, tamaño):
     assert _recorrer(browser, datos, tamaño, "trabajadora", CLAVE_TRABAJADOR, RUTAS_TRABAJADOR) == []
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="Fallo conocido (plan E1-1): los campos salen a 13 px y el iPhone hace zoom. "
-                                       "Al arreglarlo, este test pasa y hay que quitar el xfail.")
 def test_campos_de_16px_en_el_movil(browser, datos):
     pequeños = []
     for usuario, clave, rutas in (("admin", PW, RUTAS_ENCARGADO), ("trabajadora", CLAVE_TRABAJADOR, RUTAS_TRABAJADOR)):
@@ -112,3 +110,32 @@ def test_campos_de_16px_en_el_movil(browser, datos):
                 pequeños.append(f"#/{ruta} ({usuario}): {min(tamaños):g} px")
         ctx.close()
     assert pequeños == []
+
+
+def test_foco_visible_y_movimiento_reducido(browser, datos):
+    """Con el teclado siempre se ve dónde está el foco, y con «reducir movimiento» no queda ninguna animación."""
+    ctx = browser.new_context(**TAMAÑOS["1280"], reduced_motion="reduce")
+    page = ctx.new_page()
+    page.goto(datos["url"])
+    page.fill("input[name=usuario]", "admin")
+    page.fill("input[name=password]", PW)
+    page.click("button[type=submit]")
+    _visitar(page, datos, "horarios/{sid}")
+    sin_anillo = []
+    for _ in range(25):
+        page.keyboard.press("Tab")
+        estilo = page.evaluate("() => { const e = document.activeElement, s = getComputedStyle(e);"
+                               " return [e.tagName + (e.className ? '.' + e.className : ''), s.outlineStyle, s.outlineWidth]; }")
+        if estilo[1] in ("none", "auto") or estilo[2] == "0px":
+            sin_anillo.append(estilo[0])
+    assert sin_anillo == []
+    # Lo único que se mueve es el indicador de carga, que gira despacio (2,4 s) para seguir diciendo «trabajando».
+    lentas = page.evaluate("""() => {
+      const seg = (v) => Math.max(...v.split(',').map((x) => parseFloat(x) * (x.trim().endsWith('ms') ? 0.001 : 1)));
+      return [...document.querySelectorAll('*')].filter((e) => !e.classList.contains('spinner')).map((e) => {
+        const s = getComputedStyle(e);
+        return [e.tagName + '.' + e.className, Math.max(seg(s.animationDuration), seg(s.transitionDuration))];
+      }).filter(([, d]) => d > 0.01);
+    }""")
+    assert lentas == []
+    ctx.close()

@@ -18,6 +18,9 @@ Los valores viven en las variables de `:root` de `app/static/styles.css`. Usa si
 | Estados | `--bad`, `--high`, `--warn`, `--ok` (+ `-soft`) | rojo, naranja, ámbar, verde |
 | Puestos | `--cocina`, `--sala` (+ `-soft`) | `#8C4A2F`, `#3F5F7A` |
 | Radio y sombra | `--radius`, `--shadow` | `12px`, sombra suave de dos capas |
+| Texto de poco peso («libre», «libra») | `--faint` | `#786B5F` (4,6:1 sobre las tarjetas) |
+| Anillo de foco | `--focus` | `--brown` sobre fondo claro; `--gold` en la barra negra |
+| Movimiento | `--dur-fast`, `--dur`, `--ease` | `120ms`, `180ms`, sin rebote |
 
 - **Tipografía**: `--display` (Oswald) en mayúsculas espaciadas solo para la marca, la navegación, los `h1`/`h2` y las cabeceras de días; `--text` (Raleway) para todo lo demás. No se añaden otras fuentes.
 - El dorado es el único acento. Los colores de estado se reservan para estados reales (una alerta, un error, algo correcto), nunca para decorar.
@@ -94,9 +97,7 @@ Los valores viven en las variables de `:root` de `app/static/styles.css`. Usa si
 
 Cosas de esta guía que la interfaz aún no cumple (revisado el 08/11/2026):
 
-- No hay ninguna regla `prefers-reduced-motion` en `styles.css`.
-- Los campos de formulario salen a 13px (heredan el tamaño de `label.field`), por debajo de los 16px que evitan el zoom en el iPhone. `tests/test_pantallas_navegador.py` lo comprueba como fallo conocido.
-- Lo que axe encuentra hoy está en `EXCEPCIONES` de `tests/test_accesibilidad_navegador.py`, con la propuesta que lo arregla.
+- Lo que axe encuentra todavía está en `EXCEPCIONES` de `tests/test_accesibilidad_navegador.py`, con la propuesta que lo arregla.
 
 ## Fuentes
 

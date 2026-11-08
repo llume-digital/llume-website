@@ -19,17 +19,13 @@ NORMAS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
 # Fallos conocidos el 08/11/2026, con la propuesta del plan de reestructuración que los arregla.
 EXCEPCIONES = {
     "horarios/{sid}": {
-        "color-contrast": "E1-5 y F3-5: «libre», «libra» y etiquetas de función por debajo de 4,5:1",
         "aria-prohibited-attr": "F3-4: la barra de cobertura lleva aria-label sin rol",
         "scrollable-region-focusable": "F3-3: el cuadrante con scroll lateral no se alcanza con el teclado",
     },
-    "calendario": {"color-contrast": "E1-5 y F3-5"},
-    "calendario/persona/{emp}/{lunes}": {"color-contrast": "E1-5 y F3-5"},
     "ausencias": {
         "label": "F3-9: campos de la tabla de ausencias sin etiqueta",
         "select-name": "F3-9: desplegables de la tabla de ausencias sin nombre",
     },
-    "inicio": {"color-contrast": "E1-5 y F3-5"},
     "horas": {"scrollable-region-focusable": "E3-2: la tabla de Mis horas se desplaza de lado en el móvil"},
 }
 
