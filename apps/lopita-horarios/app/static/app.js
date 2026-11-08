@@ -473,6 +473,13 @@ function viewLogin() {
 }
 
 // ------------------------------------------------------------------ HORARIOS: lista y generador
+// Un publicado deja de valer en las fechas que ocupa otro publicado después (línea de tiempo de lo publicado)
+function vigencia(s) {
+  if (s.sustituido) return ' <span class="badge neutral" title="Otros horarios publicados después ocupan todas sus fechas">Sustituido</span>';
+  const total = daysBetween(s.desde, s.hasta) + 1;
+  if (s.estado === 'publicado' && s.dias_vigentes != null && s.dias_vigentes < total) return ` <span class="badge neutral" title="En los demás días vale otro horario publicado después">Vale ${s.dias_vigentes} de ${total} días</span>`;
+  return '';
+}
 function nextMonday() { const t = todayIso(); return addDays(t, 7 - weekday(t)); }
 function nextMonth() { const t = todayIso(); let y = Number(t.slice(0, 4)), m = Number(t.slice(5, 7)) + 1; if (m > 12) { m = 1; y++; } return `${y}-${String(m).padStart(2, '0')}`; }
 function genPeriod() {
@@ -501,7 +508,7 @@ function viewHorarios() {
       <button class="btn primary" data-act="generate" ${valid ? '' : 'disabled'}>Generar horario</button>
     </div>
     <p class="small muted" style="margin:12px 0 0">${valid ? `Del ${fmtLong(a)} al ${fmtLong(b)} (${daysBetween(a, b) + 1} días).` : 'Elige un periodo válido (máximo 9 semanas).'}
-    ${overlaps.length ? ` <span style="color:var(--warn)">Ya hay ${overlaps.length === 1 ? 'un horario que se solapa' : `${overlaps.length} horarios que se solapan`} con estas fechas; se creará otro borrador aparte.</span>` : ''}
+    ${overlaps.length ? ` <span style="color:var(--warn)">Ya hay ${overlaps.length === 1 ? 'un horario que se solapa' : `${overlaps.length} horarios que se solapan`} con estas fechas. Se creará otro borrador aparte y, al publicarlo, será el que valga en todas sus fechas.</span>` : ''}
     ${state.dirty ? ' <span style="color:var(--warn)">Antes de generar se guardarán tus cambios de configuración.</span>' : ''}</p>
   </div>
   <div class="section">
@@ -510,7 +517,7 @@ function viewHorarios() {
       <thead><tr><th>Periodo</th><th>Estado</th><th class="num">Huecos</th><th>Alertas</th><th class="num">Errores</th><th>Actualizado</th></tr></thead>
       <tbody>${list.map((s) => `<tr class="click" data-act="open" data-id="${s.id}" tabindex="0">
         <td><b>${fmtRange(s.desde, s.hasta)}</b><div class="small muted">${daysBetween(s.desde, s.hasta) + 1} días · ${s.turnos} turnos${s.bloqueos ? ` · ${s.bloqueos} cambios manuales` : ''}</div></td>
-        <td><span class="badge ${s.estado}">${s.estado === 'publicado' ? 'Publicado' : 'Borrador'}</span>${s.reemplaza ? ' <span class="badge warn">Arreglo sin publicar</span>' : ''}${s.cambios_pendientes.length ? ' <span class="badge warn">Cambios sin avisar</span>' : ''}</td>
+        <td><span class="badge ${s.estado}">${s.estado === 'publicado' ? 'Publicado' : 'Borrador'}</span>${vigencia(s)}${s.reemplaza ? ' <span class="badge warn">Arreglo sin publicar</span>' : ''}${s.cambios_pendientes.length ? ' <span class="badge warn">Cambios sin avisar</span>' : ''}</td>
         <td class="num">${s.huecos ? `<span class="badge bad">${s.huecos}</span>` : '0'}</td>
         <td>${sevBadges(s.alertas)}</td>
         <td class="num">${s.errores ? `<span class="badge bad">${s.errores}</span>` : '0'}</td>

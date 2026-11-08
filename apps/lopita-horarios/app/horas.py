@@ -7,6 +7,8 @@ from typing import Optional
 from lopita_horarios.models import Config, Schedule, parse_hhmm
 from lopita_horarios.planning import target_minutes
 
+from . import linea_tiempo
+
 CLASES = {
     "horas": "Horas distintas",
     "turno": "Turno distinto",
@@ -57,19 +59,9 @@ def validate_correction(config: Config, datos: dict) -> dict:
 
 
 def best_schedules(rows: list[dict], solo_publicados: bool = True) -> dict[dt.date, Schedule]:
-    """Para cada fecha, el horario más fiable que la cubre (publicado antes que borrador, el más reciente)."""
-    best: dict[dt.date, tuple] = {}
-    for s in rows:
-        if solo_publicados and s["estado"] != "publicado":
-            continue
-        h: Schedule = s["horario"]
-        rank = (s["estado"] == "publicado", s["updated_at"])
-        d = h.desde
-        while d <= h.hasta:
-            if d not in best or rank > best[d][0]:
-                best[d] = (rank, h)
-            d += dt.timedelta(days=1)
-    return {d: h for d, (_, h) in best.items()}
+    """Para cada fecha, el horario que manda en ella (el publicado de la línea de tiempo; si no hay, el borrador más
+    reciente cuando se piden también los borradores)."""
+    return {d: r["horario"] for d, r in linea_tiempo.por_dia(rows, solo_publicados=solo_publicados).items()}
 
 
 def planned_minutes(config: Config, h: Schedule, emp_id: str, fecha: dt.date) -> tuple[Optional[str], int]:

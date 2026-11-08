@@ -11,7 +11,7 @@ App web para crear el horario del equipo de Lopita en un clic. El encargado intr
 | **Interfaz** (`app/static/`) | Sin dependencias ni compilación. Pantallas: Horarios, Equipo, Turnos, Demanda, Ausencias, Preferencias, Reglas y Ajustes. Funciona en el móvil. Identidad de lopita.es: dorado `#B0904C`, marrón `#764A09`, negro, Oswald y Raleway (servidas desde la propia app). |
 | **Slack** (`app/slack.py`) | Al publicar: un mensaje en el canal y uno privado a cada persona con sus turnos y su enlace. Si se cambia algo después, avisa solo a quien le ha cambiado. Sin token funciona en modo simulación. |
 | **Calendario de cada persona** (`app/calendario.py`) | Un enlace secreto `/cal/<token>.ics` por persona para suscribirse desde Google Calendar, el iPhone u Outlook: sus turnos publicados y sus ausencias aprobadas, que se actualizan solos. |
-| **Vista del equipo** | `/ver/<enlace>`: horario publicado de solo lectura; `?e=<persona>` destaca sus turnos. No muestra horas ni avisos internos. |
+| **Vista del equipo** | `/ver/<enlace>`: horario publicado de solo lectura; `?e=<persona>` destaca sus turnos. No muestra horas ni avisos internos. Un enlace viejo enseña lo que vale hoy en sus fechas. |
 
 ## Probarlo en local
 
@@ -123,7 +123,9 @@ En **Ajustes → Slack** se ve si la conexión funciona.
 
 ## Calendario: día, semana y mes
 
-La pestaña **Calendario** junta todos los horarios (cada día manda el publicado y, si no hay, el borrador más reciente) y se recorre **semana a semana** o **mes a mes**, con un filtro por persona. Tocar un día o un turno abre ese día en su horario para editarlo hora a hora (**Día**). Cada horario tiene también su vista **Mes**, además de Semana y Día.
+La pestaña **Calendario** junta todos los horarios (cada día manda el publicado y, si no hay, el borrador más reciente; ver *Línea de tiempo de lo publicado*) y se recorre **semana a semana** o **mes a mes**, con un filtro por persona. Tocar un día o un turno abre ese día en su horario para editarlo hora a hora (**Día**). Cada horario tiene también su vista **Mes**, además de Semana y Día.
+
+**Línea de tiempo de lo publicado** (`app/linea_tiempo.py`). Cada fecha tiene como mucho un horario publicado que manda en ella (tabla `dias_publicados`). Al publicar un horario por primera vez se queda con todas sus fechas, también las que ya tenía otro publicado, y lo que había pasa al historial (`dias_historial`). Tocar o volver a publicar el viejo no le devuelve esas fechas. Despublicar o borrar uno devuelve cada fecha al último publicado anterior que la cubra, o la deja sin horario. Calendario, portal del trabajador, informes de horas, calendarios `.ics`, alertas, arreglos por ausencias, los días previos que usa el motor y los enlaces de Slack leen de ella. La lista de horarios marca los publicados que solo valen en parte de sus días (*Vale N de M días*) o en ninguno (*Sustituido*). Las bases de datos de antes se migran solas la primera vez que se abren (`PRAGMA user_version` 1): manda el último publicado y, si había solapes, el encargado recibe una notificación con las fechas, marcando las que cambian respecto a lo que se veía (antes mandaba el modificado más tarde).
 
 **Ajustes rápidos.** En el menú de un turno (en la vista de día, o en el cuadrante tocando la casilla) hay botones para alargarlo o acortarlo 30 min o 1 h por el principio o por el final, y para desplazarlo 30 min o 1 h. Desde el cuadrante, el ajuste se prepara en la vista de día y se revisa con *Confirmar cambios*, como cualquier edición.
 
