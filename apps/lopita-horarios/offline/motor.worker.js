@@ -20,13 +20,26 @@ const ESPERA_NUBE_MS = 30_000;
 
 class ErrorNube extends Error {}
 
+// Sin internet, el navegador falla al momento. Si hay internet pero el servidor no contesta en 30 s, lo normal en España
+// es el bloqueo de LaLiga: en horario de partido algunas operadoras cortan las IP compartidas de Cloudflare, que son
+// las de llumedigital.com. Con una VPN u otra conexión vuelve a funcionar.
+function motivoSinNube(e) {
+  const pendiente = 'Los cambios no se guardan hasta que vuelva la conexión.';
+  if (self.navigator && self.navigator.onLine === false) return `Sin conexión a internet. ${pendiente}`;
+  if (e && e.name === 'TimeoutError') {
+    return 'El servidor de datos no responde. Si estás en España y hay partido de fútbol, puede que tu operadora esté '
+      + `bloqueando la web: prueba con una VPN o con otra conexión. ${pendiente}`;
+  }
+  return `Sin conexión con el servidor de datos. ${pendiente}`;
+}
+
 async function pedirNube(metodo, cabeceras = {}, cuerpo = undefined) {
   let r;
   try {
     r = await fetch(nube.url, { method: metodo, cache: 'no-store', body: cuerpo, signal: AbortSignal.timeout(ESPERA_NUBE_MS),
       headers: { Authorization: `Bearer ${nube.clave}`, ...cabeceras } });
   } catch (e) {
-    throw new ErrorNube('Sin conexión con el servidor de datos. Los cambios no se guardan hasta que vuelva la conexión.');
+    throw new ErrorNube(motivoSinNube(e));
   }
   if (r.status === 401) throw new ErrorNube('CLAVE');
   return r;

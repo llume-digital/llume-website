@@ -167,3 +167,39 @@ def test_saldo_de_horas_reduce_objetivo():
     s = generate(cfg(), *WEEK, FAST, saldo_horas={"fran": 6})
     st = next(r for r in s.resumen if r.empleado_id == "fran")
     assert st.horas_objetivo == 24 and st.saldo_anterior == 6
+
+
+def test_encadena_con_lo_publicado_despues():
+    """Un borrador que acaba justo antes de un horario ya publicado no puede romper el descanso con su primer día."""
+    c = cfg()
+    # Carla entra a las 8 el lunes 16, ya publicado: el domingo 15 no puede cerrar (hasta las 22:30)
+    despues = [Assignment(empleado_id="carla", fecha=dt.date(2026, 11, 16), turno_id="M")]
+    cierre = [Assignment(empleado_id="carla", fecha=dt.date(2026, 11, 15), turno_id="CI")]
+    issues = validate(c, *WEEK, cierre, previo=despues)
+    assert "descanso_corto" in {i.codigo for i in issues}
+    s = generate(c, *WEEK, FAST, previo=despues)
+    ultimo = [a for a in s.asignaciones if a.empleado_id == "carla" and a.fecha == dt.date(2026, 11, 15)]
+    assert all(24 * 60 - c.shift(a.turno_id).end_min + c.shift("M").start_min >= c.reglas.descanso_minimo_horas * 60
+               for a in ultimo)
+    assert not errors(s)
+
+
+def test_semana_partida_cuenta_dias_publicados_despues():
+    """Un borrador de lunes a miércoles cuenta los días que ya trabaja cada uno de jueves a domingo."""
+    c = cfg()
+    despues = [Assignment(empleado_id="fran", fecha=dt.date(2026, 11, d), turno_id="M") for d in (12, 13, 14, 15)]
+    s = generate(c, dt.date(2026, 11, 9), dt.date(2026, 11, 11), FAST, previo=despues)
+    fran = [a for a in s.asignaciones if a.empleado_id == "fran"]
+    assert len(fran) + 4 <= 5
+    # Y el validador lo detecta si se fuerza
+    forzado = [Assignment(empleado_id="fran", fecha=dt.date(2026, 11, d), turno_id="M") for d in (9, 10)]
+    issues = validate(c, dt.date(2026, 11, 9), dt.date(2026, 11, 11), forzado, previo=despues)
+    assert "descanso_semanal" in {i.codigo for i in issues}
+
+
+def test_sin_nada_despues_la_ultima_semana_no_cambia():
+    """Si después del periodo no hay horario, los días que faltan de la semana no son días libres ni cuentan."""
+    c = cfg()
+    forzado = [Assignment(empleado_id="fran", fecha=dt.date(2026, 11, d), turno_id="M") for d in (9, 10, 11)]
+    issues = validate(c, dt.date(2026, 11, 9), dt.date(2026, 11, 11), forzado, previo=[])
+    assert "descanso_semanal" not in {i.codigo for i in issues}

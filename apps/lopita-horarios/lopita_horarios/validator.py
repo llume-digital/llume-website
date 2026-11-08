@@ -21,7 +21,9 @@ from .planning import (
     target_minutes,
     upper_minutes,
     week_chunks,
+    carry_after,
     carry_from,
+    marco_semana,
     with_locks,
 )
 
@@ -77,6 +79,7 @@ def validate(config: Config, desde: dt.date, hasta: dt.date, assignments: list[A
              bloqueos=None) -> list[Issue]:
     config = with_locks(config, bloqueos)
     carry = carry_from(config, desde, previo)
+    despues = carry_after(config, hasta, previo)
     rules = config.reglas
     res = rules.resolucion_minutos
     days = daterange(desde, hasta)
@@ -160,6 +163,13 @@ def validate(config: Config, desde: dt.date, hasta: dt.date, assignments: list[A
                     err("descanso_corto",
                         f"{name} descansa solo {rest / 60:g} h entre el periodo anterior y el {_fmt_date(desde)}",
                         desde, e.id)
+        if despues and e.id in despues.first_day:
+            for a in by_emp_day.get((e.id, hasta), []):
+                rest = rest_minutes_between(config.turno_de(a), despues.first_day[e.id])
+                if rest < min_rest:
+                    err("descanso_corto",
+                        f"{name} descansa solo {rest / 60:g} h entre el {_fmt_date(hasta)} y el horario publicado "
+                        f"que sigue", hasta, e.id)
         for d in days[:-1]:
             nxt = d + dt.timedelta(days=1)
             for a in by_emp_day.get((e.id, d), []):
@@ -171,17 +181,17 @@ def validate(config: Config, desde: dt.date, hasta: dt.date, assignments: list[A
                             nxt, e.id)
 
         # Semana: días libres y horas
-        for i, chunk in enumerate(week_chunks(days)):
-            first = i == 0 and carry and carry.week_prev_dates
-            frame = (carry.week_prev_dates + chunk) if first else chunk
-            worked_days = sum(1 for d in chunk if by_emp_day.get((e.id, d))) + (carry.week_days.get(e.id, 0) if first else 0)
+        semanas = week_chunks(days)
+        for i, chunk in enumerate(semanas):
+            frame, ya_dias, ya_minutos = marco_semana(i, semanas, carry, despues)
+            worked_days = sum(1 for d in chunk if by_emp_day.get((e.id, d))) + ya_dias.get(e.id, 0)
             limit = max_worked_days(config, len(frame))
             if worked_days > limit:
                 err("descanso_semanal",
                     f"{name} trabaja {worked_days} días la semana del {_fmt_date(chunk[0])} (máximo {limit})",
                     chunk[0], e.id)
             minutes = sum(config.turno_de(a).minutes for d in chunk for a in by_emp_day.get((e.id, d), []))
-            minutes += carry.week_minutes.get(e.id, 0) if first else 0
+            minutes += ya_minutos.get(e.id, 0)
             upper = upper_minutes(config, e, frame)
             if e.activo and upper is not None and minutes > upper + 0.5:
                 err("semana_excedida",

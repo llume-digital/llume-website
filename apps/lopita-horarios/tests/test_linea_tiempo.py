@@ -243,3 +243,16 @@ def test_preparar_pone_al_dia_una_base_sustituida_por_otra_antigua(tmp_path):
         s.list_schedules()
     s.preparar()
     assert len(s.timeline()) == 7 and quien(s, 3) == "ana"
+
+
+def test_el_motor_lee_lo_publicado_despues_pero_no_los_borradores(store):
+    publicar(store, horario(7, 13, "ana"))
+    store.create_schedule(horario(14, 20, "bruno"), "admin")  # borrador después: no ata
+    publicar(store, horario(0, 1, "carla"))
+    ctx = store.assignments_around(dia(2), dia(6))
+    assert sorted({(a.empleado_id, a.fecha) for a in ctx}) == \
+        [("ana", dia(i)) for i in range(7, 14)] + [("carla", dia(0)), ("carla", dia(1))]
+    # Un periodo que pisa lo publicado (se regenera excluyéndose a sí mismo) lee lo que manda después de su rango
+    ctx = store.assignments_around(dia(0), dia(9), exclude=None)
+    assert {a.fecha for a in ctx if a.fecha > dia(9)} == {dia(i) for i in range(10, 14)}
+    assert store.assignments_around(dia(30), dia(31)) is None
