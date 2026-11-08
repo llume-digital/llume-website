@@ -224,6 +224,13 @@ class Store:
         self.path = path
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
+        self.preparar()
+
+    def preparar(self) -> None:
+        """Crea las tablas que falten y migra la base al esquema actual. Es idempotente.
+
+        La app offline con datos compartidos la vuelve a llamar cada vez que baja una base nueva de la nube, porque
+        puede venir de un dispositivo con una versión anterior de la app."""
         with self.conn() as c:
             if sys.platform != "emscripten":
                 # WAL: las lecturas no esperan a las escrituras y cada escritura cuesta menos. En el navegador (app

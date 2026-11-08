@@ -135,6 +135,13 @@ def iniciar(datos: str, segundos_motor: float = 60.0, nube: str | None = None, c
     return {"usuario": USUARIO_DEMO, "clave": CLAVE_DEMO}
 
 
+def reabrir() -> None:
+    """La base de datos se acaba de sustituir por la de la nube: se pone al día su esquema (puede haberla subido
+    un dispositivo con una versión anterior de la app, sin las tablas o columnas nuevas)."""
+    if _app is not None:
+        _app.state.store.preparar()
+
+
 def calendarios() -> str:
     """JSON {token: contenido .ics} de los calendarios creados, para subirlos al Worker."""
     if _app is None:

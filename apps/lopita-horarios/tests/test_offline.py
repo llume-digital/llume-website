@@ -58,6 +58,22 @@ def test_sesion_y_datos_sobreviven_a_cerrar_la_app(puente, tmp_path):
     assert pedir(puente, "GET", "/api/me")[0] == 401
 
 
+def test_reabrir_pone_al_dia_la_base_que_baja_de_la_nube(puente, tmp_path):
+    """Con datos compartidos, la base se sustituye por la de la nube, que puede haber subido un dispositivo con la
+    app anterior (sin las tablas nuevas). El worker llama a reabrir() y la app sigue funcionando sin recargar."""
+    import sqlite3
+
+    demo = puente.iniciar(str(tmp_path), segundos_motor=20)
+    assert pedir(puente, "POST", "/api/login", {"usuario": demo["usuario"], "password": demo["clave"]})[0] == 200
+    with sqlite3.connect(tmp_path / "lopita.db") as c:  # lo que baja: una base del esquema anterior
+        c.execute("DROP TABLE dias_publicados")
+        c.execute("DROP TABLE dias_historial")
+        c.execute("PRAGMA user_version = 0")
+    puente.reabrir()
+    assert pedir(puente, "GET", "/api/horarios")[0] == 200
+    assert pedir(puente, "GET", "/api/calendario?desde=2026-11-09&hasta=2026-11-15")[0] == 200
+
+
 def test_cuerpo_como_uint8array_de_javascript(puente, tmp_path):
     """Desde el worker el cuerpo llega como JsProxy de un Uint8Array, que se convierte con to_bytes()."""
     class Uint8Array:
