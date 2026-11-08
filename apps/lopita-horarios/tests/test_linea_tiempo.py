@@ -1,6 +1,7 @@
 """Línea de tiempo de lo publicado: cada fecha tiene un solo horario publicado que manda en ella."""
 import datetime as dt
 import json
+import pathlib
 import sqlite3
 
 import pytest
@@ -219,3 +220,26 @@ def test_api_calendario_lista_y_enlace_viejo(api):
     lista = {s["id"]: s for s in c.get("/api/horarios").json()}
     assert lista[a["id"]]["sustituido"] and lista[a["id"]]["dias_vigentes"] == 0
     assert a["id"] not in {h["id"] for h in c.get("/api/alertas").json()["horarios"]}
+
+
+def test_preparar_pone_al_dia_una_base_sustituida_por_otra_antigua(tmp_path):
+    """App offline con datos compartidos: la base se sustituye por la que sube otro dispositivo con la app anterior,
+    sin la línea de tiempo. Sin volver a prepararla, cada lectura de horarios fallaba con «no such table»."""
+    path = str(tmp_path / "t.db")
+    s = Store(path)
+    vieja = str(tmp_path / "vieja.db")
+    _base_antigua(vieja, [(0, 6, "ana", "2026-10-20T10:00:00+00:00", "2026-10-20T10:00:00+00:00")])
+    plano = str(tmp_path / "bajada.db")  # la base entera en un solo fichero, como la que baja de la nube
+    c = sqlite3.connect(vieja)
+    c.execute("DROP TABLE dias_publicados")
+    c.execute("DROP TABLE dias_historial")
+    c.commit()
+    c.execute("VACUUM INTO ?", (plano,))
+    c.close()
+    for resto in ("-wal", "-shm"):  # en el navegador no hay WAL: el fichero bajado sustituye a toda la base
+        pathlib.Path(path + resto).unlink(missing_ok=True)
+    pathlib.Path(path).write_bytes(pathlib.Path(plano).read_bytes())
+    with pytest.raises(sqlite3.OperationalError):
+        s.list_schedules()
+    s.preparar()
+    assert len(s.timeline()) == 7 and quien(s, 3) == "ana"

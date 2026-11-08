@@ -42,6 +42,9 @@ async function bajar() {
   if (!r.ok) throw new ErrorNube(`El servidor de datos respondió ${r.status}`);
   py.FS.writeFile(DB, new Uint8Array(await r.arrayBuffer()));
   nube.version = versionDe(r);
+  // Puede venir de otro dispositivo con una versión anterior de la app: se pone al día su esquema (en local; se
+  // sube con el siguiente cambio). Al arrancar aún no hay servidor: lo hace él al abrir la base.
+  if (servidor) servidor.reabrir();
   await guardar();
   return true;
 }
