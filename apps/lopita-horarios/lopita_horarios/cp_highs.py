@@ -15,6 +15,12 @@ from dataclasses import dataclass, field
 import highspy
 import numpy as np
 
+# La clase `highspy.Highs` engancha al crearse un callback de Python (enableCallbacks). En Pyodide, crear un segundo
+# objeto después de haber resuelto con otro hace que Python aborte («_PyThreadState_Attach: non-NULL old thread
+# state»): el motor del navegador moría al solucionar alertas tras haber generado un horario, y la app se quedaba
+# esperando para siempre. El motor no usa callbacks, así que se usa la clase de C++ sin ellos.
+_HighsSinCallbacks = highspy._core._Highs
+
 OPTIMAL = 4
 FEASIBLE = 2
 INFEASIBLE = 3
@@ -195,7 +201,7 @@ class CpSolver:
         self._valores: np.ndarray | None = None
 
     def Solve(self, model: CpModel) -> int:  # noqa: N802
-        h = highspy.Highs()
+        h = _HighsSinCallbacks()
         h.setOptionValue("output_flag", False)
         h.setOptionValue("time_limit", float(self.parameters.max_time_in_seconds))
         h.setOptionValue("random_seed", int(self.parameters.random_seed))

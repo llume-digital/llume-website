@@ -166,11 +166,39 @@ function closeOverlay() {
   document.querySelectorAll('.overlay').forEach((o) => o.remove());
   if (habia && state.notifPending) setTimeout(showNotifications, 50);
 }
-function busy(text) { return overlay(`<div class="spinner"></div><h2 style="text-align:center">${esc(text)}</h2><p class="muted small" style="text-align:center;margin:0">Puede tardar hasta medio minuto.</p>`); }
+function busy(text) { return overlay(`<div class="spinner"></div><h2 style="text-align:center">${esc(text)}</h2><p class="muted small" style="text-align:center;margin:0" data-espera>Puede tardar hasta un minuto.</p>`); }
+
+// Si tarda más de esto, la ventana de espera lo dice y deja cancelar (el motor tiene un tope de un minuto).
+const ESPERA_LARGA_MS = 90_000;
+const mmss = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+
+// Cancelar una espera: sin servidor el cálculo corre en este dispositivo y solo se para reiniciando el motor
+// (arranque.js recarga la página; lo guardado ya está a salvo). Con servidor, se deja de esperar la respuesta.
+function cancelarEspera() {
+  const offline = window.LOPITA_OFFLINE;
+  if (offline && typeof offline.cancelar === 'function') offline.cancelar();
+}
 
 async function withBusy(text, fn) {
-  busy(text);
-  try { return await fn(); } finally { closeOverlay(); }
+  const o = busy(text);
+  const inicio = Date.now();
+  let cancelar;
+  const cancelado = new Promise((_, mal) => { cancelar = mal; });
+  const reloj = setInterval(() => {
+    const p = o.querySelector('[data-espera]');
+    if (!p) return;
+    const pasados = Date.now() - inicio;
+    if (pasados < ESPERA_LARGA_MS) { p.textContent = `Puede tardar hasta un minuto. Llevas ${mmss(Math.round(pasados / 1000))}.`; return; }
+    if (o.querySelector('[data-cancelar]')) { p.firstChild.textContent = `Está tardando más de lo normal (${mmss(Math.round(pasados / 1000))}). `; return; }
+    p.innerHTML = `<span>Está tardando más de lo normal (${mmss(Math.round(pasados / 1000))}). </span>`
+      + '<span>Puedes cancelar y volver a intentarlo; lo que ya estaba guardado no se pierde.</span>'
+      + '<span class="row" style="justify-content:center;margin-top:12px"><button class="btn ghost" data-cancelar>Cancelar</button></span>';
+    p.querySelector('[data-cancelar]').addEventListener('click', () => {
+      cancelar(new Error('Cancelado: no se ha cambiado nada.'));
+      cancelarEspera();
+    });
+  }, 1000);
+  try { return await Promise.race([fn(), cancelado]); } finally { clearInterval(reloj); closeOverlay(); }
 }
 
 async function loadConfig() {
