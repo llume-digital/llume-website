@@ -47,6 +47,36 @@ jobs:
       # El recorrido en el navegador de la app offline lo hace el workflow «App offline»
       - run: python -m pytest -q --ignore=tests/test_offline_navegador.py
 
+  capturas:
+    # Compara cada pantalla con la rama base en el mismo runner (herramientas/comparar_capturas.py). Solo avisa:
+    # el resumen sale en la pestaña del job y las imágenes en el artefacto «capturas».
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: apps/lopita-horarios/requirements*.txt
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m playwright install --with-deps chromium
+      - name: Capturas de la base y del cambio
+        run: |
+          git worktree add "$RUNNER_TEMP/base" "origin/${{ github.base_ref }}"
+          python herramientas/comparar_capturas.py --base "$RUNNER_TEMP/base/apps/lopita-horarios" --salida salida/capturas
+          cat salida/capturas/resumen.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: capturas
+          path: apps/lopita-horarios/salida/capturas
+          if-no-files-found: ignore
+          retention-days: 14
+
   imagen:
     runs-on: ubuntu-latest
     timeout-minutes: 20
