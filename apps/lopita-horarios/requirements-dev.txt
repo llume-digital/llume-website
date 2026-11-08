@@ -1,0 +1,5 @@
+-r requirements.txt
+pytest>=8
+playwright>=1.44
+# Resolutor alternativo de la app offline; la misma versión que trae Pyodide 314.0.7
+highspy==1.13.1

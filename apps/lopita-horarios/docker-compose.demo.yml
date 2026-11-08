@@ -1,0 +1,9 @@
+# Demo privada (web + app) en un servidor propio. Se usa encima de docker-compose.yml:
+#   docker compose -f docker-compose.yml -f docker-compose.demo.yml up -d --build
+# Pasos completos en deploy/demo/README.md.
+services:
+  caddy:
+    volumes:
+      - ./deploy/demo/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./deploy/demo/acceso-web.caddy:/etc/caddy/acceso-web.caddy:ro
+      - ./web:/srv/web:ro

@@ -1,0 +1,11 @@
+.git
+.env
+__pycache__
+.pytest_cache
+salida
+datos/*.db
+tests
+movil
+offline
+herramientas
+.github

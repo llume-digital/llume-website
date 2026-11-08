@@ -1,0 +1,433 @@
+{
+  "negocio": "Lopita (datos de ejemplo)",
+  "empleados": [
+    {
+      "id": "ana",
+      "nombre": "Ana",
+      "horas_semanales": 40,
+      "puede_abrir": true,
+      "puede_cerrar": true,
+      "es_encargado": true,
+      "libranzas_fijas": [
+        "lunes",
+        "martes"
+      ]
+    },
+    {
+      "id": "bruno",
+      "nombre": "Bruno",
+      "horas_semanales": 40,
+      "puede_abrir": true,
+      "puede_cerrar": true,
+      "es_encargado": true,
+      "libranzas_fijas": [
+        "miercoles",
+        "jueves"
+      ]
+    },
+    {
+      "id": "carla",
+      "nombre": "Carla",
+      "horas_semanales": 40,
+      "puede_abrir": false,
+      "puede_cerrar": true,
+      "es_encargado": false,
+      "libranzas_fijas": [
+        "domingo",
+        "lunes"
+      ]
+    },
+    {
+      "id": "diego",
+      "nombre": "Diego",
+      "horas_semanales": 30,
+      "puede_abrir": true,
+      "puede_cerrar": false,
+      "es_encargado": false,
+      "libranzas_fijas": [
+        "viernes",
+        "sabado"
+      ]
+    },
+    {
+      "id": "elena",
+      "nombre": "Elena",
+      "horas_semanales": 30,
+      "puede_abrir": false,
+      "puede_cerrar": true,
+      "es_encargado": false,
+      "libranzas_fijas": [
+        "martes",
+        "miercoles"
+      ]
+    },
+    {
+      "id": "fran",
+      "nombre": "Fran",
+      "horas_semanales": 30,
+      "puede_abrir": false,
+      "puede_cerrar": false,
+      "es_encargado": false,
+      "libranzas_fijas": [
+        "jueves",
+        "viernes"
+      ]
+    },
+    {
+      "id": "gema",
+      "nombre": "Gema",
+      "horas_semanales": 20,
+      "puede_abrir": false,
+      "puede_cerrar": false,
+      "es_encargado": false,
+      "libranzas_fijas": [
+        "lunes",
+        "martes"
+      ]
+    },
+    {
+      "id": "hugo",
+      "nombre": "Hugo",
+      "horas_semanales": 20,
+      "puede_abrir": false,
+      "puede_cerrar": true,
+      "es_encargado": false,
+      "libranzas_fijas": [
+        "miercoles",
+        "jueves"
+      ]
+    },
+    {
+      "id": "irene",
+      "nombre": "Irene",
+      "horas_semanales": 20,
+      "puede_abrir": false,
+      "puede_cerrar": false,
+      "es_encargado": false,
+      "libranzas_fijas": []
+    },
+    {
+      "id": "julia",
+      "nombre": "Julia",
+      "horas_semanales": 30,
+      "puede_abrir": true,
+      "puede_cerrar": true,
+      "es_encargado": false,
+      "libranzas_fijas": [
+        "sabado",
+        "domingo"
+      ]
+    }
+  ],
+  "turnos": [
+    {
+      "id": "AP",
+      "nombre": "Apertura",
+      "inicio": "07:00",
+      "fin": "15:00",
+      "tipo": "apertura",
+      "color": "#E9C987"
+    },
+    {
+      "id": "M",
+      "nombre": "Mañana",
+      "inicio": "08:00",
+      "fin": "14:00",
+      "tipo": "normal",
+      "color": "#F4E6C8"
+    },
+    {
+      "id": "MI",
+      "nombre": "Media",
+      "inicio": "11:00",
+      "fin": "17:00",
+      "tipo": "normal",
+      "color": "#D4E4C4"
+    },
+    {
+      "id": "T",
+      "nombre": "Tarde",
+      "inicio": "16:00",
+      "fin": "22:00",
+      "tipo": "normal",
+      "color": "#CBDBEA"
+    },
+    {
+      "id": "CI",
+      "nombre": "Cierre",
+      "inicio": "15:00",
+      "fin": "22:30",
+      "tipo": "cierre",
+      "color": "#DCCBE6"
+    },
+    {
+      "id": "R",
+      "nombre": "Refuerzo",
+      "inicio": "09:00",
+      "fin": "13:00",
+      "tipo": "normal",
+      "color": "#F2D0C4",
+      "dias": [
+        "sabado",
+        "domingo"
+      ]
+    }
+  ],
+  "tipos_dia": [
+    {
+      "nombre": "laborable",
+      "franjas": [
+        {
+          "inicio": "08:00",
+          "fin": "08:30",
+          "personas": 1
+        },
+        {
+          "inicio": "08:30",
+          "fin": "11:00",
+          "personas": 2
+        },
+        {
+          "inicio": "11:00",
+          "fin": "14:00",
+          "personas": 3
+        },
+        {
+          "inicio": "14:00",
+          "fin": "16:00",
+          "personas": 2
+        },
+        {
+          "inicio": "16:00",
+          "fin": "18:00",
+          "personas": 3
+        },
+        {
+          "inicio": "18:00",
+          "fin": "20:00",
+          "personas": 4
+        },
+        {
+          "inicio": "20:00",
+          "fin": "21:00",
+          "personas": 3
+        },
+        {
+          "inicio": "21:00",
+          "fin": "21:30",
+          "personas": 1
+        }
+      ]
+    },
+    {
+      "nombre": "viernes",
+      "franjas": [
+        {
+          "inicio": "08:00",
+          "fin": "08:30",
+          "personas": 1
+        },
+        {
+          "inicio": "08:30",
+          "fin": "16:00",
+          "personas": 2
+        },
+        {
+          "inicio": "16:00",
+          "fin": "17:00",
+          "personas": 3
+        },
+        {
+          "inicio": "17:00",
+          "fin": "20:00",
+          "personas": 4
+        },
+        {
+          "inicio": "20:00",
+          "fin": "21:00",
+          "personas": 3
+        },
+        {
+          "inicio": "21:00",
+          "fin": "22:00",
+          "personas": 2
+        },
+        {
+          "inicio": "22:00",
+          "fin": "22:30",
+          "personas": 1
+        }
+      ]
+    },
+    {
+      "nombre": "sabado",
+      "franjas": [
+        {
+          "inicio": "09:00",
+          "fin": "09:30",
+          "personas": 1
+        },
+        {
+          "inicio": "09:30",
+          "fin": "11:00",
+          "personas": 2
+        },
+        {
+          "inicio": "11:00",
+          "fin": "14:00",
+          "personas": 3
+        },
+        {
+          "inicio": "14:00",
+          "fin": "16:00",
+          "personas": 2
+        },
+        {
+          "inicio": "16:00",
+          "fin": "18:00",
+          "personas": 3
+        },
+        {
+          "inicio": "18:00",
+          "fin": "21:00",
+          "personas": 4
+        },
+        {
+          "inicio": "21:00",
+          "fin": "22:00",
+          "personas": 3
+        },
+        {
+          "inicio": "22:00",
+          "fin": "22:30",
+          "personas": 1
+        }
+      ]
+    },
+    {
+      "nombre": "domingo",
+      "franjas": [
+        {
+          "inicio": "09:00",
+          "fin": "09:30",
+          "personas": 1
+        },
+        {
+          "inicio": "09:30",
+          "fin": "11:00",
+          "personas": 2
+        },
+        {
+          "inicio": "11:00",
+          "fin": "14:00",
+          "personas": 3
+        },
+        {
+          "inicio": "14:00",
+          "fin": "21:00",
+          "personas": 2
+        },
+        {
+          "inicio": "21:00",
+          "fin": "21:30",
+          "personas": 1
+        }
+      ]
+    }
+  ],
+  "tipo_dia_por_semana": {
+    "lunes": "laborable",
+    "martes": "laborable",
+    "miercoles": "laborable",
+    "jueves": "laborable",
+    "viernes": "viernes",
+    "sabado": "sabado",
+    "domingo": "domingo"
+  },
+  "tipo_dia_festivo": "domingo",
+  "festivos": [
+    "2026-11-01",
+    "2026-12-08",
+    "2026-12-25"
+  ],
+  "excepciones_fecha": [
+    {
+      "fecha": "2026-12-24",
+      "nota": "Nochebuena: cierre a las 18:00",
+      "franjas": [
+        {
+          "inicio": "07:00",
+          "fin": "09:00",
+          "personas": 1
+        },
+        {
+          "inicio": "09:00",
+          "fin": "14:00",
+          "personas": 3
+        },
+        {
+          "inicio": "14:00",
+          "fin": "18:00",
+          "personas": 2
+        }
+      ]
+    }
+  ],
+  "ausencias": [
+    {
+      "empleado_id": "elena",
+      "desde": "2026-11-16",
+      "hasta": "2026-11-22",
+      "motivo": "vacaciones"
+    }
+  ],
+  "excepciones_asignacion": [
+    {
+      "empleado_id": "irene",
+      "fecha": "2026-11-06",
+      "tipo": "libre"
+    }
+  ],
+  "preferencias": [
+    {
+      "empleado_id": "gema",
+      "tipo": "prefiere",
+      "turnos": [
+        "M",
+        "R",
+        "MI"
+      ],
+      "peso": 3
+    },
+    {
+      "empleado_id": "hugo",
+      "tipo": "prefiere",
+      "turnos": [
+        "T",
+        "CI"
+      ],
+      "peso": 3
+    },
+    {
+      "empleado_id": "diego",
+      "tipo": "evita",
+      "turnos": [
+        "T"
+      ],
+      "dias": [
+        "viernes"
+      ],
+      "peso": 2
+    }
+  ],
+  "reglas": {
+    "descanso_minimo_horas": 12,
+    "dias_libres_por_semana": 2,
+    "max_horas_dia": 9,
+    "margen_semanal_horas": 5,
+    "margen_periodo_horas": 2,
+    "max_horas_extra_semana": 5,
+    "encargado_siempre": false,
+    "resolucion_minutos": 30
+  }
+}

@@ -1,0 +1,21 @@
+# Crea la app en https://api.slack.com/apps → «Create New App» → «From an app manifest» y pega esto.
+# Después: «Install to Workspace», copia el «Bot User OAuth Token» (xoxb-…) en SLACK_BOT_TOKEN
+# e invita al bot al canal: /invite @Horarios Lopita
+display_information:
+  name: Horarios Lopita
+  description: Publica el horario del equipo de Lopita & Co
+  background_color: "#17130f"
+features:
+  bot_user:
+    display_name: Horarios Lopita
+    always_online: false
+oauth_config:
+  scopes:
+    bot:
+      - chat:write          # publicar en el canal y enviar mensajes privados
+      - users:read          # necesario junto a users:read.email
+      - users:read.email    # encontrar a cada persona por su email
+settings:
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false
