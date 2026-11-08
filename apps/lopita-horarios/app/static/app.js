@@ -1,5 +1,5 @@
 import { $, addDays, clone, todayIso } from './js/nucleo/util.js';
-import { api, arreglarPendientes, closeOverlay, confirmar, loadConfig, saveConfig, showNotifications, state, toast } from './js/nucleo/estado.js';
+import { api, arreglarPendientes, closeOverlay, confirmar, loadConfig, saveConfig, showNotifications, state, toast, vigilarRed } from './js/nucleo/estado.js';
 import { markDirty, onBind } from './js/nucleo/enlace.js';
 import { isWorker, pararDictado, render, renderView, route, tabsHtml } from './js/nucleo/pintado.js';
 import { refreshList } from './js/pantallas/horarios.js';
@@ -15,7 +15,11 @@ document.addEventListener('click', async (e) => {
   const el = e.target.closest('[data-act]');
   if (!el || el.tagName === 'SELECT' || (el.tagName === 'INPUT' && el.type === 'checkbox')) return;
   const fn = actions[el.dataset.act];
-  if (fn) { e.preventDefault(); try { await fn(el, e); } catch (err) { toast(err.message, true); } }
+  if (!fn) return;
+  e.preventDefault();
+  if (el.dataset.ocupado) return; // la acción anterior de este mismo botón aún no ha terminado (doble clic)
+  el.dataset.ocupado = '1';
+  try { await fn(el, e); } catch (err) { toast(err.message, true); } finally { delete el.dataset.ocupado; }
 });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') { closeMenu(); if (!$('.overlay .spinner')) closeOverlay(); }
@@ -31,8 +35,20 @@ document.addEventListener('change', (e) => {
   if (e.target.dataset.webDoc) { uploadWebDoc(e.target); return; }
   onBind(e);
 });
+// Un formulario se envía una sola vez a la vez: mientras responde el servidor, sus botones quedan desactivados.
 document.addEventListener('submit', async (e) => {
   e.preventDefault();
+  const f = e.target;
+  if (f.dataset.enviando) return;
+  f.dataset.enviando = '1';
+  const botones = [...f.querySelectorAll('button[type=submit]')];
+  botones.forEach((b) => { b.disabled = true; });
+  try { await enviarFormulario(e); } finally {
+    delete f.dataset.enviando;
+    botones.forEach((b) => { if (b.isConnected) b.disabled = false; });
+  }
+});
+async function enviarFormulario(e) {
   pararDictado();
   const f = e.target;
   const data = Object.fromEntries(new FormData(f));
@@ -123,7 +139,7 @@ document.addEventListener('submit', async (e) => {
       renderView();
     } catch (err) { toast(err.message, true); }
   }
-});
+}
 window.addEventListener('scroll', menuOnScroll, true);
 if (window.visualViewport) window.visualViewport.addEventListener('resize', seguirAnclas);  // p. ej. al abrirse el teclado
 window.addEventListener('hashchange', () => { closeMenu(); if (route().name === 'calendario') { state.cal.data = {}; state.cal.inf = {}; } if (route().name !== 'horarios' || !route().arg) state.current = state.current; if (route().name === 'web') state.web.data = undefined; renderView(); if (!(route().name === 'guia' && route().arg)) window.scrollTo(0, 0); });
@@ -162,4 +178,5 @@ document.addEventListener('visibilitychange', async () => {
     if (!state.dirty) renderView(); else { const t = $('#tabs'); if (t) t.innerHTML = tabsHtml(route().name); }
   } catch { /* sin conexión: se reintenta la próxima vez */ }
 });
+vigilarRed();
 boot();

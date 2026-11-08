@@ -626,3 +626,6 @@ button.pd-row:hover, button.pd-row:focus-visible { background: var(--hover); }
 
 /* Cifras que se comparan en columna: todas con el mismo ancho (DISENO §4 Datos) */
 .cell .pill, .mchip, .g-txt, .covbar, .tab-count { font-variant-numeric: tabular-nums lining-nums; }
+
+#sin-red { position: fixed; top: 0; left: 0; right: 0; z-index: 90; padding: 10px 16px calc(10px) 16px; padding-top: calc(10px + env(safe-area-inset-top)); background: var(--warn-strong); color: var(--black); text-align: center; font-size: var(--text-md); font-weight: 600; }
+#sin-red[hidden] { display: none; }

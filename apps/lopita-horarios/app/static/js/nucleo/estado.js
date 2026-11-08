@@ -13,13 +13,22 @@ export const state = {
 export async function api(method, url, body) {
   const opts = { method, credentials: 'same-origin', headers: {} };
   if (body !== undefined) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
-  const r = await fetch(url, opts);
+  let r;
+  try { r = await fetch(url, opts); } catch {
+    const err = new Error(navigator.onLine === false
+      ? 'Sin conexión: no se ha guardado nada. Cuando vuelva la red, inténtalo de nuevo.'
+      : 'No se pudo conectar con el servidor: no se ha guardado nada. Inténtalo de nuevo en un momento.');
+    err.red = true;
+    throw err;
+  }
   const isJson = (r.headers.get('content-type') || '').includes('json');
-  const data = isJson ? await r.json() : await r.text();
+  let data;
+  try { data = isJson ? await r.json() : await r.text(); } catch { data = isJson ? {} : ''; }
   if (r.status === 401 && !url.endsWith('/login')) { state.me = null; render(); throw new Error('Tu sesión ha caducado'); }
   if (!r.ok) {
     const d = isJson ? data.detail : data;
-    const err = new Error(typeof d === 'string' ? d : JSON.stringify(d));
+    const texto = typeof d === 'string' ? d : JSON.stringify(d);
+    const err = new Error(r.status >= 500 && (!isJson || !d) ? 'El servidor ha tenido un problema. Inténtalo de nuevo; si sigue igual, avisa al encargado.' : texto);
     err.status = r.status; err.data = isJson ? data : null;
     throw err;
   }
@@ -255,3 +264,16 @@ export async function saveConfig() {
   }
 }
 
+
+// Banda fija que avisa cuando el navegador se queda sin red y desaparece al volver. Las acciones que fallan por la
+// red lo dicen con su propio mensaje; esto evita que parezca que la aplicación se ha roto.
+export function vigilarRed() {
+  const banda = document.createElement('div');
+  banda.id = 'sin-red';
+  banda.setAttribute('role', 'status');
+  banda.hidden = navigator.onLine !== false;
+  banda.textContent = 'Sin conexión. Los cambios no se guardarán hasta que vuelva la red.';
+  document.body.appendChild(banda);
+  window.addEventListener('offline', () => { banda.hidden = false; });
+  window.addEventListener('online', () => { banda.hidden = true; toast('Conexión recuperada'); });
+}
