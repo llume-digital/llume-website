@@ -48,7 +48,7 @@ def generar(store: Store, config: Config, desde: dt.date, hasta: dt.date, *, seg
             congelados: Optional[list[Lock]] = None, partir_de: Optional[Schedule] = None,
             cambiable_desde: Optional[dt.date] = None) -> Resultado:
     """Genera (o arregla 'partir_de') con el contexto de la base de datos: periodo anterior y saldo de horas."""
-    previo = store.assignments_before(desde, exclude=excluir)
+    previo = store.assignments_around(desde, hasta, exclude=excluir)
     saldo = horas.saldo_arrastrado(config, store.previous_contiguous(desde, exclude=excluir),
                                    store.list_requests(tipo="correccion", estado="aprobada"))
     return asegurar(config, partir_de, desde=desde, hasta=hasta, opciones=SolveOptions(max_segundos=segundos),

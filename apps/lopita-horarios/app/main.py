@@ -260,7 +260,7 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         return f"{base_url(request)}/ver/{token}"
 
     def refresh(config: Config, h: Schedule, sid: int | None) -> Schedule:
-        previo = store.assignments_before(h.desde, exclude=sid)
+        previo = store.assignments_around(h.desde, h.hasta, exclude=sid)
         h.incidencias = validate(config, h.desde, h.hasta, h.asignaciones, previo=previo,
                                  saldo_horas=h.saldo_anterior, bloqueos=h.bloqueos)
         h.resumen = compute_stats(config, h.desde, h.hasta, h.asignaciones, h.saldo_anterior)
@@ -284,7 +284,7 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         config = config or config_now()
         ctx = contexto or contexto_alertas(config)
         h: Schedule = row["horario"]
-        previo = store.assignments_before(h.desde, exclude=row["id"], filas=filas)
+        previo = store.assignments_around(h.desde, h.hasta, exclude=row["id"], filas=filas)
         todas = evaluaciones.evaluar(config, h, previo, ctx["clave_config"]) + alertas_app.contexto(
             config, row, ctx["solicitudes"], ctx["avisos"], saldo_esperado(config, row, filas, ctx["correcciones"]),
             ctx["hoy"])
@@ -349,7 +349,7 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         h: Schedule = row["horario"]
         report = alert_report(row, config)
         pendiente = store.replacement_of(row["id"]) if row["estado"] == "publicado" else None
-        previo = store.assignments_before(h.desde, exclude=row["id"])
+        previo = store.assignments_around(h.desde, h.hasta, exclude=row["id"])
         sugerencias = sugerir(config, h, evaluaciones.evaluar(config, h, previo))
         return {**summary(row, report), "alertas_detalle": report,
                 "sugerencias": [s.model_dump(mode="json") for s in sugerencias], "horario": h.model_dump(mode="json"), "cobertura": coverage(config, h),
@@ -615,7 +615,7 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         h: Schedule = row["horario"]
         minimo = first_changeable_day(row)
         desde = max(body.desde, minimo) if body and body.desde else minimo
-        propuesta = solucionar(config_now(), h, store.assignments_before(h.desde, exclude=sid), desde,
+        propuesta = solucionar(config_now(), h, store.assignments_around(h.desde, h.hasta, exclude=sid), desde,
                                SolveOptions(max_segundos=seconds))
         return {**propuesta.model_dump(mode="json"), "estado": row["estado"]}
 
@@ -631,7 +631,7 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
             h = aplicar(old, body.cambios)
         except HorarioCambiado as exc:
             raise HTTPException(409, f"{exc}; vuelve a calcularla") from None
-        previo = store.assignments_before(h.desde, exclude=sid)
+        previo = store.assignments_around(h.desde, h.hasta, exclude=sid)
         errores = lambda x: sum(1 for i in validate(config, x.desde, x.hasta, x.asignaciones, previo=previo,  # noqa: E731
                                                      saldo_horas=x.saldo_anterior, bloqueos=x.bloqueos) if i.nivel == "error")
         if errores(h) > errores(old):
@@ -712,7 +712,7 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         editable(row)
         config = config_now()
         nuevo = day_edit(row, body, config)
-        previo = store.assignments_before(nuevo.desde, exclude=sid)
+        previo = store.assignments_around(nuevo.desde, nuevo.hasta, exclude=sid)
         ev = evaluar_edicion(config, row["horario"], nuevo, body.fecha, previo)
         return {**ev.model_dump(mode="json"), "estado": row["estado"],
                 "destino": "arreglo" if row["estado"] == "publicado" else "borrador"}

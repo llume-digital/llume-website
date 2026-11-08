@@ -25,6 +25,7 @@ from .planning import (
     allowed_posts,
     allowed_roles,
     allowed_shifts,
+    carry_after,
     carry_from,
     comodin_min_minutes,
     daterange,
@@ -32,6 +33,7 @@ from .planning import (
     function_caps,
     function_demand,
     is_weekend,
+    marco_semana,
     max_worked_days,
     rest_minutes_between,
     role_posts,
@@ -68,7 +70,8 @@ def generate(
 ) -> Schedule:
     """Genera el horario de [desde, hasta].
 
-    previo: asignaciones del periodo anterior (para el descanso entre jornadas y la semana partida).
+    previo: asignaciones de fuera del periodo, de antes y de después (para el descanso entre jornadas, la semana
+        partida y las rachas). Las de después son lo ya publicado que sigue al periodo y no se toca.
     bloqueos: cambios manuales que deben respetarse.
     saldo_horas: horas de más (+) o de menos (-) que cada empleado arrastra; se compensan en este periodo.
     referencia: horario del que partir; cada casilla que cambie respecto a él cuesta `pesos.cambio_turno`.
@@ -87,6 +90,7 @@ def generate(
     weeks = week_chunks(days)
     employees = config.active_employees()
     carry = carry_from(config, desde, previo)
+    despues = carry_after(config, hasta, previo)
     cp_model = resolutor.cargar(opciones.resolutor)
     model = cp_model.CpModel()
 
@@ -128,6 +132,10 @@ def generate(
             for b, vb in by_emp_day[e.id, desde]:
                 if rest_minutes_between(carry.last_day[e.id], b) < min_rest:
                     model.Add(vb == 0)
+        if despues and e.id in despues.first_day:
+            for a, va in by_emp_day[e.id, hasta]:
+                if rest_minutes_between(a, despues.first_day[e.id]) < min_rest:
+                    model.Add(va == 0)
         for d in days[:-1]:
             nxt = d + dt.timedelta(days=1)
             for a, va in by_emp_day[e.id, d]:
@@ -135,11 +143,7 @@ def generate(
                     if rest_minutes_between(a, b) < min_rest:
                         model.AddBoolOr([va.Not(), vb.Not()])
 
-    def week_frame(i: int, chunk: list[dt.date]):
-        """Para la primera semana, si hay periodo anterior, se cuenta la semana entera."""
-        if i == 0 and carry and carry.week_prev_dates:
-            return len(chunk) + len(carry.week_prev_dates), carry.week_prev_dates + chunk
-        return len(chunk), chunk
+    marcos = [marco_semana(i, weeks, carry, despues) for i in range(len(weeks))]
 
     # Descanso semanal mínimo
     for e in employees:
@@ -147,9 +151,8 @@ def generate(
             worked = [v for d in chunk for _, v in by_emp_day[e.id, d]]
             if not worked:
                 continue
-            n, _ = week_frame(i, chunk)
-            already = carry.week_days.get(e.id, 0) if (i == 0 and carry) else 0
-            model.Add(sum(worked) + already <= max_worked_days(config, n))
+            frame, ya_dias, _ = marcos[i]
+            model.Add(sum(worked) + ya_dias.get(e.id, 0) <= max_worked_days(config, len(frame)))
 
     # ------------------------------------------------------------------ horas de contrato (bolsa)
     penalties: list = []
@@ -178,8 +181,9 @@ def generate(
             terms = [s.minutes * v for d in chunk for s, v in by_emp_day[e.id, d]]
             if not terms:
                 continue
-            n, frame = week_frame(i, chunk)
-            already = carry.week_minutes.get(e.id, 0) if (i == 0 and carry) else 0
+            frame, _, ya_minutos = marcos[i]
+            n = len(frame)
+            already = ya_minutos.get(e.id, 0)
             upper = upper_minutes(config, e, frame)
             if upper is not None:
                 model.Add(sum(terms) + already <= upper)
@@ -272,7 +276,8 @@ def generate(
                 penalties.append(w.critica * miss)
 
     # ------------------------------------------------------------------ rachas de días seguidos
-    penalties += _streak_terms(model, config, employees, days, by_emp_day, previo, w.racha_larga)
+    penalties += _streak_terms(model, config, employees, days, by_emp_day, previo, w.racha_larga,
+                               con_despues=despues is not None)
 
     # ------------------------------------------------------------------ horas: reparto entre personas y saldo
     penalties += _hours_balance_terms(model, config, totals, len(days), w.reparto_horas)
@@ -424,14 +429,16 @@ def _stability_terms(model: Any, x: dict, by_emp_day: dict, employees, days: lis
 
 
 def _streak_terms(model: Any, config: Config, employees, days: list[dt.date], by_emp_day: dict,
-                  previo: list[Assignment] | None, peso: int) -> list:
+                  previo: list[Assignment] | None, peso: int, con_despues: bool = False) -> list:
     """Penaliza cada día de una racha que pase del máximo de días seguidos de las alertas.
 
     Una racha de L días con máximo M contiene L - M ventanas de M + 1 días todos trabajados; se penaliza
-    cada ventana. Se cuentan los días trabajados justo antes del periodo (periodo anterior).
+    cada ventana. Se cuentan los días trabajados justo antes del periodo y, si ya hay horario publicado después
+    ('con_despues'), los de justo después.
     """
     maximo = config.alertas.racha_dias_max
     antes = [days[0] - dt.timedelta(days=i) for i in range(maximo, 0, -1)]
+    luego = [days[-1] + dt.timedelta(days=i) for i in range(1, maximo + 1)] if con_despues else []
     previos = {(a.empleado_id, a.fecha) for a in (previo or [])}
     terms = []
     for e in employees:
@@ -439,10 +446,12 @@ def _streak_terms(model: Any, config: Config, employees, days: list[dt.date], by
         for d in days:
             vs = [v for _, v in by_emp_day[e.id, d]]
             worked.append(sum(vs) if vs else 0)
+        worked += [1 if (e.id, d) in previos else 0 for d in luego]
         for i in range(len(worked) - maximo):
             window = worked[i:i + maximo + 1]
-            if i + maximo < len(antes) or any(isinstance(x, int) and x == 0 for x in window):
-                continue  # ventana entera en el periodo anterior, o con un día que seguro se libra
+            if i + maximo < len(antes) or i >= len(antes) + len(days) \
+                    or any(isinstance(x, int) and x == 0 for x in window):
+                continue  # ventana entera fuera del periodo, o con un día que seguro se libra
             over = model.NewBoolVar(f"racha_{e.id}_{i}")
             model.Add(over >= sum(window) - maximo)
             terms.append(peso * over)

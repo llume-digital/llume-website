@@ -189,6 +189,71 @@ def carry_from(config: Config, desde: dt.date, previo) -> Carry | None:
     return Carry(last_day, wd, wm, prev_dates)
 
 
+@dataclass
+class Siguiente:
+    """Lo que ya está publicado justo después del periodo: primer día y días trabajados en la semana de 'hasta'.
+
+    Sirve para no romper el descanso entre jornadas ni los límites semanales con lo que ya manda después."""
+    first_day: dict  # empleado -> Shift trabajado el día siguiente a 'hasta'
+    week_days: dict  # empleado -> días trabajados en la semana de 'hasta' después de 'hasta'
+    week_minutes: dict  # empleado -> minutos trabajados en esa semana después de 'hasta'
+    week_next_dates: list  # fechas de esa semana posteriores a 'hasta' que tienen horario
+
+
+def carry_after(config: Config, hasta: dt.date, contexto) -> Siguiente | None:
+    """Como `carry_from`, pero con las asignaciones de después de 'hasta' (las de antes se ignoran).
+
+    Solo cuentan las fechas que aparecen en 'contexto': un día sin horario después del periodo no es un día libre."""
+    if not contexto:
+        return None
+    domingo = hasta + dt.timedelta(days=6 - hasta.weekday())
+    siguiente = hasta + dt.timedelta(days=1)
+    shift_ids = {s.id for s in config.turnos}
+    first_day, wd, wm, fechas = {}, {}, {}, set()
+    hay = False
+    for a in contexto:
+        if not hasta < a.fecha <= max(domingo, siguiente):
+            continue
+        hay = True
+        if a.fecha <= domingo:
+            fechas.add(a.fecha)
+        if a.turno_id not in shift_ids:
+            continue
+        s = config.turno_de(a)
+        if a.fecha == siguiente:
+            first_day[a.empleado_id] = s
+        if a.fecha <= domingo:
+            wd[a.empleado_id] = wd.get(a.empleado_id, 0) + 1
+            wm[a.empleado_id] = wm.get(a.empleado_id, 0) + s.minutes
+    if not hay:
+        return None
+    return Siguiente(first_day, wd, wm, sorted(fechas))
+
+
+def marco_semana(i: int, weeks: list[list[dt.date]], carry: Carry | None, despues: Siguiente | None):
+    """Fechas que cuentan para los límites de la semana i y lo ya trabajado en ellas fuera del periodo.
+
+    La primera semana suma los días de antes de 'desde' y la última los de después de 'hasta'.
+    Devuelve (fechas, {empleado: días}, {empleado: minutos})."""
+    frame = list(weeks[i])
+    dias: dict = {}
+    minutos: dict = {}
+
+    def sumar(d: dict, m: dict) -> None:
+        for k, v in d.items():
+            dias[k] = dias.get(k, 0) + v
+        for k, v in m.items():
+            minutos[k] = minutos.get(k, 0) + v
+
+    if i == 0 and carry and carry.week_prev_dates:
+        frame = carry.week_prev_dates + frame
+        sumar(carry.week_days, carry.week_minutes)
+    if i == len(weeks) - 1 and despues and despues.week_next_dates:
+        frame = frame + despues.week_next_dates
+        sumar(despues.week_days, despues.week_minutes)
+    return frame, dias, minutos
+
+
 def rest_minutes_between(a: Shift, b: Shift) -> int:
     """Descanso entre el fin del turno 'a' (día D) y el inicio del turno 'b' (día D+1)."""
     return 24 * 60 - a.end_min + b.start_min

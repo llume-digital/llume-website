@@ -510,6 +510,22 @@ class Store:
             return None
         return [a for d, r in mandan.items() for a in r["horario"].asignaciones if a.fecha == d]
 
+    def assignments_around(self, desde: dt.date, hasta: dt.date, days: int = 7, exclude: int | None = None,
+                           filas: list[dict] | None = None):
+        """Contexto de un horario de [desde, hasta]: las asignaciones de los 'days' días previos (como
+        `assignments_before`) y las de los 'days' días siguientes que ya están publicados en la línea de tiempo.
+
+        Lo de después solo cuenta si está publicado: un borrador posterior es una propuesta y no ata a este.
+        None si no hay nada ni antes ni después."""
+        rows = self.list_schedules() if filas is None else filas
+        antes = self.assignments_before(desde, days, exclude, rows)
+        mandan = linea_tiempo.por_dia(rows, hasta + dt.timedelta(days=1), hasta + dt.timedelta(days=days),
+                                      solo_publicados=True, excluir=exclude)
+        despues = [a for d, r in mandan.items() for a in r["horario"].asignaciones if a.fecha == d]
+        if antes is None and not mandan:
+            return None
+        return (antes or []) + despues
+
     def previous_contiguous(self, desde: dt.date, exclude: int | None = None,
                             filas: list[dict] | None = None) -> Schedule | None:
         """Horario que termina justo el día anterior a 'desde': el publicado que manda ese día y, si no, el borrador
