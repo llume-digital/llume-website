@@ -25,7 +25,21 @@ worker.onmessage = (ev) => {
   if (m.ok) p.ok(m.resultado); else p.mal(new Error(m.error));
 };
 
+// Si el motor se cae (falta de memoria, un fallo dentro de Python), sus peticiones no recibirían nunca respuesta
+// y la app se quedaría esperando: se rechazan todas y se avisa de que hay que recargar.
+let motorCaido = null;
+function caerMotor(motivo) {
+  if (motorCaido) return;
+  motorCaido = `El motor de la app se ha detenido (${motivo}). Recarga la página para seguir; lo guardado no se pierde.`;
+  console.error(motorCaido);
+  for (const p of pendientes.values()) p.mal(new Error(motorCaido));
+  pendientes.clear();
+}
+worker.onerror = (ev) => { ev.preventDefault(); caerMotor(ev.message || 'error'); };
+worker.onmessageerror = () => caerMotor('mensaje ilegible');
+
 function pedir(tipo, datos = {}, transferir = []) {
+  if (motorCaido) return Promise.reject(new Error(motorCaido));
   const id = ++siguiente;
   return new Promise((ok, mal) => {
     pendientes.set(id, { ok, mal });
@@ -133,6 +147,9 @@ async function iniciar() {
     const nube = rutaNube ? { ruta: rutaNube, clave: claveNube() } : null;
     const demo = await pedir('arrancar', { paquetes: PAQUETES, nube });
     window.LOPITA_OFFLINE.demo = demo;
+    // Parar un cálculo que se alarga (la interfaz lo ofrece tras un rato): el motor corre en el worker y no se puede
+    // interrumpir desde fuera; se para el worker y se recarga. Lo guardado ya está en el móvil y, con nube, subido.
+    window.LOPITA_OFFLINE.cancelar = () => { worker.terminate(); location.reload(); };
     if (nube) {
       document.querySelector('#demo summary').textContent = 'Datos compartidos';
       document.getElementById('demo-texto').textContent = 'Los datos se guardan en el servidor de llume y los ve todo el que tenga la clave. El horario se calcula en este dispositivo. Slack no envía nada todavía.';

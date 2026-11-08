@@ -15,13 +15,15 @@ let cola = Promise.resolve(); // las peticiones se atienden de una en una, como 
 let nube = null; // { url, clave, version, mirado, calendarios }
 const DB = `${DATOS}/lopita.db`;
 const MIRAR_CADA_MS = 15_000;
+// Una petición al servidor de datos que no responde no puede dejar la cola parada: se corta a los 30 s.
+const ESPERA_NUBE_MS = 30_000;
 
 class ErrorNube extends Error {}
 
 async function pedirNube(metodo, cabeceras = {}, cuerpo = undefined) {
   let r;
   try {
-    r = await fetch(nube.url, { method: metodo, cache: 'no-store', body: cuerpo,
+    r = await fetch(nube.url, { method: metodo, cache: 'no-store', body: cuerpo, signal: AbortSignal.timeout(ESPERA_NUBE_MS),
       headers: { Authorization: `Bearer ${nube.clave}`, ...cabeceras } });
   } catch (e) {
     throw new ErrorNube('Sin conexión con el servidor de datos. Los cambios no se guardan hasta que vuelva la conexión.');
@@ -64,12 +66,18 @@ async function subirCalendarios() {
     const json = servidor.calendarios();
     if (json === nube.calendarios) return;
     const r = await fetch(new URL('cal', nube.base).href, { method: 'PUT', cache: 'no-store', body: json,
+      signal: AbortSignal.timeout(ESPERA_NUBE_MS),
       headers: { Authorization: `Bearer ${nube.clave}`, 'Content-Type': 'application/json' } });
     if (r.ok) nube.calendarios = json;
     else console.warn('No se pudieron subir los calendarios', r.status);
   } catch (e) {
     console.warn('No se pudieron subir los calendarios', e);
   }
+}
+
+// Cuándo se escribió por última vez la base de datos (para no subirla si una petición no la ha cambiado).
+function modificada() {
+  try { return py.FS.stat(DB).mtime.getTime(); } catch (e) { return null; }
 }
 
 function guardar() {
@@ -110,6 +118,7 @@ async function arrancar(paquetes, configNube) {
 
 async function atender({ metodo, ruta, cabeceras, cuerpo }) {
   if (nube && Date.now() - nube.mirado > MIRAR_CADA_MS) await bajar();
+  const antes = modificada();
   const pyCabeceras = py.toPy(cabeceras);
   const r = await servidor.peticion(metodo, ruta, pyCabeceras, cuerpo ? new Uint8Array(cuerpo) : undefined); // undefined llega a Python como None
   pyCabeceras.destroy();
@@ -121,7 +130,8 @@ async function atender({ metodo, ruta, cabeceras, cuerpo }) {
   pyLista.destroy(); pyCuerpo.destroy(); r.destroy();
   if (metodo !== 'GET') {
     await guardar();
-    if (nube) await subir();
+    // Calcular una propuesta (solucionar alertas) es un POST que no cambia nada: no hace falta subir la base entera.
+    if (nube && modificada() !== antes) await subir();
   }
   return { estado, cabeceras: lista, cuerpo: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) };
 }

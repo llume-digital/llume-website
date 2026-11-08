@@ -64,6 +64,12 @@ def test_demo_completa_sin_conexion(url, movil):
     pg.click("button[type=submit]")
     pg.click("[data-act=generate]")
     pg.wait_for_selector("[data-act=publish]")
+    # Un segundo cálculo en la misma sesión (solucionar justo después de generar): con highspy.Highs, Python
+    # abortaba dentro del navegador y la ventana «Buscando cómo arreglar las alertas…» se quedaba para siempre.
+    pg.click("text=Solucionar problemas")
+    pg.wait_for_selector(".overlay h2:has-text('Solucionar problemas')")
+    pg.keyboard.press("Escape")
+    pg.evaluate("document.querySelectorAll('.overlay').forEach((o) => o.remove())")
     assert pg.evaluate("navigator.serviceWorker.ready.then((r) => !!r.active)")
     with pg.expect_download() as descarga:
         pg.click("text=Horas (CSV)")
