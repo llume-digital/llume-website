@@ -7,6 +7,7 @@ import os
 
 import pytest
 
+from tests.navegador import confirmar
 from tests.test_feedback_cliente_navegador import _entrar
 
 pytest.importorskip("playwright.sync_api")
@@ -44,6 +45,7 @@ def test_suscribirse_al_calendario(url, browser):  # noqa: F811
         p.locator("#mi-calendario").screenshot(path=os.path.join(os.environ["LOPITA_CAPTURAS"], "calendario-trabajador.png"))
     p.click("#mi-calendario summary")
     p.click("[data-act=renewCal]")
+    confirmar(p)
     p.wait_for_function(f"!document.querySelector('#mi-calendario a[href=\"{webcal}\"]')")
     assert w.request.get(webcal.replace("webcal://", "http://")).status == 404
     assert not errores

@@ -100,26 +100,102 @@ export function toast(msg, bad = false) {
   document.querySelectorAll('.toast:not(.fijo)').forEach((t) => t.remove());
   const t = document.createElement('div');
   t.className = `toast${bad ? ' bad' : ''}`;
-  t.setAttribute('role', 'status');
+  t.setAttribute('role', bad ? 'alert' : 'status');
   t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), bad ? 6000 : 3000);
+  quitarCuandoToque(t, bad ? 6000 : 3000);
 }
 
-export function overlay(html) {
-  closeOverlay();
+// Un aviso no se va mientras se lee: con el ratón encima o el foco dentro, espera a que se salga.
+function quitarCuandoToque(t, ms) {
+  let reloj;
+  const programar = () => { clearTimeout(reloj); reloj = setTimeout(() => { if (!t.matches(':hover, :focus-within')) t.remove(); else programar(); }, ms); };
+  t.addEventListener('mouseleave', programar);
+  t.addEventListener('focusout', programar);
+  programar();
+}
+
+// Aviso con «Deshacer» (DISENO §4): para cambios que se pueden volver atrás, en lugar de preguntar antes.
+export function deshacer(msg, fn, ms = 8000) {
+  document.querySelectorAll('.toast:not(.fijo)').forEach((t) => t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast con-accion';
+  t.setAttribute('role', 'status');
+  t.innerHTML = `<span>${esc(msg)}</span><button type="button" class="toast-accion">Deshacer</button>`;
+  t.querySelector('button').addEventListener('click', () => { t.remove(); fn(); });
+  document.body.appendChild(t);
+  quitarCuandoToque(t, ms);
+}
+
+const FOCO = 'a[href], button:not([disabled]), input:not([disabled]):not([type=hidden]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+let origenFoco = null;
+let confirmacion = null; // { capa, origen, resolver } mientras hay una confirmación abierta
+let siguienteId = 0;
+
+// Capa modal accesible: se nombra con su primer título, el foco entra (al primer control, o a `foco` si se
+// indica) y Tab no se sale de ella.
+function capaModal(html, clase, foco) {
   const o = document.createElement('div');
-  o.className = 'overlay';
+  o.className = clase;
   o.innerHTML = `<div class="box" role="dialog" aria-modal="true">${html}</div>`;
+  const box = o.querySelector('.box');
+  const titulo = box.querySelector('h1, h2, h3');
+  if (titulo) { titulo.id ||= `dialogo-${++siguienteId}`; box.setAttribute('aria-labelledby', titulo.id); }
   o.addEventListener('click', (e) => { if (e.target === o && !o.querySelector('.spinner')) closeOverlay(); });
+  box.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const items = [...box.querySelectorAll(FOCO)].filter((x) => x.offsetParent !== null);
+    if (!items.length) { e.preventDefault(); return; }
+    const [primero, ultimo] = [items[0], items[items.length - 1]];
+    if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
+    else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
+  });
   document.body.appendChild(o);
+  const destino = (foco && box.querySelector(foco)) || box.querySelector('[autofocus]') || box.querySelector(FOCO);
+  if (destino) destino.focus({ preventScroll: true });
+  else { box.tabIndex = -1; box.focus({ preventScroll: true }); }
   return o;
 }
-export function closeOverlay() {
+function enfocar(el) { if (el && el.isConnected && typeof el.focus === 'function') el.focus({ preventScroll: true }); }
+function cerrarConfirmacion(respuesta) {
+  const c = confirmacion; confirmacion = null;
+  c.capa.remove();
+  enfocar(c.origen);
+  c.resolver(respuesta);
+}
+
+// Ventana modal; al cerrarla, el foco vuelve a donde estaba antes de abrirla.
+export function overlay(html, { foco } = {}) {
+  const previo = document.querySelector('.overlay') ? origenFoco : document.activeElement;
+  closeOverlay({ devolverFoco: false });
+  origenFoco = previo;
+  return capaModal(html, 'overlay', foco);
+}
+// Si hay una confirmación abierta encima de otra ventana, solo cierra la confirmación (Esc, pulsar fuera).
+export function closeOverlay({ devolverFoco = true } = {}) {
+  if (confirmacion) { cerrarConfirmacion(false); if (devolverFoco) return; }
   pararDictado();
   const habia = document.querySelector('.overlay');
   document.querySelectorAll('.overlay').forEach((o) => o.remove());
+  if (habia && devolverFoco) { enfocar(origenFoco); origenFoco = null; }
   if (habia && state.notifPending) setTimeout(showNotifications, 50);
+}
+
+// Confirmación propia, en lugar de window.confirm: el botón dice lo que hace («Eliminar horario») y, si es
+// peligroso, el foco empieza en Cancelar. Esc, Cancelar o pulsar fuera responden que no. Se abre encima de la
+// ventana que hubiera, sin cerrarla.
+export function confirmar({ titulo, texto = '', verbo = 'Seguir', peligro = false }) {
+  if (confirmacion) cerrarConfirmacion(false);
+  return new Promise((resolver) => {
+    const origen = document.activeElement;
+    const capa = capaModal(`<h2>${esc(titulo)}</h2>${texto ? `<p>${esc(texto).replace(/\n/g, '<br>')}</p>` : ''}
+      <div class="row end" style="margin-top:16px"><button type="button" class="btn" data-cancelar-dialogo>Cancelar</button>
+      <button type="button" class="btn ${peligro ? 'danger' : 'primary'}" data-confirmar>${esc(verbo)}</button></div>`,
+    'overlay confirmacion', peligro ? '[data-cancelar-dialogo]' : '[data-confirmar]');
+    confirmacion = { capa, origen, resolver };
+    capa.querySelector('[data-confirmar]').addEventListener('click', () => cerrarConfirmacion(true));
+    capa.querySelector('[data-cancelar-dialogo]').addEventListener('click', () => cerrarConfirmacion(false));
+  });
 }
 function busy(text) { return overlay(`<div class="spinner"></div><h2 style="text-align:center">${esc(text)}</h2><p class="muted small" style="text-align:center;margin:0" data-espera>Puede tardar hasta un minuto.</p>`); }
 

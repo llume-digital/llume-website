@@ -53,3 +53,8 @@ def entrar(browser, url, movil=False, usuario="admin", clave=PW, espera="[data-a
     if espera:
         page.wait_for_selector(espera)
     return ctx, page, errores
+
+
+def confirmar(page):
+    """Acepta la confirmación propia de la interfaz (sustituye al window.confirm)."""
+    page.click(".overlay.confirmacion [data-confirmar]")
