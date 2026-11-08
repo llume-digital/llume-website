@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Literal, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, ValidationError
 from starlette.middleware.gzip import GZipMiddleware
@@ -1221,17 +1221,25 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         @app.get("/dev/recarga", include_in_schema=False)
         def dev_recarga():
             # Cambia al reiniciar el servidor (uvicorn --reload) o al tocar un archivo de la interfaz.
-            ultimo = max(f.stat().st_mtime_ns for f in (ROOT / "static").iterdir())
+            ultimo = max(f.stat().st_mtime_ns for f in (ROOT / "static").rglob("*") if f.is_file())
             return JSONResponse({"version": f"{arranque}-{ultimo}"}, headers={"Cache-Control": "no-store"})
 
-    # La interfaz se sirve con ?v=<huella> en cada archivo: el service worker (sw.js) los guarda en el móvil y los
-    # sirve sin ir a la red, y cuando un archivo cambia cambia su URL, así que nunca se queda una versión vieja.
-    versionados = ("/static/app.js", "/static/styles.css", "/fonts/fonts.css")
+    # La interfaz se sirve bajo /i/<huella>/…: el service worker (sw.js) la guarda en el móvil y la sirve sin ir a la
+    # red, y cuando un archivo cambia cambia la huella y con ella la URL, así que nunca se queda una versión vieja. Como
+    # la huella va en la ruta y no en ?v=, un `import './js/…'` relativo hereda la versión sin tocar el código.
+    STATIC = (ROOT / "static").resolve()
+    SOLO_SERVIDOR = {"index.html", "sw.js", "recarga.js"}  # la página, el service worker y la recarga de desarrollo
+
+    def archivos_interfaz() -> list[str]:
+        """Rutas relativas de todo lo que pide la interfaz: se recorre static/, no hay lista escrita a mano."""
+        return sorted(p.relative_to(STATIC).as_posix() for p in STATIC.rglob("*")
+                      if p.is_file() and p.name not in SOLO_SERVIDOR and "__pycache__" not in p.parts)
 
     def huella_interfaz() -> str:
         h = hashlib.blake2b(digest_size=6)
-        for f in sorted((ROOT / "static").iterdir()) + sorted(FONT_DIR.iterdir()):
-            h.update(f.name.encode() + f.read_bytes())
+        for base in (STATIC, FONT_DIR):
+            for f in sorted(p for p in base.rglob("*") if p.is_file()):
+                h.update(f.relative_to(base).as_posix().encode() + f.read_bytes())
         return h.hexdigest()
 
     version_interfaz = huella_interfaz()
@@ -1239,11 +1247,22 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
     def version_actual() -> str:
         return huella_interfaz() if recarga else version_interfaz
 
+    @app.get("/i/{version}/{ruta:path}", include_in_schema=False)
+    def interfaz(version: str, ruta: str):
+        archivo = (STATIC / ruta).resolve()
+        if not archivo.is_relative_to(STATIC) or not archivo.is_file() or archivo.name in SOLO_SERVIDOR:
+            return Response("No encontrado", 404, media_type="text/plain; charset=utf-8")
+        # Con la huella vigente, el archivo no cambiará nunca en esa URL; con otra (una pestaña vieja), se sirve el
+        # actual pero sin dejar que se guarde.
+        cache = "public, max-age=31536000, immutable" if version == version_actual() else "no-cache"
+        return FileResponse(archivo, headers={"Cache-Control": cache})
+
     @app.get("/", include_in_schema=False)
     def index():
         html, v = (ROOT / "static" / "index.html").read_text(encoding="utf-8"), version_actual()
-        for ruta in versionados:
-            html = html.replace(f'"{ruta}"', f'"{ruta}?v={v}"')
+        for nombre in ("app.js", "styles.css"):
+            html = html.replace(f'"/static/{nombre}"', f'"/i/{v}/{nombre}"')
+        html = html.replace('"/fonts/fonts.css"', f'"/fonts/fonts.css?v={v}"')
         if recarga:  # en desarrollo no se registra el service worker: la página se recarga sola con cada cambio
             html = html.replace("navigator.serviceWorker.register('/sw.js')", "false")
             html = html.replace("</body>", '  <script src="/static/recarga.js"></script>\n</body>')
@@ -1253,8 +1272,9 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
     def service_worker():
         v = version_actual()
         fuentes = sorted(f"/fonts/{f.name}" for f in FONT_DIR.glob("*.woff2"))
-        archivos = ["/", *(f"{r}?v={v}" for r in versionados), "/static/manifest.webmanifest", "/static/favicon.svg",
-                    "/static/icono-192.png", "/static/icono-512.png", *fuentes]
+        archivos = ["/", *(f"/i/{v}/{a}" for a in archivos_interfaz()), f"/fonts/fonts.css?v={v}",
+                    "/static/manifest.webmanifest", "/static/favicon.svg", "/static/icono-192.png",
+                    "/static/icono-512.png", *fuentes]
         js = (ROOT / "static" / "sw.js").read_text(encoding="utf-8")
         js = js.replace("'__VERSION__'", json.dumps(v)).replace("__ARCHIVOS__", json.dumps(archivos))
         return Response(js, media_type="text/javascript", headers={"Cache-Control": "no-cache"})

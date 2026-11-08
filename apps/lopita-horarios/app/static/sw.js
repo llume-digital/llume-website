@@ -1,6 +1,6 @@
 // Service worker de la web app: guarda la interfaz en el móvil para que abra al instante y sin conexión.
-// Los archivos llevan ?v=<huella> en la URL (la pone el servidor), así que se pueden servir desde la caché sin
-// preguntar: cuando cambian, cambia la URL. La API (/api/…) nunca pasa por aquí: los datos siempre son los del servidor.
+// La interfaz va bajo /i/<huella>/ (y las fuentes con ?v=<huella>), así que se puede servir desde la caché sin
+// preguntar: cuando cambia, cambia la URL. La API (/api/…) nunca pasa por aquí: los datos siempre son los del servidor.
 const VERSION = '__VERSION__';
 const ARCHIVOS = __ARCHIVOS__;
 const CACHE = `lopita-${VERSION}`;
@@ -29,7 +29,7 @@ self.addEventListener('fetch', (ev) => {
     }).catch(() => caches.match('/')));
     return;
   }
-  if (url.pathname.startsWith('/static/') || url.pathname.startsWith('/fonts/')) {
+  if (url.pathname.startsWith('/i/') || url.pathname.startsWith('/static/') || url.pathname.startsWith('/fonts/')) {
     ev.respondWith(caches.match(r).then((guardada) => guardada || fetch(r).then((resp) => {
       const copia = resp.clone();
       if (resp.ok) caches.open(CACHE).then((c) => c.put(r, copia));
