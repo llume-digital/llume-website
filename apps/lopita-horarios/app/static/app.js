@@ -1,7 +1,7 @@
 import { $, clone } from './js/nucleo/util.js';
 import { api, arreglarPendientes, closeOverlay, confirmar, loadConfig, showNotifications, state, toast, vigilarRed } from './js/nucleo/estado.js';
 import { onBind } from './js/nucleo/enlace.js';
-import { isWorker, render, renderView, tabsHtml } from './js/nucleo/pintado.js';
+import { isWorker, render, renderView, pintarTabs } from './js/nucleo/pintado.js';
 import { alNavegar, route } from './js/nucleo/rutas.js';
 import { refreshList } from './js/pantallas/horarios.js';
 import { closeMenu, diaCambios, menuOnScroll, seguirAnclas } from './js/pantallas/dia.js';
@@ -70,7 +70,7 @@ document.addEventListener('visibilitychange', async () => {
       state.me.alertas = me.alertas; state.me.pendientes = me.pendientes; state.me.criticas = me.criticas; state.alg = {};
       if (me.notificaciones) showNotifications();
     }
-    if (!state.dirty) renderView(); else { const t = $('#tabs'); if (t) t.innerHTML = tabsHtml(route().name); }
+    if (!state.dirty) renderView(); else pintarTabs(route().name);
   } catch { /* sin conexión: se reintenta la próxima vez */ }
 });
 vigilarRed();

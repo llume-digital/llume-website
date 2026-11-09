@@ -1,5 +1,5 @@
-import { $, clone, esc, fmtLong, fmtStamp } from './util.js';
-import { pararDictado, render, renderSavebar, renderView, tabsHtml } from './pintado.js';
+import { clone, esc, fmtLong, fmtStamp } from './util.js';
+import { pararDictado, render, renderSavebar, renderView, pintarTabs } from './pintado.js';
 import { route } from './rutas.js';
 import { refreshList } from '../pantallas/horarios.js';
 // ------------------------------------------------------------------ estado y API
@@ -47,7 +47,7 @@ function queueBadges() {
       if (!state.me) return;
       state.me.alertas = me.alertas; state.me.pendientes = me.pendientes; state.me.criticas = me.criticas;
       state.me.notificaciones = me.notificaciones; state.me.mensajes_web = me.mensajes_web;
-      const tabs = $('#tabs'); if (tabs) tabs.innerHTML = tabsHtml(route().name);
+      pintarTabs(route().name);
       if (me.notificaciones) showNotifications();
       if (me.arreglos_pendientes) arreglarPendientes();
     } catch { /* la insignia es informativa: si falla no pasa nada */ }
