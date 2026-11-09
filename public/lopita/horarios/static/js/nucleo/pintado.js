@@ -1,27 +1,10 @@
 import { $, DAYS, DAY_CHIP, DAY_LABEL, ICON, esc, fmtH } from './util.js';
 import { state } from './estado.js';
+import { route, vistaDe } from './rutas.js';
 import { viewLogin } from '../pantallas/acceso.js';
-import { viewHorarios } from '../pantallas/horarios.js';
-import { viewDetalle } from '../pantallas/cuadrante.js';
-import { viewHistorial } from '../pantallas/historial.js';
-import { viewAlertas } from '../pantallas/alertas.js';
-import { viewCalendario } from '../pantallas/calendario.js';
 import { seguirAnclas } from '../pantallas/dia.js';
-import { viewEquipo } from '../pantallas/equipo.js';
-import { viewFunciones } from '../pantallas/funciones.js';
-import { viewTurnos } from '../pantallas/turnos.js';
-import { viewDemanda } from '../pantallas/demanda.js';
-import { viewAusencias } from '../pantallas/ausencias.js';
-import { viewPreferencias } from '../pantallas/preferencias.js';
-import { viewReglas } from '../pantallas/reglas.js';
-import { viewAjustes } from '../pantallas/ajustes.js';
-import { viewMiInicio, viewMisHoras, viewMisPrefs, viewMisVacaciones } from '../pantallas/portal.js';
-import { viewSolicitudes } from '../pantallas/solicitudes.js';
-import { viewWeb } from '../pantallas/web.js';
-import { guiaSecciones, viewGuia } from '../pantallas/guia.js';
-import { novedadesSinVer, viewNovedades } from '../pantallas/novedades.js';
-import { viewComentarios } from '../pantallas/comentarios.js';
-import { viewInformes } from '../pantallas/informes.js';
+import { guiaSecciones } from '../pantallas/guia.js';
+import { novedadesSinVer } from '../pantallas/novedades.js';
 import { botonGoogle, entrarConGoogle, viewForcePw } from '../pantallas/cuenta.js';
 // ------------------------------------------------------------------ pintado general
 // Botón de la barra de cuenta: icono y texto; en el móvil solo el icono, así que el nombre va en aria-label.
@@ -34,12 +17,12 @@ export function render() {
   if (state.me.cambiar_clave) { app.innerHTML = viewForcePw(); return; }
   if (!$('.topbar')) {
     app.innerHTML = `
-      <header class="topbar">
+      <header class="topbar" data-rol="${isWorker() ? 'trabajadora' : 'encargado'}">
         <div class="topbar-inner">
           <a class="wordmark" href="#/" aria-label="Lopita & Co · Horarios"><b>LOPITA &amp; CO</b><span>Horarios</span></a>
-          <div class="userbox"><span>${esc(state.me.nombre)}</span>${botonCuenta('goGuia', 'guia', 'Guía', 'Cómo funciona la app', ' id="guia-btn"')}${botonCuenta('feedback', 'comentar', 'Comentarios', 'Deja una sugerencia, un fallo o una duda', ' class="fb-btn"')}${botonCuenta('cuentaDialog', 'cuenta', 'Mi cuenta', 'Tu correo, Google y tu contraseña')}${botonCuenta('logout', 'salir', 'Salir', 'Cerrar la sesión')}</div>
+          <div class="userbox"><span>${esc(state.me.nombre)}</span>${menuCuenta()}${botonCuenta('goGuia', 'guia', 'Guía', 'Cómo funciona la app', ' id="guia-btn"')}${botonCuenta('feedback', 'comentar', 'Comentarios', 'Deja una sugerencia, un fallo o una duda', ' class="fb-btn"')}${botonCuenta('cuentaDialog', 'cuenta', 'Mi cuenta', 'Tu correo, Google y tu contraseña')}${botonCuenta('logout', 'salir', 'Salir', 'Cerrar la sesión')}</div>
         </div>
-        <div class="tabsbar"><nav class="tabs" id="tabs" aria-label="Secciones"></nav></div>
+        <div class="tabsbar"><nav class="tabs" id="tabs" aria-label="Secciones"></nav><nav class="tabs subtabs" id="subtabs" aria-label="Pantallas de la sección" hidden></nav></div>
       </header>
       <main id="view"></main>
       <div id="savebar"></div>`;
@@ -51,20 +34,72 @@ export const NAV_ADMIN = [
   ['horarios', 'Horarios'], ['calendario', 'Calendario'], ['alertas', 'Alertas'], ['solicitudes', 'Solicitudes'], ['informes', 'Informes'], ['equipo', 'Equipo'], ['funciones', 'Funciones'], ['turnos', 'Turnos'], ['demanda', 'Demanda'],
   ['ausencias', 'Ausencias'], ['preferencias', 'Preferencias'], ['reglas', 'Reglas'], ['web', 'Web'], ['comentarios', 'Comentarios'], ['ajustes', 'Ajustes'], ['novedades', 'Novedades'],
 ];
+// El encargado ve cinco secciones; cada una agrupa pantallas (la dirección de cada pantalla no cambia). Web,
+// Comentarios y Novedades no son de la semana a semana y viven en el menú «Más» de la cuenta.
+export const SECCIONES_ADMIN = [
+  ['horario', 'Horario', ['horarios', 'calendario']],
+  ['pendiente', 'Pendiente', ['alertas', 'solicitudes']],
+  ['equipo', 'Equipo', ['equipo', 'ausencias', 'preferencias']],
+  ['informes', 'Informes', ['informes']],
+  ['configuracion', 'Configuración', ['funciones', 'turnos', 'demanda', 'reglas', 'ajustes']],
+];
+const MENU_CUENTA = ['web', 'comentarios', 'novedades'];
 export const NAV_WORKER = [['inicio', 'Inicio'], ['horas', 'Mis horas'], ['vacaciones', 'Vacaciones'], ['preferencias', 'Preferencias']];
 export const isWorker = () => state.me && state.me.rol === 'empleado';
-
-export function route() {
-  const parts = (location.hash.replace(/^#\/?/, '') || (isWorker() ? 'inicio' : 'horarios')).split('/');
-  return { name: parts[0], arg: parts[1], arg2: parts[2], arg3: parts[3] };
-}
 
 export function tabsHtml(name) {
   const w = isWorker();
   const count = (n, label) => (n ? `<span class="tab-count" aria-label="${n} ${label}">${n}</span>` : '');
   const crit = !w && state.me.criticas ? `<span class="tab-count crit" aria-label="${state.me.criticas} alertas críticas">${state.me.criticas}</span>` : '';
   const badge = { solicitudes: w ? '' : count(state.me.pendientes, 'pendientes'), alertas: w ? '' : crit + count(state.me.alertas - (state.me.criticas || 0), 'alertas importantes'), inicio: w ? count(state.me.avisos, 'avisos nuevos') : '', web: w ? '' : count(state.me.mensajes_web, 'mensajes nuevos'), comentarios: w ? '' : count(state.me.comentarios, 'comentarios nuevos'), novedades: w ? '' : count(novedadesSinVer(), 'novedades sin ver'), ajustes: w ? '' : count(state.me.accesos, 'registros pendientes') };
-  return (w ? NAV_WORKER : NAV_ADMIN).map(([k, label]) => `<a href="#/${k}" class="${name === k ? 'active' : ''}"${name === k ? ' aria-current="page"' : ''}>${label}${badge[k] || ''}</a>`).join('');
+  const enlace = ([k, label]) => `<a href="#/${k}" class="${name === k ? 'active' : ''}"${name === k ? ' aria-current="page"' : ''}>${label}${badge[k] || ''}</a>`;
+  if (w) return NAV_WORKER.map(enlace).join('');
+  const activa = seccionDe(name);
+  // Cada sección lleva a su primera pantalla; el contador de la sección es el de sus pantallas.
+  return SECCIONES_ADMIN.map(([id, label, pantallas]) => {
+    const n = (id === 'pendiente' ? (state.me.criticas || 0) + (state.me.alertas - (state.me.criticas || 0)) + (state.me.pendientes || 0)
+      : id === 'configuracion' ? (state.me.accesos || 0) : 0);
+    const marca = n ? `<span class="tab-count${id === 'pendiente' && state.me.criticas ? ' crit' : ''}" aria-label="${n} por revisar">${n}</span>` : '';
+    return `<a href="#/${pantallas[0]}" class="${activa === id ? 'active' : ''}"${activa === id ? ' aria-current="page"' : ''}>${label}${marca}</a>`;
+  }).join('');
+}
+
+// Las pantallas de la sección activa, en una segunda fila; vacía si la sección tiene una sola.
+export function subtabsHtml(name) {
+  if (isWorker()) return '';
+  const sec = SECCIONES_ADMIN.find(([id]) => id === seccionDe(name));
+  if (!sec || sec[2].length < 2) return '';
+  const etiqueta = Object.fromEntries(NAV_ADMIN);
+  const cuenta = (n, label) => (n ? `<span class="tab-count" aria-label="${n} ${label}">${n}</span>` : '');
+  const marca = { alertas: (state.me.criticas ? `<span class="tab-count crit" aria-label="${state.me.criticas} alertas críticas">${state.me.criticas}</span>` : '') + cuenta(state.me.alertas - (state.me.criticas || 0), 'alertas importantes'), solicitudes: cuenta(state.me.pendientes, 'pendientes'), ajustes: cuenta(state.me.accesos, 'registros pendientes') };
+  return sec[2].map((k) => `<a href="#/${k}" class="${name === k ? 'active' : ''}"${name === k ? ' aria-current="page"' : ''}>${etiqueta[k]}${marca[k] || ''}</a>`).join('');
+}
+
+// A qué sección pertenece una pantalla; las del menú de la cuenta y la guía no son de ninguna.
+export const seccionDe = (name) => { const s = SECCIONES_ADMIN.find(([, , pantallas]) => pantallas.includes(name)); return s ? s[0] : null; };
+
+// Pinta las dos filas de pestañas (secciones y pantallas de la sección).
+export function pintarTabs(name) {
+  const t = $('#tabs'); if (t) t.innerHTML = tabsHtml(name);
+  const sub = $('#subtabs');
+  if (sub) { const h = subtabsHtml(name); sub.innerHTML = h; sub.hidden = !h; }
+  const mas = $('#mas-cuenta');
+  if (mas) {
+    const abierto = mas.open;
+    mas.outerHTML = menuCuenta();
+    const nuevo = $('#mas-cuenta');
+    if (nuevo) { nuevo.open = abierto; nuevo.querySelectorAll('a').forEach((a) => { if (a.getAttribute('href') === `#/${name}`) { a.classList.add('active'); a.setAttribute('aria-current', 'page'); } }); }
+  }
+}
+
+// Menú «Más» de la cuenta del encargado: Web, Comentarios recibidos y Novedades, con sus contadores.
+function menuCuenta() {
+  if (isWorker()) return '';
+  const etiqueta = { web: 'Web', comentarios: 'Comentarios recibidos', novedades: 'Novedades' };
+  const n = { web: state.me.mensajes_web, comentarios: state.me.comentarios, novedades: novedadesSinVer() };
+  const total = MENU_CUENTA.reduce((t, k) => t + (n[k] || 0), 0);
+  return `<details class="mas-cuenta" id="mas-cuenta"><summary title="Web, comentarios recibidos y novedades" aria-label="Más${total ? `, ${total} sin ver` : ''}">Más${total ? `<span class="tab-count">${total}</span>` : ''}</summary>
+    <div class="mas-cuenta-lista">${MENU_CUENTA.map((k) => `<a href="#/${k}">${etiqueta[k]}${n[k] ? `<span class="tab-count">${n[k]}</span>` : ''}</a>`).join('')}</div></details>`;
 }
 
 // La guía vive en la barra de cuenta (no es una sección): su botón se marca cuando estás en ella.
@@ -81,16 +116,13 @@ export function renderView() {
   if (!view) return render();
   const r = route();
   const w = isWorker();
-  const views = w
-    ? { inicio: viewMiInicio, horas: viewMisHoras, vacaciones: viewMisVacaciones, preferencias: viewMisPrefs, guia: viewGuia }
-    : { horarios: r.arg ? (r.arg2 === 'historial' ? () => viewHistorial(Number(r.arg)) : () => viewDetalle(Number(r.arg))) : viewHorarios, calendario: viewCalendario, alertas: viewAlertas, solicitudes: viewSolicitudes, informes: viewInformes, equipo: viewEquipo, funciones: viewFunciones, turnos: viewTurnos, demanda: viewDemanda, ausencias: viewAusencias, preferencias: viewPreferencias, reglas: viewReglas, web: viewWeb, comentarios: viewComentarios, ajustes: viewAjustes, novedades: viewNovedades, guia: viewGuia };
-  const name = views[r.name] ? r.name : (w ? 'inicio' : 'horarios');
+  const { name, vista } = vistaDe(r, w);
   // Si había un turno enfocado (teclado), sigue enfocado tras redibujar aunque la vista se recargue por detrás.
   const foco = document.activeElement && document.activeElement.closest && document.activeElement.closest('.g-bar');
   const focoEmp = foco && foco.dataset.emp;
-  $('#tabs').innerHTML = tabsHtml(name);
+  pintarTabs(name);
   marcarGuia(name);
-  view.innerHTML = views[name]();
+  view.innerHTML = vista();
   renderSavebar();
   seguirAnclas();  // un menú abierto sigue abierto si su casilla sigue en la vista
   if (focoEmp) { const b = view.querySelector(`.g-bar[data-emp="${CSS.escape(focoEmp)}"]`); if (b) b.focus({ preventScroll: true }); }
@@ -108,7 +140,7 @@ export function renderSavebar() {
   if (!state.dirty) { bar.innerHTML = ''; bar.dataset.html = ''; return; }
   const html = `<div class="savebar"><div class="savebar-inner">
     <span>Tienes cambios sin guardar en la configuración.</span><span class="spacer"></span>
-    <button class="btn" data-act="discard">Descartar</button>
+    <button class="btn" data-act="discard">Descartar cambios</button>
     <button class="btn primary" data-act="save">Guardar cambios</button>
     ${state.saveError ? `<div class="err" role="alert">No se ha guardado: ${esc(state.saveError)}${state.saveError.includes('ha cambiado') ? ' <button class="btn small" data-act="reloadConfig">Recargar configuración</button>' : ''}</div>` : ''}
   </div></div>`;

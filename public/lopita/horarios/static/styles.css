@@ -292,6 +292,7 @@ table.sched tr:last-child td { border-bottom: none; }
 .login-form { display: grid; place-items: center; padding: 32px 20px; }
 .login-form form { width: 100%; max-width: 340px; display: grid; gap: 14px; }
 .empty { text-align: center; padding: 40px 16px; color: var(--muted); }
+.empty p { margin: 0 0 12px; }
 
 @media (max-width: 860px) {
   .login { grid-template-columns: 1fr; }
@@ -639,3 +640,72 @@ button.pd-row:hover, button.pd-row:focus-visible { background: var(--hover); }
 
 #sin-red { position: fixed; top: 0; left: 0; right: 0; z-index: 90; padding: 10px 16px calc(10px) 16px; padding-top: calc(10px + env(safe-area-inset-top)); background: var(--warn-strong); color: var(--black); text-align: center; font-size: var(--text-md); font-weight: 600; }
 #sin-red[hidden] { display: none; }
+
+/* Detalle del horario: una acción principal y el resto en «Más»; las alertas, plegadas salvo las críticas. */
+.mas-menu { position: relative; }
+.mas-menu > summary { list-style: none; cursor: pointer; }
+.mas-menu > summary::-webkit-details-marker { display: none; }
+.mas-menu > summary::after { content: " ▾"; }
+.mas-lista { position: absolute; z-index: 20; top: calc(100% + 4px); left: 0; display: flex; flex-direction: column; gap: 4px; min-width: 210px; padding: 8px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.mas-lista .btn { justify-content: flex-start; width: 100%; }
+.alerts-fold > summary { display: flex; align-items: center; gap: 12px; cursor: pointer; list-style: none; min-height: 44px; }
+.alerts-fold > summary::-webkit-details-marker { display: none; }
+.alerts-fold > summary h2 { margin: 0; }
+.alerts-fold > summary .fold-hint::after { content: " ▾"; }
+.alerts-fold[open] > summary .fold-hint::after { content: " ▴"; }
+
+/* Menús de casilla y de barra como hoja inferior en pantallas pequeñas o táctiles. */
+.popover-fondo { position: fixed; inset: 0; z-index: 59; background: rgba(23,19,15,.45); }
+.popover[data-hoja] { left: 0; right: 0; top: auto; bottom: 0; width: 100%; max-width: none; max-height: 82vh; border-radius: 16px 16px 0 0; border-bottom: 0; padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); animation: hoja-sube .18s ease-out; }
+.popover[data-hoja]::before { content: ""; display: block; width: 40px; height: 4px; border-radius: 2px; background: var(--line-strong); margin: 2px auto 8px; }
+.popover[data-hoja] button { min-height: 48px; }
+.popover[data-hoja] .quick-adj button { min-height: 44px; }
+@keyframes hoja-sube { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .popover[data-hoja] { animation: none; } }
+
+/* Navegación del encargado: cinco secciones y, debajo, las pantallas de la activa. */
+nav.tabs.subtabs { border-top: 1px solid var(--night-edge); padding-top: 0; }
+nav.tabs.subtabs[hidden] { display: none; }
+nav.tabs.subtabs a { font-size: var(--text-xs); padding: 10px 10px 8px; }
+.mas-cuenta { position: relative; }
+.mas-cuenta > summary { list-style: none; cursor: pointer; background: none; border: 1px solid var(--night-line); color: var(--night-text); border-radius: 999px; padding: 4px 12px; min-height: 34px; display: inline-flex; align-items: center; gap: 6px; }
+.mas-cuenta > summary::-webkit-details-marker { display: none; }
+.mas-cuenta > summary:hover { border-color: var(--night-line-hover); color: var(--white); }
+.mas-cuenta > summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.mas-cuenta-lista { position: absolute; z-index: 40; right: 0; top: calc(100% + 6px); min-width: 210px; display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--line-strong); border-radius: var(--radius); box-shadow: var(--shadow); padding: 6px; }
+.mas-cuenta-lista a { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; padding: 0 12px; border-radius: 8px; color: var(--ink); text-decoration: none; font-size: var(--text-md); }
+.mas-cuenta-lista a:hover, .mas-cuenta-lista a.active { background: var(--gold-soft); }
+
+/* Trabajadora en el móvil: sus cuatro secciones en una barra inferior fija, con texto y a la altura del pulgar. */
+@media (max-width: 600px) {
+  .topbar[data-rol="trabajadora"] .tabsbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 35; border-top: 1px solid var(--night-line); border-bottom: 0; padding-bottom: env(safe-area-inset-bottom); }
+  .topbar[data-rol="trabajadora"] nav.tabs { padding: 0; gap: 0; overflow: visible; }
+  .topbar[data-rol="trabajadora"] nav.tabs a { flex: 1; min-height: 56px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 4px; border-bottom: 0; border-top: 3px solid transparent; font-size: var(--text-xs); letter-spacing: .06em; }
+  .topbar[data-rol="trabajadora"] nav.tabs a.active { border-top-color: var(--gold); }
+  body:has(.topbar[data-rol="trabajadora"]) #view { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  body:has(.topbar[data-rol="trabajadora"]) .toast { bottom: calc(80px + env(safe-area-inset-bottom)); }
+}
+
+/* Equipo: lista de la plantilla; cada fila abre la ficha de la persona. */
+.lista-equipo { padding: 4px 0; }
+.persona-fila { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-height: 52px; padding: 8px 16px; color: inherit; text-decoration: none; border-bottom: 1px solid var(--line); }
+.persona-fila:last-child { border-bottom: 0; }
+.persona-fila:hover, .persona-fila:focus-visible { background: var(--surface-2); }
+.persona-fila.inactiva { opacity: .6; }
+.persona-nombre { font-weight: 600; }
+.persona-datos { flex: 1 1 auto; }
+.persona-ir { color: var(--muted); font-size: var(--text-lg); margin-left: auto; }
+
+/* Error de un campo: justo debajo de él, en rojo, y el campo se marca. */
+.field-error { color: var(--bad); font-size: var(--text-sm); font-weight: 600; }
+input[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--bad); }
+
+/* Cuadrante en el móvil: la columna de nombres se estrecha (nombre en una línea; el contrato está en la ficha; las funciones siguen abreviadas). */
+@media (max-width: 600px) {
+  table.sched .emp { width: 96px; padding-left: 8px; font-size: var(--text-sm); }
+  table.sched td.emp { overflow: hidden; }
+  table.sched td.emp .emp-link { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  table.sched td.emp small { display: none; }
+  table.sched td.tot, table.sched th.tot { width: 56px; }
+  table.sched { min-width: 790px !important; }
+}

@@ -9,7 +9,7 @@ const GUIA_ADMIN = [
     'Abre el horario. Arriba ves los avisos y la cobertura de cada día; abajo, el cuadrante y las horas de cada persona.',
     'Toca una casilla para cambiar un turno o, con <b>Quitar el turno</b>, dejar a esa persona libre ese día. Los cambios a mano quedan bloqueados (candado) y se respetan si regeneras.',
     'Con <b>Día · Semana · Mes</b> cambias de vista. En la de día puedes arrastrar los turnos hora a hora.',
-    '<b>Solucionar problemas</b> propone los mínimos cambios para quitar alertas. <b>Publicar y enviar a Slack</b> lo hace visible al equipo.',
+    '<b>Solucionar problemas</b> propone los mínimos cambios para quitar alertas. <b>Publicar horario</b> lo hace visible al equipo.',
   ] },
   { id: 'calendario', titulo: 'Calendario', para: 'Ver todos los horarios juntos, día a día, semana a semana o mes a mes.', pasos: [
     'Elige <b>Semana</b> o <b>Mes</b> y muévete con ‹ › u <b>Hoy</b>.',

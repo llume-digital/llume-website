@@ -1,10 +1,12 @@
 import { DAYS, DAY_SHORT, ICON, MOTIVOS, addDays, dayNum, esc, fmtH, fmtLong, fmtRange, iso, monthName, toMin, todayIso, weekday } from '../nucleo/util.js';
-import { state } from '../nucleo/estado.js';
-import { abreviaturas, capTags, funcionesDe, head, horasDe, puestoDe, puestoTag, rolDe, rolTag, route, shiftById, tipoDe, usaPuestos } from '../nucleo/pintado.js';
+import { api, confirmar, state, toast } from '../nucleo/estado.js';
+import { abreviaturas, capTags, funcionesDe, head, horasDe, puestoDe, puestoTag, renderView, rolDe, rolTag, shiftById, tipoDe, usaPuestos } from '../nucleo/pintado.js';
+import { route, urlDetalle } from '../nucleo/rutas.js';
 import { coverageBar } from './alertas.js';
 import { monthDayHtml, monthGrid } from './mes.js';
 import { calPersonas, personaHref, viewPersona } from './persona.js';
-import { ensure } from './portal.js';
+import { ensure, pad2 } from './portal.js';
+import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ CALENDARIO (todos los horarios juntos)
 // Semana a semana o mes a mes, con lo que manda cada día (el horario publicado o, si no hay, el borrador más
 // reciente). Tocar un día o un turno abre ese día en su horario para editarlo hora a hora.
@@ -100,3 +102,59 @@ function calSemana(lunes, data, porDia) {
     }).join('')}<th class="tot">Horas</th></tr></thead><tbody>${filas}</tbody></table></div>`;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  createCal: async () => { state.mi.cal = await api('POST', '/api/mi/calendario', {}); renderView(); toast('Enlace creado'); },
+  renewCal: async () => {
+    if (!(await confirmar({ titulo: '¿Cambiar el enlace del calendario?', texto: 'El enlace actual dejará de funcionar y tendrás que volver a suscribirte.', verbo: 'Cambiar el enlace', peligro: true }))) return;
+    state.mi.cal = await api('POST', '/api/mi/calendario', { renovar: true }); renderView(); toast('Enlace cambiado');
+  },
+  createTeamCal: async (el) => { await api('POST', `/api/calendarios/${encodeURIComponent(el.dataset.id)}`, {}); state.calT.data = undefined; renderView(); toast('Enlace creado'); },
+  copyCal: async (el) => {
+    try { await navigator.clipboard.writeText(el.dataset.url); toast('Enlace copiado'); } catch { window.prompt('Copia el enlace:', el.dataset.url); }
+  },
+  calModo: (el) => {
+    if (el.dataset.v === 'dia') { actions.calDia({ dataset: { date: state.cal.ref || todayIso() } }); return; }
+    state.cal.modo = el.dataset.v; renderView();
+  },
+  calMover: (el) => {
+    const c = state.cal; const dir = Number(el.dataset.dir);
+    if (c.modo === 'mes') {
+      let y = Number(c.ref.slice(0, 4)), m = Number(c.ref.slice(5, 7)) + dir;
+      if (m < 1) { m = 12; y--; } if (m > 12) { m = 1; y++; }
+      c.ref = `${y}-${pad2(m)}-01`;
+    } else c.ref = addDays(c.ref, 7 * dir);
+    renderView();
+  },
+  calHoy: () => { state.cal.ref = todayIso(); renderView(); },
+  calAgrupar: (el) => { state.cal.agrupar = el.dataset.v; renderView(); },
+  calVolverPersonas: () => { state.cal.agrupar = 'persona'; location.hash = '#/calendario'; },
+  calDia: (el) => {
+    let f = el.dataset.date;
+    const [desde, hasta] = calRango();
+    const data = state.cal.data[`${desde}|${hasta}`];
+    let info = data && data.dias && data.dias[f];
+    if (!info) {
+      const pub = (x) => (x.estado === 'publicado' ? 0 : 1);
+      const s = state.schedules.filter((x) => x.desde <= f && f <= x.hasta).sort((a, b) => pub(a) - pub(b))[0];
+      if (s) info = { horario_id: s.id };
+      else {
+        // Sin horario ese día: se abre el primer día posterior que tenga uno (o, si no hay, el último anterior).
+        const despues = state.schedules.filter((x) => x.desde > f).sort((a, b) => a.desde.localeCompare(b.desde) || pub(a) - pub(b))[0];
+        const antes = state.schedules.filter((x) => x.hasta < f).sort((a, b) => b.hasta.localeCompare(a.hasta) || pub(a) - pub(b))[0];
+        const alt = despues || antes;
+        if (alt) {
+          const nf = despues ? alt.desde : alt.hasta;
+          toast(`No hay horario el ${fmtLong(f)}; te enseño el ${fmtLong(nf)}, el ${despues ? 'siguiente' : 'último'} día que tiene.`);
+          f = nf; info = { horario_id: alt.id };
+        }
+      }
+    }
+    if (!info) { toast('Aún no hay ningún horario. Créalo en Horarios.', true); return; }
+    state.cal.ref = f;
+    state.vista = 'dia'; state.diaFecha = f; state.dia = null;
+    if (!state.current || state.current.id !== info.horario_id) state.current = null;
+    location.hash = urlDetalle(info.horario_id, 'dia', f);
+    renderView();
+  },
+});

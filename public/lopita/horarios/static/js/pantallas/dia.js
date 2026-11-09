@@ -1,9 +1,12 @@
-import { DAYS, DAY_LABEL, ICON, MOTIVOS, addDays, clone, dayNum, esc, fmtH, fmtLong, fmtMin, fmtRange, monthName, toMin, todayIso, weekday } from '../nucleo/util.js';
-import { confirmar, state, toast } from '../nucleo/estado.js';
+import { $, DAYS, DAY_LABEL, ICON, MOTIVOS, addDays, clone, dayNum, esc, fmtH, fmtLong, fmtMin, fmtRange, monthName, toMin, todayIso, weekday } from '../nucleo/util.js';
+import { api, closeOverlay, confirmar, deshacer, overlay, saveConfig, state, toast, withBusy } from '../nucleo/estado.js';
+import { empujarUrl, urlDetalle } from '../nucleo/rutas.js';
 import { PUESTOS, abreviaturas, capTags, empById, esRol, funcById, funcionesDe, horasDe, puestoDe, puestoTag, puestosDe, renderView, rolTag, rolesDe, shiftById, tipoDe, usaPuestos } from '../nucleo/pintado.js';
 import { horasFila, nameIn } from './cuadrante.js';
 import { SEV, SEV_ORDER, alertCard, sevBadges } from './alertas.js';
 import { aMin, franjaDe } from './equipo.js';
+import { actions } from '../nucleo/registro.js';
+import { refreshList } from './horarios.js';
 // ------------------------------------------------------------------ VISTA DIARIA (diagrama de Gantt editable)
 // Filas: personas; columnas: horas. Cada barra es el turno de una persona ese día. Se mueve arrastrándola,
 // se alarga o acorta por los bordes y se añade tocando un hueco de la fila. Los cambios se quedan en el
@@ -195,7 +198,7 @@ export function dayView(cur) {
       <div class="alert-list">${alertasDia.slice(0, 6).map((a) => alertCard(a, { sid: cur.id })).join('')}</div>
       <p class="small muted">Son las del horario guardado; al confirmar tus cambios verás cómo quedan.</p></div>` : ''}
     ${n ? `<div class="day-pending no-print" role="status"><span><b>${n} cambio${n > 1 ? 's' : ''}</b> sin confirmar</span><span class="spacer"></span>
-      <button class="btn" data-act="dayDiscard">Descartar</button><button class="btn primary" data-act="dayConfirm">Confirmar cambios</button></div>` : ''}`;
+      <button class="btn" data-act="dayDiscard">Descartar cambios</button><button class="btn primary" data-act="dayConfirm">Confirmar cambios</button></div>` : ''}`;
 }
 
 // --- interacción con las barras (ratón y dedo)
@@ -339,6 +342,9 @@ export function openBarMenu(empId, anchor) {
 }
 
 const esTactil = () => window.matchMedia('(pointer: coarse)').matches;
+// En pantallas pequeñas o táctiles el menú de una casilla sale como hoja inferior, a todo el ancho y con
+// opciones grandes, en vez de flotar junto a un dedo que lo tapa.
+const hojaInferior = () => window.matchMedia('(max-width: 600px), (pointer: coarse)').matches;
 const enfocar = (el) => el.focus({ preventScroll: true });
 
 // Un menú flotante se ancla a su casilla o barra por un selector, no por el elemento: la vista se vuelve a
@@ -350,6 +356,8 @@ const altoVisible = () => (window.visualViewport ? window.visualViewport.height 
 // que nunca se salga de la pantalla: lo que no quepa se ve desplazando el propio menú.
 function placePopover(m, ancla) {
   m.dataset.ancla = ancla;
+  // El menú de una barra (ajustes encadenados, con la vista del día detrás) sigue flotando junto a ella.
+  if (hojaInferior() && !m.classList.contains('bar-menu')) { abrirHoja(m); return; }
   const r = document.querySelector(ancla).getBoundingClientRect();
   const abajo = altoVisible() - r.bottom - MENU_HUECO - MENU_MARGEN;
   const arriba = r.top - MENU_HUECO - MENU_MARGEN;
@@ -359,9 +367,21 @@ function placePopover(m, ancla) {
   seguirAncla(m);
 }
 
+function abrirHoja(m) {
+  m.dataset.hoja = '1';
+  const fondo = document.createElement('div');
+  fondo.className = 'popover-fondo';
+  m.before(fondo);
+  // Arrastrar la hoja hacia abajo la cierra.
+  let y0 = null;
+  m.addEventListener('touchstart', (e) => { y0 = m.scrollTop === 0 ? e.touches[0].clientY : null; }, { passive: true });
+  m.addEventListener('touchend', (e) => { if (y0 !== null && e.changedTouches[0].clientY - y0 > 70) closeMenu(); y0 = null; }, { passive: true });
+}
+
 // Vuelve a pegar el menú a su ancla (tras desplazar la página o redibujar la vista). Si el ancla ya no existe
 // o ha salido de la pantalla, el menú se cierra: ya no se sabría a qué casilla se refiere.
 function seguirAncla(m) {
+  if (m.dataset.hoja) return;
   const ancla = document.querySelector(m.dataset.ancla);
   const r = ancla && ancla.getBoundingClientRect();
   const alto = altoVisible();
@@ -473,7 +493,7 @@ export function openCellMenu(btn) {
   placePopover(m, `[data-act="cell"][data-emp="${CSS.escape(emp.id)}"][data-date="${d}"]`);
   enfocar(m.querySelector('button.current') || m.querySelector('button'));
 }
-export function closeMenu() { document.querySelectorAll('.popover').forEach((p) => p.remove()); }
+export function closeMenu() { document.querySelectorAll('.popover, .popover-fondo').forEach((p) => p.remove()); }
 // Al desplazar la página o una tabla, el menú acompaña a su casilla (y se cierra si sale de la pantalla); al
 // desplazar el propio menú para ver las opciones que no caben, no se toca.
 export function menuOnScroll(e) {
@@ -481,3 +501,93 @@ export function menuOnScroll(e) {
   seguirAnclas();
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  setVista: async (el) => {
+    if (el.dataset.v === state.vista) return;
+    if (state.vista === 'dia' && !(await diaDescartable())) return;
+    if (state.vista === 'dia') state.dia = null;
+    state.vista = el.dataset.v;
+    empujarUrl(urlDetalle(state.current.id, state.vista, state.diaFecha)); renderView();
+  },
+  openDay: (el) => {
+    state.diaFecha = el.dataset.date; state.vista = 'dia'; state.dia = null;
+    empujarUrl(urlDetalle(state.current.id, 'dia', state.diaFecha)); renderView(); window.scrollTo(0, 0);
+  },
+  dayGo: async (el) => {
+    if (!(await diaDescartable())) return;
+    state.dia = null; state.diaFecha = el.dataset.date;
+    if (el.dataset.sid) { state.current = null; location.hash = urlDetalle(el.dataset.sid, 'dia', state.diaFecha); return; }
+    empujarUrl(urlDetalle(state.current.id, 'dia', state.diaFecha)); renderView();
+  },
+  dayDiscard: () => { const antes = state.dia; state.dia = null; renderView(); deshacer('Cambios del día descartados', () => { state.dia = antes; renderView(); }); },
+  barTimes: (el) => {
+    const t = state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp);
+    const ini = $('#bar-ini').value, fin = $('#bar-fin').value === '23:59' ? '24:00' : $('#bar-fin').value;
+    if (!ini || !fin || toMin(fin) <= toMin(ini)) { toast('La salida tiene que ser después de la entrada', true); return; }
+    t.inicio = ini; t.fin = fin; closeMenu(); renderView();
+  },
+  barAdj: (el) => {
+    const emp = el.dataset.emp;
+    const t = state.dia.tramos.find((x) => x.empleado_id === emp);
+    if (!ajustarTramo(t, el.dataset.k, Number(el.dataset.dm))) { toast('Así no cabe en el día', true); return; }
+    const desplazado = el.closest('.popover').scrollTop;
+    closeMenu(); renderView();
+    const bar = document.querySelector(`.g-bar[data-emp="${CSS.escape(emp)}"]`);
+    const m = bar && openBarMenu(emp, bar);  // sigue abierto, en el mismo sitio, para encadenar ajustes
+    if (m) m.scrollTop = desplazado;
+  },
+  cellAdj: async (el) => {
+    closeMenu();
+    const cur = state.current;
+    if (diaSoloLectura(cur)) { toast('Este horario tiene un arreglo pendiente: haz los cambios en él', true); return; }
+    if (state.vista === 'dia' && !(await diaDescartable())) return;
+    state.vista = 'dia'; state.diaFecha = el.dataset.date; state.dia = null;
+    empujarUrl(urlDetalle(cur.id, 'dia', state.diaFecha)); renderView();
+    const t = state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp);
+    if (!t || !ajustarTramo(t, el.dataset.k, Number(el.dataset.dm))) { toast('Así no cabe en el día', true); renderView(); return; }
+    renderView(); window.scrollTo(0, 0);
+    toast('Ajuste preparado en la vista del día: revisa y pulsa «Confirmar cambios»');
+  },
+  barPuesto: (el) => {
+    const t = state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp);
+    if (t.puesto !== el.dataset.p) Object.assign(t, { puesto: el.dataset.p, funcion: null }); // la app le da su rol de ese puesto
+    closeMenu(); renderView();
+  },
+  barRol: (el) => { state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp).funcion = el.dataset.funcion || ''; closeMenu(); renderView(); },
+  barShift: (el) => {
+    const t = state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp);
+    const sh = shiftById(state.config, el.dataset.shift);
+    Object.assign(t, { inicio: sh.inicio, fin: sh.fin, turno_id: sh.id }); closeMenu(); renderView();
+  },
+  barRemove: (el) => { state.dia.tramos = state.dia.tramos.filter((x) => x.empleado_id !== el.dataset.emp); closeMenu(); renderView(); },
+  dayConfirm: async () => {
+    const d = state.dia;
+    if (state.dirty && !(await saveConfig())) return;
+    try {
+      const ev = await withBusy('Evaluando las alertas…', () => api('POST', `/api/horarios/${d.sid}/dia/evaluar`, { fecha: d.fecha, tramos: d.tramos, base: d.base }));
+      state.diaEval = ev;
+      overlay(dayEvalDialog(ev));
+    } catch (e) { toast(e.message, true); }
+  },
+  dayApply: async (el) => {
+    const d = state.dia;
+    const publicar = Boolean(el.dataset.publicar);
+    try {
+      const r = await withBusy('Guardando…', () => api('POST', `/api/horarios/${d.sid}/dia/aplicar`, { fecha: d.fecha, tramos: d.tramos, base: d.base }));
+      state.dia = null; state.diaEval = null; state.current = r; refreshList();
+      if (r.guardado_en !== d.sid) location.hash = `#/horarios/${r.guardado_en}`;
+      if (publicar) { await actions.publish(); return; }
+      renderView();
+      toast(r.reemplaza && r.guardado_en !== d.sid ? 'Guardado como arreglo: el equipo lo verá cuando lo publiques' : 'Cambios guardados');
+    } catch (e) { closeOverlay(); toast(e.message, true); }
+  },
+  zoom: (el) => {
+    const d = Number(el.dataset.d), k = ZOOMS.indexOf(ganttZoom());
+    state.zoom = d === 0 ? 1 : ZOOMS[Math.max(0, Math.min(ZOOMS.length - 1, k + d))];
+    try { localStorage.setItem('lopita-zoom', String(state.zoom)); } catch { /* sin almacenamiento */ }
+    const w = $('.gantt-wrap'), centro = w ? (w.scrollLeft + w.clientWidth / 2) / w.scrollWidth : 0;
+    renderView();
+    const w2 = $('.gantt-wrap'); if (w2) w2.scrollLeft = centro * w2.scrollWidth - w2.clientWidth / 2;
+  },
+});

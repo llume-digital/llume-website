@@ -1,7 +1,8 @@
 import { ICON, esc, fmtH, fmtLong, fmtStamp } from '../nucleo/util.js';
-import { state } from '../nucleo/estado.js';
-import { head } from '../nucleo/pintado.js';
+import { api, confirmar, state } from '../nucleo/estado.js';
+import { head, renderView } from '../nucleo/pintado.js';
 import { ensure } from './portal.js';
+import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ WEB (encargados): formularios y carta
 const WEB_TIPOS = { candidatura: 'Candidatura', catering: 'Catering' };
 const WEB_ESTADOS = { nuevo: 'Nuevo', atendido: 'Atendido', archivado: 'Archivado' };
@@ -40,3 +41,16 @@ export function viewWeb() {
   <p class="small muted section">Los CV y mensajes son datos personales: bórralos cuando ya no hagan falta.</p>`;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  webFiltro: (el) => { state.web.filtro = el.dataset.f; renderView(); },
+  webEstado: async (el) => {
+    const m = await api('POST', `/api/web/mensajes/${el.dataset.id}/estado`, { estado: el.dataset.estado });
+    state.web.data = state.web.data.map((x) => (x.id === m.id ? m : x)); renderView();
+  },
+  webBorrar: async (el) => {
+    if (!(await confirmar({ titulo: '¿Borrar este mensaje y su archivo?', texto: 'No se puede deshacer.', verbo: 'Borrar mensaje', peligro: true }))) return;
+    await api('DELETE', `/api/web/mensajes/${el.dataset.id}`);
+    state.web.data = state.web.data.filter((x) => x.id !== Number(el.dataset.id)); renderView();
+  },
+});

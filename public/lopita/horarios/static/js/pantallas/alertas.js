@@ -1,9 +1,12 @@
 import { DAYS, DAY_SHORT, ICON, MOTIVOS, addDays, dayNum, esc, fmtH, fmtLong, fmtMin, fmtRange, monthName, toMin, weekday } from '../nucleo/util.js';
-import { state } from '../nucleo/estado.js';
-import { PUESTOS, abreviaturas, capTags, funcionesDe, head, horasDe, horasPersona, puestoDe, puestoTag, rolDe, rolTag, shiftById, tipoDe, usaPuestos } from '../nucleo/pintado.js';
+import { api, overlay, saveConfig, state, toast, withBusy } from '../nucleo/estado.js';
+import { PUESTOS, abreviaturas, capTags, funcionesDe, head, horasDe, horasPersona, puestoDe, puestoTag, renderView, rolDe, rolTag, shiftById, tipoDe, usaPuestos } from '../nucleo/pintado.js';
 import { horasFila } from './cuadrante.js';
 import { personaHref } from './persona.js';
 import { ensure } from './portal.js';
+import { markDirty } from '../nucleo/enlace.js';
+import { actions } from '../nucleo/registro.js';
+import { refreshList } from './horarios.js';
 // ------------------------------------------------------------------ ALERTAS DEL ENCARGADO
 export const SEV = { critica: 'Crítica', alta: 'Alta', media: 'Media', baja: 'Baja' };
 export const SEV_ORDER = ['critica', 'alta', 'media', 'baja'];
@@ -42,12 +45,13 @@ export function alertsPanel(cur) {
   const cards = (list) => list.map((a) => alertCard(a, { sid: cur.id })).join('');
   const top = act.slice(0, 5), more = act.slice(5);
   const solve = act.length ? '<div class="notice info no-print" style="margin-bottom:12px"><span class="small">El solucionador busca los mínimos cambios en este horario para arreglar sus alertas (por ejemplo, pasar turnos de quien va sobrado de horas a quien va corto) y te los enseña antes de aplicarlos.</span><span class="spacer"></span><button class="btn primary" data-act="solve">Solucionar problemas</button></div>' : '';
-  return `<div class="section alerts-panel"><h2>Alertas ${sevBadges(rep.resumen)}</h2>${regen}${solve}
+  const criticas = (rep.resumen && rep.resumen.critica) || cur.alertas.critica;
+  return `<div class="section alerts-panel"><details class="alerts-fold"${criticas ? ' open' : ''}><summary><h2>Alertas ${sevBadges(rep.resumen)}</h2><span class="small muted fold-hint">Revisar</span></summary>${regen}${solve}
     ${act.length ? `<div class="alert-list">${cards(top)}</div>` : '<div class="notice ok">No quedan alertas por revisar.</div>'}
     ${more.length ? `<details class="alert-more"><summary>Ver ${more.length} más</summary><div class="alert-list">${cards(more)}</div></details>` : ''}
     ${rec.length ? `<details class="alert-more"><summary>Reconocidas (${rec.length})</summary><div class="alert-list">${cards(rec)}</div></details>` : ''}
-    ${(cur.sugerencias || []).length ? `<details class="alert-more no-print" open><summary>Qué cambiar en la configuración (${cur.sugerencias.length})</summary><p class="small muted">Las alertas que no se arreglan moviendo turnos suelen venir de la configuración. Estos cambios ayudarían; después, regenera el horario.</p>${suggestionsHtml(cur.sugerencias)}</details>` : ''}
-  </div>`;
+    ${(cur.sugerencias || []).length ? `<details class="alert-more no-print"><summary>Qué cambiar en la configuración (${cur.sugerencias.length})</summary><p class="small muted">Las alertas que no se arreglan moviendo turnos suelen venir de la configuración. Estos cambios ayudarían; después, regenera el horario.</p>${suggestionsHtml(cur.sugerencias)}</details>` : ''}
+  </details></div>`;
 }
 
 // Cambios de configuración que ayudarían con las alertas que no se arreglan moviendo turnos.
@@ -182,3 +186,42 @@ export function weeksGrid(cur) {
   return html;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  solve: async () => {
+    if (state.dirty && !(await saveConfig())) return;
+    const sid = state.current.id;
+    try {
+      state.fix = { sid, p: await withBusy('Buscando cómo arreglar las alertas…', () => api('POST', `/api/horarios/${sid}/solucionar`, {})) };
+      overlay(fixDialog(state.fix.p));
+    } catch (e) { toast(e.message, true); }
+  },
+  applyFix: async () => {
+    const { sid, p } = state.fix || {};
+    if (!p) return;
+    try {
+      state.current = await withBusy('Aplicando cambios…', () => api('POST', `/api/horarios/${sid}/solucionar/aplicar`, { cambios: p.cambios }));
+      state.fix = null;
+      toast(`${p.cambios.length === 1 ? 'Cambio aplicado' : `${p.cambios.length} cambios aplicados`}`);
+      refreshList(); renderView();
+    } catch (e) { toast(e.message, true); }
+  },
+  alFiltro: (el) => { state.alf[el.dataset.kind] = el.dataset.k || null; renderView(); },
+  ackAlert: async (el) => {
+    const nota = window.prompt('Nota opcional (por qué lo das por revisado):', '');
+    if (nota === null) return;
+    const d = await api('POST', `/api/horarios/${el.dataset.sid}/alertas/reconocer`, { clave: el.dataset.clave, nota: nota.trim() || null });
+    if (state.current && state.current.id === d.id) state.current = d;
+    refreshList(); renderView();
+  },
+  reopenAlert: async (el) => {
+    const d = await api('DELETE', `/api/horarios/${el.dataset.sid}/alertas/reconocer?clave=${encodeURIComponent(el.dataset.clave)}`);
+    if (state.current && state.current.id === d.id) state.current = d;
+    refreshList(); renderView();
+  },
+  toggleAlertCode: (el) => {
+    const a = state.draft.alertas, c = el.dataset.code;
+    a.desactivadas = a.desactivadas.includes(c) ? a.desactivadas.filter((x) => x !== c) : [...a.desactivadas, c];
+    markDirty(); renderView();
+  },
+});

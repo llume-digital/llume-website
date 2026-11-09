@@ -1,6 +1,9 @@
 import { ICON, TIPOS_TURNO, esc, fmtH, toMin } from '../nucleo/util.js';
 import { state } from '../nucleo/estado.js';
-import { dayChips, head } from '../nucleo/pintado.js';
+import { dayChips, head, renderView } from '../nucleo/pintado.js';
+import { conDeshacer } from '../nucleo/borrador.js';
+import { getPath, markDirty, setPath } from '../nucleo/enlace.js';
+import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ TURNOS
 export function timeline(items, from = 6 * 60, to = 24 * 60) {
   const pct = (m) => `${((Math.min(Math.max(m, from), to) - from) / (to - from)) * 100}%`;
@@ -29,6 +32,29 @@ export function viewTurnos() {
   }).join('')}</div>
   <div class="card section"><h2>Así cubren el día</h2>${t.map((s) => `<div class="row" style="flex-wrap:nowrap;margin-bottom:6px"><b style="width:120px;flex:none" class="small">${esc(s.nombre)}</b><div style="flex:1">${timeline([s]).split('<div class="timeline-axis">')[0]}</div></div>`).join('')}
   <div class="row" style="flex-wrap:nowrap"><span style="width:120px;flex:none"></span><div style="flex:1" class="timeline-axis"><span>06</span><span>09</span><span>12</span><span>15</span><span>18</span><span>21</span><span>24</span></div></div></div>`
-    : '<div class="card empty">No hay turnos. Añade al menos uno.</div>'}`;
+    : `<div class="card empty"><p>No hay turnos. Sin ellos el generador no puede hacer horarios.</p><button class="btn primary" data-act="addShift">${ICON.plus} Añadir el primer turno</button></div>`}`;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  toggleShift: (el) => {
+    const path = el.dataset.path; let arr = getPath(state.draft, path) || [];
+    arr = arr.includes(el.dataset.shift) ? arr.filter((d) => d !== el.dataset.shift) : [...arr, el.dataset.shift];
+    setPath(state.draft, path, arr); markDirty(); renderView();
+  },
+  addShift: () => {
+    const ids = state.draft.turnos.map((s) => s.id);
+    let n = 1; while (ids.includes(`T${n}`)) n++;
+    state.draft.turnos.push({ id: `T${n}`, nombre: 'Nuevo turno', inicio: '09:00', fin: '15:00', tipo: 'normal', dias: null, color: '#E8D5B0' });
+    markDirty(); renderView();
+  },
+  delShift: (el) => {
+    const c = state.draft; const s = c.turnos[Number(el.dataset.i)];
+    const avisar = conDeshacer(`Turno ${s.nombre} eliminado`);
+    c.turnos.splice(Number(el.dataset.i), 1);
+    c.preferencias.forEach((p) => { p.turnos = p.turnos.filter((t) => t !== s.id); });
+    c.preferencias = c.preferencias.filter((p) => p.turnos.length);
+    c.excepciones_asignacion = c.excepciones_asignacion.filter((o) => o.turno_id !== s.id);
+    markDirty(); renderView(); avisar();
+  },
+});
