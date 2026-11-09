@@ -13,6 +13,7 @@ import { CLASES, monthBounds, pad2, shiftText } from './pantallas/portal.js';
 import { feedbackDialog } from './pantallas/comentarios.js';
 import { corrDetail, openCorrection } from './pantallas/informes.js';
 import { claveTemporal, cuentaDialog, pwForm } from './pantallas/cuenta.js';
+import { eleccion, hayQueRevisar, revisionDialog } from './pantallas/publicar.js';
 // ------------------------------------------------------------------ acciones
 const confirmLeave = async () => !state.dirty || confirmar({ titulo: '¿Descartar los cambios sin guardar?', verbo: 'Descartar cambios', peligro: true });
 
@@ -259,9 +260,24 @@ export const actions = {
     renderView();
   },
   publish: async (el) => {
-    const confirmar = Boolean(el && el.dataset && el.dataset.confirm);
+    const datos = (el && el.dataset) || {};
+    const confirmar = Boolean(datos.confirm);
+    const sid = state.current.id;
+    // Primero la revisión (diferencias con lo publicado, ediciones a conservar, días pasados); al confirmar
+    // alertas críticas se repite lo elegido en ella.
+    if (datos.revisado) state.publicacion = { sid, ...eleccion(state.publicacion.rev) };
+    else if (!confirmar || !state.publicacion || state.publicacion.sid !== sid) {
+      state.publicacion = null;
+      try {
+        const rev = await api('GET', `/api/horarios/${sid}/revision`);
+        if (hayQueRevisar(rev)) { state.publicacion = { sid, rev }; overlay(revisionDialog(rev)); return; }
+      } catch (e) { toast(e.message, true); return; }
+    }
+    const elegido = state.publicacion && state.publicacion.sid === sid
+      ? { conservar: state.publicacion.conservar || [], confirmar_pasado: Boolean(state.publicacion.confirmar_pasado) } : {};
     try {
-      const d = await withBusy('Publicando…', () => api('POST', `/api/horarios/${state.current.id}/publicar`, confirmar ? { confirmar_criticas: true } : {}));
+      const d = await withBusy('Publicando…', () => api('POST', `/api/horarios/${sid}/publicar`, { ...elegido, ...(confirmar ? { confirmar_criticas: true } : {}) }));
+      state.publicacion = null;
       const reemplazo = d.reemplazado;
       state.current = d; refreshList();
       if (reemplazo) { location.hash = `#/horarios/${reemplazo}`; renderView(); toast('Arreglo publicado. Avisa por Slack a quien le cambia el turno.'); }

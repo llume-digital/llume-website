@@ -366,6 +366,12 @@ textarea { font: inherit; resize: vertical; }
 .suggestion { padding: 12px 14px; border-left: 3px solid var(--gold); }
 .fix-alerts { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 6px; font-size: var(--text-md); }
 .fix-off { color: var(--warn); font-weight: 700; }
+/* revisión antes de publicar */
+.revision-cambios { display: grid; gap: 8px; max-height: 40vh; overflow: auto; font-size: var(--text-md); }
+.revision-dia { border-left: 3px solid var(--line-strong); padding-left: 10px; }
+.revision-dia.pasado { border-left-color: var(--warn); }
+.revision-dia ul, .revision-conservar { margin: 4px 0 0; padding-left: 0; list-style: none; display: grid; gap: 2px; }
+.revision-conservar { margin-bottom: 12px; }
 .alert-more summary { cursor: pointer; font-weight: 700; color: var(--brown); margin-bottom: 8px; }
 .alerts-panel h2 { display: flex; align-items: center; gap: 10px; }
 /* avisos del trabajador */
