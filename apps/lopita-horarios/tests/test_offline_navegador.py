@@ -72,6 +72,7 @@ def test_demo_completa_sin_conexion(url, movil):
     pg.evaluate("document.querySelectorAll('.overlay').forEach((o) => o.remove())")
     assert pg.evaluate("navigator.serviceWorker.ready.then((r) => !!r.active)")
     with pg.expect_download() as descarga:
+        pg.click(".mas-menu > summary")
         pg.click("text=Horas (CSV)")
     assert descarga.value.suggested_filename.startswith("horas_")
 

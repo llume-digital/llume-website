@@ -45,12 +45,13 @@ export function alertsPanel(cur) {
   const cards = (list) => list.map((a) => alertCard(a, { sid: cur.id })).join('');
   const top = act.slice(0, 5), more = act.slice(5);
   const solve = act.length ? '<div class="notice info no-print" style="margin-bottom:12px"><span class="small">El solucionador busca los mínimos cambios en este horario para arreglar sus alertas (por ejemplo, pasar turnos de quien va sobrado de horas a quien va corto) y te los enseña antes de aplicarlos.</span><span class="spacer"></span><button class="btn primary" data-act="solve">Solucionar problemas</button></div>' : '';
-  return `<div class="section alerts-panel"><h2>Alertas ${sevBadges(rep.resumen)}</h2>${regen}${solve}
+  const criticas = (rep.resumen && rep.resumen.critica) || cur.alertas.critica;
+  return `<div class="section alerts-panel"><details class="alerts-fold"${criticas ? ' open' : ''}><summary><h2>Alertas ${sevBadges(rep.resumen)}</h2><span class="small muted fold-hint">Revisar</span></summary>${regen}${solve}
     ${act.length ? `<div class="alert-list">${cards(top)}</div>` : '<div class="notice ok">No quedan alertas por revisar.</div>'}
     ${more.length ? `<details class="alert-more"><summary>Ver ${more.length} más</summary><div class="alert-list">${cards(more)}</div></details>` : ''}
     ${rec.length ? `<details class="alert-more"><summary>Reconocidas (${rec.length})</summary><div class="alert-list">${cards(rec)}</div></details>` : ''}
-    ${(cur.sugerencias || []).length ? `<details class="alert-more no-print" open><summary>Qué cambiar en la configuración (${cur.sugerencias.length})</summary><p class="small muted">Las alertas que no se arreglan moviendo turnos suelen venir de la configuración. Estos cambios ayudarían; después, regenera el horario.</p>${suggestionsHtml(cur.sugerencias)}</details>` : ''}
-  </div>`;
+    ${(cur.sugerencias || []).length ? `<details class="alert-more no-print"><summary>Qué cambiar en la configuración (${cur.sugerencias.length})</summary><p class="small muted">Las alertas que no se arreglan moviendo turnos suelen venir de la configuración. Estos cambios ayudarían; después, regenera el horario.</p>${suggestionsHtml(cur.sugerencias)}</details>` : ''}
+  </details></div>`;
 }
 
 // Cambios de configuración que ayudarían con las alertas que no se arreglan moviendo turnos.
