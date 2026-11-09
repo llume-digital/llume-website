@@ -1,5 +1,6 @@
 import { $, clone, esc, fmtLong, fmtStamp } from './util.js';
-import { pararDictado, render, renderSavebar, renderView, route, tabsHtml } from './pintado.js';
+import { pararDictado, render, renderSavebar, renderView, tabsHtml } from './pintado.js';
+import { route } from './rutas.js';
 import { refreshList } from '../pantallas/horarios.js';
 // ------------------------------------------------------------------ estado y API
 export const state = {

@@ -1,7 +1,8 @@
 import { $, clone } from './js/nucleo/util.js';
 import { api, arreglarPendientes, closeOverlay, confirmar, loadConfig, showNotifications, state, toast, vigilarRed } from './js/nucleo/estado.js';
 import { onBind } from './js/nucleo/enlace.js';
-import { isWorker, render, renderView, route, tabsHtml } from './js/nucleo/pintado.js';
+import { isWorker, render, renderView, tabsHtml } from './js/nucleo/pintado.js';
+import { alNavegar, route } from './js/nucleo/rutas.js';
 import { refreshList } from './js/pantallas/horarios.js';
 import { closeMenu, diaCambios, menuOnScroll, seguirAnclas } from './js/pantallas/dia.js';
 import { uploadWebDoc } from './js/pantallas/comentarios.js';
@@ -36,7 +37,7 @@ document.addEventListener('change', (e) => {
 document.addEventListener('submit', enviarFormulario);
 window.addEventListener('scroll', menuOnScroll, true);
 if (window.visualViewport) window.visualViewport.addEventListener('resize', seguirAnclas);  // p. ej. al abrirse el teclado
-window.addEventListener('hashchange', () => { closeMenu(); state.historial = null; if (route().name === 'calendario') { state.cal.data = {}; state.cal.inf = {}; } if (route().name !== 'horarios' || !route().arg) state.current = state.current; if (route().name === 'web') state.web.data = undefined; renderView(); if (!(route().name === 'guia' && route().arg)) window.scrollTo(0, 0); });
+window.addEventListener('hashchange', () => { const arriba = alNavegar(); renderView(); if (arriba) window.scrollTo(0, 0); });
 window.addEventListener('beforeunload', (e) => { if (state.dirty || (state.dia && diaCambios(state.dia).length)) { e.preventDefault(); e.returnValue = ''; } });
 
 async function importConfig(file) {
