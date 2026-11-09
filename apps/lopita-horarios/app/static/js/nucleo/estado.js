@@ -103,7 +103,7 @@ export async function showNotifications() {
     </article>`;
   overlay(`<h2>${list.some((n) => n.detalle && n.detalle.valido === false) ? 'Hay alertas críticas' : 'Avisos'}</h2>
     <div class="stack" style="gap:12px">${list.map(item).join('')}</div>
-    <div class="row end" style="margin-top:16px"><button class="btn" data-act="readNotifications">Entendido</button></div>`);
+    <div class="row end" style="margin-top:16px"><button class="btn" data-act="readNotifications">Marcar como leídos</button></div>`);
 }
 
 export function toast(msg, bad = false) {
