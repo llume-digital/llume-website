@@ -15,7 +15,25 @@ export function viewAjustes() {
   const { users, history, slack, accesos, google } = state.ajustes;
   const empsLibres = state.draft.empleados.filter((e) => e.activo && !users.some((u) => u.empleado_id === e.id));
   return `${head('Ajustes', '')}
-  <div class="grid">
+  <div class="ajustes-col">
+    <div class="card"><h2>Cuentas de acceso</h2>
+      ${accesos.length ? `<div class="accesos"><h3 style="margin:16px 0 6px">Registros con Google pendientes (${accesos.length})</h3>${accesos.map((a) => `<form id="acceso-form-${a.id}" data-form="acceso-form" class="acceso card" data-id="${a.id}">
+        <div><b>${esc(a.nombre || a.email)}</b><div class="small muted">${esc(a.email)} · ${fmtStamp(a.created_at)}</div></div>
+        <div class="fields two"><label class="field">Usuario<input type="text" name="usuario" required value="${esc(a.email.split('@')[0].toLowerCase().replace(/[^a-z0-9._-]/g, ''))}"></label><label class="field">Nombre<input type="text" name="nombre" value="${esc(a.nombre || '')}"></label></div>
+        <label class="field">Tipo de cuenta<select name="rol" data-act-change="accesoRol"><option value="empleado">Trabajador</option><option value="admin">Encargado</option></select></label>
+        <label class="field acceso-emp">Persona del equipo<select name="empleado_id">${empsLibres.map((e) => `<option value="${esc(e.id)}">${esc(e.nombre)}</option>`).join('')}</select></label>
+        <div class="row end"><button type="button" class="btn" data-act="rechazarAcceso" data-id="${a.id}">Rechazar</button><button class="btn primary" type="submit">Dar acceso</button></div>
+      </form>`).join('')}</div>` : ''}
+      <table class="list"><tbody>${users.map((u) => `<tr><td><b>${esc(u.nombre || u.username)}</b>${u.google ? ' <span class="badge neutral">Google</span>' : ''}<div class="small muted">${esc(u.username)} · ${u.rol === 'admin' ? 'Encargado' : `Trabajador · ${esc(empName(u.empleado_id))}`}${u.cambiar_clave ? ' · contraseña temporal' : ''}</div><div class="small muted">${u.email ? esc(u.email) : 'sin correo'}</div>
+        <div class="user-acts">${u.username !== state.me.username ? `<button class="btn small" data-act="emailUser" data-u="${esc(u.username)}">Correo</button><button class="btn small" data-act="resetUser" data-u="${esc(u.username)}">Contraseña</button><button class="icon-btn" data-act="delUser" data-u="${esc(u.username)}" title="Quitar acceso">${ICON.trash}</button>` : '<button class="btn small" data-act="cuentaDialog">Mi cuenta</button>'}</div></td></tr>`).join('')}</tbody></table>
+      <form id="user-form" class="stack" style="gap:10px;margin-top:14px">
+        <div class="small muted" style="font-weight:600">Crear cuenta</div>
+        <div class="fields two"><label class="field">Usuario<input type="text" name="usuario" required autocomplete="off"></label><label class="field">Nombre<input type="text" name="nombre"></label></div>
+        <label class="field">Tipo de cuenta<select name="rol" data-act-change="userRol"><option value="empleado">Trabajador (ve sus horas y hace solicitudes)</option><option value="admin">Encargado (control total)</option></select></label>
+        <label class="field" id="user-emp">Persona del equipo<select name="empleado_id">${state.draft.empleados.filter((e) => e.activo).map((e) => `<option value="${esc(e.id)}">${esc(e.nombre)}</option>`).join('')}</select></label>
+        <label class="field">Contraseña<span class="hint">Para un trabajador es temporal: la cambiará al entrar.</span><input type="password" name="password" minlength="8" required autocomplete="new-password"></label>
+        <button class="btn" type="submit">Crear cuenta</button>
+      </form></div>
     <div class="card"><h2>Negocio</h2><label class="field">Nombre que aparece en los horarios<input type="text" value="${esc(state.draft.negocio)}" data-bind="negocio"></label></div>
     <div class="card"><h2>Slack</h2>
       ${slack.configurado ? (slack.ok ? `<div class="notice ok">Conectado a <b>${esc(slack.equipo || '')}</b> como ${esc(slack.bot || '')}. Canal: <b>${esc(slack.canal || 'sin canal')}</b>.</div>` : `<div class="notice warn">El token de Slack no funciona: ${esc(slack.error || 'error desconocido')}.</div>`)
@@ -29,26 +47,6 @@ export function viewAjustes() {
         ${google.desde_entorno ? '<p class="small muted" style="margin:0">Viene de la configuración del servidor (LOPITA_GOOGLE_CLIENT_ID).</p>' : '<div class="row end"><button class="btn" type="submit">Guardar</button></div>'}
       </form>
       <p class="small muted">Quien entra con Google entra en la cuenta que tenga ese correo. Si no tiene cuenta, queda como registro pendiente aquí abajo hasta que le des acceso.</p></div>
-  </div>
-  <div class="grid section">
-    <div class="card"><h2>Cuentas de acceso</h2>
-      <table class="list"><tbody>${users.map((u) => `<tr><td><b>${esc(u.nombre || u.username)}</b>${u.google ? ' <span class="badge neutral">Google</span>' : ''}<div class="small muted">${esc(u.username)} · ${u.rol === 'admin' ? 'Encargado' : `Trabajador · ${esc(empName(u.empleado_id))}`}${u.cambiar_clave ? ' · contraseña temporal' : ''}</div><div class="small muted">${u.email ? esc(u.email) : 'sin correo'}</div>
-        <div class="user-acts">${u.username !== state.me.username ? `<button class="btn small" data-act="emailUser" data-u="${esc(u.username)}">Correo</button><button class="btn small" data-act="resetUser" data-u="${esc(u.username)}">Contraseña</button><button class="icon-btn" data-act="delUser" data-u="${esc(u.username)}" title="Quitar acceso">${ICON.trash}</button>` : '<button class="btn small" data-act="cuentaDialog">Mi cuenta</button>'}</div></td></tr>`).join('')}</tbody></table>
-      ${accesos.length ? `<div class="accesos"><h3 style="margin:16px 0 6px">Registros con Google pendientes</h3>${accesos.map((a) => `<form id="acceso-form" class="acceso card" data-id="${a.id}">
-        <div><b>${esc(a.nombre || a.email)}</b><div class="small muted">${esc(a.email)} · ${fmtStamp(a.created_at)}</div></div>
-        <div class="fields two"><label class="field">Usuario<input type="text" name="usuario" required value="${esc(a.email.split('@')[0].toLowerCase().replace(/[^a-z0-9._-]/g, ''))}"></label><label class="field">Nombre<input type="text" name="nombre" value="${esc(a.nombre || '')}"></label></div>
-        <label class="field">Tipo de cuenta<select name="rol" data-act-change="accesoRol"><option value="empleado">Trabajador</option><option value="admin">Encargado</option></select></label>
-        <label class="field acceso-emp">Persona del equipo<select name="empleado_id">${empsLibres.map((e) => `<option value="${esc(e.id)}">${esc(e.nombre)}</option>`).join('')}</select></label>
-        <div class="row end"><button type="button" class="btn" data-act="rechazarAcceso" data-id="${a.id}">Rechazar</button><button class="btn primary" type="submit">Dar acceso</button></div>
-      </form>`).join('')}</div>` : ''}
-      <form id="user-form" class="stack" style="gap:10px;margin-top:14px">
-        <div class="small muted" style="font-weight:600">Crear cuenta</div>
-        <div class="fields two"><label class="field">Usuario<input type="text" name="usuario" required autocomplete="off"></label><label class="field">Nombre<input type="text" name="nombre"></label></div>
-        <label class="field">Tipo de cuenta<select name="rol" data-act-change="userRol"><option value="empleado">Trabajador (ve sus horas y hace solicitudes)</option><option value="admin">Encargado (control total)</option></select></label>
-        <label class="field" id="user-emp">Persona del equipo<select name="empleado_id">${state.draft.empleados.filter((e) => e.activo).map((e) => `<option value="${esc(e.id)}">${esc(e.nombre)}</option>`).join('')}</select></label>
-        <label class="field">Contraseña<span class="hint">Para un trabajador es temporal: la cambiará al entrar.</span><input type="password" name="password" minlength="8" required autocomplete="new-password"></label>
-        <button class="btn" type="submit">Crear cuenta</button>
-      </form></div>
     <div class="card"><h2>Copia de la configuración</h2>
       <p class="small muted" style="margin-top:0">Descarga toda la configuración (equipo, turnos, demanda, ausencias…) o carga una guardada.</p>
       <div class="row"><button class="btn" data-act="exportConfig">Descargar</button><label class="btn">Cargar archivo…<input type="file" accept="application/json,.json" id="import-file" hidden></label></div>

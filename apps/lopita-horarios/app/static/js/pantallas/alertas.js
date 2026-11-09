@@ -245,6 +245,7 @@ Object.assign(actions, {
   toggleAlertCode: (el) => {
     const a = state.draft.alertas, c = el.dataset.code;
     a.desactivadas = a.desactivadas.includes(c) ? a.desactivadas.filter((x) => x !== c) : [...a.desactivadas, c];
+    state.reglasAlertasAbiertas = true; // el panel sigue abierto tras repintar
     markDirty(); renderView();
   },
 });

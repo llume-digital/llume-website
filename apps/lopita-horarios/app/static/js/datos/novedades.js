@@ -7,6 +7,10 @@
 // - Lo puramente interno (tests, refactors, CI, documentación) no lleva entrada: el PR lo dice con «Sin novedades: …».
 // La comprobación de CI (herramientas/comprobar_novedades.py) falla si un PR toca la app sin pasar por aquí.
 export const NOVEDADES = [
+  { fecha: '2026-11-09', titulo: 'Ajustes y Reglas, más ordenados', ir: 'ajustes', texto: [
+    '<b>Ajustes</b> va en una sola columna, con las <b>cuentas de acceso</b> primero y, arriba, los registros con Google que esperan aprobación (con su número).',
+    'En <b>Reglas</b>, lo importante (descansos, jornada y bolsa de horas) se ve de entrada. <b>Alertas</b> queda plegado con un resumen («22 de 22 activas») y los tipos de alerta, en casillas de dos columnas.',
+  ] },
   { fecha: '2026-11-09', titulo: 'Pendiente: todo lo que te espera, en una lista', ir: 'alertas', texto: [
     'Arriba de <b>Pendiente</b> hay ahora una lista de lo que espera: alertas críticas, solicitudes por resolver, arreglos listos para revisar, borradores sin publicar y accesos con Google por aprobar. Cada fila tiene un solo botón que te lleva al sitio exacto.',
   ] },
