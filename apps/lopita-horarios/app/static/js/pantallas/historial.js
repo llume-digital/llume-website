@@ -4,6 +4,7 @@
 import { daysBetween, esc, fmtLong, fmtRange, fmtStamp } from '../nucleo/util.js';
 import { api, overlay, state, toast, withBusy } from '../nucleo/estado.js';
 import { head, renderView } from '../nucleo/pintado.js';
+import { actions } from '../nucleo/registro.js';
 
 export const nombreHorario = (h) => h.nombre || fmtRange(h.desde, h.hasta);
 
@@ -61,7 +62,7 @@ const version = (id) => (state.historial?.versiones || []).find((v) => v.id === 
   || (state.current && state.current.id === id ? { id, nombre: state.current.nombre, ...state.current.horario } : { id });
 
 // Acciones del historial (se añaden a las de acciones.js).
-export const accionesHistorial = {
+Object.assign(actions, {
   compararVersion: async (el) => {
     const id = Number(el.dataset.id);
     const rev = await api('GET', `/api/horarios/${id}/comparar`);
@@ -89,4 +90,4 @@ export const accionesHistorial = {
     toast('Borrador creado: revísalo y publícalo cuando quieras');
     location.hash = `#/horarios/${d.id}`;
   },
-};
+});

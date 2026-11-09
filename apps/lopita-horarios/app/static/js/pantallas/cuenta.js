@@ -1,6 +1,8 @@
 import { $, esc } from '../nucleo/util.js';
-import { api, overlay, state, toast } from '../nucleo/estado.js';
+import { api, confirmar, overlay, state, toast } from '../nucleo/estado.js';
 import { boot } from '../../app.js';
+import { renderView } from '../nucleo/pintado.js';
+import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ CUENTA y GOOGLE
 export function claveTemporal() {
   const abc = 'abcdefghjkmnpqrstuvwxyz23456789';
@@ -80,3 +82,34 @@ export function viewForcePw() {
   return `<div class="login"><div class="login-art"><div class="mark">LOPITA &amp; CO</div><div class="rule"></div><div class="tag">Horarios del equipo</div></div><div class="login-form">${pwForm(true)}</div></div>`;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  pwDialog: () => overlay(pwForm(false)),
+  cuentaDialog: () => cuentaDialog(),
+  desvincularGoogle: async () => {
+    try { state.me = { ...state.me, ...(await api('DELETE', '/api/mi/google')) }; toast('Cuenta de Google desvinculada'); cuentaDialog(); } catch (e) { toast(e.message, true); }
+  },
+  resetUser: (el) => {
+    const u = el.dataset.u;
+    overlay(`<h2>Nueva contraseña para ${esc(u)}</h2>
+      <form id="reset-form" class="stack" style="gap:12px" data-u="${esc(u)}">
+        <p class="small muted" style="margin:0">Es temporal: al entrar con ella tendrá que cambiarla por una suya. Si tiene Google vinculado, también puede entrar con Google.</p>
+        <label class="field">Contraseña temporal<input type="text" name="password" minlength="8" required autocomplete="off" value="${esc(claveTemporal())}"></label>
+        <div class="row end"><button type="button" class="btn" data-act="closeOverlay">Cancelar</button><button class="btn primary" type="submit">Guardar</button></div>
+      </form>`);
+  },
+  emailUser: (el) => {
+    const u = state.ajustes.users.find((x) => x.username === el.dataset.u);
+    overlay(`<h2>Correo de ${esc(u.nombre || u.username)}</h2>
+      <form id="email-form" class="stack" style="gap:12px" data-u="${esc(u.username)}">
+        <p class="small muted" style="margin:0">Con su correo de Google podrá entrar con Google.</p>
+        <label class="field">Correo electrónico<input type="email" name="email" value="${esc(u.email || '')}" placeholder="nombre@gmail.com"></label>
+        <div class="row end"><button type="button" class="btn" data-act="closeOverlay">Cancelar</button><button class="btn primary" type="submit">Guardar</button></div>
+      </form>`);
+  },
+
+  delUser: async (el) => {
+    if (!(await confirmar({ titulo: `¿Quitar el acceso a ${el.dataset.u}?`, verbo: 'Quitar acceso', peligro: true }))) return;
+    try { state.ajustes.users = await api('DELETE', `/api/usuarios/${encodeURIComponent(el.dataset.u)}`); renderView(); } catch (e) { toast(e.message, true); }
+  },
+});

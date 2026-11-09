@@ -1,6 +1,9 @@
-import { DAYS, DAY_LABEL, ICON, daysBetween, esc, fmtLong, todayIso, weekday } from '../nucleo/util.js';
-import { state } from '../nucleo/estado.js';
-import { PUESTOS, TIPOS, dayChips, esRol, funcById, funcionesCfg, head, horasField, puestosDe, rolesDe, slackField, toggle } from '../nucleo/pintado.js';
+import { DAYS, DAY_LABEL, ICON, addDays, daysBetween, esc, fmtLong, todayIso, uid, weekday } from '../nucleo/util.js';
+import { overlay, state, toast } from '../nucleo/estado.js';
+import { PUESTOS, TIPOS, dayChips, empById, esRol, funcById, funcionesCfg, head, horasField, puestosDe, renderView, rolesDe, slackField, toggle } from '../nucleo/pintado.js';
+import { conDeshacer } from '../nucleo/borrador.js';
+import { markDirty } from '../nucleo/enlace.js';
+import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ EQUIPO
 export function viewEquipo() {
   const emps = state.draft.empleados;
@@ -109,3 +112,67 @@ function funcionesField(i, e) {
     </div>${roles}</div>`;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  togglePuesto: (el) => {
+    const e = state.draft.empleados[Number(el.dataset.i)];
+    const ps = puestosDe(e), p = el.dataset.p;
+    if (ps.includes(p) && ps.length === 1) { toast('Cada persona tiene que tener al menos un puesto', true); return; }
+    e.puestos = ps.includes(p) ? ps.filter((x) => x !== p) : [...ps, p];
+    markDirty(); renderView();
+  },
+  addEmp: () => {
+    const ids = state.draft.empleados.map((e) => e.id);
+    state.draft.empleados.push({ id: uid(`persona-${ids.length + 1}`, ids), nombre: 'Nueva persona', horas_semanales: 30, puede_abrir: false, puede_cerrar: false, es_encargado: false, puestos: ['sala', 'cocina'], funciones: [], libranzas_fijas: [], restricciones_horarias: [], slack_user_id: null, email: null, activo: true });
+    markDirty(); renderView(); window.scrollTo(0, document.body.scrollHeight);
+  },
+  addComodin: () => {
+    const emps = state.draft.empleados;
+    const usados = new Set(emps.map((e) => e.nombre.trim().toUpperCase()));
+    let n = 1;
+    while (usados.has(`X${n}`)) n++;
+    emps.push({ id: uid(`comodin-${n}`, emps.map((e) => e.id)), nombre: `X${n}`, horas_semanales: 0, comodin: true, horas_min_semana: null, horas_max_semana: null, puede_abrir: false, puede_cerrar: false, es_encargado: false, puestos: ['sala', 'cocina'], funciones: [], libranzas_fijas: [], restricciones_horarias: [], slack_user_id: null, email: null, activo: true });
+    markDirty(); renderView(); window.scrollTo(0, document.body.scrollHeight);
+  },
+  delEmp: (el) => {
+    const c = state.draft; const e = c.empleados[Number(el.dataset.i)];
+    const avisar = conDeshacer(`${e.nombre} eliminada del equipo, con sus ausencias y preferencias`);
+    c.empleados.splice(Number(el.dataset.i), 1);
+    c.ausencias = c.ausencias.filter((a) => a.empleado_id !== e.id);
+    c.excepciones_asignacion = c.excepciones_asignacion.filter((a) => a.empleado_id !== e.id);
+    c.preferencias = c.preferencias.filter((a) => a.empleado_id !== e.id);
+    markDirty(); renderView(); avisar();
+  },
+  bajaDialog: (el) => {
+    const e = empById(state.draft, el.dataset.emp);
+    overlay(`<h2>Baja de ${esc(e.nombre)}</h2>
+      <form id="baja-form" class="stack" style="gap:12px" data-emp="${esc(e.id)}">
+        <div class="fields two"><label class="field">Desde<input type="date" name="desde" value="${todayIso()}" required></label>
+          <label class="field">Hasta (si se sabe)<input type="date" name="hasta"><span class="hint">Vacío: hasta que le des el alta.</span></label></div>
+        <p class="small muted" style="margin:0">Al guardar, el motor deja de darle turnos esos días. Si ya tenía turnos asignados, te aviso de cuáles no se van a hacer y preparo un arreglo como borrador para que lo revises y lo publiques.${state.dirty ? ' También se guardarán los demás cambios que tienes sin guardar.' : ''}</p>
+        <div class="row end"><button type="button" class="btn" data-act="closeOverlay">Cancelar</button><button class="btn primary" type="submit">Guardar la baja</button></div>
+      </form>`);
+  },
+  bajaAlta: (el) => {
+    const e = empById(state.draft, el.dataset.emp);
+    const b = bajaDe(e);
+    const min = b.desde > todayIso() ? b.desde : todayIso();
+    overlay(`<h2>Alta de ${esc(e.nombre)}</h2>
+      <form id="alta-form" class="stack" style="gap:12px" data-emp="${esc(e.id)}">
+        <label class="field">Vuelve a trabajar el<input type="date" name="vuelve" value="${addDays(min, 1) > b.hasta && !bajaSinFin(b) ? b.hasta : addDays(min, 1)}" min="${b.desde}" required></label>
+        <p class="small muted" style="margin:0">Desde ese día el motor vuelve a contar con ${esc(e.nombre)}. Los horarios ya hechos no cambian solos: regenéralos si quieres que trabaje en ellos.</p>
+        <div class="row end"><button type="button" class="btn" data-act="closeOverlay">Cancelar</button><button class="btn primary" type="submit">Dar el alta</button></div>
+      </form>`);
+  },
+  addAbsence: () => {
+    const e = state.draft.empleados.find((x) => x.activo);
+    if (!e) { toast('Primero añade a alguien al equipo', true); return; }
+    state.draft.ausencias.push({ empleado_id: e.id, desde: todayIso(), hasta: addDays(todayIso(), 6), motivo: 'vacaciones' }); markDirty(); renderView();
+  },
+  addPref: () => {
+    const e = state.draft.empleados.find((x) => x.activo);
+    if (!e || !state.draft.turnos.length) { toast('Necesitas al menos una persona y un turno', true); return; }
+    state.draft.preferencias.push({ empleado_id: e.id, tipo: 'prefiere', turnos: [state.draft.turnos[0].id], dias: null, peso: 3 }); markDirty(); renderView();
+  },
+  delRow: (el) => { state.draft[el.dataset.list].splice(Number(el.dataset.i), 1); markDirty(); renderView(); },
+});

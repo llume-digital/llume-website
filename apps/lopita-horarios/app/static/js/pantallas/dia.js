@@ -1,9 +1,11 @@
-import { DAYS, DAY_LABEL, ICON, MOTIVOS, addDays, clone, dayNum, esc, fmtH, fmtLong, fmtMin, fmtRange, monthName, toMin, todayIso, weekday } from '../nucleo/util.js';
-import { confirmar, state, toast } from '../nucleo/estado.js';
+import { $, DAYS, DAY_LABEL, ICON, MOTIVOS, addDays, clone, dayNum, esc, fmtH, fmtLong, fmtMin, fmtRange, monthName, toMin, todayIso, weekday } from '../nucleo/util.js';
+import { api, closeOverlay, confirmar, deshacer, overlay, saveConfig, state, toast, withBusy } from '../nucleo/estado.js';
 import { PUESTOS, abreviaturas, capTags, empById, esRol, funcById, funcionesDe, horasDe, puestoDe, puestoTag, puestosDe, renderView, rolTag, rolesDe, shiftById, tipoDe, usaPuestos } from '../nucleo/pintado.js';
 import { horasFila, nameIn } from './cuadrante.js';
 import { SEV, SEV_ORDER, alertCard, sevBadges } from './alertas.js';
 import { aMin, franjaDe } from './equipo.js';
+import { actions } from '../nucleo/registro.js';
+import { refreshList } from './horarios.js';
 // ------------------------------------------------------------------ VISTA DIARIA (diagrama de Gantt editable)
 // Filas: personas; columnas: horas. Cada barra es el turno de una persona ese día. Se mueve arrastrándola,
 // se alarga o acorta por los bordes y se añade tocando un hueco de la fila. Los cambios se quedan en el
@@ -481,3 +483,88 @@ export function menuOnScroll(e) {
   seguirAnclas();
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  setVista: async (el) => {
+    if (el.dataset.v === state.vista) return;
+    if (state.vista === 'dia' && !(await diaDescartable())) return;
+    if (state.vista === 'dia') state.dia = null;
+    state.vista = el.dataset.v; renderView();
+  },
+  openDay: (el) => { state.diaFecha = el.dataset.date; state.vista = 'dia'; state.dia = null; renderView(); window.scrollTo(0, 0); },
+  dayGo: async (el) => {
+    if (!(await diaDescartable())) return;
+    state.dia = null; state.diaFecha = el.dataset.date;
+    if (el.dataset.sid) { state.current = null; location.hash = `#/horarios/${el.dataset.sid}`; } else renderView();
+  },
+  dayDiscard: () => { const antes = state.dia; state.dia = null; renderView(); deshacer('Cambios del día descartados', () => { state.dia = antes; renderView(); }); },
+  barTimes: (el) => {
+    const t = state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp);
+    const ini = $('#bar-ini').value, fin = $('#bar-fin').value === '23:59' ? '24:00' : $('#bar-fin').value;
+    if (!ini || !fin || toMin(fin) <= toMin(ini)) { toast('La salida tiene que ser después de la entrada', true); return; }
+    t.inicio = ini; t.fin = fin; closeMenu(); renderView();
+  },
+  barAdj: (el) => {
+    const emp = el.dataset.emp;
+    const t = state.dia.tramos.find((x) => x.empleado_id === emp);
+    if (!ajustarTramo(t, el.dataset.k, Number(el.dataset.dm))) { toast('Así no cabe en el día', true); return; }
+    const desplazado = el.closest('.popover').scrollTop;
+    closeMenu(); renderView();
+    const bar = document.querySelector(`.g-bar[data-emp="${CSS.escape(emp)}"]`);
+    const m = bar && openBarMenu(emp, bar);  // sigue abierto, en el mismo sitio, para encadenar ajustes
+    if (m) m.scrollTop = desplazado;
+  },
+  cellAdj: async (el) => {
+    closeMenu();
+    const cur = state.current;
+    if (diaSoloLectura(cur)) { toast('Este horario tiene un arreglo pendiente: haz los cambios en él', true); return; }
+    if (state.vista === 'dia' && !(await diaDescartable())) return;
+    state.vista = 'dia'; state.diaFecha = el.dataset.date; state.dia = null;
+    renderView();
+    const t = state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp);
+    if (!t || !ajustarTramo(t, el.dataset.k, Number(el.dataset.dm))) { toast('Así no cabe en el día', true); renderView(); return; }
+    renderView(); window.scrollTo(0, 0);
+    toast('Ajuste preparado en la vista del día: revisa y pulsa «Confirmar cambios»');
+  },
+  barPuesto: (el) => {
+    const t = state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp);
+    if (t.puesto !== el.dataset.p) Object.assign(t, { puesto: el.dataset.p, funcion: null }); // la app le da su rol de ese puesto
+    closeMenu(); renderView();
+  },
+  barRol: (el) => { state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp).funcion = el.dataset.funcion || ''; closeMenu(); renderView(); },
+  barShift: (el) => {
+    const t = state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp);
+    const sh = shiftById(state.config, el.dataset.shift);
+    Object.assign(t, { inicio: sh.inicio, fin: sh.fin, turno_id: sh.id }); closeMenu(); renderView();
+  },
+  barRemove: (el) => { state.dia.tramos = state.dia.tramos.filter((x) => x.empleado_id !== el.dataset.emp); closeMenu(); renderView(); },
+  dayConfirm: async () => {
+    const d = state.dia;
+    if (state.dirty && !(await saveConfig())) return;
+    try {
+      const ev = await withBusy('Evaluando las alertas…', () => api('POST', `/api/horarios/${d.sid}/dia/evaluar`, { fecha: d.fecha, tramos: d.tramos, base: d.base }));
+      state.diaEval = ev;
+      overlay(dayEvalDialog(ev));
+    } catch (e) { toast(e.message, true); }
+  },
+  dayApply: async (el) => {
+    const d = state.dia;
+    const publicar = Boolean(el.dataset.publicar);
+    try {
+      const r = await withBusy('Guardando…', () => api('POST', `/api/horarios/${d.sid}/dia/aplicar`, { fecha: d.fecha, tramos: d.tramos, base: d.base }));
+      state.dia = null; state.diaEval = null; state.current = r; refreshList();
+      if (r.guardado_en !== d.sid) location.hash = `#/horarios/${r.guardado_en}`;
+      if (publicar) { await actions.publish(); return; }
+      renderView();
+      toast(r.reemplaza && r.guardado_en !== d.sid ? 'Guardado como arreglo: el equipo lo verá cuando lo publiques' : 'Cambios guardados');
+    } catch (e) { closeOverlay(); toast(e.message, true); }
+  },
+  zoom: (el) => {
+    const d = Number(el.dataset.d), k = ZOOMS.indexOf(ganttZoom());
+    state.zoom = d === 0 ? 1 : ZOOMS[Math.max(0, Math.min(ZOOMS.length - 1, k + d))];
+    try { localStorage.setItem('lopita-zoom', String(state.zoom)); } catch { /* sin almacenamiento */ }
+    const w = $('.gantt-wrap'), centro = w ? (w.scrollLeft + w.clientWidth / 2) / w.scrollWidth : 0;
+    renderView();
+    const w2 = $('.gantt-wrap'); if (w2) w2.scrollLeft = centro * w2.scrollWidth - w2.clientWidth / 2;
+  },
+});

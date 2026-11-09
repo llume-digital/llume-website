@@ -1,5 +1,8 @@
 import { $, esc } from '../nucleo/util.js';
-import { NAV_ADMIN, head, tabsHtml } from '../nucleo/pintado.js';
+import { NAV_ADMIN, head, renderView, tabsHtml } from '../nucleo/pintado.js';
+import { api, closeOverlay, state } from '../nucleo/estado.js';
+import { actions } from '../nucleo/registro.js';
+import { refreshList } from './horarios.js';
 // ------------------------------------------------------------------ NOVEDADES (mejoras recientes de la app)
 // Las últimas mejoras, de la más nueva a la más antigua, explicadas para quien usa la app. Para anunciar una
 // mejora nueva, añádela arriba del todo: la pestaña muestra cuántas hay desde la última vez que se abrió.
@@ -47,3 +50,19 @@ export function viewNovedades() {
   <p class="small muted section">¿Echas algo en falta? Pulsa <a href="#" data-act="feedback">Comentarios</a> y cuéntanoslo.</p>`;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  readNotices: async () => {
+    state.mi.perfil = await api('POST', '/api/mi/avisos/leer', {});
+    state.me.avisos = 0; renderView();
+  },
+  openNotification: async (el) => {
+    try { await api('POST', '/api/notificaciones/leer', { ids: [Number(el.dataset.id)] }); } catch { /* se puede volver a leer luego */ }
+    state.notifPending = false; closeOverlay();
+    state.current = null; await refreshList(); location.hash = `#/horarios/${el.dataset.sid}`;
+  },
+  readNotifications: async () => {
+    try { await api('POST', '/api/notificaciones/leer', {}); } catch { /* se volverá a mostrar */ }
+    state.notifPending = false; closeOverlay();
+  },
+});

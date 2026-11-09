@@ -26,7 +26,7 @@ def test_cuentas_correo_registros_y_restablecer(url, browser, monkeypatch):  # n
     page.wait_for_selector("#google-form")
     page.fill("#google-form input[name=client_id]", "no-vale")
     page.click("#google-form button[type=submit]")
-    page.wait_for_selector(".toast.bad")
+    page.wait_for_selector("#google-form .form-error")  # el error sale dentro del propio formulario
     page.fill("#google-form input[name=client_id]", CID)
     page.click("#google-form button[type=submit]")
     page.wait_for_selector("#google-form >> xpath=.. >> .notice.ok")

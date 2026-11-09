@@ -1,9 +1,12 @@
 import { DAYS, DAY_SHORT, ICON, MOTIVOS, addDays, dayNum, esc, fmtH, fmtLong, fmtMin, fmtRange, monthName, toMin, weekday } from '../nucleo/util.js';
-import { state } from '../nucleo/estado.js';
-import { PUESTOS, abreviaturas, capTags, funcionesDe, head, horasDe, horasPersona, puestoDe, puestoTag, rolDe, rolTag, shiftById, tipoDe, usaPuestos } from '../nucleo/pintado.js';
+import { api, overlay, saveConfig, state, toast, withBusy } from '../nucleo/estado.js';
+import { PUESTOS, abreviaturas, capTags, funcionesDe, head, horasDe, horasPersona, puestoDe, puestoTag, renderView, rolDe, rolTag, shiftById, tipoDe, usaPuestos } from '../nucleo/pintado.js';
 import { horasFila } from './cuadrante.js';
 import { personaHref } from './persona.js';
 import { ensure } from './portal.js';
+import { markDirty } from '../nucleo/enlace.js';
+import { actions } from '../nucleo/registro.js';
+import { refreshList } from './horarios.js';
 // ------------------------------------------------------------------ ALERTAS DEL ENCARGADO
 export const SEV = { critica: 'Crítica', alta: 'Alta', media: 'Media', baja: 'Baja' };
 export const SEV_ORDER = ['critica', 'alta', 'media', 'baja'];
@@ -182,3 +185,42 @@ export function weeksGrid(cur) {
   return html;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  solve: async () => {
+    if (state.dirty && !(await saveConfig())) return;
+    const sid = state.current.id;
+    try {
+      state.fix = { sid, p: await withBusy('Buscando cómo arreglar las alertas…', () => api('POST', `/api/horarios/${sid}/solucionar`, {})) };
+      overlay(fixDialog(state.fix.p));
+    } catch (e) { toast(e.message, true); }
+  },
+  applyFix: async () => {
+    const { sid, p } = state.fix || {};
+    if (!p) return;
+    try {
+      state.current = await withBusy('Aplicando cambios…', () => api('POST', `/api/horarios/${sid}/solucionar/aplicar`, { cambios: p.cambios }));
+      state.fix = null;
+      toast(`${p.cambios.length === 1 ? 'Cambio aplicado' : `${p.cambios.length} cambios aplicados`}`);
+      refreshList(); renderView();
+    } catch (e) { toast(e.message, true); }
+  },
+  alFiltro: (el) => { state.alf[el.dataset.kind] = el.dataset.k || null; renderView(); },
+  ackAlert: async (el) => {
+    const nota = window.prompt('Nota opcional (por qué lo das por revisado):', '');
+    if (nota === null) return;
+    const d = await api('POST', `/api/horarios/${el.dataset.sid}/alertas/reconocer`, { clave: el.dataset.clave, nota: nota.trim() || null });
+    if (state.current && state.current.id === d.id) state.current = d;
+    refreshList(); renderView();
+  },
+  reopenAlert: async (el) => {
+    const d = await api('DELETE', `/api/horarios/${el.dataset.sid}/alertas/reconocer?clave=${encodeURIComponent(el.dataset.clave)}`);
+    if (state.current && state.current.id === d.id) state.current = d;
+    refreshList(); renderView();
+  },
+  toggleAlertCode: (el) => {
+    const a = state.draft.alertas, c = el.dataset.code;
+    a.desactivadas = a.desactivadas.includes(c) ? a.desactivadas.filter((x) => x !== c) : [...a.desactivadas, c];
+    markDirty(); renderView();
+  },
+});

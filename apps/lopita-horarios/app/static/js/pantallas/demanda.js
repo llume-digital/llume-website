@@ -1,7 +1,9 @@
-import { DAYS, DAY_LABEL, ICON, esc, fmtH, fmtMin, fmtShort, monthName, toMin } from '../nucleo/util.js';
-import { state } from '../nucleo/estado.js';
-import { PUESTOS, dayChips, dayTypeOptions, head, toggle } from '../nucleo/pintado.js';
+import { $, DAYS, DAY_LABEL, ICON, esc, fmtH, fmtMin, fmtShort, monthName, toMin, todayIso } from '../nucleo/util.js';
+import { state, toast } from '../nucleo/estado.js';
+import { PUESTOS, dayChips, dayTypeOptions, head, renderView, toggle } from '../nucleo/pintado.js';
 import { timeline } from './turnos.js';
+import { getPath, markDirty, setPath } from '../nucleo/enlace.js';
+import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ DEMANDA
 function slotsEditor(path, slots) {
   const mal = (f) => (f.cocina || 0) + (f.sala || 0) > f.personas;
@@ -91,3 +93,48 @@ export function viewDemanda() {
   </div>`;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+
+  toggleDay: (el) => {
+    const path = el.dataset.path; let arr = getPath(state.draft, path) || [];
+    arr = arr.includes(el.dataset.day) ? arr.filter((d) => d !== el.dataset.day) : DAYS.filter((d) => d === el.dataset.day || arr.includes(d));
+    setPath(state.draft, path, path.startsWith('turnos') || path.startsWith('preferencias') || path.startsWith('tareas') || path.startsWith('funciones') ? (arr.length ? arr : null) : arr);
+    markDirty(); renderView();
+  },
+  addDayType: () => {
+    const names = state.draft.tipos_dia.map((t) => t.nombre);
+    let n = 1; while (names.includes(`nuevo ${n}`)) n++;
+    state.draft.tipos_dia.push({ nombre: `nuevo ${n}`, cerrado: false, franjas: [{ inicio: '08:00', fin: '20:00', personas: 2 }] });
+    markDirty(); renderView();
+  },
+  delDayType: (el) => {
+    const c = state.draft; const t = c.tipos_dia[Number(el.dataset.i)];
+    const used = Object.values(c.tipo_dia_por_semana).includes(t.nombre) || c.tipo_dia_festivo === t.nombre || c.excepciones_fecha.some((o) => o.tipo_dia === t.nombre);
+    if (used) { toast(`«${t.nombre}» está en uso. Cámbialo antes en los días de la semana, festivos o días especiales.`, true); return; }
+    c.tipos_dia.splice(Number(el.dataset.i), 1); markDirty(); renderView();
+  },
+  addSlot: (el) => {
+    const arr = getPath(state.draft, el.dataset.path);
+    const last = arr[arr.length - 1];
+    const start = last ? last.fin : '08:00';
+    arr.push({ inicio: start, fin: fmtMin(Math.min(toMin(start) + 120, 23 * 60 + 59)), personas: last ? last.personas : 2, cocina: last ? last.cocina || 0 : 0, sala: last ? last.sala || 0 : 0 });
+    markDirty(); renderView();
+  },
+  delSlot: (el) => { getPath(state.draft, el.dataset.path).splice(Number(el.dataset.j), 1); markDirty(); renderView(); },
+  addHoliday: () => {
+    const v = $('#new-holiday').value;
+    if (!v) { toast('Elige una fecha', true); return; }
+    if (!state.draft.festivos.includes(v)) state.draft.festivos.push(v);
+    markDirty(); renderView();
+  },
+  delHoliday: (el) => { state.draft.festivos = state.draft.festivos.filter((f) => f !== el.dataset.date); markDirty(); renderView(); },
+  addSpecial: () => { state.draft.excepciones_fecha.push({ fecha: todayIso(), tipo_dia: null, franjas: null, cerrado: true, nota: null }); markDirty(); renderView(); },
+  addTask: () => {
+    if (!state.draft.tareas) state.draft.tareas = [];
+    state.draft.tareas.push({ nombre: 'Nueva tarea', inicio: '07:00', fin: '08:00', personas: 1, dias: null, puesto: null });
+    markDirty(); renderView();
+  },
+  delTask: (el) => { state.draft.tareas.splice(Number(el.dataset.i), 1); markDirty(); renderView(); },
+  delSpecial: (el) => { state.draft.excepciones_fecha.splice(Number(el.dataset.i), 1); markDirty(); renderView(); },
+});
