@@ -100,6 +100,28 @@ export function fixDialog(p) {
     <div class="row end" style="margin-top:16px"><button class="btn" data-act="closeOverlay">Cancelar</button><button class="btn primary" data-act="applyFix">Aplicar ${n} cambio${n > 1 ? 's' : ''}</button></div>`;
 }
 
+// Qué espera al encargado, de lo más urgente a lo menos, cada cosa con un solo enlace al sitio exacto.
+export function pendientes(d) {
+  const me = state.me || {};
+  const filas = [];
+  const critica = d.horarios.find((h) => h.resumen && h.resumen.critica);
+  if (d.resumen.critica) filas.push({ nivel: 'crit', texto: `${d.resumen.critica} ${d.resumen.critica === 1 ? 'alerta crítica' : 'alertas críticas'}: el horario no vale hasta arreglarlas`, href: critica ? `#/horarios/${critica.id}` : '#/alertas', accion: 'Arreglar' });
+  if (me.pendientes) filas.push({ nivel: 'alta', texto: `${me.pendientes} ${me.pendientes === 1 ? 'solicitud' : 'solicitudes'} por resolver`, href: '#/solicitudes', accion: 'Resolver' });
+  if (me.arreglos_pendientes) filas.push({ nivel: 'alta', texto: 'Hay un arreglo listo para revisar antes de publicar', href: '#/horarios', accion: 'Revisar' });
+  for (const h of d.horarios.filter((x) => x.estado === 'borrador').slice(0, 5)) {
+    filas.push({ nivel: 'media', texto: `Borrador del ${fmtRange(h.desde, h.hasta)} sin publicar`, href: `#/horarios/${h.id}`, accion: 'Abrir' });
+  }
+  if (me.accesos) filas.push({ nivel: 'media', texto: `${me.accesos} ${me.accesos === 1 ? 'acceso' : 'accesos'} con Google por aprobar`, href: '#/ajustes', accion: 'Revisar' });
+  return filas;
+}
+
+function pendienteHtml(d) {
+  const filas = pendientes(d);
+  return `<section class="section pendiente" aria-labelledby="pendiente-t"><h2 id="pendiente-t">Qué hay pendiente</h2>
+    ${filas.length ? `<ul class="pendiente-lista">${filas.map((f) => `<li class="pendiente-fila ${f.nivel}"><span>${esc(f.texto)}</span><a class="btn small" href="${f.href}">${f.accion}</a></li>`).join('')}</ul>`
+      : '<div class="card empty">Nada pendiente. Los horarios están en orden y no hay solicitudes por resolver.</div>'}</section>`;
+}
+
 export function viewAlertas() {
   const e0 = ensure(state.alg, 'data', '/api/alertas'); if (e0) return e0;
   const d = state.alg.data, f = state.alf;
@@ -108,6 +130,7 @@ export function viewAlertas() {
   const chip = (kind, k, label, n) => `<button type="button" class="chip ${f[kind] === k ? 'on' : ''}" data-act="alFiltro" data-kind="${kind}" data-k="${k ?? ''}">${label}${n != null ? ` <b>${n}</b>` : ''}</button>`;
   const regen = d.horarios.filter((h) => h.regenerar_desde);
   return `${head('Alertas', 'Todo lo que conviene revisar de los horarios que aún no han terminado, de más a menos importante. Cada alerta tiene una importancia de 0 a 100.')}
+  ${pendienteHtml(d)}
   ${regen.length ? `<div class="stack section" style="gap:10px">${regen.map((h) => `<div class="notice warn"><span>El horario del <b>${esc(fmtRange(h.desde, h.hasta))}</b> hay que regenerarlo a partir del <b>${esc(fmtLong(h.regenerar_desde))}</b>.</span><span class="spacer"></span><a class="btn small primary" href="#/horarios/${h.id}">Abrir horario</a></div>`).join('')}</div>` : ''}
   <div class="row section" style="gap:8px">
     ${chip('sev', null, 'Todas', d.alertas.length)}${SEV_ORDER.map((k) => chip('sev', k, SEV[k], d.resumen[k])).join('')}
@@ -222,6 +245,7 @@ Object.assign(actions, {
   toggleAlertCode: (el) => {
     const a = state.draft.alertas, c = el.dataset.code;
     a.desactivadas = a.desactivadas.includes(c) ? a.desactivadas.filter((x) => x !== c) : [...a.desactivadas, c];
+    state.reglasAlertasAbiertas = true; // el panel sigue abierto tras repintar
     markDirty(); renderView();
   },
 });
