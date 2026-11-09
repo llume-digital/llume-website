@@ -1,5 +1,5 @@
-import { $, esc } from '../nucleo/util.js';
-import { NAV_ADMIN, head, renderView, tabsHtml } from '../nucleo/pintado.js';
+import { esc } from '../nucleo/util.js';
+import { NAV_ADMIN, head, renderView, pintarTabs } from '../nucleo/pintado.js';
 import { api, closeOverlay, state } from '../nucleo/estado.js';
 import { actions } from '../nucleo/registro.js';
 import { refreshList } from './horarios.js';
@@ -25,7 +25,7 @@ const fmtFechaLarga = (iso) => new Date(`${iso}T12:00:00`).toLocaleDateString('e
 export function viewNovedades() {
   const nuevas = novedadesSinVer();
   try { localStorage.setItem(VISTAS_KEY, String(NOVEDADES.length)); } catch { /* sin almacenamiento */ }
-  const t = $('#tabs'); if (t) t.innerHTML = tabsHtml('novedades');
+  pintarTabs('novedades');
   const nombreTab = (id) => (NAV_ADMIN.find(([k]) => k === id) || [])[1] || id;
   const items = NOVEDADES.map((n, i) => `<article class="card novedad">
       <div class="novedad-cab"><time datetime="${n.fecha}">${esc(fmtFechaLarga(n.fecha))}</time>${i < nuevas ? '<span class="badge warn">Nuevo</span>' : ''}</div>

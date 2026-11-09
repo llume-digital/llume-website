@@ -55,7 +55,7 @@ function tasksCard(tareas) {
 export function viewDemanda() {
   const c = state.draft;
   const ex = c.excepciones_fecha;
-  return `${head('Demanda', 'Cuántas personas hacen falta en cada franja. Defines unos pocos tipos de día y asignas uno a cada día de la semana; los festivos y los días especiales pueden tener el suyo.', `<button class="btn primary" data-act="addDayType">${ICON.plus} Tipo de día</button>`)}
+  return `${head('Demanda', 'Cuántas personas hacen falta en cada franja. Defines unos pocos tipos de día y asignas uno a cada día de la semana; los festivos y los días especiales pueden tener el suyo.', `<button class="btn primary" data-act="addDayType">${ICON.plus} Añadir tipo de día</button>`)}
   <div class="card"><h2>Cada día de la semana</h2><div class="fields">
     ${DAYS.map((d, i) => `<label class="field">${DAY_LABEL[i]}<select data-bind="tipo_dia_por_semana.${d}">${dayTypeOptions(c.tipo_dia_por_semana[d])}</select></label>`).join('')}
   </div></div>

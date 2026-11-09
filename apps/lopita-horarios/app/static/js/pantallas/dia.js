@@ -198,7 +198,7 @@ export function dayView(cur) {
       <div class="alert-list">${alertasDia.slice(0, 6).map((a) => alertCard(a, { sid: cur.id })).join('')}</div>
       <p class="small muted">Son las del horario guardado; al confirmar tus cambios verás cómo quedan.</p></div>` : ''}
     ${n ? `<div class="day-pending no-print" role="status"><span><b>${n} cambio${n > 1 ? 's' : ''}</b> sin confirmar</span><span class="spacer"></span>
-      <button class="btn" data-act="dayDiscard">Descartar</button><button class="btn primary" data-act="dayConfirm">Confirmar cambios</button></div>` : ''}`;
+      <button class="btn" data-act="dayDiscard">Descartar cambios</button><button class="btn primary" data-act="dayConfirm">Confirmar cambios</button></div>` : ''}`;
 }
 
 // --- interacción con las barras (ratón y dedo)

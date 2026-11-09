@@ -47,7 +47,7 @@ export function viewAjustes() {
         <label class="field">Tipo de cuenta<select name="rol" data-act-change="userRol"><option value="empleado">Trabajador (ve sus horas y hace solicitudes)</option><option value="admin">Encargado (control total)</option></select></label>
         <label class="field" id="user-emp">Persona del equipo<select name="empleado_id">${state.draft.empleados.filter((e) => e.activo).map((e) => `<option value="${esc(e.id)}">${esc(e.nombre)}</option>`).join('')}</select></label>
         <label class="field">Contraseña<span class="hint">Para un trabajador es temporal: la cambiará al entrar.</span><input type="password" name="password" minlength="8" required autocomplete="new-password"></label>
-        <button class="btn" type="submit">Guardar cuenta</button>
+        <button class="btn" type="submit">Crear cuenta</button>
       </form></div>
     <div class="card"><h2>Copia de la configuración</h2>
       <p class="small muted" style="margin-top:0">Descarga toda la configuración (equipo, turnos, demanda, ausencias…) o carga una guardada.</p>

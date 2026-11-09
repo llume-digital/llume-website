@@ -7,6 +7,17 @@
 // - Lo puramente interno (tests, refactors, CI, documentación) no lleva entrada: el PR lo dice con «Sin novedades: …».
 // La comprobación de CI (herramientas/comprobar_novedades.py) falla si un PR toca la app sin pasar por aquí.
 export const NOVEDADES = [
+  { fecha: '2026-11-09', titulo: 'Botones con textos más claros', ir: 'horarios', texto: [
+    'Varios botones dicen ahora exactamente lo que hacen: <b>Descartar cambios</b>, <b>Crear cuenta</b>, <b>Añadir tipo de día</b> y <b>Marcar como leídos</b>.',
+  ] },
+  { fecha: '2026-11-09', titulo: 'Las secciones de la trabajadora, abajo en el móvil', ir: 'inicio', texto: [
+    'En el móvil, <b>Inicio, Mis horas, Vacaciones y Preferencias</b> están ahora en una barra fija en la parte de abajo, al alcance del pulgar, con el nombre de cada sección.',
+    'La parte de arriba se queda con el nombre de la app y los botones de cuenta. El contenido ya no queda tapado por la barra.',
+  ] },
+  { fecha: '2026-11-09', titulo: 'Menos pestañas: el menú, en cinco secciones', ir: 'horarios', texto: [
+    'El menú del encargado pasa de 16 pestañas a cinco: <b>Horario, Pendiente, Equipo, Informes y Configuración</b>. Debajo salen las pantallas de la sección en la que estás (por ejemplo, Horarios y Calendario dentro de Horario).',
+    '<b>Web, Comentarios recibidos y Novedades</b> están en el botón <b>Más</b>, arriba a la derecha, con su contador. Todas las pantallas siguen en su sitio y los enlaces de siempre funcionan.',
+  ] },
   { fecha: '2026-11-09', titulo: 'En el móvil, el menú de cada casilla sale desde abajo', ir: 'horarios', texto: [
     'Al tocar una casilla del horario en el móvil, las opciones aparecen en una hoja desde abajo de la pantalla, a todo el ancho y con botones grandes, fáciles de pulsar con el pulgar.',
     'Para cerrarla, desliza hacia abajo o toca fuera.',

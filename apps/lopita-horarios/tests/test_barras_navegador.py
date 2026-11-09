@@ -30,11 +30,15 @@ def test_secciones_en_segunda_barra(url, browser, ancho):  # noqa: F811
     assert page.locator(".topbar-inner nav.tabs").count() == 0
 
     # Las secciones son solo pantallas de trabajo: la guía y la cuenta están en la primera barra.
-    hrefs = page.eval_on_selector_all("nav.tabs a", "as => as.map(a => a.getAttribute('href'))")
-    assert hrefs[:3] == ["#/horarios", "#/calendario", "#/alertas"]
+    hrefs = page.eval_on_selector_all("#tabs a", "as => as.map(a => a.getAttribute('href'))")
+    # Cinco secciones (Horario, Pendiente, Equipo, Informes, Configuración); cada una lleva a su primera pantalla.
+    assert hrefs == ["#/horarios", "#/alertas", "#/equipo", "#/informes", "#/funciones"]
     assert "#/guia" not in hrefs
     assert page.locator(".userbox [data-act=goGuia]").count() == 1
-    assert page.locator("nav.tabs a.active[aria-current=page]").get_attribute("href") == "#/horarios"
+    assert page.locator("#tabs a.active[aria-current=page]").get_attribute("href") == "#/horarios"
+
+    # Dentro de la sección, las pantallas van en una segunda fila.
+    assert page.eval_on_selector_all("#subtabs a", "as => as.map(a => a.getAttribute('href'))") == ["#/horarios", "#/calendario"]
 
     # Navegar marca la sección; la guía marca su botón de la barra de cuenta.
     page.click("nav.tabs a[href='#/calendario']")

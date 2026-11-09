@@ -661,3 +661,26 @@ button.pd-row:hover, button.pd-row:focus-visible { background: var(--hover); }
 .popover[data-hoja] .quick-adj button { min-height: 44px; }
 @keyframes hoja-sube { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .popover[data-hoja] { animation: none; } }
+
+/* Navegación del encargado: cinco secciones y, debajo, las pantallas de la activa. */
+nav.tabs.subtabs { border-top: 1px solid var(--night-edge); padding-top: 0; }
+nav.tabs.subtabs[hidden] { display: none; }
+nav.tabs.subtabs a { font-size: var(--text-xs); padding: 10px 10px 8px; }
+.mas-cuenta { position: relative; }
+.mas-cuenta > summary { list-style: none; cursor: pointer; background: none; border: 1px solid var(--night-line); color: var(--night-text); border-radius: 999px; padding: 4px 12px; min-height: 34px; display: inline-flex; align-items: center; gap: 6px; }
+.mas-cuenta > summary::-webkit-details-marker { display: none; }
+.mas-cuenta > summary:hover { border-color: var(--night-line-hover); color: var(--white); }
+.mas-cuenta > summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.mas-cuenta-lista { position: absolute; z-index: 40; right: 0; top: calc(100% + 6px); min-width: 210px; display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--line-strong); border-radius: var(--radius); box-shadow: var(--shadow); padding: 6px; }
+.mas-cuenta-lista a { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; padding: 0 12px; border-radius: 8px; color: var(--ink); text-decoration: none; font-size: var(--text-md); }
+.mas-cuenta-lista a:hover, .mas-cuenta-lista a.active { background: var(--gold-soft); }
+
+/* Trabajadora en el móvil: sus cuatro secciones en una barra inferior fija, con texto y a la altura del pulgar. */
+@media (max-width: 600px) {
+  .topbar[data-rol="trabajadora"] .tabsbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 35; border-top: 1px solid var(--night-line); border-bottom: 0; padding-bottom: env(safe-area-inset-bottom); }
+  .topbar[data-rol="trabajadora"] nav.tabs { padding: 0; gap: 0; overflow: visible; }
+  .topbar[data-rol="trabajadora"] nav.tabs a { flex: 1; min-height: 56px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 4px; border-bottom: 0; border-top: 3px solid transparent; font-size: var(--text-xs); letter-spacing: .06em; }
+  .topbar[data-rol="trabajadora"] nav.tabs a.active { border-top-color: var(--gold); }
+  body:has(.topbar[data-rol="trabajadora"]) #view { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  body:has(.topbar[data-rol="trabajadora"]) .toast { bottom: calc(80px + env(safe-area-inset-bottom)); }
+}
