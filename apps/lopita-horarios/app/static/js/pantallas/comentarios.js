@@ -1,7 +1,8 @@
-import { esc, fmtStamp } from '../nucleo/util.js';
-import { api, state, toast } from '../nucleo/estado.js';
-import { NAV_ADMIN, NAV_WORKER, head, mic, renderView, route } from '../nucleo/pintado.js';
+import { $, esc, fmtStamp } from '../nucleo/util.js';
+import { api, overlay, state, toast } from '../nucleo/estado.js';
+import { NAV_ADMIN, NAV_WORKER, head, isWorker, mic, renderView, route } from '../nucleo/pintado.js';
 import { ensure } from './portal.js';
+import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ COMENTARIOS (feedback sobre la app)
 const FB_TIPOS = { sugerencia: 'Sugerencia', error: 'Algo no funciona', duda: 'Duda' };
 const FB_ESTADOS = { nuevo: ['warn', 'Nuevo'], en_curso: ['borrador', 'En curso'], hecho: ['publicado', 'Hecho'], descartado: ['neutral', 'Descartado'] };
@@ -58,3 +59,19 @@ export async function uploadWebDoc(input) {
   } catch (e) { toast(e.message, true); }
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  feedback: async () => {
+    overlay(feedbackDialog([]));
+    try { const mios = await api('GET', '/api/comentarios'); if ($('#fb-form')) { const t = $('#fb-form textarea').value; overlay(feedbackDialog(isWorker() ? mios : mios.filter((c) => c.autor === state.me.username))); $('#fb-form textarea').value = t; } } catch { /* sin lista no pasa nada */ }
+    const ta = $('#fb-form textarea'); if (ta) ta.focus();
+  },
+  fbFiltro: (el) => { state.fb.filtro = el.dataset.f; renderView(); },
+  fbResponder: async (el) => {
+    const id = Number(el.dataset.id);
+    try {
+      const c = await api('PATCH', `/api/comentarios/${id}`, { respuesta: $(`#fb-resp-${id}`).value });
+      Object.assign(state.fb.data.find((x) => x.id === id), c); toast('Respuesta guardada'); renderView();
+    } catch (e) { toast(e.message, true); }
+  },
+});

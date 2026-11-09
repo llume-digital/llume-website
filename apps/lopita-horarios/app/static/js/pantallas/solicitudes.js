@@ -1,7 +1,8 @@
 import { esc, fmtStamp } from '../nucleo/util.js';
-import { state } from '../nucleo/estado.js';
-import { head } from '../nucleo/pintado.js';
+import { overlay, state, toast } from '../nucleo/estado.js';
+import { head, mic, renderView } from '../nucleo/pintado.js';
 import { ensure, reqBadge, reqSummary, shiftHours, signed } from './portal.js';
+import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ SOLICITUDES (encargados)
 export function viewSolicitudes() {
   const s = state.sol; if (!s.filtro) s.filtro = 'pendiente';
@@ -28,3 +29,22 @@ export function viewSolicitudes() {
   }).join('')}</div>`;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+
+  // ---- solicitudes e informes (encargados)
+  solFiltro: (el) => { state.sol.filtro = el.dataset.f; renderView(); },
+  resolve: (el) => {
+    if (state.dirty) { toast('Guarda o descarta antes los cambios de configuración sin guardar', true); return; }
+    const ap = el.dataset.accion === 'aprobar';
+    const nota = !ap ? 'La persona verá que se ha rechazado y tu respuesta.'
+      : el.dataset.tipo === 'ausencia' ? 'La ausencia se añadirá a la configuración y el motor la respetará al generar o regenerar horarios.'
+        : 'Se ajustarán las horas de ese día en su informe y el saldo que se arrastra al siguiente horario.';
+    overlay(`<h2>${ap ? 'Aprobar' : 'Rechazar'} solicitud</h2>
+      <form id="resolve-form" class="stack" style="gap:12px" data-id="${el.dataset.id}" data-accion="${el.dataset.accion}" data-tipo="${el.dataset.tipo}">
+        <p class="small muted" style="margin:0">${nota}</p>
+        <label class="field">Respuesta para la persona (opcional)<textarea name="respuesta" rows="3"></textarea></label>${mic("respuesta")}
+        <div class="row end"><button type="button" class="btn" data-act="closeOverlay">Cancelar</button><button class="btn ${ap ? 'primary' : 'danger'}" type="submit">${ap ? 'Aprobar' : 'Rechazar'}</button></div>
+      </form>`);
+  },
+});

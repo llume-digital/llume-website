@@ -3,7 +3,8 @@ import { api, state, toast } from '../nucleo/estado.js';
 import { head, renderView } from '../nucleo/pintado.js';
 import { alertsPanel, weeksGrid } from './alertas.js';
 import { monthOfSchedule } from './mes.js';
-import { dayView, summaryTable } from './dia.js';
+import { closeMenu, dayView, openCellMenu, summaryTable } from './dia.js';
+import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ HORARIOS: detalle y cuadrante
 export function viewDetalle(id) {
   const cur = state.current;
@@ -95,3 +96,25 @@ export function horasFila(cfg, x) {
   return `<tr><td><b>${esc(nameIn(cfg, x.empleado_id))}</b></td><td class="num">${comodin ? '<span class="muted">Comodín</span>' : fmtH(x.objetivo)}</td><td class="num">${tag(x.antes)} → ${tag(x.despues)}</td></tr>`;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  cell: (el) => openCellMenu(el),
+  setCell: async (el) => {
+    closeMenu();
+    try {
+      const body = { empleado_id: el.dataset.emp, fecha: el.dataset.date, turno_id: el.dataset.shift || null, bloquear: true };
+      if (el.dataset.puesto) Object.assign(body, { puesto: el.dataset.puesto, conservar_horas: true });
+      if (el.dataset.funcion !== undefined) body.funcion = el.dataset.funcion; // '' = sin rol
+      state.current = await api('PATCH', `/api/horarios/${state.current.id}/celda`, body);
+      renderView();
+      const errs = state.current.horario.incidencias.filter((i) => i.nivel === 'error' && i.empleado_id === el.dataset.emp && i.fecha === el.dataset.date);
+      if (errs.length) toast(errs[0].mensaje, true);
+    } catch (e) { toast(e.message, true); }
+  },
+  unlockCell: async (el) => {
+    closeMenu();
+    const a = state.current.horario.asignaciones.find((x) => x.empleado_id === el.dataset.emp && x.fecha === el.dataset.date);
+    state.current = await api('PATCH', `/api/horarios/${state.current.id}/celda`, { empleado_id: el.dataset.emp, fecha: el.dataset.date, turno_id: a ? a.turno_id : null, puesto: a ? a.puesto : null, funcion: a ? a.funcion || '' : null, conservar_horas: true, bloquear: false });
+    renderView();
+  },
+});

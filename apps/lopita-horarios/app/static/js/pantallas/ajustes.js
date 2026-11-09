@@ -1,7 +1,9 @@
-import { ICON, esc, fmtStamp } from '../nucleo/util.js';
-import { api, state, toast } from '../nucleo/estado.js';
+import { ICON, clone, esc, fmtStamp } from '../nucleo/util.js';
+import { api, confirmar, loadConfig, state, toast } from '../nucleo/estado.js';
 import { empName, head, renderView } from '../nucleo/pintado.js';
 import { teamCalendarsCard } from './portal.js';
+import { confirmLeave } from '../nucleo/borrador.js';
+import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ AJUSTES
 export function viewAjustes() {
   if (!state.ajustes) {
@@ -56,3 +58,22 @@ export function viewAjustes() {
   </div>`;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  reloadConfig: async () => {
+    if (!(await confirmLeave())) return;
+    await loadConfig(); state.ajustes = null; renderView();
+  },
+  exportConfig: () => {
+    const blob = new Blob([JSON.stringify(state.config, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `lopita_config_v${state.version}.json`; a.click();
+  },
+  restore: async (el) => {
+    if (!(await confirmLeave()) || !(await confirmar({ titulo: `¿Volver a la versión ${el.dataset.v}?`, texto: 'Se guardará como una versión nueva.', verbo: `Restaurar versión ${el.dataset.v}` }))) return;
+    try {
+      const r = await api('POST', `/api/config/restaurar/${el.dataset.v}`);
+      state.config = r.config; state.version = r.version; state.draft = clone(r.config); state.dirty = false;
+      state.ajustes = null; toast('Versión restaurada'); renderView();
+    } catch (e) { toast(e.message, true); }
+  },
+});

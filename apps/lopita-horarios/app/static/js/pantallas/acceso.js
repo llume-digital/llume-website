@@ -1,4 +1,6 @@
-import { state } from '../nucleo/estado.js';
+import { api, closeOverlay, state, toast } from '../nucleo/estado.js';
+import { renderView } from '../nucleo/pintado.js';
+import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ acceso
 export function viewLogin() {
   return `<div class="login">
@@ -16,3 +18,13 @@ export function viewLogin() {
   </div>`;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  rechazarAcceso: async (el) => {
+    try { const r = await api('POST', `/api/accesos/${el.dataset.id}/rechazar`); state.ajustes.accesos = r.accesos; state.me.accesos = r.accesos.length; toast('Registro rechazado'); renderView(); } catch (e) { toast(e.message, true); }
+  },
+  verAccesos: async (el) => {
+    try { await api('POST', '/api/notificaciones/leer', { ids: [Number(el.dataset.id)] }); } catch { /* se verá otra vez, sin más */ }
+    state.notifPending = false; closeOverlay(); state.ajustes = null; location.hash = '#/ajustes';
+  },
+});
