@@ -78,3 +78,25 @@ def conservar(h: Schedule, bloqueos: list[Lock]) -> Schedule:
     asignaciones.sort(key=lambda a: (a.fecha, a.empleado_id))
     propios = [b for b in h.bloqueos if (b.empleado_id, b.fecha) not in fuera]
     return h.model_copy(update={"asignaciones": asignaciones, "bloqueos": propios + list(bloqueos)}, deep=True)
+
+
+def comparar(rows: list[dict], row: dict) -> dict:
+    """Diferencias entre un horario (por ejemplo, una versión antigua) y lo que manda hoy en sus fechas.
+
+    Solo cuentan las fechas que tienen otro horario publicado mandando: restaurar esta versión cambiaría eso."""
+    h: Schedule = row["horario"]
+    mandan = {d: r for d, r in linea_tiempo.por_dia(rows, h.desde, h.hasta, solo_publicados=True).items()
+              if r["id"] != row["id"]}
+    actual = [a for d, r in mandan.items() for a in r["horario"].asignaciones if a.fecha == d]
+    version = [a for a in h.asignaciones if a.fecha in mandan]
+    sustituye = defaultdict(list)
+    for d, r in mandan.items():
+        sustituye[r["id"]].append(d)
+    return {
+        "cambios": diferencias(actual, version),
+        "dias_publicados": len(mandan),
+        "dias_nuevos": 0,
+        "sustituye": [{"id": sid, "desde": min(ds), "hasta": max(ds), "dias": len(ds)} for sid, ds in sustituye.items()],
+        "conservables": [],
+        "pasado": [],
+    }

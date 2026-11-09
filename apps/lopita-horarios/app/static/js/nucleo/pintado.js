@@ -3,6 +3,7 @@ import { state } from './estado.js';
 import { viewLogin } from '../pantallas/acceso.js';
 import { viewHorarios } from '../pantallas/horarios.js';
 import { viewDetalle } from '../pantallas/cuadrante.js';
+import { viewHistorial } from '../pantallas/historial.js';
 import { viewAlertas } from '../pantallas/alertas.js';
 import { viewCalendario } from '../pantallas/calendario.js';
 import { seguirAnclas } from '../pantallas/dia.js';
@@ -82,7 +83,7 @@ export function renderView() {
   const w = isWorker();
   const views = w
     ? { inicio: viewMiInicio, horas: viewMisHoras, vacaciones: viewMisVacaciones, preferencias: viewMisPrefs, guia: viewGuia }
-    : { horarios: r.arg ? () => viewDetalle(Number(r.arg)) : viewHorarios, calendario: viewCalendario, alertas: viewAlertas, solicitudes: viewSolicitudes, informes: viewInformes, equipo: viewEquipo, funciones: viewFunciones, turnos: viewTurnos, demanda: viewDemanda, ausencias: viewAusencias, preferencias: viewPreferencias, reglas: viewReglas, web: viewWeb, comentarios: viewComentarios, ajustes: viewAjustes, novedades: viewNovedades, guia: viewGuia };
+    : { horarios: r.arg ? (r.arg2 === 'historial' ? () => viewHistorial(Number(r.arg)) : () => viewDetalle(Number(r.arg))) : viewHorarios, calendario: viewCalendario, alertas: viewAlertas, solicitudes: viewSolicitudes, informes: viewInformes, equipo: viewEquipo, funciones: viewFunciones, turnos: viewTurnos, demanda: viewDemanda, ausencias: viewAusencias, preferencias: viewPreferencias, reglas: viewReglas, web: viewWeb, comentarios: viewComentarios, ajustes: viewAjustes, novedades: viewNovedades, guia: viewGuia };
   const name = views[r.name] ? r.name : (w ? 'inicio' : 'horarios');
   // Si había un turno enfocado (teclado), sigue enfocado tras redibujar aunque la vista se recargue por detrás.
   const foco = document.activeElement && document.activeElement.closest && document.activeElement.closest('.g-bar');
