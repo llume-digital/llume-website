@@ -19,6 +19,6 @@ export function viewPreferencias() {
     <div class="row" style="margin-top:12px;align-items:flex-end">
       <label class="field" style="flex:1">Importancia: <b style="color:var(--ink)" id="w${i}">${x.peso}</b> de 10<input type="range" min="1" max="10" value="${x.peso}" data-type="int" data-bind="preferencias.${i}.peso" data-rerender></label>
       <button class="icon-btn" data-act="delRow" data-list="preferencias" data-i="${i}" title="Quitar">${ICON.trash}</button>
-    </div></div>`).join('')}</div>` : '<div class="card empty">Sin preferencias. El motor solo atenderá a la demanda y a las reglas.</div>'}`;
+    </div></div>`).join('')}</div>` : `<div class="card empty"><p>Sin preferencias. El motor solo atenderá a la demanda y a las reglas.</p><button class="btn primary" data-act="addPref">${ICON.plus} Añadir preferencia</button></div>`}`;
 }
 
