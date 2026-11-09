@@ -57,6 +57,9 @@ def _comprobar_desplazable(page):
     assert ultimo_caja["y"] + ultimo_caja["height"] <= caja["y"] + caja["height"] + 0.5  # ya se ve
     assert pop.evaluate("el => getComputedStyle(el).overscrollBehaviorY") == "contain"  # no arrastra la página
 
+    if pop.get_attribute("data-hoja"):  # hoja inferior: pegada abajo, a todo el ancho, no a la casilla
+        assert abs(caja["y"] + caja["height"] - alto) <= 1 and caja["width"] == page.viewport_size["width"]
+        return
     _comprobar_anclado(page)
 
 
@@ -165,6 +168,7 @@ def test_menu_de_barra_no_se_cierra_al_cambiar_de_dia(url, browser):  # noqa: F8
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(1000)
     assert page.locator(".popover").count() == 1, "el menú se ha cerrado solo"
-    _comprobar_anclado(page)
+    if not page.locator(".popover").get_attribute("data-hoja"):
+        _comprobar_anclado(page)
     assert not errores, errores
     ctx.close()

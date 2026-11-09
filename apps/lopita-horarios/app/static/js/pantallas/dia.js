@@ -342,6 +342,9 @@ export function openBarMenu(empId, anchor) {
 }
 
 const esTactil = () => window.matchMedia('(pointer: coarse)').matches;
+// En pantallas pequeñas o táctiles el menú de una casilla sale como hoja inferior, a todo el ancho y con
+// opciones grandes, en vez de flotar junto a un dedo que lo tapa.
+const hojaInferior = () => window.matchMedia('(max-width: 600px), (pointer: coarse)').matches;
 const enfocar = (el) => el.focus({ preventScroll: true });
 
 // Un menú flotante se ancla a su casilla o barra por un selector, no por el elemento: la vista se vuelve a
@@ -353,6 +356,8 @@ const altoVisible = () => (window.visualViewport ? window.visualViewport.height 
 // que nunca se salga de la pantalla: lo que no quepa se ve desplazando el propio menú.
 function placePopover(m, ancla) {
   m.dataset.ancla = ancla;
+  // El menú de una barra (ajustes encadenados, con la vista del día detrás) sigue flotando junto a ella.
+  if (hojaInferior() && !m.classList.contains('bar-menu')) { abrirHoja(m); return; }
   const r = document.querySelector(ancla).getBoundingClientRect();
   const abajo = altoVisible() - r.bottom - MENU_HUECO - MENU_MARGEN;
   const arriba = r.top - MENU_HUECO - MENU_MARGEN;
@@ -362,9 +367,21 @@ function placePopover(m, ancla) {
   seguirAncla(m);
 }
 
+function abrirHoja(m) {
+  m.dataset.hoja = '1';
+  const fondo = document.createElement('div');
+  fondo.className = 'popover-fondo';
+  m.before(fondo);
+  // Arrastrar la hoja hacia abajo la cierra.
+  let y0 = null;
+  m.addEventListener('touchstart', (e) => { y0 = m.scrollTop === 0 ? e.touches[0].clientY : null; }, { passive: true });
+  m.addEventListener('touchend', (e) => { if (y0 !== null && e.changedTouches[0].clientY - y0 > 70) closeMenu(); y0 = null; }, { passive: true });
+}
+
 // Vuelve a pegar el menú a su ancla (tras desplazar la página o redibujar la vista). Si el ancla ya no existe
 // o ha salido de la pantalla, el menú se cierra: ya no se sabría a qué casilla se refiere.
 function seguirAncla(m) {
+  if (m.dataset.hoja) return;
   const ancla = document.querySelector(m.dataset.ancla);
   const r = ancla && ancla.getBoundingClientRect();
   const alto = altoVisible();
@@ -476,7 +493,7 @@ export function openCellMenu(btn) {
   placePopover(m, `[data-act="cell"][data-emp="${CSS.escape(emp.id)}"][data-date="${d}"]`);
   enfocar(m.querySelector('button.current') || m.querySelector('button'));
 }
-export function closeMenu() { document.querySelectorAll('.popover').forEach((p) => p.remove()); }
+export function closeMenu() { document.querySelectorAll('.popover, .popover-fondo').forEach((p) => p.remove()); }
 // Al desplazar la página o una tabla, el menú acompaña a su casilla (y se cierra si sale de la pantalla); al
 // desplazar el propio menú para ver las opciones que no caben, no se toca.
 export function menuOnScroll(e) {
