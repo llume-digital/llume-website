@@ -270,8 +270,14 @@ table.sched tr:last-child td { border-bottom: none; }
 .toast { position: fixed; bottom: calc(24px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); background: var(--black); color: var(--white); padding: 10px 18px; border-radius: 999px; z-index: 80; font-size: var(--text-md); box-shadow: var(--shadow); max-width: calc(100vw - 32px); }
 .toast.bad { background: var(--bad); }
 .toast.fijo { bottom: calc(72px + env(safe-area-inset-bottom)); border-radius: 12px; text-align: center; }
+.toast.con-accion { display: flex; align-items: center; gap: 12px; padding: 4px 6px 4px 18px; }
+.toast-accion { min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: var(--gold); font: inherit; font-weight: 700; cursor: pointer; }
+.toast-accion:hover { text-decoration: underline; }
+.toast-accion:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .overlay { position: fixed; inset: 0; background: rgba(23,19,15,.55); z-index: 70; display: grid; place-items: center; padding: 16px; }
 .overlay .box { background: var(--card); border-radius: 16px; padding: 28px; max-width: 560px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,.3); max-height: 85vh; overflow: auto; }
+.overlay.confirmacion { z-index: 75; }
+.overlay.confirmacion .box { max-width: 420px; }
 .spinner { width: 36px; height: 36px; border: 3px solid var(--gold-soft); border-top-color: var(--brown); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 14px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .msg { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; white-space: pre-wrap; font-size: var(--text-md); margin-top: 8px; }
@@ -360,6 +366,12 @@ textarea { font: inherit; resize: vertical; }
 .suggestion { padding: 12px 14px; border-left: 3px solid var(--gold); }
 .fix-alerts { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 6px; font-size: var(--text-md); }
 .fix-off { color: var(--warn); font-weight: 700; }
+/* revisión antes de publicar */
+.revision-cambios { display: grid; gap: 8px; max-height: 40vh; overflow: auto; font-size: var(--text-md); }
+.revision-dia { border-left: 3px solid var(--line-strong); padding-left: 10px; }
+.revision-dia.pasado { border-left-color: var(--warn); }
+.revision-dia ul, .revision-conservar { margin: 4px 0 0; padding-left: 0; list-style: none; display: grid; gap: 2px; }
+.revision-conservar { margin-bottom: 12px; }
 .alert-more summary { cursor: pointer; font-weight: 700; color: var(--brown); margin-bottom: 8px; }
 .alerts-panel h2 { display: flex; align-items: center; gap: 10px; }
 /* avisos del trabajador */
@@ -620,3 +632,6 @@ button.pd-row:hover, button.pd-row:focus-visible { background: var(--hover); }
 
 /* Cifras que se comparan en columna: todas con el mismo ancho (DISENO §4 Datos) */
 .cell .pill, .mchip, .g-txt, .covbar, .tab-count { font-variant-numeric: tabular-nums lining-nums; }
+
+#sin-red { position: fixed; top: 0; left: 0; right: 0; z-index: 90; padding: 10px 16px calc(10px) 16px; padding-top: calc(10px + env(safe-area-inset-top)); background: var(--warn-strong); color: var(--black); text-align: center; font-size: var(--text-md); font-weight: 600; }
+#sin-red[hidden] { display: none; }
