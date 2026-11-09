@@ -1,7 +1,7 @@
 import { DAYS, DAY_SHORT, ICON, MOTIVOS, addDays, dayNum, esc, fmtH, fmtLong, fmtRange, iso, monthName, toMin, todayIso, weekday } from '../nucleo/util.js';
 import { api, confirmar, state, toast } from '../nucleo/estado.js';
 import { abreviaturas, capTags, funcionesDe, head, horasDe, puestoDe, puestoTag, renderView, rolDe, rolTag, shiftById, tipoDe, usaPuestos } from '../nucleo/pintado.js';
-import { route } from '../nucleo/rutas.js';
+import { route, urlDetalle } from '../nucleo/rutas.js';
 import { coverageBar } from './alertas.js';
 import { monthDayHtml, monthGrid } from './mes.js';
 import { calPersonas, personaHref, viewPersona } from './persona.js';
@@ -154,7 +154,7 @@ Object.assign(actions, {
     state.cal.ref = f;
     state.vista = 'dia'; state.diaFecha = f; state.dia = null;
     if (!state.current || state.current.id !== info.horario_id) state.current = null;
-    location.hash = `#/horarios/${info.horario_id}`;
+    location.hash = urlDetalle(info.horario_id, 'dia', f);
     renderView();
   },
 });

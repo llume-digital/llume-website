@@ -48,7 +48,7 @@ def test_calendario_ajustes_funciones_y_comentarios(url, browser, movil):  # noq
     dia = dt.date.today() + dt.timedelta(days=28 if movil else 0)
     page.click(f".mday[data-date='{dia.isoformat()}']")
     page.wait_for_selector(".gantt")
-    assert page.url.endswith(f"#/horarios/{sid}")
+    assert f"#/horarios/{sid}/dia/" in page.url  # el día va en la dirección
     page.wait_for_load_state("networkidle")
     bar = page.locator(".g-bar").first
     bar.evaluate("el => el.scrollIntoView({ block: 'center', inline: 'center' })")
