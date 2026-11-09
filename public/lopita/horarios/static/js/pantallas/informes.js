@@ -1,7 +1,8 @@
-import { esc, fmtH, monthName, todayIso } from '../nucleo/util.js';
+import { esc, fmtH, fmtRange, fmtShort, monthName, todayIso } from '../nucleo/util.js';
 import { overlay, state } from '../nucleo/estado.js';
 import { head, mic } from '../nucleo/pintado.js';
-import { ensure, monthBounds, signed } from './portal.js';
+import { CLASES, ensure, monthBounds, shiftText, signed } from './portal.js';
+import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ INFORMES DE HORAS (encargados)
 export function viewInformes() {
   const h = state.inf; if (!h.desde) [h.desde, h.hasta] = monthBounds(0);
@@ -75,3 +76,14 @@ export function openCorrection(pre = {}) {
     </form>`);
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  infDetalle: (el) => {
+    const e = state.inf.data.empleados.find((x) => x.empleado_id === el.dataset.e); const turnos = state.config.turnos;
+    overlay(`<h2>${esc(e.nombre)}</h2><p class="small muted" style="margin-top:-6px">${fmtRange(e.desde, e.hasta)} · previstas ${fmtH(e.previstas)} h · ajustadas ${fmtH(e.ajustadas)} h</p>
+      ${e.dias.length ? `<div class="table-wrap"><table class="list"><thead><tr><th>Día</th><th>Turno</th><th class="num">Prev.</th><th class="num">Ajust.</th><th>Corrección</th></tr></thead><tbody>
+      ${e.dias.map((x) => `<tr><td>${esc(fmtShort(x.fecha))}</td><td>${x.turno_id ? esc(shiftText(turnos, x.turno_id)) : '—'}</td><td class="num">${fmtH(x.previstas)}</td><td class="num"><b>${fmtH(x.ajustadas)}</b></td>
+        <td class="small">${x.correccion ? `${CLASES[x.correccion.clase]}${x.correccion.motivo ? `<div class="muted">${esc(x.correccion.motivo)}</div>` : ''}` : ''}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">Sin turnos en este periodo.</p>'}
+      <div class="row end" style="margin-top:16px"><button class="btn primary" data-act="closeOverlay">Cerrar</button></div>`);
+  },
+});

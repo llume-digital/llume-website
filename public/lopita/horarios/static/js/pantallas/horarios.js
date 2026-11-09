@@ -1,7 +1,8 @@
 import { addDays, daysBetween, esc, fmtLong, fmtRange, fmtStamp, todayIso, weekday } from '../nucleo/util.js';
-import { api, state } from '../nucleo/estado.js';
-import { head } from '../nucleo/pintado.js';
+import { api, confirmar, saveConfig, state, toast, withBusy } from '../nucleo/estado.js';
+import { head, renderView } from '../nucleo/pintado.js';
 import { sevBadges } from './alertas.js';
+import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ HORARIOS: lista y generador
 // Un publicado deja de valer en las fechas que ocupa otro publicado después (línea de tiempo de lo publicado)
 function vigencia(s) {
@@ -58,3 +59,55 @@ export function viewHorarios() {
 
 export async function refreshList() { state.schedules = await api('GET', '/api/horarios'); }
 
+export function generationToast(g) {
+  if (!g || !g.valido || !g.reintentos) return;
+  toast(`El primer intento tenía alertas críticas; se ${g.reintentos === 1 ? 'ha arreglado en el reintento' : `han arreglado en ${g.reintentos} reintentos`}.`);
+}
+
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+
+  genMode: (el) => { state.gen.modo = el.dataset.mode; renderView(); },
+  open: (el) => { location.hash = `#/horarios/${el.dataset.id}`; },
+  generate: async () => {
+    if (state.dirty && !(await saveConfig())) { toast('Corrige la configuración antes de generar', true); return; }
+    const [desde, hasta] = genPeriod();
+    try {
+      const d = await withBusy('Calculando el mejor horario…', () => api('POST', '/api/horarios/generar', { desde, hasta }));
+      state.current = d; await refreshList();
+      location.hash = `#/horarios/${d.id}`;
+      generationToast(d.generacion);
+    } catch (e) { toast(e.message, true); }
+  },
+  regenerate: async (el) => {
+    const n = state.current.horario.bloqueos.length;
+    const desde = el && el.dataset ? el.dataset.desde : null;
+    const alcance = desde ? `a partir del ${fmtLong(desde)} (los días anteriores no cambian)` : 'entero';
+    if (!(await confirmar({ titulo: 'Regenerar el horario', texto: `Se recalculará el horario ${alcance} con la configuración actual${n ? `, respetando tus ${n} cambios manuales` : ''}.`, verbo: 'Regenerar' }))) return;
+    if (state.dirty && !(await saveConfig())) return;
+    try {
+      state.current = await withBusy('Recalculando…', () => api('POST', `/api/horarios/${state.current.id}/regenerar`, desde ? { desde } : {}));
+      refreshList(); renderView(); generationToast(state.current.generacion);
+    } catch (e) { toast(e.message, true); }
+  },
+  clearLocks: async () => {
+    if (!(await confirmar({ titulo: '¿Quitar los bloqueos?', texto: 'Los turnos actuales se mantienen hasta que regeneres.', verbo: 'Quitar bloqueos' }))) return;
+    state.current = await api('DELETE', `/api/horarios/${state.current.id}/bloqueos`); renderView();
+  },
+  print: () => window.open(`/api/horarios/${state.current.id}/html`, '_blank'),
+  pdf: async () => {
+    try {
+      const r = await fetch(`/api/horarios/${state.current.id}/pdf`, { credentials: 'same-origin' });
+      if (!r.ok) throw new Error((await r.json()).detail);
+      const blob = await r.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = `horario_${state.current.desde}_${state.current.hasta}.pdf`; a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    } catch (e) { toast(e.message, true); }
+  },
+  deleteSchedule: async () => {
+    if (!(await confirmar({ titulo: '¿Eliminar este horario?', texto: 'No se puede deshacer.', verbo: 'Eliminar horario', peligro: true }))) return;
+    await api('DELETE', `/api/horarios/${state.current.id}`);
+    state.current = null; await refreshList(); location.hash = '#/horarios';
+  },
+});

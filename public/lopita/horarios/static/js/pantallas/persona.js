@@ -1,6 +1,7 @@
 import { DAYS, DAY_CHIP, DAY_LABEL, DAY_SHORT, ICON, MOTIVOS, addDays, dayNum, daysBetween, esc, fmtH, fmtLong, fmtShort, toMin, todayIso, weekday } from '../nucleo/util.js';
 import { state } from '../nucleo/estado.js';
-import { PUESTOS, empById, funcTags, head, horasDe, horasPersona, puestoDe, puestoTag, puestosDe, rolDe, rolTag, route, shiftById, tipoDe, usaPuestos } from '../nucleo/pintado.js';
+import { PUESTOS, empById, funcTags, head, horasDe, horasPersona, puestoDe, puestoTag, puestosDe, rolDe, rolTag, shiftById, tipoDe, usaPuestos } from '../nucleo/pintado.js';
+import { route } from '../nucleo/rutas.js';
 import { calChip, calNav, calRango, calTitulo } from './calendario.js';
 import { ensure } from './portal.js';
 // ------------------------------------------------------------------ CALENDARIO POR PERSONA

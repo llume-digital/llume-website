@@ -3,7 +3,8 @@ import { api, state, toast } from '../nucleo/estado.js';
 import { head, renderView } from '../nucleo/pintado.js';
 import { alertsPanel, weeksGrid } from './alertas.js';
 import { monthOfSchedule } from './mes.js';
-import { dayView, summaryTable } from './dia.js';
+import { closeMenu, dayView, openCellMenu, summaryTable } from './dia.js';
+import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ HORARIOS: detalle y cuadrante
 export function viewDetalle(id) {
   const cur = state.current;
@@ -20,20 +21,24 @@ export function viewDetalle(id) {
   const errors = h.incidencias.filter((i) => i.nivel === 'error');
   const extra = h.resumen.reduce((s, r) => s + r.horas_extra, 0);
   const pend = cur.cambios_pendientes;
-  const actions = [
-    `<button class="btn" data-act="solve">Solucionar problemas</button>`,
+  // Una acción principal a la vista (arreglar o publicar); el resto, en «Más».
+  const principal = cur.estado === 'borrador'
+    ? `<button class="btn primary" data-act="publish">Publicar horario</button>`
+    : `<button class="btn primary" data-act="solve">Solucionar problemas</button>`;
+  const secundaria = cur.estado === 'borrador' ? `<button class="btn" data-act="solve">Solucionar problemas</button>` : '';
+  const mas = [
     `<button class="btn" data-act="regenerate">Regenerar</button>`,
     h.bloqueos.length ? `<button class="btn" data-act="clearLocks">Quitar ${h.bloqueos.length === 1 ? 'el bloqueo' : `${h.bloqueos.length} bloqueos`}</button>` : '',
     `<button class="btn" data-act="print">Imprimir</button>`,
     `<button class="btn" data-act="pdf">PDF</button>`,
     `<a class="btn" href="/api/horarios/${cur.id}/csv">Horas (CSV)</a>`,
     cur.url_publica ? `<button class="btn" data-act="copyLink">Copiar enlace</button>` : '',
-    cur.estado === 'publicado' ? `<button class="btn" data-act="unpublish">Volver a borrador</button>` : '',
-    cur.estado === 'borrador' ? `<button class="btn primary" data-act="publish">${cur.reemplaza ? 'Publicar el arreglo' : 'Publicar y enviar a Slack'}</button>` : '',
     `<a class="btn" href="#/horarios/${cur.id}/historial">Historial</a>`,
     `<button class="btn" data-act="renombrarHorario" data-id="${cur.id}" data-nombre="${esc(cur.nombre || '')}">${cur.nombre ? 'Renombrar' : 'Poner nombre'}</button>`,
+    cur.estado === 'publicado' ? `<button class="btn" data-act="unpublish">Volver a borrador</button>` : '',
     `<button class="btn danger" data-act="deleteSchedule">Eliminar</button>`,
   ].join('');
+  const actions = `${principal}${secundaria}<details class="mas-menu"><summary class="btn">Más</summary><div class="mas-lista">${mas}</div></details>`;
   return `<p class="no-print" style="margin:0 0 8px"><a href="#/horarios">← Horarios</a></p>
   ${head(cur.nombre ? `${esc(cur.nombre)} <span class="muted small">${fmtRange(h.desde, h.hasta)}</span>` : fmtRange(h.desde, h.hasta), `<span class="badge ${cur.estado}">${cur.estado === 'publicado' ? 'Publicado' : 'Borrador'}</span>
     <span class="small muted">&nbsp;Actualizado ${fmtStamp(cur.actualizado)}${cur.publicado ? ` · publicado ${fmtStamp(cur.publicado)}` : ''}</span>`, '')}
@@ -95,3 +100,25 @@ export function horasFila(cfg, x) {
   return `<tr><td><b>${esc(nameIn(cfg, x.empleado_id))}</b></td><td class="num">${comodin ? '<span class="muted">Comodín</span>' : fmtH(x.objetivo)}</td><td class="num">${tag(x.antes)} → ${tag(x.despues)}</td></tr>`;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  cell: (el) => openCellMenu(el),
+  setCell: async (el) => {
+    closeMenu();
+    try {
+      const body = { empleado_id: el.dataset.emp, fecha: el.dataset.date, turno_id: el.dataset.shift || null, bloquear: true };
+      if (el.dataset.puesto) Object.assign(body, { puesto: el.dataset.puesto, conservar_horas: true });
+      if (el.dataset.funcion !== undefined) body.funcion = el.dataset.funcion; // '' = sin rol
+      state.current = await api('PATCH', `/api/horarios/${state.current.id}/celda`, body);
+      renderView();
+      const errs = state.current.horario.incidencias.filter((i) => i.nivel === 'error' && i.empleado_id === el.dataset.emp && i.fecha === el.dataset.date);
+      if (errs.length) toast(errs[0].mensaje, true);
+    } catch (e) { toast(e.message, true); }
+  },
+  unlockCell: async (el) => {
+    closeMenu();
+    const a = state.current.horario.asignaciones.find((x) => x.empleado_id === el.dataset.emp && x.fecha === el.dataset.date);
+    state.current = await api('PATCH', `/api/horarios/${state.current.id}/celda`, { empleado_id: el.dataset.emp, fecha: el.dataset.date, turno_id: a ? a.turno_id : null, puesto: a ? a.puesto : null, funcion: a ? a.funcion || '' : null, conservar_horas: true, bloquear: false });
+    renderView();
+  },
+});

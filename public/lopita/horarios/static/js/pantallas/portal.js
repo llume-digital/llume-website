@@ -1,6 +1,8 @@
 import { DAYS, DAY_CHIP, DAY_LABEL, ICON, MOTIVOS, addDays, clone, daysBetween, esc, fmtH, fmtLong, fmtRange, fmtStamp, iso, toMin, todayIso } from '../nucleo/util.js';
-import { api, state } from '../nucleo/estado.js';
+import { api, confirmar, state, toast } from '../nucleo/estado.js';
 import { head, mic, renderView } from '../nucleo/pintado.js';
+import { actions } from '../nucleo/registro.js';
+import { openCorrection } from './informes.js';
 // ------------------------------------------------------------------ utilidades del portal
 export const CLASES = { horas: 'Horas distintas', turno: 'Turno distinto', no_trabajado: 'No trabajé', extra: 'Día extra' };
 const ESTADO_BADGE = { pendiente: ['warn', 'Pendiente'], aprobada: ['publicado', 'Aprobada'], rechazada: ['bad', 'Rechazada'] };
@@ -190,3 +192,41 @@ export function viewMisPrefs() {
     </div></div>`).join('')}</div>` : '<div class="card empty">Sin preferencias. El horario se hará solo según la demanda y las reglas.</div>'}`;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+
+  // ---- portal del trabajador
+  miDay: (el) => {
+    const p = state.mi.prefs[Number(el.dataset.i)]; const arr = p.dias || [];
+    const set = new Set(arr); set.has(el.dataset.day) ? set.delete(el.dataset.day) : set.add(el.dataset.day);
+    p.dias = DAYS.filter((d) => set.has(d)); if (!p.dias.length) p.dias = null;
+    state.mi.prefsDirty = true; renderView();
+  },
+  miShift: (el) => {
+    const p = state.mi.prefs[Number(el.dataset.i)];
+    p.turnos = p.turnos.includes(el.dataset.shift) ? p.turnos.filter((t) => t !== el.dataset.shift) : [...p.turnos, el.dataset.shift];
+    state.mi.prefsDirty = true; renderView();
+  },
+  miAddPref: () => {
+    const t = state.mi.perfil.turnos[0]; if (!t) return;
+    state.mi.prefs.push({ tipo: 'prefiere', turnos: [t.id], dias: null, peso: 3 }); state.mi.prefsDirty = true; renderView();
+  },
+  miDelPref: (el) => { state.mi.prefs.splice(Number(el.dataset.i), 1); state.mi.prefsDirty = true; renderView(); },
+  miSavePrefs: async () => {
+    const body = { preferencias: state.mi.prefs.map(({ tipo, turnos, dias, peso }) => ({ tipo, turnos, dias, peso })) };
+    state.mi.perfil = await api('PUT', '/api/mi/preferencias', body);
+    state.mi.prefs = clone(state.mi.perfil.preferencias); state.mi.prefsDirty = false;
+    toast('Preferencias guardadas'); renderView();
+  },
+  newCorr: () => openCorrection({}),
+  corrRow: (el) => openCorrection({ fecha: el.dataset.date, turno_id: el.dataset.shift || '', clase: el.dataset.shift ? 'horas' : 'extra' }),
+  cancelReq: async (el) => {
+    if (!(await confirmar({ titulo: '¿Retirar esta solicitud?', verbo: 'Retirar solicitud', peligro: true }))) return;
+    state.mi.perfil = await api('DELETE', `/api/mi/solicitudes/${el.dataset.id}`);
+    state.miH.data = undefined; renderView();
+  },
+  periodoRango: (el) => { const h = state.inf; h.desde = el.dataset.desde; h.hasta = el.dataset.hasta; h.data = undefined; renderView(); },
+  periodoRapido: (el) => {
+    const h = state[el.dataset.h]; [h.desde, h.hasta] = monthBounds(Number(el.dataset.off)); h.data = undefined; renderView();
+  },
+});

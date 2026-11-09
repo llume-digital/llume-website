@@ -1,6 +1,9 @@
-import { DAYS, DAY_SHORT, ICON, esc } from '../nucleo/util.js';
-import { state } from '../nucleo/estado.js';
-import { dayChips, esRol, funcionesCfg, head, puestosDe } from '../nucleo/pintado.js';
+import { DAYS, DAY_SHORT, ICON, esc, uid } from '../nucleo/util.js';
+import { state, toast } from '../nucleo/estado.js';
+import { dayChips, esRol, funcionesCfg, head, puestosDe, renderView } from '../nucleo/pintado.js';
+import { conDeshacer } from '../nucleo/borrador.js';
+import { markDirty } from '../nucleo/enlace.js';
+import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ FUNCIONES (categorías de empleado con reglas)
 const personasTxt = (n) => `${n} ${n === 1 ? 'persona' : 'personas'}`;
 function funcionReglasTexto(f) {
@@ -62,3 +65,43 @@ export function viewFunciones() {
     'Aún no hay ninguna. Por ejemplo, «Preparar pinchos»: añádela, marca quién sabe hacerlo y pon de qué hora a qué hora hace falta.')}`;
 }
 
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  toggleFuncion: (el) => {
+    const e = state.draft.empleados[Number(el.dataset.i)];
+    const fs = e.funciones || [], f = el.dataset.f;
+    e.funciones = fs.includes(f) ? fs.filter((x) => x !== f) : [...fs, f];
+    markDirty(); renderView();
+  },
+  addFuncion: () => {
+    const c = state.draft; c.funciones = c.funciones || [];
+    const nombre = window.prompt('Nombre de la función (por ejemplo, Preparar pinchos):', '');
+    if (!nombre || !nombre.trim()) return;
+    const colores = ['#C9733B', '#4F7A5A', '#3E6A8A', '#8A4F7D', '#A88B2C', '#5E5E8F'];
+    c.funciones.push({ id: uid(nombre, c.funciones.map((f) => f.id)), nombre: nombre.trim(), color: colores[c.funciones.length % colores.length], reglas: [] });
+    markDirty(); renderView();
+  },
+  delFuncion: (el) => {
+    const c = state.draft; const f = c.funciones[Number(el.dataset.i)];
+    const avisar = conDeshacer(`Función «${f.nombre}» eliminada`);
+    c.funciones.splice(Number(el.dataset.i), 1);
+    c.empleados.forEach((e) => { e.funciones = (e.funciones || []).filter((x) => x !== f.id); });
+    markDirty(); renderView(); avisar();
+  },
+  addReglaFuncion: (el) => {
+    const f = state.draft.funciones[Number(el.dataset.i)];
+    f.reglas.push(esRol(f) ? { inicio: '09:00', fin: '21:00', personas: 1, maximo: null, dias: null } : { inicio: '10:00', fin: '12:00', personas: 1, dias: null });
+    markDirty(); renderView();
+  },
+  addRolesCamarero: () => {
+    const c = state.draft; c.funciones = c.funciones || [];
+    for (const [nombre, color] of ROLES_CAMARERO) {
+      c.funciones.push({ id: uid(nombre, c.funciones.map((f) => f.id)), nombre, color, puesto: 'sala', reglas: [] });
+    }
+    markDirty(); renderView();
+    toast('Roles creados: marca quién puede hacer cada uno y añade sus reglas, y guarda');
+  },
+  addFranja: (el) => { const e = state.draft.empleados[Number(el.dataset.i)]; (e.restricciones_horarias ||= []).push({ dias: [], desde: '10:00', hasta: null }); markDirty(); renderView(); },
+  delFranja: (el) => { state.draft.empleados[Number(el.dataset.i)].restricciones_horarias.splice(Number(el.dataset.j), 1); markDirty(); renderView(); },
+  delReglaFuncion: (el) => { state.draft.funciones[Number(el.dataset.i)].reglas.splice(Number(el.dataset.j), 1); markDirty(); renderView(); },
+});

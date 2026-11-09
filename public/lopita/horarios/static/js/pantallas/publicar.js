@@ -2,6 +2,10 @@
 // Enseña las diferencias por día y persona, ofrece conservar las ediciones a mano y bloqueos del horario publicado
 // que el borrador no respeta, y pide confirmar aparte si cambian días que ya han pasado. Ver app/revision.py.
 import { $, esc, fmtLong, fmtRange } from '../nucleo/util.js';
+import { api, confirmar, overlay, state, toast, withBusy } from '../nucleo/estado.js';
+import { renderView } from '../nucleo/pintado.js';
+import { actions } from '../nucleo/registro.js';
+import { refreshList } from './horarios.js';
 
 // ¿Hay algo que revisar? Si el borrador solo cubre días sin publicar, se publica sin más.
 export const hayQueRevisar = (rev) => Boolean(rev.cambios.length || rev.conservables.length || rev.pasado.length);
@@ -45,3 +49,68 @@ export function eleccion(rev) {
     .map((x) => x.bloqueo);
   return { conservar, confirmar_pasado: rev.pasado.length > 0 };
 }
+
+export function confirmCriticalDialog(data) {
+  return `<h2>¿Publicar un horario que no vale?</h2>
+    <div class="notice crit small"><span>${esc(data.detail)}</span></div>
+    <ul class="fix-alerts">${data.criticas.map((a) => `<li><span class="sev-badge critica">Crítica</span> ${esc(a.detalle)}</li>`).join('')}</ul>
+    <label class="toggle" style="margin-top:12px"><input type="checkbox" data-act-change="toggleConfirm"> Lo publico sabiendo que tiene alertas críticas y que las resolveré fuera de la app.</label>
+    <p class="small muted">Quedará registrado quién lo publicó y cuándo.</p>
+    <div class="row end" style="margin-top:16px"><button class="btn" data-act="closeOverlay">Cancelar</button>
+      <button class="btn danger" id="confirm-publish" data-act="publish" data-confirm="1" disabled>Publicar igualmente</button></div>`;
+}
+
+export function showSlack(res, title) {
+  if (!res) return;
+  const sent = res.mensajes.filter((m) => m.ok).length;
+  overlay(`<h2>${esc(title)}</h2>
+    ${res.simulado ? '<div class="notice info small">Slack aún no está conectado: estos son los mensajes que se enviarían. El enlace público ya funciona.</div>'
+      : res.ok ? `<div class="notice ok small">Enviados ${sent} mensajes por Slack.</div>` : `<div class="notice warn small">Se enviaron ${sent} de ${res.mensajes.length} mensajes. Revisa los que fallaron.</div>`}
+    ${res.mensajes.map((m) => `<div class="msg ${m.ok ? '' : 'bad'}"><b>${esc(m.destino)}</b>${m.ok ? '' : ` · ${esc(m.error || 'error')}`}\n${esc(m.texto)}</div>`).join('')}
+    <div class="row end" style="margin-top:16px"><button class="btn primary" data-act="closeOverlay">Cerrar</button></div>`);
+}
+
+// ------------------------------------------------------------------ acciones de la pantalla
+Object.assign(actions, {
+  publish: async (el) => {
+    const datos = (el && el.dataset) || {};
+    const confirmar = Boolean(datos.confirm);
+    const sid = state.current.id;
+    // Primero la revisión (diferencias con lo publicado, ediciones a conservar, días pasados); al confirmar
+    // alertas críticas se repite lo elegido en ella.
+    if (datos.revisado) state.publicacion = { sid, ...eleccion(state.publicacion.rev) };
+    else if (!confirmar || !state.publicacion || state.publicacion.sid !== sid) {
+      state.publicacion = null;
+      try {
+        const rev = await api('GET', `/api/horarios/${sid}/revision`);
+        if (hayQueRevisar(rev)) { state.publicacion = { sid, rev }; overlay(revisionDialog(rev)); return; }
+      } catch (e) { toast(e.message, true); return; }
+    }
+    const elegido = state.publicacion && state.publicacion.sid === sid
+      ? { conservar: state.publicacion.conservar || [], confirmar_pasado: Boolean(state.publicacion.confirmar_pasado) } : {};
+    try {
+      const d = await withBusy('Publicando…', () => api('POST', `/api/horarios/${sid}/publicar`, { ...elegido, ...(confirmar ? { confirmar_criticas: true } : {}) }));
+      state.publicacion = null;
+      const reemplazo = d.reemplazado;
+      state.current = d; refreshList();
+      if (reemplazo) { location.hash = `#/horarios/${reemplazo}`; renderView(); toast('Arreglo publicado. Avisa por Slack a quien le cambia el turno.'); }
+      else { renderView(); showSlack(d.slack, 'Horario publicado'); }
+    } catch (e) {
+      if (e.data && e.data.codigo === 'criticas') overlay(confirmCriticalDialog(e.data));
+      else toast(e.message, true);
+    }
+  },
+  notify: async () => {
+    try {
+      const d = await withBusy('Avisando al equipo…', () => api('POST', `/api/horarios/${state.current.id}/notificar`));
+      state.current = d; refreshList(); renderView(); showSlack(d.slack, 'Cambios enviados');
+    } catch (e) { toast(e.message, true); }
+  },
+  unpublish: async () => {
+    if (!(await confirmar({ titulo: '¿Volver a borrador?', texto: 'El horario dejará de verse en el enlace público hasta que lo vuelvas a publicar.', verbo: 'Volver a borrador', peligro: true }))) return;
+    state.current = await api('POST', `/api/horarios/${state.current.id}/despublicar`); refreshList(); renderView();
+  },
+  copyLink: async () => {
+    try { await navigator.clipboard.writeText(state.current.url_publica); toast('Enlace copiado'); } catch { window.prompt('Copia el enlace:', state.current.url_publica); }
+  },
+});
