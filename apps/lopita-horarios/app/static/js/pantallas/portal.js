@@ -58,7 +58,7 @@ function myRequests(p) {
 // ------------------------------------------------------------------ PORTAL DEL TRABAJADOR
 function myNotices(p) {
   const nuevos = (p.avisos || []).filter((a) => !a.leido), vistos = (p.avisos || []).filter((a) => a.leido);
-  const item = (a) => `<li class="${a.urgente ? 'urgent' : ''}">${a.urgente ? '<span class="badge bad">Pronto</span> ' : ''}${esc(a.texto)} <span class="small muted">· ${esc(fmtStamp(a.creado))}</span></li>`;
+  const item = (a) => `<li class="${a.urgente ? 'urgent' : ''}">${a.urgente ? '<span class="badge bad">Pronto</span> ' : ''}${a.pasado ? '<span class="badge warn">Día pasado</span> ' : ''}${esc(a.texto)} <span class="small muted">· ${esc(fmtStamp(a.creado))}</span></li>`;
   return `${nuevos.length ? `<div class="notice-board section" role="alert"><div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Tu horario ha cambiado</h2><button class="btn primary small" data-act="readNotices">Entendido</button></div><ul>${nuevos.map(item).join('')}</ul></div>` : ''}
   ${vistos.length ? `<details class="section"><summary class="small muted" style="cursor:pointer">Avisos anteriores (${vistos.length})</summary><ul class="old-notices">${vistos.map(item).join('')}</ul></details>` : ''}`;
 }

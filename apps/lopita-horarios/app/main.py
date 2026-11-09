@@ -823,10 +823,12 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         if destino and destino["estado"] == "publicado":
             return publish_replacement(row, destino, h, criticas, request, u)
         primera = row["estado"] != "publicado"
+        publicado = {d: [a for a in r["horario"].asignaciones if a.fecha == d] for d, r in linea_tiempo.por_dia(
+            store.list_schedules(), h.desde, h.hasta, solo_publicados=True, excluir=sid).items()} if primera else {}
         h.estado = "publicado"
         token = store.publish_schedule(sid, h)
         if primera:
-            avisos.registrar_publicacion(store, sid, h)
+            avisos.registrar_publicacion(store, sid, h, publicado)
         if criticas:
             store.log_action(sid, u["username"], "publicado_con_criticas", {"criticas": [a["detalle"] for a in criticas]})
         res = slack.publish(config, h, slack_url(request, token), calendario=slack_cal(request))

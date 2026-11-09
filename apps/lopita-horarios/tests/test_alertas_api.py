@@ -318,3 +318,45 @@ def test_regenerar_sin_cuerpo_sigue_funcionando(env):
     _, admin = env
     sid, _ = make_week(admin)
     assert admin.post(f"/api/horarios/{sid}/regenerar").status_code == 200
+
+
+def test_publicar_encima_de_lo_publicado_avisa_solo_de_lo_que_cambia(env):
+    """Un horario nuevo que pisa días ya publicados no manda «se ha publicado tu horario» a todo el mundo: en esos
+    días cada persona recibe solo los cambios de sus turnos."""
+    app, admin = env
+    a, d = make_week(admin, publish=True)
+    t = admin.get(f"/api/horarios/{a}").json()["horario"]["asignaciones"][0]
+    emp = t["empleado_id"]
+    w = worker_client(app, admin, emp)
+    w.post("/api/mi/avisos/leer", json={})
+    r = admin.post("/api/horarios/generar", json={"desde": d.isoformat(), "hasta": (d + dt.timedelta(days=6)).isoformat()})
+    b = r.json()["id"]
+    otro = "T" if turno_de(admin, b, emp)["turno_id"] != "T" else "M"
+    fecha = turno_de(admin, b, emp)["fecha"]
+    admin.patch(f"/api/horarios/{b}/celda", json={"empleado_id": emp, "fecha": fecha, "turno_id": otro})
+    r = admin.post(f"/api/horarios/{b}/publicar", json={"confirmar_criticas": True})
+    assert r.status_code == 200, r.text
+    sin_leer = [x for x in w.get("/api/mi/perfil").json()["avisos"] if not x["leido"]]
+    assert "nuevo_horario" not in {x["tipo"] for x in sin_leer}
+    assert any(x["tipo"] == "turno" and x["fecha"] == fecha for x in sin_leer)
+
+
+def test_corregir_un_dia_pasado_avisa_al_trabajador(env):
+    app, admin = env
+    hoy = dt.date.today()
+    r = admin.post("/api/horarios/generar", json={"desde": (hoy - dt.timedelta(days=3)).isoformat(),
+                                                   "hasta": (hoy + dt.timedelta(days=3)).isoformat()})
+    sid = r.json()["id"]
+    assert admin.post(f"/api/horarios/{sid}/publicar", json={"confirmar_criticas": True}).status_code == 200
+    h = admin.get(f"/api/horarios/{sid}").json()["horario"]
+    t = next(a for a in h["asignaciones"] if a["fecha"] == (hoy - dt.timedelta(days=2)).isoformat())
+    emp = t["empleado_id"]
+    w = worker_client(app, admin, emp)
+    w.post("/api/mi/avisos/leer", json={})
+    # No hizo su turno: el encargado lo corrige a libre
+    admin.patch(f"/api/horarios/{sid}/celda", json={"empleado_id": emp, "fecha": t["fecha"], "turno_id": None})
+    [aviso] = [x for x in w.get("/api/mi/perfil").json()["avisos"] if not x["leido"]]
+    assert aviso["pasado"] and "Se ha corregido" in aviso["texto"] and "libre" in aviso["texto"]
+    # Una vez leído deja de enseñarse
+    w.post("/api/mi/avisos/leer", json={})
+    assert not [x for x in w.get("/api/mi/perfil").json()["avisos"] if x["fecha"] == t["fecha"]]
