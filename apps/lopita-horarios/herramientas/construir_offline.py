@@ -97,7 +97,10 @@ def _codigo_python() -> bytes:
     return buf.getvalue()
 
 
-def construir(salida: Path, pyodide_local: Path | None, nube: str | None = None) -> list[str]:
+NOINDEX = '<meta name="robots" content="noindex, nofollow">'
+
+
+def construir(salida: Path, pyodide_local: Path | None, nube: str | None = None, noindex: bool = False) -> list[str]:
     if salida.exists():
         shutil.rmtree(salida)
     (salida / "pyodide").mkdir(parents=True)
@@ -132,6 +135,13 @@ def construir(salida: Path, pyodide_local: Path | None, nube: str | None = None)
     for nombre in SHELL:
         shutil.copy2(RAIZ / "offline" / nombre, salida / nombre)
     (salida / "lopita.zip").write_bytes(_codigo_python())
+    if noindex:  # la demo publicada en la web no debe salir en los buscadores
+        index = salida / "index.html"
+        html = index.read_text(encoding="utf-8")
+        if NOINDEX not in html:
+            viewport = html.index("\n", html.index('<meta name="viewport"')) + 1
+            html = html[:viewport] + f"  {NOINDEX}\n" + html[viewport:]
+        index.write_text(html, encoding="utf-8")
 
     archivos = sorted(p.relative_to(salida).as_posix() for p in salida.rglob("*") if p.is_file())
     huella = hashlib.sha256()
@@ -157,8 +167,9 @@ def main() -> None:
     ap.add_argument("--zip", action="store_true", help="deja también salida/lopita-offline.zip")
     ap.add_argument("--nube", help="ruta (relativa a la app) de la base de datos compartida, p. ej. nube/db "
                     "(la sirve src/worker.js de la web de llume); sin ella, los datos se quedan en el móvil")
+    ap.add_argument("--noindex", action="store_true", help="añade <meta name=robots noindex> (la demo de la web)")
     args = ap.parse_args()
-    archivos = construir(args.salida, args.pyodide, args.nube)
+    archivos = construir(args.salida, args.pyodide, args.nube, args.noindex)
     total = sum((args.salida / a).stat().st_size for a in archivos if a != "./")
     print(f"App offline en {args.salida}: {len(archivos) - 1} archivos, {total / 1e6:.1f} MB")
     if args.zip:
