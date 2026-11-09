@@ -7,6 +7,9 @@
 // - Lo puramente interno (tests, refactors, CI, documentación) no lleva entrada: el PR lo dice con «Sin novedades: …».
 // La comprobación de CI (herramientas/comprobar_novedades.py) falla si un PR toca la app sin pasar por aquí.
 export const NOVEDADES = [
+  { fecha: '2026-11-09', titulo: 'El cuadrante, más cómodo en el móvil', ir: 'horarios', texto: [
+    'En el móvil, la columna de nombres del cuadrante es más estrecha (solo el nombre, en una línea), así que ves más días de cada vez. El contrato de cada persona sigue en su ficha de <b>Equipo</b>.',
+  ] },
   { fecha: '2026-11-09', titulo: 'Los errores salen junto al campo que hay que corregir', ir: 'equipo', texto: [
     'Si un formulario no se puede enviar (por ejemplo, una baja que acaba antes de empezar o dos contraseñas que no coinciden), el aviso sale <b>justo debajo del campo</b> afectado, el campo se marca en rojo y el cursor se coloca en él.',
   ] },

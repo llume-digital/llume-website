@@ -699,3 +699,13 @@ nav.tabs.subtabs a { font-size: var(--text-xs); padding: 10px 10px 8px; }
 /* Error de un campo: justo debajo de él, en rojo, y el campo se marca. */
 .field-error { color: var(--bad); font-size: var(--text-sm); font-weight: 600; }
 input[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--bad); }
+
+/* Cuadrante en el móvil: la columna de nombres se estrecha (nombre en una línea; el contrato está en la ficha; las funciones siguen abreviadas). */
+@media (max-width: 600px) {
+  table.sched .emp { width: 96px; padding-left: 8px; font-size: var(--text-sm); }
+  table.sched td.emp { overflow: hidden; }
+  table.sched td.emp .emp-link { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  table.sched td.emp small { display: none; }
+  table.sched td.tot, table.sched th.tot { width: 56px; }
+  table.sched { min-width: 790px !important; }
+}
