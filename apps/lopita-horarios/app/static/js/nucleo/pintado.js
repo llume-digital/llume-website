@@ -17,7 +17,7 @@ export function render() {
   if (state.me.cambiar_clave) { app.innerHTML = viewForcePw(); return; }
   if (!$('.topbar')) {
     app.innerHTML = `
-      <header class="topbar">
+      <header class="topbar" data-rol="${isWorker() ? 'trabajadora' : 'encargado'}">
         <div class="topbar-inner">
           <a class="wordmark" href="#/" aria-label="Lopita & Co · Horarios"><b>LOPITA &amp; CO</b><span>Horarios</span></a>
           <div class="userbox"><span>${esc(state.me.nombre)}</span>${menuCuenta()}${botonCuenta('goGuia', 'guia', 'Guía', 'Cómo funciona la app', ' id="guia-btn"')}${botonCuenta('feedback', 'comentar', 'Comentarios', 'Deja una sugerencia, un fallo o una duda', ' class="fb-btn"')}${botonCuenta('cuentaDialog', 'cuenta', 'Mi cuenta', 'Tu correo, Google y tu contraseña')}${botonCuenta('logout', 'salir', 'Salir', 'Cerrar la sesión')}</div>

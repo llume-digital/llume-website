@@ -7,6 +7,14 @@ import { refreshList } from './horarios.js';
 // Las últimas mejoras, de la más nueva a la más antigua, explicadas para quien usa la app. Para anunciar una
 // mejora nueva, añádela arriba del todo: la pestaña muestra cuántas hay desde la última vez que se abrió.
 const NOVEDADES = [
+  { fecha: '2026-11-09', titulo: 'Las secciones de la trabajadora, abajo en el móvil', ir: 'inicio', texto: [
+    'En el móvil, <b>Inicio, Mis horas, Vacaciones y Preferencias</b> están ahora en una barra fija en la parte de abajo, al alcance del pulgar, con el nombre de cada sección.',
+    'La parte de arriba se queda con el nombre de la app y los botones de cuenta. El contenido ya no queda tapado por la barra.',
+  ] },
+  { fecha: '2026-11-09', titulo: 'Menos pestañas: el menú, en cinco secciones', ir: 'horarios', texto: [
+    'El menú del encargado pasa de 16 pestañas a cinco: <b>Horario, Pendiente, Equipo, Informes y Configuración</b>. Debajo salen las pantallas de la sección en la que estás (por ejemplo, Horarios y Calendario dentro de Horario).',
+    '<b>Web, Comentarios recibidos y Novedades</b> están en el botón <b>Más</b>, arriba a la derecha, con su contador. Todas las pantallas siguen en su sitio y los enlaces de siempre funcionan.',
+  ] },
   { fecha: '2026-11-05', titulo: 'Más personas a la vista en el horario del día', ir: 'horarios', texto: [
     'Las filas de la vista de día son más bajas, así que ves a mucha más gente a la vez sin desplazarte.',
     'Junto al nombre solo sale si es camarero o cocinero. Las etiquetas (abre, cierra, encargado y las funciones) van abreviadas dentro de la barra del turno, con una leyenda debajo que explica cada abreviatura.',
