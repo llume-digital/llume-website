@@ -7,6 +7,7 @@ import { diaDescartable } from './pantallas/dia.js';
 import { PINCHOS } from './pantallas/equipo.js';
 import { corrDetail } from './pantallas/informes.js';
 import { actions } from './nucleo/registro.js';
+import { empujarUrl, urlDetalle } from './nucleo/rutas.js';
 import './pantallas/acceso.js';
 import './pantallas/ajustes.js';
 import './pantallas/alertas.js';
@@ -106,7 +107,8 @@ export const changeActions = {
   dayPick: async (el) => {
     if (!el.value) return;
     if (!(await diaDescartable())) { el.value = state.dia.fecha; return; }
-    state.dia = null; state.diaFecha = el.value; renderView();
+    state.dia = null; state.diaFecha = el.value;
+    empujarUrl(urlDetalle(state.current.id, 'dia', state.diaFecha)); renderView();
   },
   corrClase: (el) => { $('#corr-detail').innerHTML = corrDetail(el.value, state.mi.perfil.turnos); },
   infBorradores: (el) => { state.inf.borradores = el.checked; state.inf.data = undefined; renderView(); },

@@ -77,7 +77,7 @@ def test_calendario_por_persona(url, browser, movil):  # noqa: F811
     page.wait_for_selector(".pd-row.pd-turno")
     page.click(f'.pd-row[data-date="{fecha}"]')
     page.wait_for_selector(".gantt")
-    assert page.url.endswith(f"#/horarios/{sid}")
+    assert f"#/horarios/{sid}/dia/" in page.url  # el día va en la dirección
 
     # Desde el calendario por fecha, el nombre de la fila también lleva a la persona.
     page.goto(f"{url}/#/calendario/persona/{emp}/{lunes.isoformat()}")

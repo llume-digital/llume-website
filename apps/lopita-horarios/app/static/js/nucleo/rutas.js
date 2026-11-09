@@ -34,8 +34,27 @@ const VISTAS_ENCARGADO = (r) => ({
   horarios: r.arg ? (r.arg2 === 'historial' ? () => viewHistorial(Number(r.arg)) : () => viewDetalle(Number(r.arg))) : viewHorarios,
   calendario: viewCalendario, alertas: viewAlertas, solicitudes: viewSolicitudes, informes: viewInformes, equipo: viewEquipo, funciones: viewFunciones, turnos: viewTurnos, demanda: viewDemanda, ausencias: viewAusencias, preferencias: viewPreferencias, reglas: viewReglas, web: viewWeb, comentarios: viewComentarios, ajustes: viewAjustes, novedades: viewNovedades, guia: viewGuia })
 
+// Dirección de un horario en una vista: #/horarios/12 (semana), #/horarios/12/mes y #/horarios/12/dia/2026-11-10.
+export function urlDetalle(id, vista, fecha) {
+  if (vista === 'dia') return `#/horarios/${id}/dia${fecha ? `/${fecha}` : ''}`;
+  return `#/horarios/${id}${vista === 'mes' ? '/mes' : ''}`;
+}
+
+// Cambia la dirección sin disparar «hashchange» (el que llama ya repinta): el botón atrás vuelve a la vista anterior.
+export function empujarUrl(hash) {
+  if (location.hash !== hash) history.pushState(null, '', hash);
+}
+
+// La vista y el día de un horario salen de la dirección, así recargar o compartir el enlace los conserva.
+function sincronizarDetalle(r) {
+  if (r.name !== 'horarios' || !r.arg || r.arg2 === 'historial') return;
+  state.vista = r.arg2 === 'dia' || r.arg2 === 'mes' ? r.arg2 : 'semana';
+  if (state.vista === 'dia' && /^\d{4}-\d{2}-\d{2}$/.test(r.arg3 || '')) state.diaFecha = r.arg3;
+}
+
 // La vista de una ruta; una pantalla que no existe (o que no es de ese rol) cae en la de inicio.
 export function vistaDe(r, trabajadora) {
+  if (!trabajadora) sincronizarDetalle(r);
   const vistas = trabajadora ? VISTAS_TRABAJADORA : VISTAS_ENCARGADO(r);
   const name = vistas[r.name] ? r.name : (trabajadora ? 'inicio' : 'horarios');
   return { name, vista: vistas[name] };

@@ -30,7 +30,7 @@ def test_dia_sin_horario_orden_y_zoom(url, browser):  # noqa: F811
     page.wait_for_selector("[data-act=calModo][data-v=dia]")
     page.click("[data-act=calModo][data-v=dia]")
     page.wait_for_selector(".gantt")
-    assert page.url.endswith(f"#/horarios/{sid}")
+    assert f"#/horarios/{sid}/dia/" in page.url  # el día va en la dirección
     assert page.input_value(".day-pick input") == lunes.isoformat()
     assert "No hay horario" in page.locator("#toast, .toast").first.inner_text()
 

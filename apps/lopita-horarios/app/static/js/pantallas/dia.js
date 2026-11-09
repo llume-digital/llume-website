@@ -1,5 +1,6 @@
 import { $, DAYS, DAY_LABEL, ICON, MOTIVOS, addDays, clone, dayNum, esc, fmtH, fmtLong, fmtMin, fmtRange, monthName, toMin, todayIso, weekday } from '../nucleo/util.js';
 import { api, closeOverlay, confirmar, deshacer, overlay, saveConfig, state, toast, withBusy } from '../nucleo/estado.js';
+import { empujarUrl, urlDetalle } from '../nucleo/rutas.js';
 import { PUESTOS, abreviaturas, capTags, empById, esRol, funcById, funcionesDe, horasDe, puestoDe, puestoTag, puestosDe, renderView, rolTag, rolesDe, shiftById, tipoDe, usaPuestos } from '../nucleo/pintado.js';
 import { horasFila, nameIn } from './cuadrante.js';
 import { SEV, SEV_ORDER, alertCard, sevBadges } from './alertas.js';
@@ -489,13 +490,18 @@ Object.assign(actions, {
     if (el.dataset.v === state.vista) return;
     if (state.vista === 'dia' && !(await diaDescartable())) return;
     if (state.vista === 'dia') state.dia = null;
-    state.vista = el.dataset.v; renderView();
+    state.vista = el.dataset.v;
+    empujarUrl(urlDetalle(state.current.id, state.vista, state.diaFecha)); renderView();
   },
-  openDay: (el) => { state.diaFecha = el.dataset.date; state.vista = 'dia'; state.dia = null; renderView(); window.scrollTo(0, 0); },
+  openDay: (el) => {
+    state.diaFecha = el.dataset.date; state.vista = 'dia'; state.dia = null;
+    empujarUrl(urlDetalle(state.current.id, 'dia', state.diaFecha)); renderView(); window.scrollTo(0, 0);
+  },
   dayGo: async (el) => {
     if (!(await diaDescartable())) return;
     state.dia = null; state.diaFecha = el.dataset.date;
-    if (el.dataset.sid) { state.current = null; location.hash = `#/horarios/${el.dataset.sid}`; } else renderView();
+    if (el.dataset.sid) { state.current = null; location.hash = urlDetalle(el.dataset.sid, 'dia', state.diaFecha); return; }
+    empujarUrl(urlDetalle(state.current.id, 'dia', state.diaFecha)); renderView();
   },
   dayDiscard: () => { const antes = state.dia; state.dia = null; renderView(); deshacer('Cambios del día descartados', () => { state.dia = antes; renderView(); }); },
   barTimes: (el) => {
@@ -520,7 +526,7 @@ Object.assign(actions, {
     if (diaSoloLectura(cur)) { toast('Este horario tiene un arreglo pendiente: haz los cambios en él', true); return; }
     if (state.vista === 'dia' && !(await diaDescartable())) return;
     state.vista = 'dia'; state.diaFecha = el.dataset.date; state.dia = null;
-    renderView();
+    empujarUrl(urlDetalle(cur.id, 'dia', state.diaFecha)); renderView();
     const t = state.dia.tramos.find((x) => x.empleado_id === el.dataset.emp);
     if (!t || !ajustarTramo(t, el.dataset.k, Number(el.dataset.dm))) { toast('Así no cabe en el día', true); renderView(); return; }
     renderView(); window.scrollTo(0, 0);
