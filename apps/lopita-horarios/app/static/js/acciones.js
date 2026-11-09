@@ -52,6 +52,7 @@ Object.assign(actions, {
 
 // cambios de <select> que no son un simple data-bind
 export const changeActions = {
+  toggleAlertCode: (el) => actions.toggleAlertCode(el),
   comodin: (el) => {
     const e = state.draft.empleados[Number(el.dataset.i)];
     e.comodin = el.checked;

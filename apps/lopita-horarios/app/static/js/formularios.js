@@ -109,8 +109,9 @@ const CAMPO_DEL_ERROR = {
   'reset-form': [[/contraseña/, 'password']],
   'email-form': [[/correo|email/i, 'email']],
 };
+const clave = (f) => f.dataset.form || f.id; // un formulario que se repite lleva ids distintos y la misma clave
 const campoDe = (f, mensaje) => {
-  const par = (CAMPO_DEL_ERROR[f.id] || []).find(([re]) => re.test(mensaje));
+  const par = (CAMPO_DEL_ERROR[clave(f)] || []).find(([re]) => re.test(mensaje));
   return par ? f.elements[par[1]] : null;
 };
 
@@ -153,7 +154,7 @@ export async function enviarFormulario(e) {
   e.preventDefault();
   pararDictado();
   const f = e.target;
-  const manejador = formularios[f.id];
+  const manejador = formularios[clave(f)];
   if (!manejador || f.dataset.enviando) return;
   f.dataset.enviando = '1';
   const botones = [...f.querySelectorAll('button[type=submit]')];

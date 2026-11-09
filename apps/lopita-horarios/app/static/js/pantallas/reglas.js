@@ -8,7 +8,8 @@ function numField(path, label, hint, val, step = 0.5, min = 0) {
 function alertSettingsCard() {
   const a = state.draft.alertas;
   const cat = (state.me && state.me.alertas_catalogo) || [];
-  return `<div class="card section"><h2>Alertas</h2>
+  const activas = cat.filter((c) => !a.desactivadas.includes(c.codigo)).length;
+  return `<details class="card section"${state.reglasAlertasAbiertas ? ' open' : ''}><summary style="cursor:pointer"><h2 style="display:inline">Alertas</h2> <span class="small muted">· ${activas} de ${cat.length} activas</span></summary>
     <p class="small muted">Cuándo te avisa el sistema. El motor también intenta no pasarse de los umbrales de reparto y de días seguidos.</p>
     <div class="fields two">
       ${numField('alertas.reparto_horas_pct', 'Reparto de horas (puntos %)', 'Diferencia máxima entre quien más y quien menos cumple su contrato', a.reparto_horas_pct, 1)}
@@ -20,9 +21,9 @@ function alertSettingsCard() {
       ${numField('alertas.plantilla_sobra_pct', 'Plantilla sobrante (%)', 'Cuánto pueden superar los contratos a la demanda de una semana antes de avisar', a.plantilla_sobra_pct, 1)}
     </div>
     <h3 style="margin:18px 0 6px;font-size:var(--text-base)">Qué alertas recibir</h3>
-    <div class="chips">${cat.map((c) => `<button type="button" class="chip ${a.desactivadas.includes(c.codigo) ? '' : 'on'}" data-act="toggleAlertCode" data-code="${esc(c.codigo)}" aria-pressed="${!a.desactivadas.includes(c.codigo)}">${esc(c.descripcion)}</button>`).join('')}</div>
+    <div class="alertas-casillas">${cat.map((c) => `<label class="toggle"><input type="checkbox" data-act-change="toggleAlertCode" data-code="${esc(c.codigo)}" ${a.desactivadas.includes(c.codigo) ? '' : 'checked'}> ${esc(c.descripcion)}</label>`).join('')}</div>
     <p class="small muted" style="margin-bottom:0">Las reglas incumplidas, las ausencias que no se reflejan en el horario y los avisos de contexto no se pueden silenciar.</p>
-  </div>`;
+  </details>`;
 }
 
 export function viewReglas() {

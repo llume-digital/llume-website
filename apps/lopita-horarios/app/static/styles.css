@@ -716,3 +716,10 @@ input[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--ba
 .pendiente-fila.crit { border-left-color: var(--bad); }
 .pendiente-fila.alta { border-left-color: var(--warn); }
 .pendiente-fila.media { border-left-color: var(--line-strong); }
+
+/* Ajustes: una sola columna, por frecuencia de uso. */
+.ajustes-col { display: grid; gap: 16px; max-width: 760px; }
+
+/* Reglas: qué alertas recibir, en casillas de dos columnas (se ve cuáles están apagadas). */
+.alertas-casillas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; }
+@media (max-width: 600px) { .alertas-casillas { grid-template-columns: 1fr; } }
