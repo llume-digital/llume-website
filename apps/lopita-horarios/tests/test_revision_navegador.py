@@ -61,3 +61,41 @@ def test_revisar_y_conservar_al_publicar(url, browser):  # noqa: F811
     assert h["estado"] == "publicado"
     assert not any(y["empleado_id"] == x["empleado_id"] and y["fecha"] == x["fecha"] for y in h["asignaciones"])
     assert not errores, errores
+
+
+def test_historial_comparar_y_restaurar(url, browser):  # noqa: F811
+    ctx = browser.new_context(viewport={"width": 1360, "height": 900})
+    page = ctx.new_page()
+    errores = []
+    page.on("pageerror", lambda e: errores.append(str(e)))
+    page.goto(url)
+    page.fill("input[name=usuario]", "admin")
+    page.fill("input[name=password]", PW)
+    page.click("button[type=submit]")
+    page.wait_for_selector("[data-act=generate]")
+    lunes = dt.date.today() + dt.timedelta(days=7 - dt.date.today().weekday() + 63)
+    cab = {"Origin": url}
+    rango = {"desde": lunes.isoformat(), "hasta": (lunes + dt.timedelta(days=6)).isoformat()}
+    a = page.request.post(f"{url}/api/horarios/generar", headers=cab, data=rango).json()["id"]
+    assert page.request.post(f"{url}/api/horarios/{a}/publicar", headers=cab, data={"confirmar_criticas": True}).ok
+    b = page.request.post(f"{url}/api/horarios/generar", headers=cab, data=rango).json()["id"]
+    h = page.request.get(f"{url}/api/horarios/{b}").json()["horario"]
+    x = h["asignaciones"][0]
+    assert page.request.patch(f"{url}/api/horarios/{b}/celda", headers=cab,
+                              data={"empleado_id": x["empleado_id"], "fecha": x["fecha"], "turno_id": None}).ok
+    assert page.request.post(f"{url}/api/horarios/{b}/publicar", headers=cab, data={"confirmar_criticas": True}).ok
+
+    page.goto(f"{url}/#/horarios/{b}")
+    page.click("text=Historial")
+    page.wait_for_selector(".historial-version")
+    assert page.locator(".historial-version").count() == 2
+    vieja = page.locator(f'.historial-version[data-version="{a}"]')
+    assert "Sustituido" in vieja.inner_text()
+    vieja.locator("[data-act=compararVersion]").click()
+    page.wait_for_selector("text=frente a hoy")
+    assert page.locator(".overlay .revision-dia").count() >= 1
+    page.click(".overlay [data-act=restaurarVersion]")
+    page.wait_for_selector("text=Restaurado de")
+    nuevo = int(page.evaluate("location.hash").split("/")[2])
+    assert page.request.get(f"{url}/api/horarios/{nuevo}").json()["estado"] == "borrador"
+    assert not errores, errores

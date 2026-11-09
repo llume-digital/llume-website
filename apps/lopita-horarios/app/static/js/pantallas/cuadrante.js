@@ -30,10 +30,12 @@ export function viewDetalle(id) {
     cur.url_publica ? `<button class="btn" data-act="copyLink">Copiar enlace</button>` : '',
     cur.estado === 'publicado' ? `<button class="btn" data-act="unpublish">Volver a borrador</button>` : '',
     cur.estado === 'borrador' ? `<button class="btn primary" data-act="publish">${cur.reemplaza ? 'Publicar el arreglo' : 'Publicar y enviar a Slack'}</button>` : '',
+    `<a class="btn" href="#/horarios/${cur.id}/historial">Historial</a>`,
+    `<button class="btn" data-act="renombrarHorario" data-id="${cur.id}" data-nombre="${esc(cur.nombre || '')}">${cur.nombre ? 'Renombrar' : 'Poner nombre'}</button>`,
     `<button class="btn danger" data-act="deleteSchedule">Eliminar</button>`,
   ].join('');
   return `<p class="no-print" style="margin:0 0 8px"><a href="#/horarios">← Horarios</a></p>
-  ${head(`${fmtRange(h.desde, h.hasta)}`, `<span class="badge ${cur.estado}">${cur.estado === 'publicado' ? 'Publicado' : 'Borrador'}</span>
+  ${head(cur.nombre ? `${esc(cur.nombre)} <span class="muted small">${fmtRange(h.desde, h.hasta)}</span>` : fmtRange(h.desde, h.hasta), `<span class="badge ${cur.estado}">${cur.estado === 'publicado' ? 'Publicado' : 'Borrador'}</span>
     <span class="small muted">&nbsp;Actualizado ${fmtStamp(cur.actualizado)}${cur.publicado ? ` · publicado ${fmtStamp(cur.publicado)}` : ''}</span>`, '')}
   <div class="row no-print" style="margin:-6px 0 18px">${actions}</div>
   ${scheduleNotices(cur)}

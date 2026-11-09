@@ -32,7 +32,7 @@ from lopita_horarios.sugerencias import sugerir
 from lopita_horarios.validator import compute_stats, validate
 
 from . import alertas as alertas_app
-from . import arreglos, avisos, calendario, comentarios, cuentas, horas, linea_tiempo, revision
+from . import arreglos, avisos, calendario, comentarios, cuentas, historial, horas, linea_tiempo, revision
 from . import web as web_publica
 from .db import Store, default_db_path
 from .seguridad import LimiteIntentos, MismoOrigen
@@ -147,6 +147,10 @@ class AckIn(BaseModel):
 
 class ReadIn(BaseModel):
     ids: Optional[list[int]] = None
+
+
+class NombreIn(BaseModel):
+    nombre: Optional[str] = Field(default=None, max_length=80)
 
 
 class PublishIn(BaseModel):
@@ -352,7 +356,7 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         report = report or alert_report(row)
         return {
             "alertas": report["resumen"], "regenerar_desde": report["regenerar_desde"],
-            "id": row["id"], "desde": h.desde, "hasta": h.hasta, "estado": row["estado"],
+            "id": row["id"], "nombre": row.get("nombre"), "desde": h.desde, "hasta": h.hasta, "estado": row["estado"],
             "errores": sum(1 for i in h.incidencias if i.nivel == "error"),
             "avisos": sum(1 for i in h.incidencias if i.nivel == "aviso"),
             "huecos": sum(1 for i in h.incidencias if i.codigo == "falta_cobertura"),
@@ -786,6 +790,38 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
             "pasado": [d.isoformat() for d in rev["pasado"]],
         }
 
+    @app.get("/api/horarios/{sid}/historial")
+    def schedule_history(sid: int, u=Depends(admin)):
+        """Versiones que mandan o mandaron en las fechas de este horario (la línea de tiempo y su historial)."""
+        h = load(sid)["horario"]
+        return {"desde": h.desde, "hasta": h.hasta, "versiones": historial.versiones(store, h.desde, h.hasta)}
+
+    @app.get("/api/horarios/{sid}/comparar")
+    def compare(sid: int, u=Depends(admin)):
+        """Qué cambiaría respecto a lo publicado hoy si se restaurase este horario (por ejemplo, una versión vieja)."""
+        row = load(sid)
+        return revision_json(config_now(), revision.comparar(store.list_schedules(), row))
+
+    @app.patch("/api/horarios/{sid}/nombre")
+    def rename(sid: int, body: NombreIn, request: Request, u=Depends(admin)):
+        load(sid)
+        nombre = (body.nombre or "").strip() or None
+        store.rename_schedule(sid, nombre)
+        store.log_action(sid, u["username"], "renombrado", {"nombre": nombre})
+        return detail(load(sid), request)
+
+    @app.post("/api/horarios/{sid}/restaurar")
+    def restore(sid: int, request: Request, u=Depends(admin)):
+        """Copia una versión como borrador nuevo. Al publicarlo, la revisión enseña qué cambia respecto a hoy."""
+        row = load(sid)
+        h = row["horario"].model_copy(deep=True)
+        h.estado = "borrador"
+        nuevo = store.create_schedule(refresh(config_now(), h, None), u["username"])
+        base = row.get("nombre") or f"{h.desde.strftime('%d/%m')}–{h.hasta.strftime('%d/%m/%Y')}"
+        store.rename_schedule(nuevo, f"Restaurado de {base}"[:80])
+        store.log_action(nuevo, u["username"], "restaurado", {"desde_horario": sid})
+        return detail(load(nuevo), request)
+
     @app.get("/api/horarios/{sid}/revision")
     def review(sid: int, u=Depends(admin)):
         """Qué cambia para el equipo si se publica este horario: diferencias con lo publicado, ediciones a mano y
@@ -823,10 +859,12 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         if destino and destino["estado"] == "publicado":
             return publish_replacement(row, destino, h, criticas, request, u)
         primera = row["estado"] != "publicado"
+        publicado = {d: [a for a in r["horario"].asignaciones if a.fecha == d] for d, r in linea_tiempo.por_dia(
+            store.list_schedules(), h.desde, h.hasta, solo_publicados=True, excluir=sid).items()} if primera else {}
         h.estado = "publicado"
         token = store.publish_schedule(sid, h)
         if primera:
-            avisos.registrar_publicacion(store, sid, h)
+            avisos.registrar_publicacion(store, sid, h, publicado)
         if criticas:
             store.log_action(sid, u["username"], "publicado_con_criticas", {"criticas": [a["detalle"] for a in criticas]})
         res = slack.publish(config, h, slack_url(request, token), calendario=slack_cal(request))

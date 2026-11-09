@@ -20,13 +20,27 @@ def env(tmp_path, monkeypatch):
     return app, admin
 
 
-def week_with_gaps(admin, publish=False):
-    """Una semana generada a la que se le quitan dos turnos sin bloquearlos: quedan huecos y horas de menos."""
+HUECOS = {"falta_cobertura", "sin_nadie"}
+
+
+def huecos(admin, sid):
+    """Alertas de franjas sin cubrir (o sin nadie), por día."""
+    return {(a["codigo"], a.get("fecha")) for a in admin.get(f"/api/horarios/{sid}/alertas").json()["activas"]
+            if a["codigo"] in HUECOS}
+
+
+def week_with_gaps(admin, publish=False, base=None):
+    """Una semana generada a la que se le quitan dos turnos sin bloquearlos: quedan huecos y horas de menos.
+
+    Si se pasa 'base' (un set), se llena con los huecos que ya tenía la semana generada antes de quitar nada: según
+    la semana, la plantilla no llega a todas las franjas y el solucionador no puede arreglar esos."""
     t = dt.date.today()
     lunes = t + dt.timedelta(days=7 - t.weekday())
     r = admin.post("/api/horarios/generar", json={"desde": lunes.isoformat(), "hasta": (lunes + dt.timedelta(days=6)).isoformat()})
     assert r.status_code == 200, r.text
     sid = r.json()["id"]
+    if base is not None:
+        base |= huecos(admin, sid)
     if publish:
         assert admin.post(f"/api/horarios/{sid}/publicar").status_code == 200
     asign = r.json()["horario"]["asignaciones"]
@@ -44,25 +58,30 @@ def active_codes(admin, sid):
 
 def test_proponer_no_cambia_el_horario_y_aplicar_arregla_los_huecos(env):
     _, admin = env
-    sid, _ = week_with_gaps(admin)
-    assert "falta_cobertura" in active_codes(admin, sid)
+    base = set()
+    sid, quitados = week_with_gaps(admin, base=base)
+    dia = quitados[0]["fecha"]
+    nuevos = huecos(admin, sid) - base
+    assert {f for _, f in nuevos} == {dia}  # quitar los turnos deja huecos ese día
     antes = admin.get(f"/api/horarios/{sid}").json()
 
     r = admin.post(f"/api/horarios/{sid}/solucionar", json={})
     assert r.status_code == 200, r.text
     p = r.json()
     assert p["mejora"] and p["cambios"] and p["movimientos"] and p["estado"] == "borrador"
-    assert "falta_cobertura" in {a["codigo"] for a in p["resueltas"]}
+    arregladas = {(a["codigo"], a.get("fecha")) for a in p["resueltas"] + p["mejoradas"]}
+    assert any(c in HUECOS and f == dia for c, f in arregladas)
     assert admin.get(f"/api/horarios/{sid}").json()["horario"] == antes["horario"]  # solo es una propuesta
 
     r = admin.post(f"/api/horarios/{sid}/solucionar/aplicar", json={"cambios": p["cambios"]})
     assert r.status_code == 200, r.text
     d = r.json()
-    assert "falta_cobertura" not in active_codes(admin, sid)
+    assert huecos(admin, sid) <= base  # quedan, como mucho, los huecos que ya tenía la semana generada
     assert d["horario"]["bloqueos"] == antes["horario"]["bloqueos"]  # lo aplicado no queda como cambio manual
     assert not [i for i in d["horario"]["incidencias"] if i["nivel"] == "error"]
-    # Una segunda vez ya no hay nada que mejorar... o al menos no lo mismo
-    assert "falta_cobertura" not in {a["codigo"] for a in admin.post(f"/api/horarios/{sid}/solucionar").json()["resueltas"]}
+    # Una segunda vez ya no hay nada que mejorar en esos huecos
+    segunda = admin.post(f"/api/horarios/{sid}/solucionar").json()["resueltas"]
+    assert not {(a["codigo"], a.get("fecha")) for a in segunda} & nuevos
 
 
 def test_aplicar_una_propuesta_desfasada_da_conflicto(env):

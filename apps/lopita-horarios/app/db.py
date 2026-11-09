@@ -251,6 +251,9 @@ class Store:
             if "reemplaza" not in {r["name"] for r in c.execute("PRAGMA table_info(schedules)")}:
                 # Borrador que, al publicarse, sustituye a un horario publicado (un arreglo pendiente)
                 c.execute("ALTER TABLE schedules ADD COLUMN reemplaza INTEGER")
+            if "nombre" not in {r["name"] for r in c.execute("PRAGMA table_info(schedules)")}:
+                # Nombre que le pone el encargado (si no tiene, se le llama por sus fechas)
+                c.execute("ALTER TABLE schedules ADD COLUMN nombre TEXT")
             if c.execute("PRAGMA user_version").fetchone()[0] < 1:
                 self._migrar_linea_tiempo(c)
                 c.execute(f"PRAGMA user_version = {VERSION_ESQUEMA}")
@@ -415,6 +418,16 @@ class Store:
         with self.conn() as c:
             return {dt.date.fromisoformat(r["fecha"]): r["schedule_id"]
                     for r in c.execute("SELECT fecha, schedule_id FROM dias_publicados ORDER BY fecha")}
+
+    def history_between(self, desde: dt.date, hasta: dt.date) -> list[dict]:
+        """Lo que mandó antes en cada fecha de [desde, hasta], del cambio más reciente al más antiguo."""
+        with self.conn() as c:
+            return [dict(r) for r in c.execute("SELECT * FROM dias_historial WHERE fecha BETWEEN ? AND ? ORDER BY id DESC",
+                                               (desde.isoformat(), hasta.isoformat()))]
+
+    def rename_schedule(self, sid: int, nombre: str | None) -> None:
+        with self.conn() as c:
+            c.execute("UPDATE schedules SET nombre=? WHERE id=?", (nombre or None, sid))
 
     def day_history(self, fecha: dt.date) -> list[dict]:
         """Quién mandó antes en una fecha, del cambio más reciente al más antiguo."""
