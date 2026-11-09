@@ -1,0 +1,67 @@
+name: Lopita · Demo en la web
+
+# Cada vez que cambia la app de horarios en main, reconstruye la demo que sirve la web (public/lopita/horarios) y
+# abre (o actualiza) un PR con ella. La web sirve esa copia ya construida: sin este PR, lo fusionado en
+# apps/lopita-horarios no se ve en llumedigital.com/lopita/horarios.
+# El PR solo toca public/, así que las comprobaciones obligatorias no se lanzan y se fusiona con bypass.
+# Necesita que el repositorio permita a GitHub Actions crear PR (Settings → Actions → General → Workflow permissions).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/lopita-horarios/app/**"
+      - "apps/lopita-horarios/lopita_horarios/**"
+      - "apps/lopita-horarios/offline/**"
+      - "apps/lopita-horarios/datos/**"
+      - "apps/lopita-horarios/herramientas/construir_offline.py"
+      - ".github/workflows/demo-web.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: demo-web
+  cancel-in-progress: true
+
+jobs:
+  reconstruir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RAMA: demo/lopita-horarios
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - name: Construir la demo (descarga Pyodide y comprueba los sha256)
+        working-directory: apps/lopita-horarios
+        run: python herramientas/construir_offline.py --nube nube/db --noindex --salida "$RUNNER_TEMP/demo"
+      - name: Sustituir public/lopita/horarios
+        run: |
+          rm -rf public/lopita/horarios
+          cp -r "$RUNNER_TEMP/demo" public/lopita/horarios
+          git add -A public/lopita/horarios
+          if git diff --cached --quiet; then echo "La demo ya está al día."; echo "CAMBIA=0" >> "$GITHUB_ENV"; else echo "CAMBIA=1" >> "$GITHUB_ENV"; fi
+      - name: Abrir o actualizar el PR
+        if: env.CAMBIA == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(grep -o 'VERSION = "[^"]*"' public/lopita/horarios/sw.js | cut -d'"' -f2)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$RAMA"
+          git commit -q -m "Demo de Lopita horarios: reconstruida con main (${GITHUB_SHA::7}), versión $version"
+          git push -f origin "$RAMA"
+          cuerpo="Reconstruye \`public/lopita/horarios\` con \`main\` en ${GITHUB_SHA::7}. Versión de la demo: \`$version\`.
+
+          Solo cambia \`public/\`, así que las comprobaciones obligatorias no se lanzan: se fusiona con bypass.
+          Abierto por el workflow «Lopita · Demo en la web»; si llegan más cambios antes de fusionarlo, se actualiza solo."
+          if gh pr view "$RAMA" --json state -q .state 2>/dev/null | grep -q OPEN; then
+            gh pr edit "$RAMA" --title "Demo de Lopita horarios: versión $version" --body "$cuerpo"
+          else
+            gh pr create --base main --head "$RAMA" --title "Demo de Lopita horarios: versión $version" --body "$cuerpo"
+          fi
