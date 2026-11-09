@@ -709,3 +709,10 @@ input[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--ba
   table.sched td.tot, table.sched th.tot { width: 56px; }
   table.sched { min-width: 790px !important; }
 }
+
+/* Bandeja «Pendiente»: una fila por cosa que espera, con su enlace. */
+.pendiente-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.pendiente-fila { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--line); border-left-width: 4px; border-radius: 8px; padding: 10px 14px; }
+.pendiente-fila.crit { border-left-color: var(--bad); }
+.pendiente-fila.alta { border-left-color: var(--warn); }
+.pendiente-fila.media { border-left-color: var(--line-strong); }
