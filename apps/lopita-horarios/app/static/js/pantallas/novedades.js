@@ -7,6 +7,10 @@ import { refreshList } from './horarios.js';
 // Las últimas mejoras, de la más nueva a la más antigua, explicadas para quien usa la app. Para anunciar una
 // mejora nueva, añádela arriba del todo: la pestaña muestra cuántas hay desde la última vez que se abrió.
 const NOVEDADES = [
+  { fecha: '2026-11-09', titulo: 'Equipo: una lista y una ficha por persona', ir: 'equipo', texto: [
+    '<b>Equipo</b> ya no es una pared de formularios: ves la plantilla en una lista corta (puesto, horas y si alguien está de baja) y, al tocar a una persona, se abre su <b>ficha</b> con todo lo que puedes ajustar.',
+    'Cada ficha tiene su propio enlace y un «← Equipo» para volver. Al añadir una persona o un comodín se abre directamente su ficha.',
+  ] },
   { fecha: '2026-11-09', titulo: 'Botones con textos más claros', ir: 'horarios', texto: [
     'Varios botones dicen ahora exactamente lo que hacen: <b>Descartar cambios</b>, <b>Crear cuenta</b>, <b>Añadir tipo de día</b> y <b>Marcar como leídos</b>.',
   ] },
