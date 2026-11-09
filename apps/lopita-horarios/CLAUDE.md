@@ -1,5 +1,11 @@
 # Lopita Horarios · notas para Claude Code
 
+## Novedades: cada cambio visible lleva su entrada
+
+La pestaña **Novedades** es cómo el cliente se entera de lo que se ha hecho. Todo PR que cambie algo que note quien usa la app (pantallas, textos, reglas del motor, avisos, arreglos de errores) añade **en el mismo PR** una entrada arriba de `NOVEDADES` en [`app/static/js/datos/novedades.js`](app/static/js/datos/novedades.js): fecha del día en que se fusiona, título corto y dos o tres frases en lenguaje sencillo, sin nombres técnicos. Las reglas completas están al principio de ese archivo.
+
+Si el PR es puramente interno (tests, refactor sin cambios visibles, CI, documentación), escribe en su descripción una línea `Sin novedades: <motivo>`. El job «Novedades» de CI (`herramientas/comprobar_novedades.py`) falla si un PR toca `app/`, `lopita_horarios/` u `offline/` sin una cosa ni la otra.
+
 ## Interfaz
 
 Antes de cambiar cualquier cosa de `app/static/` (HTML, CSS o JS de la interfaz), lee [DISENO.md](DISENO.md) y síguelo. Resumen:
