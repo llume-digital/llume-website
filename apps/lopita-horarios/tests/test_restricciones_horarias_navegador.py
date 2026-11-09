@@ -24,9 +24,11 @@ def test_restriccion_horaria_en_equipo(url, browser, movil):
     page.click("button[type=submit]")
     page.wait_for_selector("[data-act=generate]")
 
-    page.goto(f"{url}/#/equipo")
-    page.wait_for_selector("[data-act=addFranja]")
     i = 1 if movil else 0  # una persona distinta en cada recorrido, para no pisarse
+    persona = page.request.get(f"{url}/api/config").json()["config"]["empleados"][i]["id"]
+    page.goto(f"{url}/#/equipo")
+    page.click(f"a.persona-fila[href='#/equipo/{persona}']")  # de la lista a su ficha
+    page.wait_for_selector("[data-act=addFranja]")
     page.click(f"[data-act=addFranja][data-i='{i}']")
     hasta = page.locator(f"input[data-bind='empleados.{i}.restricciones_horarias.0.hasta']")
     hasta.fill("16:00")

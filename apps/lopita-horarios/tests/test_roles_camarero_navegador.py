@@ -69,7 +69,7 @@ def test_roles_de_camarero(url, browser, movil):  # noqa: F811
     assert roles["Caja"]["id"] not in next(e for e in cfg["empleados"] if e["nombre"] == "Irene")["funciones"]
 
     # Equipo: la ficha dice qué roles puede hacer y cuál hace normalmente.
-    page.goto(f"{url}/#/equipo")
+    page.goto(f"{url}/#/equipo/{cfg['empleados'][0]['id']}")
     page.wait_for_selector("text=Como camarero/a puede hacer")
 
     # Horario: cada turno lleva su rol.

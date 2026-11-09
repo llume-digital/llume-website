@@ -50,7 +50,7 @@ def test_baja_guarda_al_momento_y_arregla_aparte(url, browser):  # noqa: F811
 
     peticiones = []
     page.on("request", lambda q: peticiones.append((q.method, q.url)))
-    page.goto(f"{url}/#/equipo")
+    page.goto(f"{url}/#/equipo/{emp}")
     page.wait_for_selector(f"[data-act=bajaDialog][data-emp='{emp}']")
     page.click(f"[data-act=bajaDialog][data-emp='{emp}']")
     page.fill("#baja-form input[name=desde]", lunes.isoformat())
