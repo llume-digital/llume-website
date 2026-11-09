@@ -24,7 +24,7 @@ def test_novedades(url, browser, ancho):  # noqa: F811
 
     # La primera vez todas cuentan como nuevas.
     total = int(page.locator(f"{tab} .tab-count").text_content())
-    assert total >= 4
+    assert total >= 5
 
     page.click("#mas-cuenta > summary")
     page.click(tab)
