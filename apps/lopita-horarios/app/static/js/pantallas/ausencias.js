@@ -11,7 +11,7 @@ export function viewAusencias() {
   return `${head('Ausencias', 'Vacaciones, bajas y peticiones puntuales. El motor no asigna turnos a quien está ausente y respeta lo que fijes aquí.')}
   <div class="card"><div class="row"><h2 style="margin:0">Vacaciones, bajas y permisos</h2><span class="spacer"></span>
     <label class="toggle small"><input type="checkbox" data-act-change="togglePast" ${state.showPast ? 'checked' : ''}> Ver pasadas</label>
-    <button class="btn small primary" data-act="addAbsence">${ICON.plus} Añadir</button></div>
+    <button class="btn small primary" data-act="addAbsence">${ICON.plus} Añadir ausencia</button></div>
     ${rows.length ? `<div class="table-wrap"><table class="list edit" style="margin-top:10px"><thead><tr><th>Persona</th><th>Desde</th><th>Hasta</th><th>Motivo</th><th class="num">Días</th><th></th></tr></thead><tbody>
     ${rows.map(({ a, i }) => `<tr>
       <td style="min-width:150px"><select data-bind="ausencias.${i}.empleado_id">${empOptions(a.empleado_id)}</select></td>
@@ -23,7 +23,7 @@ export function viewAusencias() {
     </tbody></table></div>` : '<p class="muted small">No hay ausencias próximas.</p>'}
     ${hidden ? `<p class="small muted">${hidden} ausencias pasadas ocultas.</p>` : ''}
   </div>
-  <div class="card section"><div class="row"><h2 style="margin:0">Peticiones puntuales</h2><span class="spacer"></span><button class="btn small primary" data-act="addRequest">${ICON.plus} Añadir</button></div>
+  <div class="card section"><div class="row"><h2 style="margin:0">Peticiones puntuales</h2><span class="spacer"></span><button class="btn small primary" data-act="addRequest">${ICON.plus} Añadir petición</button></div>
     <p class="small muted">Un día libre que alguien pide, que trabaje en su día de libranza o que haga un turno concreto.</p>
     ${reqs.length ? `<div class="table-wrap"><table class="list edit"><thead><tr><th>Persona</th><th>Fecha</th><th>Petición</th><th>Turno</th><th></th></tr></thead><tbody>
     ${reqs.map(({ o, i }) => `<tr>

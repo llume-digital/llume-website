@@ -29,7 +29,7 @@ function viewLista(emps) {
       <span class="persona-ir" aria-hidden="true">›</span></a>`;
   };
   return `${head('Equipo', AYUDA_EQUIPO, botonesAlta)}
-  ${emps.length ? `<div class="card lista-equipo">${emps.map(fila).join('')}</div>` : '<div class="card empty">No hay nadie en el equipo todavía.</div>'}`;
+  ${emps.length ? `<div class="card lista-equipo">${emps.map(fila).join('')}</div>` : `<div class="card empty"><p>No hay nadie en el equipo todavía.</p><button class="btn primary" data-act="addEmp">${ICON.plus} Añadir la primera persona</button></div>`}`;
 }
 
 function viewFicha(i) {

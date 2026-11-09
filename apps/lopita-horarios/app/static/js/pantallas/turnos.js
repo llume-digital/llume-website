@@ -32,7 +32,7 @@ export function viewTurnos() {
   }).join('')}</div>
   <div class="card section"><h2>Así cubren el día</h2>${t.map((s) => `<div class="row" style="flex-wrap:nowrap;margin-bottom:6px"><b style="width:120px;flex:none" class="small">${esc(s.nombre)}</b><div style="flex:1">${timeline([s]).split('<div class="timeline-axis">')[0]}</div></div>`).join('')}
   <div class="row" style="flex-wrap:nowrap"><span style="width:120px;flex:none"></span><div style="flex:1" class="timeline-axis"><span>06</span><span>09</span><span>12</span><span>15</span><span>18</span><span>21</span><span>24</span></div></div></div>`
-    : '<div class="card empty">No hay turnos. Añade al menos uno.</div>'}`;
+    : `<div class="card empty"><p>No hay turnos. Sin ellos el generador no puede hacer horarios.</p><button class="btn primary" data-act="addShift">${ICON.plus} Añadir el primer turno</button></div>`}`;
 }
 
 // ------------------------------------------------------------------ acciones de la pantalla
