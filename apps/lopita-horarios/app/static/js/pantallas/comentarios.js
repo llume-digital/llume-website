@@ -1,6 +1,7 @@
 import { $, esc, fmtStamp } from '../nucleo/util.js';
 import { api, overlay, state, toast } from '../nucleo/estado.js';
-import { NAV_ADMIN, NAV_WORKER, head, isWorker, mic, renderView, route } from '../nucleo/pintado.js';
+import { NAV_ADMIN, NAV_WORKER, head, isWorker, mic, renderView } from '../nucleo/pintado.js';
+import { route } from '../nucleo/rutas.js';
 import { ensure } from './portal.js';
 import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ COMENTARIOS (feedback sobre la app)

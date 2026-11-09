@@ -1,27 +1,10 @@
 import { $, DAYS, DAY_CHIP, DAY_LABEL, ICON, esc, fmtH } from './util.js';
 import { state } from './estado.js';
+import { route, vistaDe } from './rutas.js';
 import { viewLogin } from '../pantallas/acceso.js';
-import { viewHorarios } from '../pantallas/horarios.js';
-import { viewDetalle } from '../pantallas/cuadrante.js';
-import { viewHistorial } from '../pantallas/historial.js';
-import { viewAlertas } from '../pantallas/alertas.js';
-import { viewCalendario } from '../pantallas/calendario.js';
 import { seguirAnclas } from '../pantallas/dia.js';
-import { viewEquipo } from '../pantallas/equipo.js';
-import { viewFunciones } from '../pantallas/funciones.js';
-import { viewTurnos } from '../pantallas/turnos.js';
-import { viewDemanda } from '../pantallas/demanda.js';
-import { viewAusencias } from '../pantallas/ausencias.js';
-import { viewPreferencias } from '../pantallas/preferencias.js';
-import { viewReglas } from '../pantallas/reglas.js';
-import { viewAjustes } from '../pantallas/ajustes.js';
-import { viewMiInicio, viewMisHoras, viewMisPrefs, viewMisVacaciones } from '../pantallas/portal.js';
-import { viewSolicitudes } from '../pantallas/solicitudes.js';
-import { viewWeb } from '../pantallas/web.js';
-import { guiaSecciones, viewGuia } from '../pantallas/guia.js';
-import { novedadesSinVer, viewNovedades } from '../pantallas/novedades.js';
-import { viewComentarios } from '../pantallas/comentarios.js';
-import { viewInformes } from '../pantallas/informes.js';
+import { guiaSecciones } from '../pantallas/guia.js';
+import { novedadesSinVer } from '../pantallas/novedades.js';
 import { botonGoogle, entrarConGoogle, viewForcePw } from '../pantallas/cuenta.js';
 // ------------------------------------------------------------------ pintado general
 // Botón de la barra de cuenta: icono y texto; en el móvil solo el icono, así que el nombre va en aria-label.
@@ -54,11 +37,6 @@ export const NAV_ADMIN = [
 export const NAV_WORKER = [['inicio', 'Inicio'], ['horas', 'Mis horas'], ['vacaciones', 'Vacaciones'], ['preferencias', 'Preferencias']];
 export const isWorker = () => state.me && state.me.rol === 'empleado';
 
-export function route() {
-  const parts = (location.hash.replace(/^#\/?/, '') || (isWorker() ? 'inicio' : 'horarios')).split('/');
-  return { name: parts[0], arg: parts[1], arg2: parts[2], arg3: parts[3] };
-}
-
 export function tabsHtml(name) {
   const w = isWorker();
   const count = (n, label) => (n ? `<span class="tab-count" aria-label="${n} ${label}">${n}</span>` : '');
@@ -81,16 +59,13 @@ export function renderView() {
   if (!view) return render();
   const r = route();
   const w = isWorker();
-  const views = w
-    ? { inicio: viewMiInicio, horas: viewMisHoras, vacaciones: viewMisVacaciones, preferencias: viewMisPrefs, guia: viewGuia }
-    : { horarios: r.arg ? (r.arg2 === 'historial' ? () => viewHistorial(Number(r.arg)) : () => viewDetalle(Number(r.arg))) : viewHorarios, calendario: viewCalendario, alertas: viewAlertas, solicitudes: viewSolicitudes, informes: viewInformes, equipo: viewEquipo, funciones: viewFunciones, turnos: viewTurnos, demanda: viewDemanda, ausencias: viewAusencias, preferencias: viewPreferencias, reglas: viewReglas, web: viewWeb, comentarios: viewComentarios, ajustes: viewAjustes, novedades: viewNovedades, guia: viewGuia };
-  const name = views[r.name] ? r.name : (w ? 'inicio' : 'horarios');
+  const { name, vista } = vistaDe(r, w);
   // Si había un turno enfocado (teclado), sigue enfocado tras redibujar aunque la vista se recargue por detrás.
   const foco = document.activeElement && document.activeElement.closest && document.activeElement.closest('.g-bar');
   const focoEmp = foco && foco.dataset.emp;
   $('#tabs').innerHTML = tabsHtml(name);
   marcarGuia(name);
-  view.innerHTML = views[name]();
+  view.innerHTML = vista();
   renderSavebar();
   seguirAnclas();  // un menú abierto sigue abierto si su casilla sigue en la vista
   if (focoEmp) { const b = view.querySelector(`.g-bar[data-emp="${CSS.escape(focoEmp)}"]`); if (b) b.focus({ preventScroll: true }); }

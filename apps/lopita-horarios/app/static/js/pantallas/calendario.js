@@ -1,6 +1,7 @@
 import { DAYS, DAY_SHORT, ICON, MOTIVOS, addDays, dayNum, esc, fmtH, fmtLong, fmtRange, iso, monthName, toMin, todayIso, weekday } from '../nucleo/util.js';
 import { api, confirmar, state, toast } from '../nucleo/estado.js';
-import { abreviaturas, capTags, funcionesDe, head, horasDe, puestoDe, puestoTag, renderView, rolDe, rolTag, route, shiftById, tipoDe, usaPuestos } from '../nucleo/pintado.js';
+import { abreviaturas, capTags, funcionesDe, head, horasDe, puestoDe, puestoTag, renderView, rolDe, rolTag, shiftById, tipoDe, usaPuestos } from '../nucleo/pintado.js';
+import { route } from '../nucleo/rutas.js';
 import { coverageBar } from './alertas.js';
 import { monthDayHtml, monthGrid } from './mes.js';
 import { calPersonas, personaHref, viewPersona } from './persona.js';
