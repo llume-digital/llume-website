@@ -7,6 +7,9 @@ import { refreshList } from './horarios.js';
 // Las últimas mejoras, de la más nueva a la más antigua, explicadas para quien usa la app. Para anunciar una
 // mejora nueva, añádela arriba del todo: la pestaña muestra cuántas hay desde la última vez que se abrió.
 const NOVEDADES = [
+  { fecha: '2026-11-09', titulo: 'Los errores salen junto al campo que hay que corregir', ir: 'equipo', texto: [
+    'Si un formulario no se puede enviar (por ejemplo, una baja que acaba antes de empezar o dos contraseñas que no coinciden), el aviso sale <b>justo debajo del campo</b> afectado, el campo se marca en rojo y el cursor se coloca en él.',
+  ] },
   { fecha: '2026-11-09', titulo: 'Pantallas vacías con el siguiente paso a un toque', ir: 'equipo', texto: [
     'Cuando todavía no hay equipo, turnos o preferencias, la pantalla te ofrece directamente el botón para añadir el primero. En Ausencias, los botones dicen ahora <b>Añadir ausencia</b> y <b>Añadir petición</b>.',
   ] },

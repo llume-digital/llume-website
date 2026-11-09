@@ -695,3 +695,7 @@ nav.tabs.subtabs a { font-size: var(--text-xs); padding: 10px 10px 8px; }
 .persona-nombre { font-weight: 600; }
 .persona-datos { flex: 1 1 auto; }
 .persona-ir { color: var(--muted); font-size: var(--text-lg); margin-left: auto; }
+
+/* Error de un campo: justo debajo de él, en rojo, y el campo se marca. */
+.field-error { color: var(--bad); font-size: var(--text-sm); font-weight: 600; }
+input[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--bad); }

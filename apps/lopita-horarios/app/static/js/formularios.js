@@ -101,8 +101,35 @@ const formularios = {
   },
 };
 
-// El error va en el hueco que el formulario ya tenga (id acabado en -err) o en uno que se crea sobre los botones.
+// Qué campo causa cada error conocido, por el texto del mensaje: así el aviso sale junto a ese campo.
+const CAMPO_DEL_ERROR = {
+  'pw-form': [[/no coinciden/, 'repite'], [/actual/, 'actual'], [/8 caracteres|distinta/, 'nueva']],
+  'user-form': [[/contraseña/, 'password'], [/usuario/i, 'usuario']],
+  'baja-form': [[/baja no puede/, 'hasta']],
+  'reset-form': [[/contraseña/, 'password']],
+  'email-form': [[/correo|email/i, 'email']],
+};
+const campoDe = (f, mensaje) => {
+  const par = (CAMPO_DEL_ERROR[f.id] || []).find(([re]) => re.test(mensaje));
+  return par ? f.elements[par[1]] : null;
+};
+
+// Con campo, el error sale justo debajo de él (y se anuncia); sin campo, en el hueco que el formulario ya tenga
+// (id acabado en -err) o en uno que se crea sobre los botones.
 function mostrarError(f, mensaje) {
+  const campo = campoDe(f, mensaje);
+  if (campo && campo.closest('label')) {
+    const aviso = document.createElement('span');
+    aviso.className = 'field-error';
+    aviso.id = `${f.id}-${campo.name}-error`;
+    aviso.setAttribute('role', 'alert');
+    aviso.textContent = mensaje;
+    campo.closest('label').append(aviso);
+    campo.setAttribute('aria-invalid', 'true');
+    campo.setAttribute('aria-describedby', aviso.id);
+    campo.focus();
+    return;
+  }
   let hueco = f.querySelector('[id$="-err"], .form-error');
   if (!hueco) {
     hueco = document.createElement('div');
@@ -114,6 +141,8 @@ function mostrarError(f, mensaje) {
   hueco.textContent = mensaje;
 }
 function limpiarError(f) {
+  f.querySelectorAll('.field-error').forEach((x) => x.remove());
+  f.querySelectorAll('[aria-invalid]').forEach((x) => { x.removeAttribute('aria-invalid'); x.removeAttribute('aria-describedby'); });
   const hueco = f.querySelector('[id$="-err"], .form-error');
   if (!hueco) return;
   if (hueco.classList.contains('form-error')) hueco.remove(); else hueco.textContent = '';
