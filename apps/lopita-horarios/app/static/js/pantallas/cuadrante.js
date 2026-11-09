@@ -21,20 +21,24 @@ export function viewDetalle(id) {
   const errors = h.incidencias.filter((i) => i.nivel === 'error');
   const extra = h.resumen.reduce((s, r) => s + r.horas_extra, 0);
   const pend = cur.cambios_pendientes;
-  const actions = [
-    `<button class="btn" data-act="solve">Solucionar problemas</button>`,
+  // Una acción principal a la vista (arreglar o publicar); el resto, en «Más».
+  const principal = cur.estado === 'borrador'
+    ? `<button class="btn primary" data-act="publish">Publicar horario</button>`
+    : `<button class="btn primary" data-act="solve">Solucionar problemas</button>`;
+  const secundaria = cur.estado === 'borrador' ? `<button class="btn" data-act="solve">Solucionar problemas</button>` : '';
+  const mas = [
     `<button class="btn" data-act="regenerate">Regenerar</button>`,
     h.bloqueos.length ? `<button class="btn" data-act="clearLocks">Quitar ${h.bloqueos.length === 1 ? 'el bloqueo' : `${h.bloqueos.length} bloqueos`}</button>` : '',
     `<button class="btn" data-act="print">Imprimir</button>`,
     `<button class="btn" data-act="pdf">PDF</button>`,
     `<a class="btn" href="/api/horarios/${cur.id}/csv">Horas (CSV)</a>`,
     cur.url_publica ? `<button class="btn" data-act="copyLink">Copiar enlace</button>` : '',
-    cur.estado === 'publicado' ? `<button class="btn" data-act="unpublish">Volver a borrador</button>` : '',
-    cur.estado === 'borrador' ? `<button class="btn primary" data-act="publish">${cur.reemplaza ? 'Publicar el arreglo' : 'Publicar y enviar a Slack'}</button>` : '',
     `<a class="btn" href="#/horarios/${cur.id}/historial">Historial</a>`,
     `<button class="btn" data-act="renombrarHorario" data-id="${cur.id}" data-nombre="${esc(cur.nombre || '')}">${cur.nombre ? 'Renombrar' : 'Poner nombre'}</button>`,
+    cur.estado === 'publicado' ? `<button class="btn" data-act="unpublish">Volver a borrador</button>` : '',
     `<button class="btn danger" data-act="deleteSchedule">Eliminar</button>`,
   ].join('');
+  const actions = `${principal}${secundaria}<details class="mas-menu"><summary class="btn">Más</summary><div class="mas-lista">${mas}</div></details>`;
   return `<p class="no-print" style="margin:0 0 8px"><a href="#/horarios">← Horarios</a></p>
   ${head(cur.nombre ? `${esc(cur.nombre)} <span class="muted small">${fmtRange(h.desde, h.hasta)}</span>` : fmtRange(h.desde, h.hasta), `<span class="badge ${cur.estado}">${cur.estado === 'publicado' ? 'Publicado' : 'Borrador'}</span>
     <span class="small muted">&nbsp;Actualizado ${fmtStamp(cur.actualizado)}${cur.publicado ? ` · publicado ${fmtStamp(cur.publicado)}` : ''}</span>`, '')}

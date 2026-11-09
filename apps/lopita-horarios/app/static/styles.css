@@ -639,3 +639,16 @@ button.pd-row:hover, button.pd-row:focus-visible { background: var(--hover); }
 
 #sin-red { position: fixed; top: 0; left: 0; right: 0; z-index: 90; padding: 10px 16px calc(10px) 16px; padding-top: calc(10px + env(safe-area-inset-top)); background: var(--warn-strong); color: var(--black); text-align: center; font-size: var(--text-md); font-weight: 600; }
 #sin-red[hidden] { display: none; }
+
+/* Detalle del horario: una acción principal y el resto en «Más»; las alertas, plegadas salvo las críticas. */
+.mas-menu { position: relative; }
+.mas-menu > summary { list-style: none; cursor: pointer; }
+.mas-menu > summary::-webkit-details-marker { display: none; }
+.mas-menu > summary::after { content: " ▾"; }
+.mas-lista { position: absolute; z-index: 20; top: calc(100% + 4px); left: 0; display: flex; flex-direction: column; gap: 4px; min-width: 210px; padding: 8px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.mas-lista .btn { justify-content: flex-start; width: 100%; }
+.alerts-fold > summary { display: flex; align-items: center; gap: 12px; cursor: pointer; list-style: none; min-height: 44px; }
+.alerts-fold > summary::-webkit-details-marker { display: none; }
+.alerts-fold > summary h2 { margin: 0; }
+.alerts-fold > summary .fold-hint::after { content: " ▾"; }
+.alerts-fold[open] > summary .fold-hint::after { content: " ▴"; }

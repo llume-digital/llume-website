@@ -86,6 +86,7 @@ def test_historial_comparar_y_restaurar(url, browser):  # noqa: F811
     assert page.request.post(f"{url}/api/horarios/{b}/publicar", headers=cab, data={"confirmar_criticas": True}).ok
 
     page.goto(f"{url}/#/horarios/{b}")
+    page.click(".mas-menu > summary")
     page.click("text=Historial")
     page.wait_for_selector(".historial-version")
     assert page.locator(".historial-version").count() == 2
