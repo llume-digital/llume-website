@@ -63,7 +63,8 @@ def test_pinchos_junto_a_abrir_y_dictado(url, browser):  # noqa: F811
     ctx, page, errores = _entrar(browser, url, movil=True)
     page.on("dialog", lambda d: d.accept())
     # En el ejemplo ya existe «Preparar pinchos»: sale como interruptor junto a «Puede abrir».
-    page.goto(f"{url}/#/equipo")
+    primero = page.request.get(f"{url}/api/config").json()["config"]["empleados"][0]["id"]
+    page.goto(f"{url}/#/equipo/{primero}")
     page.wait_for_selector("[data-act-change=funcCheck]")
     check = page.locator("label.toggle", has_text="Preparar pinchos").first.locator("input")
     antes = check.is_checked()
@@ -77,7 +78,7 @@ def test_pinchos_junto_a_abrir_y_dictado(url, browser):  # noqa: F811
     page.wait_for_selector(".func-grid")
     page.locator(".func-grid > .card", has=page.locator("input[value='Preparar pinchos']")).locator("[data-act=delFuncion]").click()
     assert page.locator(".func-grid input[value='Preparar pinchos']").count() == 0
-    page.goto(f"{url}/#/equipo")
+    page.goto(f"{url}/#/equipo/{primero}")
     check = page.locator("label.toggle", has_text="Preparar pinchos").first.locator("input")
     assert not check.is_checked()
     check.click()

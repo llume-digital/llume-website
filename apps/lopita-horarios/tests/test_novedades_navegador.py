@@ -43,8 +43,9 @@ def test_novedades(url, browser, ancho):  # noqa: F811
     assert page.locator("article.novedad .badge", has_text="Nuevo").count() == 0
 
     # Cada novedad lleva a su pantalla.
+    destino = page.locator("article.novedad a.btn").first.get_attribute("href")
     page.locator("article.novedad a.btn").first.click()
-    page.wait_for_selector("nav.tabs a.active[href='#/horarios']")
+    page.wait_for_selector(f"nav.tabs a.active[href='{destino}']")
 
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
     assert errores == []

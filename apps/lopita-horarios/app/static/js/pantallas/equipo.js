@@ -5,10 +5,38 @@ import { conDeshacer } from '../nucleo/borrador.js';
 import { markDirty } from '../nucleo/enlace.js';
 import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ EQUIPO
+// #/equipo es la lista de la plantilla; #/equipo/<id> es la ficha de una persona, con todo lo que se le puede ajustar.
+const equipoSeleccionado = () => decodeURIComponent(location.hash.replace(/^#\/?/, '').split('/')[1] || '');
+const irAEquipo = (id) => { location.hash = id ? `#/equipo/${encodeURIComponent(id)}` : '#/equipo'; };
+
 export function viewEquipo() {
   const emps = state.draft.empleados;
-  return `${head('Equipo', 'Quién trabaja en Lopita, sus horas de contrato, si es camarero/a o cocinero/a, sus funciones y qué días libra habitualmente. Los comodines no tienen horas de contrato: el generador solo les da turnos para cubrir lo que el resto no llega a cubrir.', `<button class="btn" data-act="addComodin">${ICON.plus} Añadir comodín</button><button class="btn primary" data-act="addEmp">${ICON.plus} Añadir persona</button>`)}
-  ${emps.length ? `<div class="grid">${emps.map((e, i) => `<div class="card" style="${e.activo ? '' : 'opacity:.6'}">
+  const i = emps.findIndex((e) => e.id === equipoSeleccionado());
+  return i >= 0 ? viewFicha(i) : viewLista(emps);
+}
+
+const AYUDA_EQUIPO = 'Quién trabaja en Lopita, sus horas de contrato, si es camarero/a o cocinero/a, sus funciones y qué días libra habitualmente. Los comodines no tienen horas de contrato: el generador solo les da turnos para cubrir lo que el resto no llega a cubrir.';
+const botonesAlta = `<button class="btn" data-act="addComodin">${ICON.plus} Añadir comodín</button><button class="btn primary" data-act="addEmp">${ICON.plus} Añadir persona</button>`;
+
+function viewLista(emps) {
+  const fila = (e) => {
+    const baja = e.activo && bajaDe(e);
+    const etiquetas = [e.comodin ? 'Comodín' : '', baja ? 'De baja' : '', e.activo ? '' : 'Fuera de plantilla'].filter(Boolean);
+    return `<a class="persona-fila${e.activo ? '' : ' inactiva'}" href="#/equipo/${encodeURIComponent(e.id)}">
+      <span class="persona-nombre">${esc(e.nombre)}</span>
+      <span class="persona-datos small muted">${esc(puestosDe(e).map((p) => TIPOS[p]).join(' y '))} · ${e.comodin ? 'sin horas fijas' : `${esc(String(e.horas_semanales))} h/semana`}</span>
+      ${etiquetas.map((t) => `<span class="baja-tag">${t}</span>`).join('')}
+      <span class="persona-ir" aria-hidden="true">›</span></a>`;
+  };
+  return `${head('Equipo', AYUDA_EQUIPO, botonesAlta)}
+  ${emps.length ? `<div class="card lista-equipo">${emps.map(fila).join('')}</div>` : '<div class="card empty">No hay nadie en el equipo todavía.</div>'}`;
+}
+
+function viewFicha(i) {
+  const e = state.draft.empleados[i];
+  return `<p style="margin:0 0 8px"><a href="#/equipo" class="small">← Equipo</a></p>
+  ${head(esc(e.nombre), e.comodin ? 'Comodín: sin horas de contrato.' : 'Ficha de la persona.', '')}
+  <div class="card ficha" style="${e.activo ? '' : 'opacity:.6'}">
     <div class="row" style="flex-wrap:nowrap"><input class="title-input" type="text" value="${esc(e.nombre)}" data-bind="empleados.${i}.nombre" aria-label="Nombre"><button class="icon-btn" data-act="delEmp" data-i="${i}" title="Eliminar">${ICON.trash}</button></div>
     <label class="toggle" style="margin-top:10px"><input type="checkbox" data-act-change="comodin" data-i="${i}" ${e.comodin ? 'checked' : ''}> Comodín</label>
     ${e.comodin ? '<p class="small muted" style="margin:6px 0 0">Sin horas de contrato: el generador solo le da turnos cuando el resto no llega a cubrir la demanda.</p>' : ''}
@@ -26,7 +54,7 @@ export function viewEquipo() {
     ${funcionesField(i, e)}
     <div style="margin-top:14px"><div class="small muted" style="font-weight:600;margin-bottom:6px">Días que libra</div>${dayChips(`empleados.${i}.libranzas_fijas`, e.libranzas_fijas, 'El motor elige sus días libres')}</div>
     ${franjasField(i, e)}
-  </div>`).join('')}</div>` : '<div class="card empty">No hay nadie en el equipo todavía.</div>'}`;
+  </div>`;
 }
 
 // Bajas: una ausencia con motivo «baja». Sin fecha de alta se guarda para un año (hasta que se dé el alta).
@@ -124,7 +152,7 @@ Object.assign(actions, {
   addEmp: () => {
     const ids = state.draft.empleados.map((e) => e.id);
     state.draft.empleados.push({ id: uid(`persona-${ids.length + 1}`, ids), nombre: 'Nueva persona', horas_semanales: 30, puede_abrir: false, puede_cerrar: false, es_encargado: false, puestos: ['sala', 'cocina'], funciones: [], libranzas_fijas: [], restricciones_horarias: [], slack_user_id: null, email: null, activo: true });
-    markDirty(); renderView(); window.scrollTo(0, document.body.scrollHeight);
+    markDirty(); irAEquipo(state.draft.empleados[state.draft.empleados.length - 1].id);
   },
   addComodin: () => {
     const emps = state.draft.empleados;
@@ -132,7 +160,7 @@ Object.assign(actions, {
     let n = 1;
     while (usados.has(`X${n}`)) n++;
     emps.push({ id: uid(`comodin-${n}`, emps.map((e) => e.id)), nombre: `X${n}`, horas_semanales: 0, comodin: true, horas_min_semana: null, horas_max_semana: null, puede_abrir: false, puede_cerrar: false, es_encargado: false, puestos: ['sala', 'cocina'], funciones: [], libranzas_fijas: [], restricciones_horarias: [], slack_user_id: null, email: null, activo: true });
-    markDirty(); renderView(); window.scrollTo(0, document.body.scrollHeight);
+    markDirty(); irAEquipo(emps[emps.length - 1].id);
   },
   delEmp: (el) => {
     const c = state.draft; const e = c.empleados[Number(el.dataset.i)];
@@ -141,7 +169,7 @@ Object.assign(actions, {
     c.ausencias = c.ausencias.filter((a) => a.empleado_id !== e.id);
     c.excepciones_asignacion = c.excepciones_asignacion.filter((a) => a.empleado_id !== e.id);
     c.preferencias = c.preferencias.filter((a) => a.empleado_id !== e.id);
-    markDirty(); renderView(); avisar();
+    markDirty(); irAEquipo(''); avisar();
   },
   bajaDialog: (el) => {
     const e = empById(state.draft, el.dataset.emp);

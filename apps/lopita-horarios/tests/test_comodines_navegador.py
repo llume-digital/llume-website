@@ -28,13 +28,12 @@ def test_anadir_comodin_y_verlo_en_el_horario(url, browser, movil):
 
     page.goto(f"{url}/#/equipo")
     page.wait_for_selector("[data-act=addComodin]")
-    antes = page.locator("[data-act-change=comodin]").count()
     page.click("[data-act=addComodin]")
-    page.wait_for_function(f"document.querySelectorAll('[data-act-change=comodin]').length === {antes + 1}")
-    nombre = page.locator(".title-input").last.input_value()
+    page.wait_for_selector(".ficha")  # al añadirlo se abre su ficha
+    nombre = page.locator(".title-input").input_value()
     assert nombre.startswith("X")
-    assert page.locator("[data-act-change=comodin]").last.is_checked()
-    tarjeta = page.locator(".card", has=page.locator(f'.title-input[value="{nombre}"]'))
+    assert page.locator("[data-act-change=comodin]").is_checked()
+    tarjeta = page.locator(".ficha")
     maximo = tarjeta.locator("input[data-bind$='horas_max_semana']")
     maximo.fill("12")
     maximo.dispatch_event("change")
@@ -45,10 +44,13 @@ def test_anadir_comodin_y_verlo_en_el_horario(url, browser, movil):
 
     cfg = page.request.get(f"{url}/api/config").json()["config"]
     x = next(e for e in cfg["empleados"] if e["nombre"] == nombre)
+    primero = cfg["empleados"][0]["id"]
     assert x["comodin"] is True and x["horas_max_semana"] == 12 and x["horas_min_semana"] is None
 
     # Quitar «Comodín» a otra ficha y volver a ponerlo deja sus horas de contrato como estaban.
-    primera = page.locator("[data-act-change=comodin]").first
+    page.goto(f"{url}/#/equipo/{primero}")
+    page.wait_for_selector(".ficha")
+    primera = page.locator("[data-act-change=comodin]")
     contrato = page.locator("input[data-bind='empleados.0.horas_semanales']").input_value()
     primera.check()
     page.wait_for_selector("input[data-bind='empleados.0.horas_max_semana']")
@@ -70,9 +72,7 @@ def test_anadir_comodin_y_verlo_en_el_horario(url, browser, movil):
     assert page.locator("tr", has_text=nombre).locator(".badge", has_text="Comodín").count() >= 1
     if os.environ.get("LOPITA_CAPTURAS"):
         page.goto(f"{url}/#/equipo")
-        page.wait_for_selector("[data-act=addComodin]")
-        page.locator(f'.title-input[value="{nombre}"]').evaluate("el => el.scrollIntoView({ block: 'start' })")
-        page.evaluate("window.scrollBy(0, -140)")
+        page.wait_for_selector(".lista-equipo")
         page.screenshot(path=os.path.join(os.environ["LOPITA_CAPTURAS"], f"equipo-{'movil' if movil else 'escritorio'}.png"))
     assert not errores, errores
     ctx.close()

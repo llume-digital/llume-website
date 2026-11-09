@@ -25,7 +25,7 @@ def test_marcar_baja_avisa_de_los_turnos_y_dar_el_alta(url, browser, movil):  # 
     emp = next(a["empleado_id"] for a in r.json()["horario"]["asignaciones"] if a["empleado_id"] not in de_baja)
     nombre = next(e["nombre"] for e in cfg["empleados"] if e["id"] == emp)
 
-    page.goto(f"{url}/#/equipo")
+    page.goto(f"{url}/#/equipo/{emp}")
     page.wait_for_selector(f"[data-act=bajaDialog][data-emp='{emp}']")
     page.click(f"[data-act=bajaDialog][data-emp='{emp}']")
     page.fill("#baja-form input[name=desde]", lunes.isoformat())
