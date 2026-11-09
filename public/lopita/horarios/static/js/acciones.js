@@ -14,6 +14,7 @@ import { feedbackDialog } from './pantallas/comentarios.js';
 import { corrDetail, openCorrection } from './pantallas/informes.js';
 import { claveTemporal, cuentaDialog, pwForm } from './pantallas/cuenta.js';
 import { eleccion, hayQueRevisar, revisionDialog } from './pantallas/publicar.js';
+import { accionesHistorial } from './pantallas/historial.js';
 // ------------------------------------------------------------------ acciones
 const confirmLeave = async () => !state.dirty || confirmar({ titulo: '¿Descartar los cambios sin guardar?', verbo: 'Descartar cambios', peligro: true });
 
@@ -24,6 +25,7 @@ function conDeshacer(msg) {
 }
 
 export const actions = {
+  ...accionesHistorial,
   logout: async () => { await api('POST', '/api/logout'); state.me = null; state.config = state.draft = null; state.dirty = false; state.mi = {}; state.miH = {}; state.inf = {}; state.sol = {}; state.web = {}; state.ajustes = null; state.calT = {}; state.current = null; try { state.acceso = await api('GET', '/api/acceso'); } catch { state.acceso = {}; } render(); },
   save: () => saveConfig(),
   discard: () => {
