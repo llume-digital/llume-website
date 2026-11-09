@@ -95,7 +95,7 @@ def test_formularios_de_la_web_llegan_al_encargado(urls, browser, movil, tmp_pat
     page.fill("#login-form [name=usuario]", "admin")
     page.fill("#login-form [name=password]", PW)
     page.click("#login-form [type=submit]")
-    page.wait_for_selector("#tabs a[href='#/web']")
+    page.wait_for_selector("#mas-cuenta a[href='#/web']", state="attached")
     page.goto(url_app + "/#/web")
     page.wait_for_selector("text=Marcos")
     assert page.is_visible("text=Lucía Pérez") and page.is_visible("text=Preboda en diciembre")

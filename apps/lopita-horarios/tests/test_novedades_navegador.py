@@ -19,13 +19,14 @@ def test_novedades(url, browser, ancho):  # noqa: F811
     page.fill("input[name=usuario]", "admin")
     page.fill("input[name=password]", PW)
     page.click("button[type=submit]")
-    tab = "nav.tabs a[href='#/novedades']"
-    page.wait_for_selector(tab)
+    tab = "#mas-cuenta a[href='#/novedades']"  # Novedades vive en el menú «Más» de la cuenta
+    page.wait_for_selector(tab, state="attached")
 
     # La primera vez todas cuentan como nuevas.
-    total = int(page.locator(f"{tab} .tab-count").inner_text())
+    total = int(page.locator(f"{tab} .tab-count").text_content())
     assert 4 <= total <= 6
 
+    page.click("#mas-cuenta > summary")
     page.click(tab)
     page.wait_for_selector("article.novedad")
     assert page.locator("article.novedad").count() == total

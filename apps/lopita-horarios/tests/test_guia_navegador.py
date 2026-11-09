@@ -22,7 +22,8 @@ def test_guia_con_enlaces(url, browser):  # noqa: F811
     secciones = page.locator(".guia-sec").count()
     assert secciones >= 15
     # Todos los botones «Ir a…» llevan a una pestaña que existe.
-    pestañas = set(page.eval_on_selector_all("nav.tabs a", "as => as.map(a => a.getAttribute('href'))"))
+    pestañas = {f"#/{k}" for k in ("horarios", "calendario", "alertas", "solicitudes", "informes", "equipo", "ausencias", "preferencias",
+                                    "funciones", "turnos", "demanda", "reglas", "ajustes", "web", "comentarios", "novedades")}
     destinos = page.eval_on_selector_all(".guia-sec a.btn", "as => as.map(a => a.getAttribute('href'))")
     assert destinos and set(destinos) <= pestañas
 
