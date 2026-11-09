@@ -372,6 +372,10 @@ textarea { font: inherit; resize: vertical; }
 .revision-dia.pasado { border-left-color: var(--warn); }
 .revision-dia ul, .revision-conservar { margin: 4px 0 0; padding-left: 0; list-style: none; display: grid; gap: 2px; }
 .revision-conservar { margin-bottom: 12px; }
+/* historial de versiones */
+.historial-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.historial-version { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
+.historial-version.actual { border-left: 5px solid var(--gold); }
 .alert-more summary { cursor: pointer; font-weight: 700; color: var(--brown); margin-bottom: 8px; }
 .alerts-panel h2 { display: flex; align-items: center; gap: 10px; }
 /* avisos del trabajador */

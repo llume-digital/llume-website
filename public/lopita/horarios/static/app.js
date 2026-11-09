@@ -142,7 +142,7 @@ async function enviarFormulario(e) {
 }
 window.addEventListener('scroll', menuOnScroll, true);
 if (window.visualViewport) window.visualViewport.addEventListener('resize', seguirAnclas);  // p. ej. al abrirse el teclado
-window.addEventListener('hashchange', () => { closeMenu(); if (route().name === 'calendario') { state.cal.data = {}; state.cal.inf = {}; } if (route().name !== 'horarios' || !route().arg) state.current = state.current; if (route().name === 'web') state.web.data = undefined; renderView(); if (!(route().name === 'guia' && route().arg)) window.scrollTo(0, 0); });
+window.addEventListener('hashchange', () => { closeMenu(); state.historial = null; if (route().name === 'calendario') { state.cal.data = {}; state.cal.inf = {}; } if (route().name !== 'horarios' || !route().arg) state.current = state.current; if (route().name === 'web') state.web.data = undefined; renderView(); if (!(route().name === 'guia' && route().arg)) window.scrollTo(0, 0); });
 window.addEventListener('beforeunload', (e) => { if (state.dirty || (state.dia && diaCambios(state.dia).length)) { e.preventDefault(); e.returnValue = ''; } });
 
 async function importConfig(file) {
