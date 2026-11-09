@@ -1,0 +1,33 @@
+name: Lopita · Novedades
+
+# Cada PR que cambia la app de horarios añade su entrada a la pestaña Novedades (o declara «Sin novedades: motivo»).
+# Se vuelve a lanzar al editar la descripción o las etiquetas, para que baste con añadir esa línea.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+    paths:
+      - "apps/lopita-horarios/**"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: apps/lopita-horarios
+
+jobs:
+  novedades:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      - name: El PR añade su novedad o dice por qué no
+        env:
+          CUERPO_PR: ${{ github.event.pull_request.body }}
+          ETIQUETAS_PR: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: python3 herramientas/comprobar_novedades.py --base "origin/${{ github.base_ref }}"
