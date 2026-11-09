@@ -140,7 +140,7 @@ export function renderSavebar() {
   if (!state.dirty) { bar.innerHTML = ''; bar.dataset.html = ''; return; }
   const html = `<div class="savebar"><div class="savebar-inner">
     <span>Tienes cambios sin guardar en la configuración.</span><span class="spacer"></span>
-    <button class="btn" data-act="discard">Descartar</button>
+    <button class="btn" data-act="discard">Descartar cambios</button>
     <button class="btn primary" data-act="save">Guardar cambios</button>
     ${state.saveError ? `<div class="err" role="alert">No se ha guardado: ${esc(state.saveError)}${state.saveError.includes('ha cambiado') ? ' <button class="btn small" data-act="reloadConfig">Recargar configuración</button>' : ''}</div>` : ''}
   </div></div>`;

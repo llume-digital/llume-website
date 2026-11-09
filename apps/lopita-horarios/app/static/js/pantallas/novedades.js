@@ -7,6 +7,9 @@ import { refreshList } from './horarios.js';
 // Las últimas mejoras, de la más nueva a la más antigua, explicadas para quien usa la app. Para anunciar una
 // mejora nueva, añádela arriba del todo: la pestaña muestra cuántas hay desde la última vez que se abrió.
 const NOVEDADES = [
+  { fecha: '2026-11-09', titulo: 'Botones con textos más claros', ir: 'horarios', texto: [
+    'Varios botones dicen ahora exactamente lo que hacen: <b>Descartar cambios</b>, <b>Crear cuenta</b>, <b>Añadir tipo de día</b> y <b>Marcar como leídos</b>.',
+  ] },
   { fecha: '2026-11-09', titulo: 'Las secciones de la trabajadora, abajo en el móvil', ir: 'inicio', texto: [
     'En el móvil, <b>Inicio, Mis horas, Vacaciones y Preferencias</b> están ahora en una barra fija en la parte de abajo, al alcance del pulgar, con el nombre de cada sección.',
     'La parte de arriba se queda con el nombre de la app y los botones de cuenta. El contenido ya no queda tapado por la barra.',
