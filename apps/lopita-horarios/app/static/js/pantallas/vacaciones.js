@@ -3,6 +3,7 @@ import { state, toast } from '../nucleo/estado.js';
 import { markDirty } from '../nucleo/enlace.js';
 import { empName, head, renderView } from '../nucleo/pintado.js';
 import { actions } from '../nucleo/registro.js';
+import { saldoVacaciones, textoQuedan } from '../nucleo/vacaciones.js';
 // ------------------------------------------------------------------ PLANIFICAR VACACIONES (años 2026 y 2027)
 export const ANIOS_VACACIONES = [2026, 2027];
 const MARCA = { vacaciones: 'V', baja: 'B', permiso: 'P', otro: 'O' };
@@ -26,11 +27,6 @@ const diasEnSemana = (a, lunes, anio) => {
   for (let x = d; x <= h; x = addDays(x, 1)) if (x.startsWith(String(anio))) n++;
   return n;
 };
-const diasDelAnio = (a, anio) => {
-  const d = a.desde > `${anio}-01-01` ? a.desde : `${anio}-01-01`;
-  const h = a.hasta < `${anio}-12-31` ? a.hasta : `${anio}-12-31`;
-  return h >= d ? daysBetween(d, h) + 1 : 0;
-};
 
 // Quién está de vacaciones (u otra ausencia) en esas fechas, para avisar antes de añadir.
 function previsualizar(f) {
@@ -46,7 +42,10 @@ function previsualizar(f) {
   const total = plantilla().filter((e) => !e.comodin).length;
   const fuera = new Set([f.emp, ...Object.keys(otros)].filter((id) => plantilla().some((e) => e.id === id && !e.comodin))).size;
   const dias = daysBetween(f.desde, f.hasta) + 1;
-  return `<p class="small" id="vac-aviso" role="status">${dias} ${dias === 1 ? 'día' : 'días'}. ${quien.length ? `Coincide con ${quien.join(', ')}. ` : 'No coincide con nadie. '}${total ? `En el peor momento quedarían <b>${Math.max(total - fuera, 0)} de ${total}</b> personas de plantilla.` : ''}${propias.length ? ' <span style="color:var(--warn)">Ya tiene otra ausencia en esas fechas.</span>' : ''}</p>`;
+  const emp = plantilla().find((e) => e.id === f.emp);
+  const sd = emp ? saldoVacaciones({ ...state.draft, ausencias: [...state.draft.ausencias, { empleado_id: f.emp, desde: f.desde, hasta: f.hasta, motivo: 'vacaciones' }] }, emp, Number(f.desde.slice(0, 4)), todayIso()) : null;
+  const pasa = sd && sd.quedan < 0 ? ` <span style="color:var(--warn)">Con estos días se pasa ${-sd.quedan} de los ${sd.derecho} que le corresponden este año.</span>` : sd ? ` Le quedarían ${sd.quedan} de ${sd.derecho} días.` : '';
+  return `<p class="small" id="vac-aviso" role="status">${dias} ${dias === 1 ? 'día' : 'días'}. ${quien.length ? `Coincide con ${quien.join(', ')}. ` : 'No coincide con nadie. '}${total ? `En el peor momento quedarían <b>${Math.max(total - fuera, 0)} de ${total}</b> personas de plantilla.` : ''}${propias.length ? ' <span style="color:var(--warn)">Ya tiene otra ausencia en esas fechas.</span>' : ''}${pasa}</p>`;
 }
 
 // Las semanas más tranquilas que aún no han pasado: pocas personas fuera y sin solape con nadie.
@@ -84,8 +83,8 @@ export function viewVacaciones() {
       const n = mias.reduce((s, x) => s + x.n, 0);
       return `<td class="vac-c ${top.a.motivo}${n >= 5 ? ' llena' : ''}" title="${esc(`${MOTIVOS[top.a.motivo]}: ${fmtRange(top.a.desde, top.a.hasta)}`)}">${MARCA[top.a.motivo]}</td>`;
     }).join('');
-    const dias = ausDe(e.id).filter((a) => a.motivo === 'vacaciones').reduce((s, a) => s + diasDelAnio(a, anio), 0);
-    return `<tr><th scope="row" class="vac-nom">${esc(e.nombre)}${e.comodin ? ' <span class="muted small">(comodín)</span>' : ''}</th><td class="num vac-dias">${dias}</td>${cel}</tr>`;
+    const sd = saldoVacaciones(state.draft, e, anio, todayIso());
+    return `<tr><th scope="row" class="vac-nom">${esc(e.nombre)}${e.comodin ? ' <span class="muted small">(comodín)</span>' : ''}</th><td class="num vac-dias" title="${sd.disfrutadas} disfrutados, ${sd.programadas} por disfrutar, de ${sd.derecho} que le corresponden">${sd.disfrutadas + sd.programadas}</td><td class="num vac-dias${sd.quedan < 0 ? ' pasa' : ''}">${textoQuedan(sd)}</td>${cel}</tr>`;
   }).join('');
   const lista = state.draft.ausencias.map((a, i) => ({ a, i })).filter(({ a }) => a.desde <= `${anio}-12-31` && a.hasta >= `${anio}-01-01`)
     .sort((x, y) => x.a.desde.localeCompare(y.a.desde));
@@ -101,12 +100,12 @@ export function viewVacaciones() {
       ${previsualizar(f)}` : '<p class="muted small">Primero añade a alguien en Equipo.</p>'}
   </div>
   <div class="card section"><h2 style="margin:0 0 4px">Plano de ${anio}</h2>
-    <p class="small muted" style="margin-top:0">Cada columna es una semana (de lunes a domingo). <b>V</b> vacaciones, <b>B</b> baja, <b>P</b> permiso, <b>O</b> otro; más oscuro si faltan 5 días o más. Abajo, cuántas personas de la plantilla faltan esa semana.</p>
+    <p class="small muted" style="margin-top:0">Cada columna es una semana (de lunes a domingo). <b>V</b> vacaciones, <b>B</b> baja, <b>P</b> permiso, <b>O</b> otro; más oscuro si faltan 5 días o más. Abajo, cuántas personas de la plantilla faltan esa semana. <b>Usados</b> son los días de vacaciones apuntados y <b>Quedan</b> los que le restan: la ley da 30 días naturales al año (o la parte proporcional si entró durante el año). Se cambian en la ficha de cada persona, en Equipo.</p>
     <div class="table-wrap vac-wrap" role="region" aria-label="Plano anual de vacaciones" tabindex="0">
-    <table class="vac-tabla"><thead><tr><th rowspan="2" class="vac-nom">Persona</th><th rowspan="2" class="num vac-dias" title="Días de vacaciones del año">Días</th>${meses.map((m) => `<th colspan="${m.n}" class="vac-mes">${m.nombre.slice(0, 3)}</th>`).join('')}</tr>
+    <table class="vac-tabla"><thead><tr><th rowspan="2" class="vac-nom">Persona</th><th rowspan="2" class="num vac-dias" title="Días de vacaciones apuntados este año (disfrutados y por disfrutar)">Usados</th><th rowspan="2" class="num vac-dias" title="Días que le quedan por apuntar, según los que le corresponden este año (mínimo 30 días naturales, y la parte proporcional si entró durante el año)">Quedan</th>${meses.map((m) => `<th colspan="${m.n}" class="vac-mes">${m.nombre.slice(0, 3)}</th>`).join('')}</tr>
       <tr>${semanas.map((l) => `<th class="vac-sem" title="Semana del ${dayNum(l)} de ${monthName(l)}">${dayNum(l)}</th>`).join('')}</tr></thead>
     <tbody>${filas}</tbody>
-    <tfoot><tr><th scope="row" class="vac-nom">Personas fuera</th><td></td>${fuera.map((n, i) => `<td class="vac-c total${nivel(n)}" title="${n} de ${reales.length} fuera la semana del ${dayNum(semanas[i])} de ${monthName(semanas[i])}">${n || ''}</td>`).join('')}</tr></tfoot></table></div>
+    <tfoot><tr><th scope="row" class="vac-nom">Personas fuera</th><td></td><td></td>${fuera.map((n, i) => `<td class="vac-c total${nivel(n)}" title="${n} de ${reales.length} fuera la semana del ${dayNum(semanas[i])} de ${monthName(semanas[i])}">${n || ''}</td>`).join('')}</tr></tfoot></table></div>
     ${maxFuera && mejores.length ? `<p class="small" style="margin-bottom:0"><b>Semanas más tranquilas que quedan:</b> ${mejores.map((s) => `${dayNum(s.l)} ${monthName(s.l).slice(0, 3)} (${s.n === 0 ? 'nadie fuera' : `${s.n} fuera`})`).join(' · ')}.</p>` : ''}
   </div>
   <div class="card section"><h2 style="margin:0">Ausencias de ${anio}</h2>

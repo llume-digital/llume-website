@@ -21,7 +21,9 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from lopita_horarios.alertas import catalogo
 from lopita_horarios.cambios import diferencias
-from lopita_horarios.edicion import EdicionInvalida, Tramo, aplicar_dia, rol_manual
+from lopita_horarios.edicion import EdicionInvalida, Tramo, aplicar_dia, puesto_para_turno, rol_manual, verificar_libranza
+from lopita_horarios.vacaciones import saldo as saldo_vacaciones
+from lopita_horarios.movimientos import Casilla, mover_turno
 from lopita_horarios.edicion import evaluar as evaluar_edicion
 from lopita_horarios.models import Absence, Assignment, Config, Lock, Preference, Puesto, Schedule, parse_hhmm
 from lopita_horarios.render import FONT_DIR, html_to_pdf_bytes, render_html
@@ -82,6 +84,16 @@ class CellIn(BaseModel):
     inicio: Optional[str] = Field(default=None, description="Horas a medida (con 'fin'): ese día entra a esa hora en lugar de la del turno")
     fin: Optional[str] = None
     bloquear: bool = True
+
+
+class CasillaIn(BaseModel):
+    empleado_id: str
+    fecha: dt.date
+
+
+class MoveIn(BaseModel):
+    origen: CasillaIn
+    destino: CasillaIn
 
 
 class UserIn(BaseModel):
@@ -698,10 +710,18 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
             raise HTTPException(400, f"{emp.nombre} no trabaja en {body.puesto.value}")
         antes = h.model_copy(deep=True)
         previa = next((a for a in h.asignaciones if a.empleado_id == body.empleado_id and a.fecha == body.fecha), None)
+        if body.turno_id and previa is None:
+            try:
+                verificar_libranza(config, emp, body.fecha)
+            except EdicionInvalida as exc:
+                raise HTTPException(400, str(exc)) from None
         h.asignaciones = [a for a in h.asignaciones if not (a.empleado_id == body.empleado_id and a.fecha == body.fecha)]
         nueva = None
         if body.turno_id:
-            puesto = body.puesto or (previa.puesto if previa and previa.puesto in emp.puestos else emp.puesto_principal)
+            try:
+                puesto = puesto_para_turno(config, emp, config.shift(body.turno_id), body.puesto, previa)
+            except EdicionInvalida as exc:
+                raise HTTPException(400, str(exc)) from None
             mismas = body.conservar_horas and previa is not None and previa.turno_id == body.turno_id
             if (body.inicio is None) != (body.fin is None):
                 raise HTTPException(400, "Indica la hora de entrada y la de salida")
@@ -728,6 +748,25 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         store.update_schedule(sid, h, cambios)
         if row["estado"] == "publicado":
             avisos.registrar_cambios(store, sid, antes, h)
+        return detail(load(sid), request)
+
+    @app.post("/api/horarios/{sid}/mover")
+    def move_shift(sid: int, body: MoveIn, request: Request, u=Depends(admin)):
+        """Pasa el turno de una casilla a otra persona y/o día (si el destino tiene turno, se intercambian)."""
+        row = load(sid)
+        editable(row)
+        config = config_now()
+        antes: Schedule = row["horario"]
+        try:
+            nuevo = mover_turno(config, antes, Casilla(**body.origen.model_dump()), Casilla(**body.destino.model_dump()))
+        except EdicionInvalida as exc:
+            raise HTTPException(400, str(exc)) from None
+        refresh(config, nuevo, sid)
+        tocados = {body.origen.empleado_id, body.destino.empleado_id}
+        cambios = row["cambios_pendientes"] + sorted(tocados - set(row["cambios_pendientes"])) if row["estado"] == "publicado" else None
+        store.update_schedule(sid, nuevo, cambios)
+        if row["estado"] == "publicado":
+            avisos.registrar_cambios(store, sid, antes, nuevo)
         return detail(load(sid), request)
 
     # ------------------------------------------------------------------ vista diaria: edición manual de un día
@@ -1115,6 +1154,7 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
             "empleado": {"id": emp.id, "nombre": emp.nombre, "horas_semanales": emp.horas_semanales,
                          "libranzas_fijas": emp.libranzas_fijas},
             "turnos": [{"id": s.id, "nombre": s.nombre, "inicio": s.inicio, "fin": s.fin} for s in config.turnos],
+            "vacaciones": saldo_vacaciones(config, emp, today.year, today).model_dump(mode="json"),
             "preferencias": [p.model_dump(mode="json") for p in config.preferencias if p.empleado_id == emp.id],
             "ausencias": [a.model_dump(mode="json") for a in config.ausencias if a.empleado_id == emp.id],
             "proximos": proximos, "horarios": pubs, "avisos": worker_notices(u),

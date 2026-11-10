@@ -458,6 +458,17 @@ export function summaryTable(h) {
     <p class="small muted">«Arrastra» son las horas de más (+) o de menos (−) del periodo anterior que se compensan en este. Objetivo = contrato prorrateado sin contar ausencias, menos lo arrastrado. Los comodines no tienen objetivo: solo cubren lo que falta.</p></div>`;
 }
 
+// «Mover»: pasar el turno a otra persona y/o a otro día del horario (lo mismo que arrastrarlo, para quien no arrastre).
+function moverHtml(cfg, h, emp, d) {
+  const dias = [];
+  for (let x = h.desde; x <= h.hasta; x = addDays(x, 1)) dias.push(x);
+  const personas = cfg.empleados.filter((e) => e.activo);
+  return `<hr><div class="ph" style="border:none;margin:0;padding-bottom:2px">Mover el turno <small class="muted">(si hay turno allí, se intercambian)</small></div>
+    <div class="bar-times"><label class="field">Persona<select class="mv-emp">${personas.map((e) => `<option value="${esc(e.id)}" ${e.id === emp.id ? 'selected' : ''}>${esc(e.nombre)}</option>`).join('')}</select></label>
+      <label class="field">Día<select class="mv-dia">${dias.map((x) => `<option value="${x}" ${x === d ? 'selected' : ''}>${esc(fmtLong(x))}</option>`).join('')}</select></label>
+      <button class="btn small primary" data-act="moveCell" data-emp="${esc(emp.id)}" data-date="${d}">Mover</button></div>`;
+}
+
 // menú de una casilla
 export function openCellMenu(btn) {
   closeMenu();
@@ -481,10 +492,11 @@ export function openCellMenu(btn) {
   m.className = 'popover';
   m.setAttribute('role', 'menu');
   m.innerHTML = `<div class="ph"><b>${esc(emp.nombre)}</b> · ${fmtLong(d)}${absence ? `<br><span style="color:var(--warn)">${esc(MOTIVOS[absence.motivo])}</span>` : fixedOff ? '<br>Es su día de libranza' : ''}</div>
-    ${cfg.turnos.map((s) => `<button role="menuitem" class="${cur && cur.turno_id === s.id ? 'current' : ''}" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="${esc(s.id)}"><i style="background:${esc(s.color || 'var(--track)')}"></i>${esc(s.nombre)} <small>${s.inicio}–${s.fin}${note(s) ? ` · <span class="warn-note">${note(s)}</span>` : ''}</small></button>`).join('')}
+    ${fixedOff && !cur ? '<button role="menuitem" disabled>Libranza fija <small>no se le puede poner turno. Cámbiala en Equipo</small></button>' : cfg.turnos.map((s) => `<button role="menuitem" class="${cur && cur.turno_id === s.id ? 'current' : ''}" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="${esc(s.id)}"><i style="background:${esc(s.color || 'var(--track)')}"></i>${esc(s.nombre)}${s.puesto ? ` · ${esc(PUESTOS[s.puesto])}` : ''} <small>${s.inicio}–${s.fin}${note(s) ? ` · <span class="warn-note">${note(s)}</span>` : ''}</small></button>`).join('')}
     <hr>${cur
       ? `<button role="menuitem" class="danger-text" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="">${ICON.trash} Quitar el turno <small>ese día libra</small></button>`
       : '<button role="menuitem" class="current" disabled>Libre <small>no tiene turno</small></button>'}
+    ${cur ? moverHtml(cfg, h, emp, d) : ''}
     ${cur && puestosDe(emp).length > 1 ? `<hr>${puestosDe(emp).map((p) => `<button role="menuitem" class="${puestoDe(cfg, cur) === p ? 'current' : ''}" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="${esc(cur.turno_id)}" data-puesto="${p}">${puestoTag(p)} En ${PUESTOS[p].toLowerCase()} <small>mismo turno</small></button>`).join('')}` : ''}
     ${cur && shiftById(cfg, cur.turno_id) ? rolesMenu(cfg, emp, puestoDe(cfg, cur), cur.funcion, 'setCell', `data-emp="${esc(emp.id)}" data-date="${d}" data-shift="${esc(cur.turno_id)}" data-puesto="${puestoDe(cfg, cur)}"`) : ''}
     ${cur && shiftById(cfg, cur.turno_id) ? `<hr><div class="ph" style="border:none;margin:0;padding-bottom:2px">Ajustar las horas <small class="muted">(se revisa en la vista del día)</small></div>${quickAdjustHtml('cellAdj', `data-emp="${esc(emp.id)}" data-date="${d}"`)}` : ''}
