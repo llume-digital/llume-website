@@ -5,6 +5,7 @@ import { alertsPanel, weeksGrid } from './alertas.js';
 import { monthOfSchedule } from './mes.js';
 import { closeMenu, dayView, openCellMenu, summaryTable } from './dia.js';
 import { actions } from '../nucleo/registro.js';
+import './arrastrar.js';
 // ------------------------------------------------------------------ HORARIOS: detalle y cuadrante
 export function viewDetalle(id) {
   const cur = state.current;
@@ -132,6 +133,16 @@ Object.assign(actions, {
       renderView();
       const errs = state.current.horario.incidencias.filter((i) => i.nivel === 'error' && i.empleado_id === el.dataset.emp && i.fecha === el.dataset.date);
       if (errs.length) toast(errs[0].mensaje, true);
+    } catch (e) { toast(e.message, true); }
+  },
+  moveCell: async (el) => {
+    const m = el.closest('.popover');
+    const emp = m.querySelector('.mv-emp').value, fecha = m.querySelector('.mv-dia').value;
+    if (emp === el.dataset.emp && fecha === el.dataset.date) { toast('Elige otra persona u otro día', true); return; }
+    closeMenu();
+    try {
+      state.current = await api('POST', `/api/horarios/${state.current.id}/mover`, { origen: { empleado_id: el.dataset.emp, fecha: el.dataset.date }, destino: { empleado_id: emp, fecha } });
+      renderView();
     } catch (e) { toast(e.message, true); }
   },
   unlockCell: async (el) => {
