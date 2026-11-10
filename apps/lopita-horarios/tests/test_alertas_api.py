@@ -360,3 +360,16 @@ def test_corregir_un_dia_pasado_avisa_al_trabajador(env):
     # Una vez leído deja de enseñarse
     w.post("/api/mi/avisos/leer", json={})
     assert not [x for x in w.get("/api/mi/perfil").json()["avisos"] if x["fecha"] == t["fecha"]]
+
+
+def test_celda_con_horario_concreto(env):
+    app, admin = env
+    sid, _ = make_week(admin)
+    t = turno_de(admin, sid, admin.get(f"/api/horarios/{sid}").json()["horario"]["asignaciones"][0]["empleado_id"])
+    celda = {"empleado_id": t["empleado_id"], "fecha": t["fecha"], "turno_id": t["turno_id"]}
+    r = admin.patch(f"/api/horarios/{sid}/celda", json={**celda, "inicio": "07:00", "fin": "13:00"})
+    assert r.status_code == 200
+    a = next(x for x in r.json()["horario"]["asignaciones"] if x["empleado_id"] == t["empleado_id"] and x["fecha"] == t["fecha"])
+    assert (a["inicio"], a["fin"]) == ("07:00", "13:00")
+    assert admin.patch(f"/api/horarios/{sid}/celda", json={**celda, "inicio": "13:00", "fin": "10:00"}).status_code == 400
+    assert admin.patch(f"/api/horarios/{sid}/celda", json={**celda, "inicio": "10:00"}).status_code == 400

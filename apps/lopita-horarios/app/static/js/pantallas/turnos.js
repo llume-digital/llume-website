@@ -1,5 +1,5 @@
 import { ICON, TIPOS_TURNO, esc, fmtH, toMin } from '../nucleo/util.js';
-import { state } from '../nucleo/estado.js';
+import { state, toast } from '../nucleo/estado.js';
 import { dayChips, head, renderView } from '../nucleo/pintado.js';
 import { conDeshacer } from '../nucleo/borrador.js';
 import { getPath, markDirty, setPath } from '../nucleo/enlace.js';
@@ -13,7 +13,7 @@ export function timeline(items, from = 6 * 60, to = 24 * 60) {
 
 export function viewTurnos() {
   const t = state.draft.turnos;
-  return `${head('Turnos', 'El catálogo de turnos entre los que elige el motor. Solo quien esté habilitado hará los de apertura y cierre.', `<button class="btn primary" data-act="addShift">${ICON.plus} Añadir turno</button>`)}
+  return `${head('Turnos', 'El catálogo de turnos entre los que elige el motor. Solo quien esté habilitado hará los de apertura y cierre.', `<button class="btn" data-act="addShiftPreset" data-ini="07:00" data-fin="13:00">${ICON.plus} 7–13</button><button class="btn" data-act="addShiftPreset" data-ini="10:00" data-fin="18:00">${ICON.plus} 10–18</button><button class="btn primary" data-act="addShift">${ICON.plus} Añadir turno</button>`)}
   ${t.length ? `<div class="grid">${t.map((s, i) => {
     const hrs = (toMin(s.fin) - toMin(s.inicio)) / 60;
     return `<div class="card">
@@ -46,6 +46,14 @@ Object.assign(actions, {
     const ids = state.draft.turnos.map((s) => s.id);
     let n = 1; while (ids.includes(`T${n}`)) n++;
     state.draft.turnos.push({ id: `T${n}`, nombre: 'Nuevo turno', inicio: '09:00', fin: '15:00', tipo: 'normal', dias: null, color: '#E8D5B0' });
+    markDirty(); renderView();
+  },
+  addShiftPreset: (el) => {
+    const { ini, fin } = el.dataset;
+    if (state.draft.turnos.some((s) => s.inicio === ini && s.fin === fin)) { toast(`Ya tienes un turno de ${ini}–${fin}`, true); return; }
+    const ids = state.draft.turnos.map((s) => s.id);
+    let n = 1; while (ids.includes(`T${n}`)) n++;
+    state.draft.turnos.push({ id: `T${n}`, nombre: `${Number(ini.slice(0, 2))}–${Number(fin.slice(0, 2))}`, inicio: ini, fin, tipo: 'normal', dias: null, color: '#E8D5B0' });
     markDirty(); renderView();
   },
   delShift: (el) => {
