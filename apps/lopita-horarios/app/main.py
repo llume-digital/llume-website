@@ -23,7 +23,7 @@ from lopita_horarios.alertas import catalogo
 from lopita_horarios.cambios import diferencias
 from lopita_horarios.edicion import EdicionInvalida, Tramo, aplicar_dia, rol_manual
 from lopita_horarios.edicion import evaluar as evaluar_edicion
-from lopita_horarios.models import Absence, Assignment, Config, Lock, Preference, Puesto, Schedule
+from lopita_horarios.models import Absence, Assignment, Config, Lock, Preference, Puesto, Schedule, parse_hhmm
 from lopita_horarios.render import FONT_DIR, html_to_pdf_bytes, render_html
 from lopita_horarios.report import coverage, hours_csv
 from lopita_horarios.solucionador import CambioPropuesto, HorarioCambiado, aplicar, congelar_antes, solucionar
@@ -79,6 +79,8 @@ class CellIn(BaseModel):
     funcion: Optional[str] = Field(default=None, description="Rol (caja, cafetera...). Vacío: el que tenía si le sigue "
                                    "valiendo o su rol principal si ese día se reparten roles; '' = sin rol")
     conservar_horas: bool = Field(default=False, description="Si es el mismo turno, mantener sus horas a medida")
+    inicio: Optional[str] = Field(default=None, description="Horas a medida (con 'fin'): ese día entra a esa hora en lugar de la del turno")
+    fin: Optional[str] = None
     bloquear: bool = True
 
 
@@ -701,12 +703,21 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         if body.turno_id:
             puesto = body.puesto or (previa.puesto if previa and previa.puesto in emp.puestos else emp.puesto_principal)
             mismas = body.conservar_horas and previa is not None and previa.turno_id == body.turno_id
+            if (body.inicio is None) != (body.fin is None):
+                raise HTTPException(400, "Indica la hora de entrada y la de salida")
+            if body.inicio is not None:
+                try:
+                    if parse_hhmm(body.fin) <= parse_hhmm(body.inicio):
+                        raise ValueError
+                except ValueError:
+                    raise HTTPException(400, "La salida tiene que ser después de la entrada") from None
             try:
                 funcion = rol_manual(config, emp, body.fecha, puesto, body.funcion, previa)
             except EdicionInvalida as exc:
                 raise HTTPException(400, str(exc)) from None
             nueva = Assignment(empleado_id=body.empleado_id, fecha=body.fecha, turno_id=body.turno_id, puesto=puesto,
-                               funcion=funcion, inicio=previa.inicio if mismas else None, fin=previa.fin if mismas else None)
+                               funcion=funcion, inicio=body.inicio if body.inicio else previa.inicio if mismas else None,
+                               fin=body.fin if body.fin else previa.fin if mismas else None)
             h.asignaciones.append(nueva)
             h.asignaciones.sort(key=lambda a: (a.fecha, a.empleado_id))
         h.bloqueos = [b for b in h.bloqueos if not (b.empleado_id == body.empleado_id and b.fecha == body.fecha)]

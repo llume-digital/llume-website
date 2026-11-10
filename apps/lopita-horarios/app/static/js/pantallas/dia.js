@@ -488,6 +488,10 @@ export function openCellMenu(btn) {
     ${cur && puestosDe(emp).length > 1 ? `<hr>${puestosDe(emp).map((p) => `<button role="menuitem" class="${puestoDe(cfg, cur) === p ? 'current' : ''}" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="${esc(cur.turno_id)}" data-puesto="${p}">${puestoTag(p)} En ${PUESTOS[p].toLowerCase()} <small>mismo turno</small></button>`).join('')}` : ''}
     ${cur && shiftById(cfg, cur.turno_id) ? rolesMenu(cfg, emp, puestoDe(cfg, cur), cur.funcion, 'setCell', `data-emp="${esc(emp.id)}" data-date="${d}" data-shift="${esc(cur.turno_id)}" data-puesto="${puestoDe(cfg, cur)}"`) : ''}
     ${cur && shiftById(cfg, cur.turno_id) ? `<hr><div class="ph" style="border:none;margin:0;padding-bottom:2px">Ajustar las horas <small class="muted">(se revisa en la vista del día)</small></div>${quickAdjustHtml('cellAdj', `data-emp="${esc(emp.id)}" data-date="${d}"`)}` : ''}
+    <hr><div class="ph" style="border:none;margin:0;padding-bottom:2px">Horario concreto <small class="muted">(otras horas ese día)</small></div>
+    <div class="bar-times"><label class="field">Entra<input type="time" step="900" class="cell-ini" value="${cur ? cur.inicio || (shiftById(cfg, cur.turno_id) || {}).inicio || '' : ''}"></label>
+      <label class="field">Sale<input type="time" step="900" class="cell-fin" value="${cur ? (cur.fin || (shiftById(cfg, cur.turno_id) || {}).fin || '').replace('24:00', '23:59') : ''}"></label>
+      <button class="btn small primary" data-act="cellHoras" data-emp="${esc(emp.id)}" data-date="${d}">Aplicar</button></div>
     ${lock ? `<button role="menuitem" data-act="unlockCell" data-emp="${esc(emp.id)}" data-date="${d}">Quitar bloqueo <small>que decida el motor</small></button>` : ''}`;
   document.body.appendChild(m);
   placePopover(m, `[data-act="cell"][data-emp="${CSS.escape(emp.id)}"][data-date="${d}"]`);

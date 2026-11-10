@@ -1,4 +1,4 @@
-import { ICON, esc, fmtH, fmtRange, fmtStamp } from '../nucleo/util.js';
+import { ICON, esc, fmtH, fmtRange, fmtStamp, toMin } from '../nucleo/util.js';
 import { api, state, toast } from '../nucleo/estado.js';
 import { head, renderView } from '../nucleo/pintado.js';
 import { alertsPanel, weeksGrid } from './alertas.js';
@@ -110,6 +110,25 @@ Object.assign(actions, {
       if (el.dataset.puesto) Object.assign(body, { puesto: el.dataset.puesto, conservar_horas: true });
       if (el.dataset.funcion !== undefined) body.funcion = el.dataset.funcion; // '' = sin rol
       state.current = await api('PATCH', `/api/horarios/${state.current.id}/celda`, body);
+      renderView();
+      const errs = state.current.horario.incidencias.filter((i) => i.nivel === 'error' && i.empleado_id === el.dataset.emp && i.fecha === el.dataset.date);
+      if (errs.length) toast(errs[0].mensaje, true);
+    } catch (e) { toast(e.message, true); }
+  },
+  // Horario concreto: horas a medida en una casilla, sobre el turno que ya tenía o el más parecido.
+  cellHoras: async (el) => {
+    const m = el.closest('.popover');
+    const ini = m.querySelector('.cell-ini').value;
+    let fin = m.querySelector('.cell-fin').value;
+    if (fin === '23:59') fin = '24:00';
+    if (!ini || !fin || toMin(fin) <= toMin(ini)) { toast('Indica la entrada y una salida posterior a ella', true); return; }
+    const cfg = state.config;
+    const a = state.current.horario.asignaciones.find((x) => x.empleado_id === el.dataset.emp && x.fecha === el.dataset.date);
+    const turnos = cfg.turnos;
+    const base = a ? a.turno_id : [...turnos].sort((x, y) => Math.abs(toMin(x.inicio) - toMin(ini)) - Math.abs(toMin(y.inicio) - toMin(ini)))[0].id;
+    closeMenu();
+    try {
+      state.current = await api('PATCH', `/api/horarios/${state.current.id}/celda`, { empleado_id: el.dataset.emp, fecha: el.dataset.date, turno_id: base, puesto: a ? a.puesto : null, funcion: a ? a.funcion || '' : null, inicio: ini, fin, bloquear: true });
       renderView();
       const errs = state.current.horario.incidencias.filter((i) => i.nivel === 'error' && i.empleado_id === el.dataset.emp && i.fecha === el.dataset.date);
       if (errs.length) toast(errs[0].mensaje, true);

@@ -7,6 +7,10 @@
 // - Lo puramente interno (tests, refactors, CI, documentación) no lleva entrada: el PR lo dice con «Sin novedades: …».
 // La comprobación de CI (herramientas/comprobar_novedades.py) falla si un PR toca la app sin pasar por aquí.
 export const NOVEDADES = [
+  { fecha: '2026-11-10', titulo: 'Turnos de 7–13 y 10–18, y horarios concretos', ir: 'turnos', texto: [
+    'En <b>Turnos</b> hay dos botones, <b>7–13</b> y <b>10–18</b>, que crean esos turnos al momento (puedes cambiarles el nombre o el color).',
+    'Y si necesitas unas horas distintas un día concreto, al tocar una casilla del cuadrante tienes <b>Horario concreto</b>: pones la entrada y la salida y se aplica a esa persona ese día.',
+  ] },
   { fecha: '2026-11-10', titulo: 'Vacaciones: un plano de 2026 y 2027', ir: 'vacaciones', texto: [
     'Nueva pantalla <b>Vacaciones</b> (dentro de Equipo): ves el año entero, una columna por semana, con quién está fuera y cuántas personas faltan cada semana. Debajo te marca las semanas más tranquilas que quedan.',
     'Al apuntar unas vacaciones, la pantalla te dice antes con quién coinciden y cuántas personas quedarían. Es la misma lista que <b>Ausencias</b>.',
