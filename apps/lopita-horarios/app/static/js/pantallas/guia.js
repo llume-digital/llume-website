@@ -76,6 +76,11 @@ const GUIA_ADMIN = [
     'Añade la persona, las fechas y el motivo. El motor no le pondrá turnos esos días.',
     'Si ya había horarios en esas fechas, la app los arregla sola y te avisa.',
   ] },
+  { id: 'vacaciones', titulo: 'Vacaciones', para: 'Un plano de 2026 y 2027 para ver dónde caben las vacaciones de cada persona.', pasos: [
+    'Elige el año, la persona y las fechas: antes de añadir, la app te dice con quién coincide y cuántas personas quedan.',
+    'El plano muestra una columna por semana y, abajo, cuántas personas faltan cada una. Las semanas más tranquilas salen debajo.',
+    'Lo apuntado es lo mismo que en Ausencias y se guarda con el botón de abajo.',
+  ] },
   { id: 'preferencias', titulo: 'Preferencias', para: 'Turnos que alguien prefiere o evita, y cuánto le importa.', pasos: [
     'Elige la persona, si prefiere o evita, los turnos y (opcional) los días.',
     'Se respetan si no comprometen la cobertura. Cada trabajador puede editar las suyas.',

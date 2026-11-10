@@ -32,14 +32,14 @@ export function render() {
 
 export const NAV_ADMIN = [
   ['horarios', 'Horarios'], ['calendario', 'Calendario'], ['alertas', 'Alertas'], ['solicitudes', 'Solicitudes'], ['informes', 'Informes'], ['equipo', 'Equipo'], ['funciones', 'Funciones'], ['turnos', 'Turnos'], ['demanda', 'Demanda'],
-  ['ausencias', 'Ausencias'], ['preferencias', 'Preferencias'], ['reglas', 'Reglas'], ['web', 'Web'], ['comentarios', 'Comentarios'], ['ajustes', 'Ajustes'], ['novedades', 'Novedades'],
+  ['ausencias', 'Ausencias'], ['vacaciones', 'Vacaciones'], ['preferencias', 'Preferencias'], ['reglas', 'Reglas'], ['web', 'Web'], ['comentarios', 'Comentarios'], ['ajustes', 'Ajustes'], ['novedades', 'Novedades'],
 ];
 // El encargado ve cinco secciones; cada una agrupa pantallas (la dirección de cada pantalla no cambia). Web,
 // Comentarios y Novedades no son de la semana a semana y viven en el menú «Más» de la cuenta.
 export const SECCIONES_ADMIN = [
   ['horario', 'Horario', ['horarios', 'calendario']],
   ['pendiente', 'Pendiente', ['alertas', 'solicitudes']],
-  ['equipo', 'Equipo', ['equipo', 'ausencias', 'preferencias']],
+  ['equipo', 'Equipo', ['equipo', 'ausencias', 'vacaciones', 'preferencias']],
   ['informes', 'Informes', ['informes']],
   ['configuracion', 'Configuración', ['funciones', 'turnos', 'demanda', 'reglas', 'ajustes']],
 ];

@@ -21,7 +21,7 @@ CLAVE_TRABAJADOR = "clave-de-trabajadora"
 # Rutas del encargado. `{sid}` es un horario publicado, `{emp}` una persona del equipo y `{lunes}` su semana.
 RUTAS_ENCARGADO = [
     "horarios", "horarios/{sid}", "calendario", "calendario/persona/{emp}/{lunes}", "alertas", "solicitudes",
-    "informes", "equipo", "funciones", "turnos", "demanda", "ausencias", "preferencias", "reglas", "web",
+    "informes", "equipo", "funciones", "turnos", "demanda", "ausencias", "vacaciones", "preferencias", "reglas", "web",
     "comentarios", "ajustes", "novedades", "guia",
 ]
 RUTAS_TRABAJADOR = ["inicio", "horas", "vacaciones", "preferencias", "guia"]
