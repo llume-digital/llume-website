@@ -104,7 +104,8 @@ def generate(
             posts = allowed_posts(config, e, d) if demands[d].by_post else [_fixed_post(config, e, d)]
             for s in allowed_shifts(config, e, d):
                 shift_of[e.id, d, s.id] = s
-                for p in posts:
+                # Un turno de cocina o de camarero solo se hace en ese puesto.
+                for p in [s.puesto] if s.puesto else posts:
                     for r in allowed_roles(config, e, d, p, p in repartir[d]):
                         x[e.id, d, s.id, p, r] = model.NewBoolVar(f"x_{e.id}_{d}_{s.id}_{p.value}_{r or ''}")
 

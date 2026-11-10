@@ -273,8 +273,11 @@ def allowed_shifts(config: Config, emp: Employee, date: dt.date) -> list[Shift]:
     if date.weekday() in emp.fixed_off_indexes() and not (override and override.tipo == "trabaja"):
         return []
     result = []
+    posts = allowed_posts(config, emp, date)
     for s in config.turnos:
         if not s.available_on(date):
+            continue
+        if s.puesto is not None and s.puesto not in posts:
             continue
         if s.hours > config.reglas.max_horas_dia:
             continue

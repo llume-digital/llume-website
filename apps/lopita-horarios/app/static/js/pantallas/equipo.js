@@ -3,6 +3,7 @@ import { overlay, state, toast } from '../nucleo/estado.js';
 import { PUESTOS, TIPOS, dayChips, empById, esRol, funcById, funcionesCfg, head, horasField, puestosDe, renderView, rolesDe, slackField, toggle } from '../nucleo/pintado.js';
 import { conDeshacer } from '../nucleo/borrador.js';
 import { markDirty } from '../nucleo/enlace.js';
+import { saldoVacaciones } from '../nucleo/vacaciones.js';
 import { actions } from '../nucleo/registro.js';
 // ------------------------------------------------------------------ EQUIPO
 // #/equipo es la lista de la plantilla; #/equipo/<id> es la ficha de una persona, con todo lo que se le puede ajustar.
@@ -47,14 +48,25 @@ function viewFicha(i) {
     ${e.comodin ? `<div class="fields" style="margin-top:10px">${slackField(i, e)}</div>` : ''}
     <label class="field" style="margin-top:12px">Email<span class="hint">Si no hay usuario de Slack, se busca por email</span><input type="email" value="${esc(e.email || '')}" data-type="nullstr" data-bind="empleados.${i}.email"></label>
     ${puestosField(i, e)}
+    ${vacacionesField(i, e)}
     <div class="stack" style="gap:8px;margin-top:14px">
       ${toggle(`empleados.${i}.activo`, e.activo, 'En plantilla')}
     </div>
     ${bajaField(e)}
     ${funcionesField(i, e)}
-    <div style="margin-top:14px"><div class="small muted" style="font-weight:600;margin-bottom:6px">Días que libra</div>${dayChips(`empleados.${i}.libranzas_fijas`, e.libranzas_fijas, 'El motor elige sus días libres')}</div>
+    <div style="margin-top:14px"><div class="small muted" style="font-weight:600;margin-bottom:6px">Días que libra siempre</div>${dayChips(`empleados.${i}.libranzas_fijas`, e.libranzas_fijas, 'El motor elige sus días libres')}<div class="hint small muted" style="margin-top:4px">Se respetan siempre: ni el motor ni los cambios a mano le ponen turno esos días. Para un día suelto que sí trabaje, usa Ausencias.</div></div>
     ${franjasField(i, e)}
   </div>`;
+}
+
+// Vacaciones: cuándo entró (las del primer año son proporcionales) y cuántos días naturales tiene al año (mínimo legal: 30).
+function vacacionesField(i, e) {
+  const anio = Number(todayIso().slice(0, 4));
+  const sd = saldoVacaciones(state.draft, e, anio, todayIso());
+  return `<div style="margin-top:14px"><div class="small muted" style="font-weight:600;margin-bottom:6px">Vacaciones</div>
+    <div class="fields"><label class="field">Fecha de alta<span class="hint">Si entró este año, se prorratean</span><input type="date" value="${esc(e.fecha_alta || '')}" data-type="nullstr" data-bind="empleados.${i}.fecha_alta" data-rerender></label>
+      <label class="field">Días al año<span class="hint">Naturales; mínimo 30 por ley</span><input type="number" min="30" max="60" value="${e.dias_vacaciones || 30}" data-type="int" data-bind="empleados.${i}.dias_vacaciones" data-rerender></label></div>
+    <p class="small muted" style="margin:6px 0 0">En ${anio}: le corresponden <b>${sd.derecho}</b> días, lleva <b>${sd.disfrutadas}</b> disfrutados y <b>${sd.programadas}</b> apuntados por disfrutar. ${sd.quedan < 0 ? `<span style="color:var(--bad)">Se pasa ${-sd.quedan}.</span>` : `Quedan <b>${sd.quedan}</b>.`}</p></div>`;
 }
 
 // Bajas: una ausencia con motivo «baja». Sin fecha de alta se guarda para un año (hasta que se dé el alta).

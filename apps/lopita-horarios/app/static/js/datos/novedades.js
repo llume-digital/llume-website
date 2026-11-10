@@ -7,6 +7,15 @@
 // - Lo puramente interno (tests, refactors, CI, documentación) no lleva entrada: el PR lo dice con «Sin novedades: …».
 // La comprobación de CI (herramientas/comprobar_novedades.py) falla si un PR toca la app sin pasar por aquí.
 export const NOVEDADES = [
+  { fecha: '2026-11-10', titulo: 'Mover turnos arrastrando y turnos de cocina o camarero', ir: 'horarios', texto: [
+    'En el cuadrante puedes <b>arrastrar el turno</b> de una casilla a otra: a otro día, a otra persona o a las dos cosas (en el móvil, mantén pulsado un momento). Si la casilla de destino ya tenía turno, se intercambian. Si no te va el arrastre, al tocar una casilla tienes <b>Mover el turno</b>.',
+    'Los turnos pueden ser <b>de cocina o de camarero</b> (en <b>Turnos</b>, campo <b>Para</b>): solo los hace quien trabaja en ese puesto.',
+    'Las <b>libranzas fijas</b> ya no se saltan ni a mano: no se puede poner turno a alguien en su día de libranza.',
+  ] },
+  { fecha: '2026-11-10', titulo: 'Contador de vacaciones según la ley', ir: 'vacaciones', texto: [
+    'Cada persona tiene <b>30 días naturales de vacaciones al año</b> (el mínimo legal; puedes subirlos en su ficha de <b>Equipo</b>). Si entró durante el año, se calcula la parte proporcional a partir de su <b>fecha de alta</b>.',
+    'En <b>Vacaciones</b> ves cuántos días lleva usados y cuántos le quedan, y al apuntar unas nuevas te avisa si se pasa. Cada trabajador lo ve también en su pantalla de vacaciones.',
+  ] },
   { fecha: '2026-11-10', titulo: 'Turnos de 7–13 y 10–18, y horarios concretos', ir: 'turnos', texto: [
     'En <b>Turnos</b> hay dos botones, <b>7–13</b> y <b>10–18</b>, que crean esos turnos al momento (puedes cambiarles el nombre o el color).',
     'Y si necesitas unas horas distintas un día concreto, al tocar una casilla del cuadrante tienes <b>Horario concreto</b>: pones la entrada y la salida y se aplica a esa persona ese día.',

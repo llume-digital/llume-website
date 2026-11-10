@@ -109,6 +109,10 @@ class Employee(BaseModel):
         default_factory=list, description="Horas del día en que puede trabajar, todos los días o algunos")
     funciones: list[str] = Field(default_factory=list,
                                  description="Funciones que puede hacer, definidas por el encargado (p. ej. preparar pinchos)")
+    fecha_alta: Optional[dt.date] = Field(default=None, description="Día en que entró; si fue durante el año, "
+                                          "las vacaciones de ese año son proporcionales")
+    dias_vacaciones: int = Field(default=30, ge=30, le=60, description="Días naturales de vacaciones al año; el "
+                                 "Estatuto de los Trabajadores fija un mínimo de 30")
     slack_user_id: Optional[str] = None
     email: Optional[str] = None
     activo: bool = True
@@ -225,6 +229,8 @@ class Shift(BaseModel):
     tipo: ShiftKind = ShiftKind.normal
     dias: Optional[list[str]] = Field(default=None, description="Días en que existe el turno; vacío = todos")
     color: Optional[str] = None
+    puesto: Optional[Puesto] = Field(default=None, description="Si el turno es de cocina o de camarero (sala); "
+                                     "vacío = lo puede hacer cualquiera")
 
     @model_validator(mode="after")
     def _check_times(self) -> "Shift":

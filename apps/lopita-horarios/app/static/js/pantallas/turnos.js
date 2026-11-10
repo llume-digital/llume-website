@@ -24,6 +24,7 @@ export function viewTurnos() {
       <label class="field">Entrada<input type="time" step="900" value="${s.inicio}" data-bind="turnos.${i}.inicio" data-rerender></label>
       <label class="field">Salida<input type="time" step="900" value="${s.fin === '24:00' ? '23:59' : s.fin}" data-bind="turnos.${i}.fin" data-rerender></label>
       <label class="field">Tipo<select data-bind="turnos.${i}.tipo">${Object.entries(TIPOS_TURNO).map(([k, v]) => `<option value="${k}" ${s.tipo === k ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+      <label class="field">Para<select data-bind="turnos.${i}.puesto" data-type="nullstr" data-rerender><option value="" ${!s.puesto ? 'selected' : ''}>Cualquiera</option><option value="sala" ${s.puesto === 'sala' ? 'selected' : ''}>Camarero</option><option value="cocina" ${s.puesto === 'cocina' ? 'selected' : ''}>Cocina</option></select></label>
       <label class="field">Color<input class="swatch-input" type="color" value="${esc(s.color || '#E8D5B0')}" data-bind="turnos.${i}.color" data-rerender></label>
       <div class="field">Duración<b style="color:var(--ink);padding-top:8px">${hrs > 0 ? `${fmtH(hrs)} h` : '<span style="color:var(--bad)">revisa las horas</span>'}</b></div>
     </div>
@@ -45,7 +46,7 @@ Object.assign(actions, {
   addShift: () => {
     const ids = state.draft.turnos.map((s) => s.id);
     let n = 1; while (ids.includes(`T${n}`)) n++;
-    state.draft.turnos.push({ id: `T${n}`, nombre: 'Nuevo turno', inicio: '09:00', fin: '15:00', tipo: 'normal', dias: null, color: '#E8D5B0' });
+    state.draft.turnos.push({ id: `T${n}`, nombre: 'Nuevo turno', inicio: '09:00', fin: '15:00', tipo: 'normal', dias: null, color: '#E8D5B0', puesto: null });
     markDirty(); renderView();
   },
   addShiftPreset: (el) => {

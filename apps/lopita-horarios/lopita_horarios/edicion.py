@@ -63,7 +63,7 @@ class Evaluacion(BaseModel):
 
 
 def turno_base(config: Config, empleado_id: str, fecha: dt.date, inicio: str, fin: str,
-               preferido: Optional[str] = None) -> Shift:
+               preferido: Optional[str] = None, puesto: Optional[Puesto] = None) -> Shift:
     """El turno definido que mejor encaja con esas horas: el que más se solapa y, a igualdad, el más parecido.
 
     Solo se eligen turnos que existen ese día y que la persona puede hacer (abrir o cerrar); si no hay ninguno,
@@ -74,8 +74,9 @@ def turno_base(config: Config, empleado_id: str, fecha: dt.date, inicio: str, fi
     del_dia = [s for s in config.turnos if s.available_on(fecha)] or list(config.turnos)
     if not del_dia:
         raise EdicionInvalida("No hay ningún turno definido: crea alguno en Turnos")
+    puesto_vale = lambda s: s.puesto is None or (s.puesto in emp.puestos and puesto in (None, s.puesto))  # noqa: E731
     puede = [s for s in del_dia if (s.tipo.value != "apertura" or emp.puede_abrir)
-             and (s.tipo.value != "cierre" or emp.puede_cerrar)] or del_dia
+             and (s.tipo.value != "cierre" or emp.puede_cerrar) and puesto_vale(s)] or del_dia
 
     def encaje(s: Shift) -> tuple[int, int, bool]:
         solape = max(0, min(b, s.end_min) - max(a, s.start_min))
@@ -108,12 +109,40 @@ def rol_manual(config: Config, emp: Employee, fecha: dt.date, puesto: Puesto, pe
     return validos[0] if validos and puesto in role_posts(config, fecha) else None
 
 
+NOMBRE_PUESTO = {Puesto.cocina: "cocina", Puesto.sala: "camarero"}
+_DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+
+
+def verificar_libranza(config: Config, emp: Employee, fecha: dt.date) -> None:
+    """Una libranza fija no se salta a mano: solo la excepción «trabaja ese día» de Ausencias la levanta."""
+    o = config.override_for(emp.id, fecha)
+    if fecha.weekday() in emp.fixed_off_indexes() and not (o and o.tipo == "trabaja"):
+        raise EdicionInvalida(f"{emp.nombre} libra los {_DIAS[fecha.weekday()]} (libranza fija). Cámbiala en Equipo "
+                              "si ya no es así, o apunta en Ausencias que ese día trabaja.")
+
+
+def puesto_para_turno(config: Config, emp: Employee, turno: Shift, pedido: Optional[Puesto],
+                      previa: Optional[Assignment]) -> Puesto:
+    """Puesto de una asignación manual: un turno de cocina o de camarero solo se hace en su puesto."""
+    if turno.puesto is not None:
+        if pedido is not None and pedido != turno.puesto:
+            raise EdicionInvalida(f"El turno {turno.nombre} es de {NOMBRE_PUESTO[turno.puesto]}: no se puede hacer "
+                                  f"en {NOMBRE_PUESTO[pedido]}")
+        if turno.puesto not in emp.puestos:
+            raise EdicionInvalida(f"{emp.nombre} no trabaja en {NOMBRE_PUESTO[turno.puesto]}, y el turno "
+                                  f"{turno.nombre} es de {NOMBRE_PUESTO[turno.puesto]}")
+        return turno.puesto
+    if pedido is not None and pedido not in emp.puestos:
+        raise EdicionInvalida(f"{emp.nombre} no trabaja en {NOMBRE_PUESTO[pedido]}")
+    return pedido or (previa.puesto if previa and previa.puesto in emp.puestos else emp.puesto_principal)
+
+
 def _asignacion(config: Config, fecha: dt.date, t: Tramo, previa: Optional[Assignment]) -> Assignment:
     emp = config.employee(t.empleado_id)
-    if t.puesto and t.puesto not in emp.puestos:
-        raise EdicionInvalida(f"{emp.nombre} no trabaja en {t.puesto.value}")
-    base = turno_base(config, t.empleado_id, fecha, t.inicio, t.fin, t.turno_id or (previa.turno_id if previa else None))
-    puesto = t.puesto or (previa.puesto if previa and previa.puesto in emp.puestos else emp.puesto_principal)
+    if previa is None:
+        verificar_libranza(config, emp, fecha)
+    base = turno_base(config, t.empleado_id, fecha, t.inicio, t.fin, t.turno_id or (previa.turno_id if previa else None), t.puesto)
+    puesto = puesto_para_turno(config, emp, base, t.puesto, previa)
     a_medida = (t.inicio, t.fin) != (base.inicio, base.fin)
     funcion = rol_manual(config, emp, fecha, puesto, t.funcion, previa)
     return Assignment(empleado_id=t.empleado_id, fecha=fecha, turno_id=base.id, puesto=puesto, funcion=funcion,

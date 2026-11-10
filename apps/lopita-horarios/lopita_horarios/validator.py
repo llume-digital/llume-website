@@ -135,6 +135,9 @@ def validate(config: Config, desde: dt.date, hasta: dt.date, assignments: list[A
                 if a.puesto and a.puesto not in e.puestos:
                     err("puesto_no_habilitado",
                         f"{name} hace {PUESTO[a.puesto]} el {_fmt_date(d)}, pero no es uno de sus puestos", d, e.id)
+                if s.puesto and config.puesto_de(a) != s.puesto:
+                    err("puesto_turno", f"El turno {s.nombre} es de {PUESTO[s.puesto]} y {name} lo hace en "
+                        f"{PUESTO[config.puesto_de(a)]} ({_fmt_date(d)})", d, e.id)
                 _check_rol(config, e, a, err)
                 if not s.available_on(d):
                     err("turno_no_disponible", f"El turno {s.nombre} no existe el {_fmt_date(d)}", d, e.id)

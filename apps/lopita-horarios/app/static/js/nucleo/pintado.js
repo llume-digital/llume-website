@@ -161,7 +161,8 @@ export function head(title, lead, actions = '') {
 // helpers de formulario
 export const empName = (id) => (state.draft.empleados.find((e) => e.id === id) || {}).nombre || id;
 export const shiftById = (cfg, id) => cfg.turnos.find((s) => s.id === id);
-export const PUESTOS = { sala: 'Sala', cocina: 'Cocina' };
+// El valor guardado es «sala»; a quien usa la app se le muestra «Camarero».
+export const PUESTOS = { sala: 'Camarero', cocina: 'Cocina' };
 // Tipo de empleado: quien trabaja en sala es camarero/a y quien trabaja en cocina, cocinero/a.
 export const TIPOS = { sala: 'Camarero/a', cocina: 'Cocinero/a' };
 export const funcionesCfg = (cfg) => cfg.funciones || [];
