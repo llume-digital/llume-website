@@ -73,12 +73,14 @@ def test_arrastrar_un_turno_con_el_raton(url, browser):  # noqa: F811
         page.mouse.move(b["x"] + b["width"] / 2, b["y"] + b["height"] / 2, steps=8)
         assert page.locator(".pill.fantasma").count() == 1
         assert page.locator(".cell.drop-ok, .cell.drop-no").count() == 1
+        # El cuadrante puede moverse mientras se arrastra (llegan las alertas): vale la casilla que quedó marcada.
+        bajo = page.evaluate("""() => { const c = document.querySelector('.cell.drop-ok, .cell.drop-no'); return [c.dataset.emp, c.dataset.date]; }""")
         page.mouse.up()
         page.wait_for_load_state("networkidle")
         assert page.locator(".popover").count() == 0  # soltar no abre el menú de la casilla de origen
         despues = asignaciones(page, url, sid)
         if despues != antes:
-            assert (de, df) in despues and (oe, of) not in despues
+            assert despues[tuple(bajo)] == antes[(oe, of)]
             hecho = True
             break
         page.keyboard.press("Escape")
