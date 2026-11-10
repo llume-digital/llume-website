@@ -157,7 +157,8 @@ export function viewMisVacaciones() {
   const p = state.mi.perfil, today = todayIso();
   const ab = p.ausencias.filter((a) => a.hasta >= today).sort((a, b) => a.desde.localeCompare(b.desde));
   return `${head('Vacaciones y permisos', 'Pide las fechas en las que no puedes trabajar. Tu encargado las aprobará o te dirá si no es posible; hasta entonces el horario las trata como días normales.')}
-  <div class="grid">
+  ${(() => { const v = p.vacaciones; return v ? `<div class="stats" aria-label="Tus vacaciones de ${v.anio}"><div class="stat"><b>${v.derecho}</b><span>días de vacaciones en ${v.anio}</span></div><div class="stat"><b>${v.disfrutadas}</b><span>disfrutados</span></div><div class="stat"><b>${v.programadas}</b><span>por disfrutar</span></div><div class="stat ${v.quedan < 0 ? 'bad' : ''}"><b>${v.quedan}</b><span>${v.quedan < 0 ? 'de más' : 'por pedir'}</span></div></div>` : ''; })()}
+  <div class="grid section">
     <div class="card"><h2>Nueva solicitud</h2>
       <form id="abs-form" class="stack" style="gap:12px">
         <div class="fields two"><label class="field">Desde<input type="date" name="desde" min="${today}" required></label><label class="field">Hasta<input type="date" name="hasta" min="${today}" required></label></div>

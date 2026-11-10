@@ -743,3 +743,13 @@ input[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--ba
 .vac-c.total.media { background: var(--warn-soft); color: var(--warn); }
 .vac-c.total.alta { background: var(--bad-soft); color: var(--bad); }
 .vac-tabla tfoot th, .vac-tabla tfoot td { border-top: 2px solid var(--line-strong); }
+
+/* Arrastrar un turno a otra casilla del cuadrante */
+.cell .pill { -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
+.cell.arrastrando { opacity: .45; }
+.cell.drop-ok { border: 2px solid var(--gold); background: var(--hover); }
+.cell.drop-no { border: 2px dashed var(--bad); background: var(--bad-soft); cursor: not-allowed; }
+.pill.fantasma { position: fixed; left: 0; top: 0; z-index: 80; pointer-events: none; box-shadow: 0 8px 24px rgba(23,19,15,.25); text-align: center; opacity: .95; }
+body.arrastrando-turno, body.arrastrando-turno * { cursor: grabbing !important; user-select: none; }
+.cell:has(.pill) { cursor: grab; }
+.vac-tabla .vac-dias.pasa { color: var(--bad); font-weight: 700; }
