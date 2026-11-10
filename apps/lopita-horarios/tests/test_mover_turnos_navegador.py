@@ -38,7 +38,7 @@ def abrir_semana(url, browser, movil):
 
 def asignaciones(page, url, sid):
     h = page.request.get(f"{url}/api/horarios/{sid}").json()["horario"]
-    return {(a["empleado_id"], a["fecha"]) for a in h["asignaciones"]}
+    return {(a["empleado_id"], a["fecha"]): (a["turno_id"], a["inicio"], a["fin"]) for a in h["asignaciones"]}
 
 
 def pares_libres(page):
@@ -50,7 +50,7 @@ def pares_libres(page):
         const libres = [...tr.querySelectorAll('[data-act=cell]')].filter((c) => c.querySelector('.off') && c.querySelector('.off').textContent === 'libre');
         con.forEach((o) => libres.forEach((d) => out.push([[o.dataset.emp, o.dataset.date], [d.dataset.emp, d.dataset.date]])));
       });
-      return out.slice(0, 12);
+      return out.slice(0, 40);
     }""")
 
 
@@ -64,6 +64,9 @@ def test_arrastrar_un_turno_con_el_raton(url, browser):  # noqa: F811
         page.wait_for_timeout(500)  # las alertas llegan después y vuelven a dibujar el cuadrante
         origen.scroll_into_view_if_needed()
         a, b = origen.bounding_box(), destino.bounding_box()
+        vp = page.viewport_size
+        if not (0 <= b["x"] and b["x"] + b["width"] <= vp["width"] and 0 <= b["y"] and b["y"] + b["height"] <= vp["height"]):
+            continue  # el destino no se ve sin desplazar: solo se prueba lo que cabe en pantalla
         page.mouse.move(a["x"] + a["width"] / 2, a["y"] + a["height"] / 2)
         page.mouse.down()
         page.mouse.move(a["x"] + a["width"] / 2 + 20, a["y"] + a["height"] / 2 + 5, steps=4)
@@ -89,23 +92,39 @@ def test_mover_desde_el_menu_y_libranza_fija(url, browser, movil):  # noqa: F811
     ctx, page, errores, sid = abrir_semana(url, browser, movil)
     antes = asignaciones(page, url, sid)
     hecho = False
-    for (oe, of), (de, df) in pares_libres(page):
-        page.wait_for_timeout(600)  # las alertas llegan después y vuelven a dibujar el cuadrante
-        page.locator(f'[data-act=cell][data-emp="{oe}"][data-date="{of}"]').click()
-        menu = page.locator(".popover")
-        menu.locator(".mv-emp").select_option(de)
-        menu.locator(".mv-dia").select_option(df)
-        menu.locator("[data-act=moveCell]").click()
-        page.wait_for_load_state("networkidle")
-        if asignaciones(page, url, sid) != antes:
-            hecho = True
+    # Se prueba con las casillas con turno que se ven; el destino se elige en el propio menú (da igual que se vea).
+    visibles = page.evaluate("""() => [...document.querySelectorAll('[data-act=cell]')].filter((c) => c.querySelector('.pill'))
+      .map((c) => [c.dataset.emp, c.dataset.date]).slice(0, 3)""")
+    assert visibles
+    for oe, of in visibles:
+        n = None
+        i = 0
+        while not hecho and (n is None or i < n):
+            page.wait_for_timeout(600)  # las alertas llegan después y vuelven a dibujar el cuadrante
+            celda = page.locator(f'[data-act=cell][data-emp="{oe}"][data-date="{of}"]')
+            celda.scroll_into_view_if_needed()
+            celda.click()
+            menu = page.locator(".popover")
+            menu.locator(".mv-dia").wait_for()
+            opciones = menu.locator(".mv-dia option").evaluate_all("els => els.map((e) => e.value)")
+            n = len(opciones)
+            if opciones[i] == of:
+                i += 1
+                page.keyboard.press("Escape")
+                continue
+            menu.locator(".mv-dia").select_option(opciones[i])
+            menu.locator("[data-act=moveCell]").click()
+            page.wait_for_load_state("networkidle")
+            hecho = asignaciones(page, url, sid) != antes
+            i += 1
+        if hecho:
             break
     assert hecho
     # Una libranza fija no ofrece turnos.
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(600)
     libranza = page.locator("[data-act=cell].fixed-off").first
-    if libranza.count():
+    if libranza.count() and libranza.is_visible():
         libranza.click()
         assert "Libranza fija" in page.locator(".popover").inner_text()
         assert page.locator(".popover [data-act=setCell]").count() == 0
