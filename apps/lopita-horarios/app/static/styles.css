@@ -723,3 +723,23 @@ input[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--ba
 /* Reglas: qué alertas recibir, en casillas de dos columnas (se ve cuáles están apagadas). */
 .alertas-casillas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; }
 @media (max-width: 600px) { .alertas-casillas { grid-template-columns: 1fr; } }
+
+/* Vacaciones: plano anual (una columna por semana) */
+.vac-form { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-top: 12px; }
+.vac-form .field { min-width: 150px; }
+.vac-wrap { max-width: 100%; }
+.vac-tabla { border-collapse: separate; border-spacing: 0; font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
+.vac-tabla th, .vac-tabla td { padding: 0; text-align: center; border-bottom: 1px solid var(--line); }
+.vac-tabla .vac-nom { position: sticky; left: 0; z-index: 1; background: var(--card); text-align: left; padding: 6px 10px; min-width: 110px; font-weight: 600; font-size: var(--text-sm); white-space: nowrap; }
+.vac-tabla .vac-dias { padding: 0 8px; min-width: 40px; color: var(--muted); }
+.vac-mes { text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-left: 1px solid var(--line); padding: 4px 0; }
+.vac-sem { color: var(--faint); min-width: 24px; height: 22px; font-weight: 400; }
+.vac-c { min-width: 24px; height: 28px; border-left: 1px solid var(--track); font-weight: 700; }
+.vac-c.vacaciones { background: var(--gold-soft); color: var(--brown); }
+.vac-c.vacaciones.llena { background: var(--cov-ok); color: var(--black); }
+.vac-c.baja { background: var(--bad-soft); color: var(--bad); }
+.vac-c.permiso, .vac-c.otro { background: var(--track); color: var(--ink); }
+.vac-c.llena { box-shadow: inset 0 -3px 0 currentColor; }
+.vac-c.total.media { background: var(--warn-soft); color: var(--warn); }
+.vac-c.total.alta { background: var(--bad-soft); color: var(--bad); }
+.vac-tabla tfoot th, .vac-tabla tfoot td { border-top: 2px solid var(--line-strong); }

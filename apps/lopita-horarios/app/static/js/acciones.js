@@ -18,6 +18,7 @@ import './pantallas/cuenta.js';
 import './pantallas/demanda.js';
 import './pantallas/dia.js';
 import './pantallas/equipo.js';
+import './pantallas/vacaciones.js';
 import './pantallas/funciones.js';
 import './pantallas/historial.js';
 import './pantallas/horarios.js';

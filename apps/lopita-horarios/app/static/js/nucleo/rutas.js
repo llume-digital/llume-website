@@ -11,6 +11,7 @@ import { viewFunciones } from '../pantallas/funciones.js';
 import { viewTurnos } from '../pantallas/turnos.js';
 import { viewDemanda } from '../pantallas/demanda.js';
 import { viewAusencias } from '../pantallas/ausencias.js';
+import { viewVacaciones } from '../pantallas/vacaciones.js';
 import { viewPreferencias } from '../pantallas/preferencias.js';
 import { viewReglas } from '../pantallas/reglas.js';
 import { viewAjustes } from '../pantallas/ajustes.js';
@@ -32,7 +33,7 @@ export function route() {
 const VISTAS_TRABAJADORA = { inicio: viewMiInicio, horas: viewMisHoras, vacaciones: viewMisVacaciones, preferencias: viewMisPrefs, guia: viewGuia };
 const VISTAS_ENCARGADO = (r) => ({
   horarios: r.arg ? (r.arg2 === 'historial' ? () => viewHistorial(Number(r.arg)) : () => viewDetalle(Number(r.arg))) : viewHorarios,
-  calendario: viewCalendario, alertas: viewAlertas, solicitudes: viewSolicitudes, informes: viewInformes, equipo: viewEquipo, funciones: viewFunciones, turnos: viewTurnos, demanda: viewDemanda, ausencias: viewAusencias, preferencias: viewPreferencias, reglas: viewReglas, web: viewWeb, comentarios: viewComentarios, ajustes: viewAjustes, novedades: viewNovedades, guia: viewGuia })
+  calendario: viewCalendario, alertas: viewAlertas, solicitudes: viewSolicitudes, informes: viewInformes, equipo: viewEquipo, funciones: viewFunciones, turnos: viewTurnos, demanda: viewDemanda, ausencias: viewAusencias, vacaciones: viewVacaciones, preferencias: viewPreferencias, reglas: viewReglas, web: viewWeb, comentarios: viewComentarios, ajustes: viewAjustes, novedades: viewNovedades, guia: viewGuia })
 
 // Dirección de un horario en una vista: #/horarios/12 (semana), #/horarios/12/mes y #/horarios/12/dia/2026-11-10.
 export function urlDetalle(id, vista, fecha) {
