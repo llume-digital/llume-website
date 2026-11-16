@@ -373,3 +373,20 @@ def test_celda_con_horario_concreto(env):
     assert (a["inicio"], a["fin"]) == ("07:00", "13:00")
     assert admin.patch(f"/api/horarios/{sid}/celda", json={**celda, "inicio": "13:00", "fin": "10:00"}).status_code == 400
     assert admin.patch(f"/api/horarios/{sid}/celda", json={**celda, "inicio": "10:00"}).status_code == 400
+
+
+def test_aprobar_solicitud_que_choca_con_ausencia_apuntada_da_409(env):
+    app, admin = env
+    sid, lunes = make_week(admin, publish=True)
+    horario = admin.get(f"/api/horarios/{sid}").json()["horario"]
+    dia = (lunes + dt.timedelta(days=2)).isoformat()
+    emp = next(a["empleado_id"] for a in horario["asignaciones"] if a["fecha"] == dia)
+    w = worker_client(app, admin, emp)
+    assert w.post("/api/mi/ausencias", json={"desde": dia, "hasta": dia, "motivo": "vacaciones"}).status_code == 200
+    g = admin.get("/api/config").json()
+    cfg = g.get("config", g)
+    cfg["ausencias"].append({"empleado_id": emp, "desde": dia, "hasta": dia, "motivo": "vacaciones"})
+    r = admin.put("/api/config", json={"config": cfg, "base": g.get("version", admin.get("/api/config").json().get("version"))})
+    assert r.status_code == 200, r.text
+    rid = admin.get("/api/solicitudes?estado=pendiente").json()[0]["id"]
+    assert admin.post(f"/api/solicitudes/{rid}/resolver", json={"accion": "aprobar"}).status_code == 409

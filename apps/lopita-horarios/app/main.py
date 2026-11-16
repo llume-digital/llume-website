@@ -1265,6 +1265,10 @@ def create_app(db_path: str | None = None, slack: Slack | None = None, secret: s
         if body.accion == "aprobar":
             if r["tipo"] == "ausencia":
                 d = r["datos"]
+                for a in config.ausencias:
+                    if a.empleado_id == r["empleado_id"] and a.desde <= dt.date.fromisoformat(d["hasta"]) and dt.date.fromisoformat(d["desde"]) <= a.hasta:
+                        raise HTTPException(409, f"{config.employee(r['empleado_id']).nombre} ya tiene una ausencia apuntada que coincide "
+                                                 f"({a.desde} – {a.hasta}). Quítala en Ausencias o rechaza esta solicitud.")
                 cfg = config.model_copy(deep=True)
                 cfg.ausencias.append(Absence(empleado_id=r["empleado_id"], desde=d["desde"], hasta=d["hasta"], motivo=d["motivo"]))
                 version = save_cfg(cfg, u, f"Ausencia aprobada: {config.employee(r['empleado_id']).nombre}")
