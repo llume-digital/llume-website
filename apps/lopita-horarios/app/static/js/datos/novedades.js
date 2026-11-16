@@ -7,6 +7,10 @@
 // - Lo puramente interno (tests, refactors, CI, documentación) no lleva entrada: el PR lo dice con «Sin novedades: …».
 // La comprobación de CI (herramientas/comprobar_novedades.py) falla si un PR toca la app sin pasar por aquí.
 export const NOVEDADES = [
+  { fecha: '2026-11-16', titulo: 'Vacaciones: fechas más cómodas y sin solapes', ir: 'vacaciones', texto: [
+    'Al elegir la <b>salida</b> de unas vacaciones, la <b>vuelta</b> se pone sola el mismo día (ya no se queda con la fecha de antes) y no deja elegir un día anterior.',
+    'Ya no se pueden apuntar vacaciones encima de otra ausencia de la misma persona, y si las fechas cruzan de un año a otro, el aviso cuenta los días de cada año. Al aprobar una solicitud que choca con una ausencia ya apuntada, la app te lo dice.',
+  ] },
   { fecha: '2026-11-10', titulo: 'Mover turnos arrastrando y turnos de cocina o camarero', ir: 'horarios', texto: [
     'En el cuadrante puedes <b>arrastrar el turno</b> de una casilla a otra: a otro día, a otra persona o a las dos cosas (en el móvil, mantén pulsado un momento). Si la casilla de destino ya tenía turno, se intercambian. Si no te va el arrastre, al tocar una casilla tienes <b>Mover el turno</b>.',
     'Los turnos pueden ser <b>de cocina o de camarero</b> (en <b>Turnos</b>, campo <b>Para</b>): solo los hace quien trabaja en ese puesto.',

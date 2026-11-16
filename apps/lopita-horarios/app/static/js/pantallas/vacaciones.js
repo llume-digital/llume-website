@@ -43,8 +43,11 @@ function previsualizar(f) {
   const fuera = new Set([f.emp, ...Object.keys(otros)].filter((id) => plantilla().some((e) => e.id === id && !e.comodin))).size;
   const dias = daysBetween(f.desde, f.hasta) + 1;
   const emp = plantilla().find((e) => e.id === f.emp);
-  const sd = emp ? saldoVacaciones({ ...state.draft, ausencias: [...state.draft.ausencias, { empleado_id: f.emp, desde: f.desde, hasta: f.hasta, motivo: 'vacaciones' }] }, emp, Number(f.desde.slice(0, 4)), todayIso()) : null;
-  const pasa = sd && sd.quedan < 0 ? ` <span style="color:var(--warn)">Con estos días se pasa ${-sd.quedan} de los ${sd.derecho} que le corresponden este año.</span>` : sd ? ` Le quedarían ${sd.quedan} de ${sd.derecho} días.` : '';
+  // Si las fechas cruzan de año, se comprueba el saldo de cada uno de los dos años.
+  const cfgNuevo = { ...state.draft, ausencias: [...state.draft.ausencias, { empleado_id: f.emp, desde: f.desde, hasta: f.hasta, motivo: 'vacaciones' }] };
+  const anios = [...new Set([f.desde.slice(0, 4), f.hasta.slice(0, 4)])].map(Number);
+  const saldos = emp ? anios.map((y) => ({ y, sd: saldoVacaciones(cfgNuevo, emp, y, todayIso()) })) : [];
+  const pasa = saldos.map(({ y, sd }) => (sd.quedan < 0 ? ` <span style="color:var(--warn)">Con estos días se pasa ${-sd.quedan} de los ${sd.derecho} que le corresponden en ${y}.</span>` : ` Le quedarían ${sd.quedan} de ${sd.derecho} días en ${y}.`)).join('');
   return `<p class="small" id="vac-aviso" role="status">${dias} ${dias === 1 ? 'día' : 'días'}. ${quien.length ? `Coincide con ${quien.join(', ')}. ` : 'No coincide con nadie. '}${total ? `En el peor momento quedarían <b>${Math.max(total - fuera, 0)} de ${total}</b> personas de plantilla.` : ''}${propias.length ? ' <span style="color:var(--warn)">Ya tiene otra ausencia en esas fechas.</span>' : ''}${pasa}</p>`;
 }
 
@@ -60,7 +63,7 @@ export function viewVacaciones() {
   const anio = f.anio;
   const gente = plantilla();
   if (!f.emp || !gente.some((e) => e.id === f.emp)) f.emp = gente[0] ? gente[0].id : '';
-  if (!f.desde) { f.desde = `${anio}-01-01` > todayIso() ? `${anio}-07-01` : todayIso(); f.hasta = addDays(f.desde, 13); }
+  if (!f.desde) { f.desde = `${anio}-01-01` > todayIso() ? `${anio}-07-01` : todayIso(); f.hasta = f.desde; }
   const semanas = semanasDe(anio);
   const ausDe = (id) => state.draft.ausencias.filter((a) => a.empleado_id === id);
   const reales = gente.filter((e) => !e.comodin);
@@ -95,7 +98,7 @@ export function viewVacaciones() {
     ${gente.length ? `<form id="vac-form" class="vac-form">
       <label class="field">Persona<select name="emp" data-act-change="vacCampo">${gente.map((e) => `<option value="${esc(e.id)}" ${e.id === f.emp ? 'selected' : ''}>${esc(e.nombre)}</option>`).join('')}</select></label>
       <label class="field">Salida<input type="date" name="desde" value="${f.desde}" data-act-change="vacCampo"></label>
-      <label class="field">Vuelta (último día)<input type="date" name="hasta" value="${f.hasta}" data-act-change="vacCampo"></label>
+      <label class="field">Vuelta (último día)<input type="date" name="hasta" value="${f.hasta}" min="${f.desde}" data-act-change="vacCampo"></label>
       <button type="button" class="btn primary" data-act="vacAnadir">${ICON.plus} Añadir vacaciones</button></form>
       ${previsualizar(f)}` : '<p class="muted small">Primero añade a alguien en Equipo.</p>'}
   </div>
@@ -117,17 +120,22 @@ export function viewVacaciones() {
 }
 
 Object.assign(actions, {
-  vacAnio: (el) => { vac().anio = Number(el.dataset.anio); vac().desde = ''; renderView(); },
+  vacAnio: (el) => { vac().anio = Number(el.dataset.anio); vac().desde = ''; vac().hasta = ''; renderView(); },
   vacCampo: (el) => {
     const f = vac(); f[el.name] = el.value;
-    if (el.name === 'desde' && f.hasta < f.desde) f.hasta = addDays(f.desde, 6);
+    // Al elegir la salida, la vuelta se preselecciona el mismo día (nunca conserva la de antes).
+    if (el.name === 'desde') f.hasta = f.desde;
     renderView();
   },
   vacAnadir: () => {
     const f = vac();
     if (!f.emp || !f.desde || !f.hasta) { toast('Elige la persona y las fechas', true); return; }
     if (f.hasta < f.desde) { toast('La vuelta no puede ser anterior a la salida', true); return; }
+    const choca = state.draft.ausencias.find((a) => a.empleado_id === f.emp && a.hasta >= f.desde && a.desde <= f.hasta);
+    if (choca) { toast(`${empName(f.emp)} ya tiene ${MOTIVOS[choca.motivo].toLowerCase()} del ${fmtRange(choca.desde, choca.hasta)}. Quítala o cambia las fechas.`, true); return; }
     state.draft.ausencias.push({ empleado_id: f.emp, desde: f.desde, hasta: f.hasta, motivo: 'vacaciones' });
+    // Tras apuntar, la siguiente salida arranca vacía de fechas viejas: se parte de la vuelta + 1.
+    f.desde = addDays(f.hasta, 1); f.hasta = f.desde;
     markDirty(); toast('Vacaciones apuntadas. Guarda los cambios para que cuenten.'); renderView();
   },
 });
