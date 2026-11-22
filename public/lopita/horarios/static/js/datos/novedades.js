@@ -7,6 +7,18 @@
 // - Lo puramente interno (tests, refactors, CI, documentación) no lleva entrada: el PR lo dice con «Sin novedades: …».
 // La comprobación de CI (herramientas/comprobar_novedades.py) falla si un PR toca la app sin pasar por aquí.
 export const NOVEDADES = [
+  { fecha: '2026-11-23', titulo: 'Varias personas con el mismo turno', ir: 'turnos', texto: [
+    'En <b>Turnos</b> cada turno tiene ahora <b>Personas el mismo día</b>: pon 2 o más y el generador intentará que ese turno lo hagan esas personas cada día que exista.',
+    'Con 1 (lo normal) todo sigue igual y lo decide el generador según la demanda. Los botones <b>7–13</b> y <b>10–18</b> ya no están: usa <b>Añadir turno</b>.',
+  ] },
+  { fecha: '2026-11-22', titulo: 'Quitar vacaciones es más fácil, y nuevas semanas tipo', ir: 'semanas', texto: [
+    'Quitar unas vacaciones ya puestas es más visible: en <b>Vacaciones</b> y <b>Ausencias</b> hay un botón <b>Quitar</b> con texto, tocar una casilla del plano te lleva a su fila, y en el cuadrante, al tocar el día de alguien que está ausente, tienes <b>Quitar vacaciones</b> (se guarda al momento y los horarios se arreglan solos). Si eres trabajador, tu pantalla te dice que se lo pidas a tu encargado.',
+    'Nueva pantalla <b>Semanas tipo</b> (dentro de Equipo): creas plantillas de semana (qué turno hace cada día) y haces que una persona las siga en orden, por ejemplo semanas alternas o un ciclo de cuatro. Al generar un horario de esas fechas se aplican solas, y también puedes intercambiar la rotación de dos personas con las mismas horas.',
+  ] },
+  { fecha: '2026-11-16', titulo: 'Vacaciones: fechas más cómodas y sin solapes', ir: 'vacaciones', texto: [
+    'Al elegir la <b>salida</b> de unas vacaciones, la <b>vuelta</b> se pone sola el mismo día (ya no se queda con la fecha de antes) y no deja elegir un día anterior.',
+    'Ya no se pueden apuntar vacaciones encima de otra ausencia de la misma persona, y si las fechas cruzan de un año a otro, el aviso cuenta los días de cada año. Al aprobar una solicitud que choca con una ausencia ya apuntada, la app te lo dice.',
+  ] },
   { fecha: '2026-11-10', titulo: 'Mover turnos arrastrando y turnos de cocina o camarero', ir: 'horarios', texto: [
     'En el cuadrante puedes <b>arrastrar el turno</b> de una casilla a otra: a otro día, a otra persona o a las dos cosas (en el móvil, mantén pulsado un momento). Si la casilla de destino ya tenía turno, se intercambian. Si no te va el arrastre, al tocar una casilla tienes <b>Mover el turno</b>.',
     'Los turnos pueden ser <b>de cocina o de camarero</b> (en <b>Turnos</b>, campo <b>Para</b>): solo los hace quien trabaja en ese puesto.',
