@@ -1,5 +1,5 @@
 import { ICON, TIPOS_TURNO, esc, fmtH, toMin } from '../nucleo/util.js';
-import { state, toast } from '../nucleo/estado.js';
+import { state } from '../nucleo/estado.js';
 import { dayChips, head, renderView } from '../nucleo/pintado.js';
 import { conDeshacer } from '../nucleo/borrador.js';
 import { getPath, markDirty, setPath } from '../nucleo/enlace.js';
@@ -13,7 +13,7 @@ export function timeline(items, from = 6 * 60, to = 24 * 60) {
 
 export function viewTurnos() {
   const t = state.draft.turnos;
-  return `${head('Turnos', 'El catálogo de turnos entre los que elige el motor. Solo quien esté habilitado hará los de apertura y cierre.', `<button class="btn" data-act="addShiftPreset" data-ini="07:00" data-fin="13:00">${ICON.plus} 7–13</button><button class="btn" data-act="addShiftPreset" data-ini="10:00" data-fin="18:00">${ICON.plus} 10–18</button><button class="btn primary" data-act="addShift">${ICON.plus} Añadir turno</button>`)}
+  return `${head('Turnos', 'El catálogo de turnos entre los que elige el motor. Solo quien esté habilitado hará los de apertura y cierre.', `<button class="btn primary" data-act="addShift">${ICON.plus} Añadir turno</button>`)}
   ${t.length ? `<div class="grid">${t.map((s, i) => {
     const hrs = (toMin(s.fin) - toMin(s.inicio)) / 60;
     return `<div class="card">
@@ -25,6 +25,7 @@ export function viewTurnos() {
       <label class="field">Salida<input type="time" step="900" value="${s.fin === '24:00' ? '23:59' : s.fin}" data-bind="turnos.${i}.fin" data-rerender></label>
       <label class="field">Tipo<select data-bind="turnos.${i}.tipo">${Object.entries(TIPOS_TURNO).map(([k, v]) => `<option value="${k}" ${s.tipo === k ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
       <label class="field">Para<select data-bind="turnos.${i}.puesto" data-type="nullstr" data-rerender><option value="" ${!s.puesto ? 'selected' : ''}>Cualquiera</option><option value="sala" ${s.puesto === 'sala' ? 'selected' : ''}>Camarero</option><option value="cocina" ${s.puesto === 'cocina' ? 'selected' : ''}>Cocina</option></select></label>
+      <label class="field">Personas el mismo día<input type="number" min="1" max="20" value="${s.plazas || 1}" data-bind="turnos.${i}.plazas" data-type="int" title="1: lo decide el motor. 2 o más: intenta poner a esas personas con este turno cada día que exista."></label>
       <label class="field">Color<input class="swatch-input" type="color" value="${esc(s.color || '#E8D5B0')}" data-bind="turnos.${i}.color" data-rerender></label>
       <div class="field">Duración<b style="color:var(--ink);padding-top:8px">${hrs > 0 ? `${fmtH(hrs)} h` : '<span style="color:var(--bad)">revisa las horas</span>'}</b></div>
     </div>
@@ -47,14 +48,6 @@ Object.assign(actions, {
     const ids = state.draft.turnos.map((s) => s.id);
     let n = 1; while (ids.includes(`T${n}`)) n++;
     state.draft.turnos.push({ id: `T${n}`, nombre: 'Nuevo turno', inicio: '09:00', fin: '15:00', tipo: 'normal', dias: null, color: '#E8D5B0', puesto: null });
-    markDirty(); renderView();
-  },
-  addShiftPreset: (el) => {
-    const { ini, fin } = el.dataset;
-    if (state.draft.turnos.some((s) => s.inicio === ini && s.fin === fin)) { toast(`Ya tienes un turno de ${ini}–${fin}`, true); return; }
-    const ids = state.draft.turnos.map((s) => s.id);
-    let n = 1; while (ids.includes(`T${n}`)) n++;
-    state.draft.turnos.push({ id: `T${n}`, nombre: `${Number(ini.slice(0, 2))}–${Number(fin.slice(0, 2))}`, inicio: ini, fin, tipo: 'normal', dias: null, color: '#E8D5B0' });
     markDirty(); renderView();
   },
   delShift: (el) => {

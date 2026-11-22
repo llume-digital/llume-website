@@ -231,6 +231,8 @@ class Shift(BaseModel):
     color: Optional[str] = None
     puesto: Optional[Puesto] = Field(default=None, description="Si el turno es de cocina o de camarero (sala); "
                                      "vacío = lo puede hacer cualquiera")
+    plazas: int = Field(default=1, ge=0, le=20, description="Personas que hacen este turno el mismo día; "
+                        "1 = lo decide el motor, 2 o más = intenta ponerlas cada día que exista el turno")
 
     @model_validator(mode="after")
     def _check_times(self) -> "Shift":
