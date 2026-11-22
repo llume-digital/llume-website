@@ -1,5 +1,5 @@
 import { ICON, TIPOS_TURNO, esc, fmtH, toMin } from '../nucleo/util.js';
-import { state, toast } from '../nucleo/estado.js';
+import { state } from '../nucleo/estado.js';
 import { dayChips, head, renderView } from '../nucleo/pintado.js';
 import { conDeshacer } from '../nucleo/borrador.js';
 import { getPath, markDirty, setPath } from '../nucleo/enlace.js';
