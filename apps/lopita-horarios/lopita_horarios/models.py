@@ -363,6 +363,52 @@ class AssignmentOverride(BaseModel):
         return self
 
 
+class SemanaTipo(BaseModel):
+    """Plantilla de semana: qué turno hace cada día. Un día que no aparece, libra."""
+    id: str
+    nombre: str
+    dias: dict[str, str] = Field(default_factory=dict, description="Día de la semana -> id de turno; el que falta libra")
+
+    @model_validator(mode="after")
+    def _check(self) -> "SemanaTipo":
+        seen = set()
+        for d in self.dias:
+            i = weekday_index(d)
+            if i in seen:
+                raise ValueError(f"Semana tipo «{self.nombre}»: el día {d} está repetido")
+            seen.add(i)
+        return self
+
+    def turno_del(self, weekday: int) -> Optional[str]:
+        return next((t for d, t in self.dias.items() if weekday_index(d) == weekday), None)
+
+
+class Rotacion(BaseModel):
+    """Una persona sigue una lista de semanas tipo en orden y vuelve a empezar; la semana i usa ``semanas[i % len]``.
+
+    Las semanas se cuentan desde el lunes de ``desde``.
+    """
+    empleado_id: str
+    semanas: list[str]
+    desde: dt.date
+    hasta: Optional[dt.date] = None
+
+    @model_validator(mode="after")
+    def _check(self) -> "Rotacion":
+        if not self.semanas:
+            raise ValueError("Una rotación necesita al menos una semana tipo")
+        if self.hasta is not None and self.hasta < self.desde:
+            raise ValueError("La rotación termina antes de empezar")
+        return self
+
+    def covers(self, date: dt.date) -> bool:
+        return self.desde <= date and (self.hasta is None or date <= self.hasta)
+
+    def semana_id(self, date: dt.date) -> str:
+        lunes = self.desde - dt.timedelta(days=self.desde.weekday())
+        return self.semanas[((date - lunes).days // 7) % len(self.semanas)]
+
+
 class Preference(BaseModel):
     """Preferencia blanda: se respeta si no compromete la cobertura."""
     empleado_id: str
@@ -463,6 +509,8 @@ class Config(BaseModel):
     funciones: list[Funcion] = Field(default_factory=list, description="Funciones que define el encargado, con sus reglas")
     ausencias: list[Absence] = Field(default_factory=list)
     excepciones_asignacion: list[AssignmentOverride] = Field(default_factory=list)
+    semanas_tipo: list[SemanaTipo] = Field(default_factory=list, description="Plantillas de semana para rotaciones")
+    rotaciones: list[Rotacion] = Field(default_factory=list, description="Qué semanas tipo sigue cada persona y desde cuándo")
     preferencias: list[Preference] = Field(default_factory=list)
     reglas: Rules = Field(default_factory=Rules)
     pesos: Weights = Field(default_factory=Weights)
@@ -511,6 +559,23 @@ class Config(BaseModel):
             for s in p.turnos:
                 if s not in shift_ids:
                     raise ValueError(f"Turno desconocido en preferencia: {s}")
+        week_ids = {w.id for w in self.semanas_tipo}
+        if len(week_ids) != len(self.semanas_tipo):
+            raise ValueError("Hay ids de semana tipo repetidos")
+        for w in self.semanas_tipo:
+            for t in w.dias.values():
+                if t not in shift_ids:
+                    raise ValueError(f"Semana tipo «{w.nombre}»: turno desconocido «{t}»")
+        for r in self.rotaciones:
+            if r.empleado_id not in emp_ids:
+                raise ValueError(f"Empleado desconocido en rotación: {r.empleado_id}")
+            for w in r.semanas:
+                if w not in week_ids:
+                    raise ValueError(f"Semana tipo desconocida en rotación: {w}")
+        for i, a in enumerate(self.rotaciones):
+            for b in self.rotaciones[i + 1:]:
+                if a.empleado_id == b.empleado_id and a.desde <= (b.hasta or dt.date.max) and b.desde <= (a.hasta or dt.date.max):
+                    raise ValueError(f"{self.employee(a.empleado_id).nombre}: tiene rotaciones que se solapan")
         return self
 
     # --- utilidades -------------------------------------------------------
@@ -547,9 +612,25 @@ class Config(BaseModel):
         return next((a for a in self.ausencias if a.empleado_id == emp_id and a.covers(date)), None)
 
     def override_for(self, emp_id: str, date: dt.date) -> Optional[AssignmentOverride]:
-        return next(
-            (o for o in self.excepciones_asignacion if o.empleado_id == emp_id and o.fecha == date), None
-        )
+        """Lo fijado para esa persona ese día: primero la petición manual y, si no hay, lo que marca su rotación."""
+        manual = next((o for o in self.excepciones_asignacion if o.empleado_id == emp_id and o.fecha == date), None)
+        if manual is not None or not self.rotaciones:
+            return manual
+        rot = next((r for r in self.rotaciones if r.empleado_id == emp_id and r.covers(date)), None)
+        if rot is None:
+            return None
+        sid = rot.semana_id(date)
+        semana = next((w for w in self.semanas_tipo if w.id == sid), None)
+        if semana is None:
+            return None
+        turno = semana.turno_del(date.weekday())
+        if turno is None:
+            return AssignmentOverride(empleado_id=emp_id, fecha=date, tipo="libre")
+        return AssignmentOverride(empleado_id=emp_id, fecha=date, tipo="turno", turno_id=turno)
+
+    def horas_semana_tipo(self, semana: SemanaTipo) -> float:
+        """Horas que suma una semana tipo."""
+        return sum(self.shift(t).hours for t in semana.dias.values())
 
     def turno_de(self, a: "Assignment | AssignmentOverride | Lock") -> Shift:
         """El turno que se hace de verdad: el definido o, si lleva horas a medida, ese turno con esas horas."""

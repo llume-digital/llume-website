@@ -493,6 +493,7 @@ export function openCellMenu(btn) {
   m.setAttribute('role', 'menu');
   m.innerHTML = `<div class="ph"><b>${esc(emp.nombre)}</b> · ${fmtLong(d)}${absence ? `<br><span style="color:var(--warn)">${esc(MOTIVOS[absence.motivo])}</span>` : fixedOff ? '<br>Es su día de libranza' : ''}</div>
     ${fixedOff && !cur ? '<button role="menuitem" disabled>Libranza fija <small>no se le puede poner turno. Cámbiala en Equipo</small></button>' : cfg.turnos.map((s) => `<button role="menuitem" class="${cur && cur.turno_id === s.id ? 'current' : ''}" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="${esc(s.id)}"><i style="background:${esc(s.color || 'var(--track)')}"></i>${esc(s.nombre)}${s.puesto ? ` · ${esc(PUESTOS[s.puesto])}` : ''} <small>${s.inicio}–${s.fin}${note(s) ? ` · <span class="warn-note">${note(s)}</span>` : ''}</small></button>`).join('')}
+    ${absence ? `<hr><button role="menuitem" class="danger-text" data-act="quitarAusencia" data-emp="${esc(emp.id)}" data-date="${d}">${ICON.trash} Quitar ${esc(MOTIVOS[absence.motivo].toLowerCase())} <small>(${esc(fmtRange(absence.desde, absence.hasta))})</small></button>` : ''}
     <hr>${cur
       ? `<button role="menuitem" class="danger-text" data-act="setCell" data-emp="${esc(emp.id)}" data-date="${d}" data-shift="">${ICON.trash} Quitar el turno <small>ese día libra</small></button>`
       : '<button role="menuitem" class="current" disabled>Libre <small>no tiene turno</small></button>'}
@@ -519,6 +520,14 @@ export function menuOnScroll(e) {
 
 // ------------------------------------------------------------------ acciones de la pantalla
 Object.assign(actions, {
+  // Quita la ausencia de esa persona ese día (entera) y guarda al momento; los horarios se arreglan solos al guardar.
+  quitarAusencia: async (el) => {
+    closeMenu();
+    const i = state.draft.ausencias.findIndex((a) => a.empleado_id === el.dataset.emp && a.desde <= el.dataset.date && el.dataset.date <= a.hasta);
+    if (i < 0) return;
+    state.draft.ausencias.splice(i, 1);
+    await saveConfig();
+  },
   setVista: async (el) => {
     if (el.dataset.v === state.vista) return;
     if (state.vista === 'dia' && !(await diaDescartable())) return;
