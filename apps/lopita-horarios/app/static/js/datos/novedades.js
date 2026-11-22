@@ -7,6 +7,10 @@
 // - Lo puramente interno (tests, refactors, CI, documentación) no lleva entrada: el PR lo dice con «Sin novedades: …».
 // La comprobación de CI (herramientas/comprobar_novedades.py) falla si un PR toca la app sin pasar por aquí.
 export const NOVEDADES = [
+  { fecha: '2026-11-23', titulo: 'Varias personas con el mismo turno', ir: 'turnos', texto: [
+    'En <b>Turnos</b> cada turno tiene ahora <b>Personas el mismo día</b>: pon 2 o más y el generador intentará que ese turno lo hagan esas personas cada día que exista.',
+    'Con 1 (lo normal) todo sigue igual y lo decide el generador según la demanda. Los botones <b>7–13</b> y <b>10–18</b> ya no están: usa <b>Añadir turno</b>.',
+  ] },
   { fecha: '2026-11-16', titulo: 'Vacaciones: fechas más cómodas y sin solapes', ir: 'vacaciones', texto: [
     'Al elegir la <b>salida</b> de unas vacaciones, la <b>vuelta</b> se pone sola el mismo día (ya no se queda con la fecha de antes) y no deja elegir un día anterior.',
     'Ya no se pueden apuntar vacaciones encima de otra ausencia de la misma persona, y si las fechas cruzan de un año a otro, el aviso cuenta los días de cada año. Al aprobar una solicitud que choca con una ausencia ya apuntada, la app te lo dice.',

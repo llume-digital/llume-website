@@ -197,6 +197,17 @@ def generate(
                 model.Add(wk_under >= lower - already - sum(terms))
                 penalties.append(w.horas_por_debajo_contrato * wk_under)
 
+    # ------------------------------------------------------------------ turnos con varias plazas
+    # Un turno con «plazas» >= 2 intenta tener a esas personas cada día que existe (blando, como la cobertura).
+    for d in days:
+        for s in config.turnos:
+            if s.plazas < 2 or not s.available_on(d):
+                continue
+            quienes = [v for (_, dd, sid, _, _), v in x.items() if dd == d and sid == s.id]
+            falta = model.NewIntVar(0, s.plazas, f"plazas_{d}_{s.id}")
+            model.Add(falta >= s.plazas - sum(quienes)) if quienes else model.Add(falta == s.plazas)
+            penalties.append(w.falta_cobertura * res * falta)
+
     # ------------------------------------------------------------------ cobertura
     for d in days:
         dem = demands[d]
