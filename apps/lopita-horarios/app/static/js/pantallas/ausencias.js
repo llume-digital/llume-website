@@ -19,7 +19,7 @@ export function viewAusencias() {
       <td><input type="date" value="${a.hasta}" data-bind="ausencias.${i}.hasta" data-rerender></td>
       <td style="min-width:130px"><select data-bind="ausencias.${i}.motivo">${Object.entries(MOTIVOS).map(([k, v]) => `<option value="${k}" ${a.motivo === k ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
       <td class="num">${a.hasta >= a.desde ? daysBetween(a.desde, a.hasta) + 1 : '<span style="color:var(--bad)">!</span>'}</td>
-      <td><button class="icon-btn" data-act="delRow" data-list="ausencias" data-i="${i}" title="Quitar">${ICON.trash}</button></td></tr>`).join('')}
+      <td><button class="btn small danger-text" data-act="delRow" data-list="ausencias" data-i="${i}" aria-label="Quitar la ausencia del ${a.desde} al ${a.hasta}">${ICON.trash} Quitar</button></td></tr>`).join('')}
     </tbody></table></div>` : '<p class="muted small">No hay ausencias próximas.</p>'}
     ${hidden ? `<p class="small muted">${hidden} ausencias pasadas ocultas.</p>` : ''}
   </div>

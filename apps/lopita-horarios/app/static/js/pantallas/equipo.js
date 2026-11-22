@@ -181,6 +181,7 @@ Object.assign(actions, {
     c.ausencias = c.ausencias.filter((a) => a.empleado_id !== e.id);
     c.excepciones_asignacion = c.excepciones_asignacion.filter((a) => a.empleado_id !== e.id);
     c.preferencias = c.preferencias.filter((a) => a.empleado_id !== e.id);
+    c.rotaciones = (c.rotaciones || []).filter((a) => a.empleado_id !== e.id);
     markDirty(); irAEquipo(''); avisar();
   },
   bajaDialog: (el) => {
