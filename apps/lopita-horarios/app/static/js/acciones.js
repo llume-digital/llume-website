@@ -19,6 +19,7 @@ import './pantallas/demanda.js';
 import './pantallas/dia.js';
 import './pantallas/equipo.js';
 import './pantallas/vacaciones.js';
+import './pantallas/semanas.js';
 import './pantallas/funciones.js';
 import './pantallas/historial.js';
 import './pantallas/horarios.js';
@@ -141,6 +142,7 @@ export function renameRefs(kind, i, value) {
     c.turnos[i].id = value;
     c.preferencias.forEach((p) => { p.turnos = p.turnos.map((t) => (t === old ? value : t)); });
     c.excepciones_asignacion.forEach((o) => { if (o.turno_id === old) o.turno_id = value; });
+    (c.semanas_tipo || []).forEach((w) => { for (const d of Object.keys(w.dias)) if (w.dias[d] === old) w.dias[d] = value; });
   } else {
     const old = c.tipos_dia[i].nombre;
     if (value === old) return;

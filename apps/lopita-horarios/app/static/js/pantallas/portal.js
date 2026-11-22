@@ -168,6 +168,7 @@ export function viewMisVacaciones() {
       </form></div>
     <div class="card"><h2>Ausencias aprobadas</h2>
       ${ab.length ? `<table class="list"><tbody>${ab.map((a) => `<tr><td><b>${fmtRange(a.desde, a.hasta)}</b></td><td>${MOTIVOS[a.motivo] || ''}</td></tr>`).join('')}</tbody></table>` : '<p class="muted small">No tienes ausencias próximas.</p>'}
+      ${ab.length ? '<p class="muted small" style="margin-bottom:0">¿Ya no las necesitas? Pide a tu encargado que las quite.</p>' : ''}
     </div>
   </div>
   <div class="card section"><h2>Mis solicitudes</h2>${myRequests({ ...p, solicitudes: p.solicitudes.filter((r) => r.tipo === 'ausencia') })}</div>`;

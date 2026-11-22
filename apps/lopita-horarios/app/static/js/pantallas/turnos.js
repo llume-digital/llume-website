@@ -57,6 +57,7 @@ Object.assign(actions, {
     c.preferencias.forEach((p) => { p.turnos = p.turnos.filter((t) => t !== s.id); });
     c.preferencias = c.preferencias.filter((p) => p.turnos.length);
     c.excepciones_asignacion = c.excepciones_asignacion.filter((o) => o.turno_id !== s.id);
+    (c.semanas_tipo || []).forEach((w) => { for (const d of Object.keys(w.dias)) if (w.dias[d] === s.id) delete w.dias[d]; });
     markDirty(); renderView(); avisar();
   },
 });

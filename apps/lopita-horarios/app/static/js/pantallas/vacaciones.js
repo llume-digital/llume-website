@@ -84,7 +84,8 @@ export function viewVacaciones() {
       if (!mias.length) return '<td class="vac-c"></td>';
       const top = mias.sort((x, y) => y.n - x.n)[0];
       const n = mias.reduce((s, x) => s + x.n, 0);
-      return `<td class="vac-c ${top.a.motivo}${n >= 5 ? ' llena' : ''}" title="${esc(`${MOTIVOS[top.a.motivo]}: ${fmtRange(top.a.desde, top.a.hasta)}`)}">${MARCA[top.a.motivo]}</td>`;
+      const txt = `${MOTIVOS[top.a.motivo]}: ${fmtRange(top.a.desde, top.a.hasta)}`;
+      return `<td class="vac-c ${top.a.motivo}${n >= 5 ? ' llena' : ''}"><button type="button" class="vac-btn" data-act="vacIrFila" data-i="${state.draft.ausencias.indexOf(top.a)}" title="${esc(`${txt}. Toca para ir a su fila y quitarla`)}" aria-label="${esc(`${e.nombre}, ${txt}. Ir a su fila de la lista`)}">${MARCA[top.a.motivo]}</button></td>`;
     }).join('');
     const sd = saldoVacaciones(state.draft, e, anio, todayIso());
     return `<tr><th scope="row" class="vac-nom">${esc(e.nombre)}${e.comodin ? ' <span class="muted small">(comodín)</span>' : ''}</th><td class="num vac-dias" title="${sd.disfrutadas} disfrutados, ${sd.programadas} por disfrutar, de ${sd.derecho} que le corresponden">${sd.disfrutadas + sd.programadas}</td><td class="num vac-dias${sd.quedan < 0 ? ' pasa' : ''}">${textoQuedan(sd)}</td>${cel}</tr>`;
@@ -92,7 +93,7 @@ export function viewVacaciones() {
   const lista = state.draft.ausencias.map((a, i) => ({ a, i })).filter(({ a }) => a.desde <= `${anio}-12-31` && a.hasta >= `${anio}-01-01`)
     .sort((x, y) => x.a.desde.localeCompare(y.a.desde));
   const mejores = mejoresSemanas(anio, semanas, fuera);
-  return `${head('Vacaciones', 'Mira el año entero, apunta las vacaciones y comprueba cuántas personas quedan cada semana. Lo que apuntes aquí es lo mismo que en Ausencias.')}
+  return `${head('Vacaciones', 'Mira el año entero, apunta las vacaciones y comprueba cuántas personas quedan cada semana. Lo que apuntes aquí es lo mismo que en Ausencias. Para quitar unas vacaciones, pulsa <b>Quitar</b> en su fila de «Ausencias de año» (o toca su casilla en el plano para ir a ella) y guarda los cambios.')}
   <div class="card"><div class="row"><h2 style="margin:0">Año</h2>
     <div class="chips" role="group" aria-label="Año a planificar">${ANIOS_VACACIONES.map((y) => `<button type="button" class="chip${y === anio ? ' on' : ''}" aria-pressed="${y === anio}" data-act="vacAnio" data-anio="${y}">${y}</button>`).join('')}</div></div>
     ${gente.length ? `<form id="vac-form" class="vac-form">
@@ -113,14 +114,22 @@ export function viewVacaciones() {
   </div>
   <div class="card section"><h2 style="margin:0">Ausencias de ${anio}</h2>
     ${lista.length ? `<div class="table-wrap"><table class="list" style="margin-top:10px"><thead><tr><th>Persona</th><th>Fechas</th><th>Motivo</th><th class="num">Días</th><th><span class="sr-only">Quitar</span></th></tr></thead><tbody>
-    ${lista.map(({ a, i }) => `<tr><td>${esc(empName(a.empleado_id))}</td><td>${fmtRange(a.desde, a.hasta)}</td><td>${MOTIVOS[a.motivo]}</td><td class="num">${daysBetween(a.desde, a.hasta) + 1}</td>
-      <td><button class="icon-btn" data-act="delRow" data-list="ausencias" data-i="${i}" title="Quitar" aria-label="Quitar ${esc(empName(a.empleado_id))} ${a.desde}">${ICON.trash}</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted small">Todavía no hay nada apuntado este año.</p>'}
+    ${lista.map(({ a, i }) => `<tr id="aus-${i}"${a === f.resaltar ? ' class="resaltada"' : ''}><td>${esc(empName(a.empleado_id))}</td><td>${fmtRange(a.desde, a.hasta)}</td><td>${MOTIVOS[a.motivo]}</td><td class="num">${daysBetween(a.desde, a.hasta) + 1}</td>
+      <td><button class="btn small danger-text" data-act="delRow" data-list="ausencias" data-i="${i}" aria-label="Quitar ${esc(MOTIVOS[a.motivo].toLowerCase())} de ${esc(empName(a.empleado_id))} del ${fmtRange(a.desde, a.hasta)}">${ICON.trash} Quitar</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted small">Todavía no hay nada apuntado este año.</p>'}
     <p class="small muted" style="margin-bottom:0">Los cambios se guardan con el botón de abajo, igual que en Ausencias. Si ya hay horarios en esas fechas, la app los arregla sola al guardar.</p>
   </div>`;
 }
 
 Object.assign(actions, {
   vacAnio: (el) => { vac().anio = Number(el.dataset.anio); vac().desde = ''; vac().hasta = ''; renderView(); },
+  // Desde el plano: baja a la fila de esa ausencia, la resalta y deja el foco en su botón «Quitar».
+  vacIrFila: (el) => {
+    const a = state.draft.ausencias[Number(el.dataset.i)];
+    if (!a) return;
+    vac().resaltar = a; renderView();
+    const fila = document.getElementById(`aus-${el.dataset.i}`);
+    if (fila) { fila.scrollIntoView({ block: 'center' }); const b = fila.querySelector('button'); if (b) b.focus({ preventScroll: true }); }
+  },
   vacCampo: (el) => {
     const f = vac(); f[el.name] = el.value;
     // Al elegir la salida, la vuelta se preselecciona el mismo día (nunca conserva la de antes).
