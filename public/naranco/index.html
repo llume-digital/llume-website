@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Nar&amp;Co · Servicio de alquiler de bicicletas en Asturias</title>
+<meta name="description" content="Alquiler de bicicletas de carretera, gravel y eMTB en Oviedo. Reserva online en 4 pasos.">
+<meta name="theme-color" content="#212121">
+<link rel="icon" type="image/png" href="img/marca/favicon.png">
+<link rel="apple-touch-icon" href="img/marca/favicon.png">
+<link rel="preload" as="image" href="img/fotos/portada-familia-960.webp" imagesrcset="img/fotos/portada-familia-960.webp 960w, img/fotos/portada-familia-1920.webp 1920w" imagesizes="100vw" fetchpriority="high">
+<link rel="stylesheet" href="css/naranco.css">
+</head>
+<body class="web">
+<!-- IMÁGENES: recursos originales de naranco.es ya optimizados en img/fotos (webp 960/1920) e img/marca (logo, favicon, separadores en pestaña).
+     Las fotos ya vienen en blanco y negro con el detalle verde de la marca; las bicis (fondo blanco) van sobre tarjeta blanca. -->
+<a class="saltar" href="#reservar" data-i18n="saltar">Ir a reservar</a>
+
+<div class="demo-bar">
+  <div class="wrap demo-bar__in">
+    <span data-i18n="demo.aviso">Demo privada · los pagos y avisos son simulados</span>
+    <span class="demo-bar__links"><a href="panel/" data-i18n="demo.panel">Panel de Mateo</a><a href="salir" data-i18n="demo.salir">Salir</a></span>
+  </div>
+</div>
+
+<header class="cab" id="cab">
+  <div class="wrap cab__in">
+    <a class="cab__logo" href="#inicio" aria-label="Nar&amp;Co"><img src="img/marca/logo.png" alt="Nar&amp;Co" width="448" height="132"></a>
+    <nav class="cab__nav" id="menu" aria-label="Principal">
+      <a href="#bicis" data-i18n="nav.bicis">Bicis</a>
+      <a href="#reservar" data-i18n="nav.reservar">Reservar</a>
+      <a href="#preguntas" data-i18n="nav.preguntas">Preguntas</a>
+      <a href="#contacto" data-i18n="nav.contacto">Contacto</a>
+    </nav>
+    <div class="cab__acc">
+      <button class="cab__idioma" id="idioma" type="button" aria-label="Cambiar idioma / Change language"><span data-lang="es">ES</span><span data-lang="en">EN</span></button>
+      <a class="btn btn--primario btn--sm" href="#reservar" data-i18n="nav.cta">Reservar</a>
+      <button class="cab__burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="Menú" data-i18n-attr="aria-label:nav.menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="inicio" aria-labelledby="hero-t">
+    <img class="hero__img" data-i18n-attr="alt:foto.familia" src="img/fotos/portada-familia-1920.webp" srcset="img/fotos/portada-familia-960.webp 960w, img/fotos/portada-familia-1920.webp 1920w" sizes="100vw" alt="" width="1920" height="1255" fetchpriority="high" decoding="async">
+    <div class="hero__vel"></div>
+    <div class="wrap hero__in">
+      <p class="eyebrow eyebrow--claro" data-i18n="hero.eyebrow">Servicio de alquiler de bicicletas en Asturias</p>
+      <h1 id="hero-t" data-i18n="hero.titulo">Asturias se pedalea mejor en buena compañía</h1>
+      <p class="hero__sub" data-i18n="hero.sub">Carretera, gravel y eMTB listas para rodar. Tú, tu pareja o tu grupo, y las montañas de Asturias a la puerta.</p>
+      <div class="hero__btns">
+        <a class="btn btn--primario btn--lg" href="#reservar" data-i18n="hero.cta">Reservar</a>
+        <a class="btn btn--borde-claro btn--lg" href="#bicis" data-i18n="hero.cta2">Ver las bicis</a>
+      </div>
+      <ul class="hero__chips">
+        <li data-i18n="hero.chip1">Casco, luz y soporte Garmin incluidos</li>
+        <li data-i18n="hero.chip2">Entrega en tu hotel</li>
+        <li data-i18n="hero.chip3">Cancelación gratis hasta 24 h antes</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec" id="bicis" aria-labelledby="bicis-t">
+    <div class="wrap">
+      <p class="eyebrow" data-i18n="bicis.eyebrow">La flota</p>
+      <h2 id="bicis-t" data-i18n="bicis.titulo">Tres bicis, tres formas de rodar</h2>
+      <p class="sec__lead" data-i18n="bicis.lead">Todas en tallas S, M y L, revisadas antes de cada alquiler. Elige la que mejor encaje con tu plan y con el terreno que te apetezca pisar por tu cuenta.</p>
+      <div class="bicis">
+        <article class="bici">
+          <div class="foto-caja"><img class="foto" src="img/fotos/bici-carretera-960.webp" srcset="img/fotos/bici-carretera-960.webp 960w, img/fotos/bici-carretera-1920.webp 1920w" sizes="(min-width: 760px) 360px, 92vw" alt="" data-i18n-attr="alt:foto.carretera" width="960" height="614" loading="lazy" decoding="async"></div>
+          <div class="bici__cuerpo">
+            <h3 data-i18n="bici.carretera.nombre">Carretera</h3>
+            <p data-i18n="bici.carretera.desc">Ligera y rápida para asfalto. Para quien quiere kilómetros y puertos con una bici de verdad.</p>
+            <ul class="lista-tec">
+              <li data-i18n="bici.carretera.f1">Cuadro ligero y geometría deportiva</li>
+              <li data-i18n="bici.carretera.f2">Transmisión con desarrollos de montaña</li>
+              <li data-i18n="bici.carretera.f3">Ideal para asfalto y puertos</li>
+            </ul>
+            <p class="bici__tallas"><span data-i18n="bici.tallas">Tallas</span> <b>S</b> <b>M</b> <b>L</b></p>
+          </div>
+        </article>
+        <article class="bici">
+          <div class="foto-caja"><img class="foto foto--cuadrada" src="img/fotos/bici-gravel-960.webp" alt="" data-i18n-attr="alt:foto.gravel" width="800" height="800" loading="lazy" decoding="async"></div>
+          <div class="bici__cuerpo">
+            <h3 data-i18n="bici.gravel.nombre">Gravel</h3>
+            <p data-i18n="bici.gravel.desc">La polivalente: asfalto, pistas y caminos anchos. Cómoda para todo el día y para cualquier nivel.</p>
+            <ul class="lista-tec">
+              <li data-i18n="bici.gravel.f1">Neumáticos anchos y manillar abierto</li>
+              <li data-i18n="bici.gravel.f2">Estable y cómoda en pista y asfalto</li>
+              <li data-i18n="bici.gravel.f3">Fácil de llevar para quien empieza</li>
+            </ul>
+            <p class="bici__tallas"><span data-i18n="bici.tallas">Tallas</span> <b>S</b> <b>M</b> <b>L</b></p>
+          </div>
+        </article>
+        <article class="bici">
+          <div class="foto-caja"><img class="foto" src="img/fotos/bici-emtb-960.webp" srcset="img/fotos/bici-emtb-960.webp 960w, img/fotos/bici-emtb-1920.webp 1920w" sizes="(min-width: 760px) 360px, 92vw" alt="" data-i18n-attr="alt:foto.emtb" width="960" height="615" loading="lazy" decoding="async"></div>
+          <div class="bici__cuerpo">
+            <h3 data-i18n="bici.emtb.nombre">eMTB</h3>
+            <p data-i18n="bici.emtb.desc">Montaña con asistencia eléctrica. Las cuestas de Asturias dejan de ser un problema y todo se disfruta más.</p>
+            <ul class="lista-tec">
+              <li data-i18n="bici.emtb.f1">Motor y batería para subir sin sufrir</li>
+              <li data-i18n="bici.emtb.f2">Suspensión y neumáticos de montaña</li>
+              <li data-i18n="bici.emtb.f3">Para pistas, caminos y cuestas</li>
+            </ul>
+            <p class="bici__tallas"><span data-i18n="bici.tallas">Tallas</span> <b>S</b> <b>M</b> <b>L</b></p>
+          </div>
+        </article>
+      </div>
+      <p class="nota" data-i18n="bici.tallaguia">Guía rápida de talla según tu altura: menos de 165 cm, S · de 165 a 180 cm, M · más de 180 cm, L. Los precios los verás al elegir tus fechas y tus extras en la reserva.</p>
+    </div>
+  </section>
+
+  <section class="sec sec--oscura" id="porque" aria-labelledby="porque-t">
+    <div class="wrap sec__ctn">
+      <p class="eyebrow eyebrow--claro" data-i18n="porque.eyebrow">Por qué Nar&amp;Co</p>
+      <h2 id="porque-t" data-i18n="porque.titulo">¿Por qué elegir Nar&amp;Co para tu aventura en bicicleta?</h2>
+      <p class="sec__lead sec__lead--claro" data-i18n="porque.lead">Olvida la inversión en bicicletas caras y el almacenamiento complicado. Te damos equipos de calidad, adaptados a tu plan, para que salgas a disfrutar de Asturias sin complicaciones.</p>
+      <figure class="porque__foto"><img src="img/fotos/ciclistas-bosque-1920.webp" srcset="img/fotos/ciclistas-bosque-960.webp 960w, img/fotos/ciclistas-bosque-1920.webp 1920w" sizes="(min-width: 1200px) 1160px, 92vw" alt="" data-i18n-attr="alt:foto.bosque" width="1920" height="888" loading="lazy" decoding="async"></figure>
+      <ul class="porque">
+        <li><span class="porque__n">01</span><h3 data-i18n="porque.1t">Todo incluido</h3><p data-i18n="porque.1d">Casco, luz trasera y soporte Garmin van incluidos en cada bici, sin pagar más.</p></li>
+        <li><span class="porque__n">02</span><h3 data-i18n="porque.2t">Entrega en tu hotel</h3><p data-i18n="porque.2d">Te llevamos y recogemos la bici en tu alojamiento de Oviedo por 30 €. O pásate por el local.</p></li>
+        <li><span class="porque__n">03</span><h3 data-i18n="porque.3t">Bicis de calidad, limpias y revisadas</h3><p data-i18n="porque.3d">Equipos de calidad, limpios y comprobados antes de cada alquiler: frenos, transmisión y neumáticos. Sales con la bici a punto.</p></li>
+        <li><span class="porque__n">04</span><h3 data-i18n="porque.4t">Flexibilidad</h3><p data-i18n="porque.4d">Cancelación gratuita hasta 24 horas antes y descuentos si alquilas varios días.</p></li>
+        <li><span class="porque__n">05</span><h3 data-i18n="porque.5t">Tu propio ritmo</h3><p data-i18n="porque.5d">Alquilamos las bicis; tú decides dónde, cuándo y cuánto rodar. Asturias y el Naranco te esperan.</p></li>
+        <li><span class="porque__n">06</span><h3 data-i18n="porque.6t">Para todos los niveles</h3><p data-i18n="porque.6d">Desde familias hasta clubes deportivos, tenemos el material adecuado para cada plan, en tallas S, M y L.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="banda" aria-labelledby="banda1-t">
+    <img class="banda__img" src="img/fotos/carretera-curva-verde-1920.webp" srcset="img/fotos/carretera-curva-verde-960.webp 960w, img/fotos/carretera-curva-verde-1920.webp 1920w" sizes="100vw" alt="" data-i18n-attr="alt:foto.curva" width="1920" height="1014" loading="lazy" decoding="async">
+    <div class="wrap banda__in">
+      <h2 id="banda1-t" class="banda__t" data-i18n="banda1.t">Tú pones el ritmo. Nosotros, la bici.</h2>
+      <p class="banda__d" data-i18n="banda1.d">Alquilamos las bicis; tú decides cuándo y cuánto rodar.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="reservar" aria-labelledby="res-t">
+    <div class="wrap">
+      <p class="eyebrow" data-i18n="res.eyebrow">Reserva online</p>
+      <h2 id="res-t" data-i18n="res.titulo">Reserva tu bici en 4 pasos</h2>
+      <p class="sec__lead" data-i18n="res.lead">Elige fechas y bici, añade extras y deja tus datos. Retenemos la señal en tu tarjeta y solo la cobramos cuando confirmemos la disponibilidad.</p>
+      <div id="reserva-app" class="rs" aria-live="polite"><noscript>Se necesita JavaScript para reservar. / JavaScript is required to book.</noscript></div>
+    </div>
+  </section>
+
+  <section class="sec sec--blanca" id="preguntas" aria-labelledby="faq-t">
+    <div class="wrap wrap--estrecho">
+      <p class="eyebrow" data-i18n="faq.eyebrow">Preguntas frecuentes</p>
+      <h2 id="faq-t" data-i18n="faq.titulo">Antes de reservar</h2>
+      <div class="faq">
+        <details><summary data-i18n="faq.q11">¿Qué tipos de bicicletas puedo alquilar?</summary><p data-i18n="faq.a11">Ofrecemos bicicletas de carretera, gravel y MTB eléctricas (eMTB), todas preparadas y listas para usar en carretera y caminos de montaña. Cada tipo está disponible en tallas S, M y L.</p></details>
+        <details><summary data-i18n="faq.q12">¿Cómo reservo mi bicicleta?</summary><p data-i18n="faq.a12">Puedes reservar online en 4 pasos en esta misma página, o escribirnos por WhatsApp, teléfono o email. La reserva queda pendiente hasta que confirmemos la disponibilidad.</p></details>
+        <details><summary data-i18n="faq.q1">¿Qué incluye el alquiler?</summary><p data-i18n="faq.a1">Cada bici incluye casco, luz trasera y soporte Garmin. Como extras puedes añadir candado (3 €), portabultos o alforjas (5 €) y soporte de móvil (5 €). Los extras se pagan una vez por bici, sin importar los días del alquiler.</p></details>
+        <details><summary data-i18n="faq.q2">¿Cuánto cuesta y qué descuentos hay por días?</summary><p data-i18n="faq.a2">Carretera 60 € al día, gravel y eMTB 50 € al día. Por cada bici, el segundo día tiene 5 € de descuento, el tercero 10 € y el cuarto 15 €. Verás el precio exacto con el desglose en el paso 2 de la reserva.</p></details>
+        <details><summary data-i18n="faq.q3">¿Cómo se paga? ¿Qué es la señal retenida?</summary><p data-i18n="faq.a3">Al reservar se retiene el 20 % en tu tarjeta como señal, pero no se cobra todavía. Solo se cobrará cuando confirmemos la disponibilidad, normalmente en menos de 24 horas. Si no podemos atenderte, la retención se libera y no pagas nada. El 80 % restante se paga al recoger la bici: en efectivo, Bizum o transferencia.</p></details>
+        <details><summary data-i18n="faq.q4">¿Puedo cancelar?</summary><p data-i18n="faq.a4">Sí. Puedes cancelar gratis hasta 24 horas antes del inicio del alquiler y te devolvemos la señal. Pasado ese plazo, la señal no se devuelve.</p></details>
+        <details><summary data-i18n="faq.q5">¿Qué talla necesito?</summary><p data-i18n="faq.a5">Como guía: menos de 165 cm, talla S; de 165 a 180 cm, talla M; más de 180 cm, talla L. En la reserva te sugerimos la talla según tu altura. Si dudas entre dos, escríbenos y te ayudamos.</p></details>
+        <details><summary data-i18n="faq.q6">¿Qué documentación necesito?</summary><p data-i18n="faq.a6">En la reserva te pedimos el número de DNI, NIE o pasaporte. Al recoger la bici firmarás el contrato de alquiler y tendrás que enseñar el documento para hacerle una foto.</p></details>
+        <details><summary data-i18n="faq.q7">¿Hacéis entrega de la bici?</summary><p data-i18n="faq.a7">Sí. Entrega y recogida en tu hotel o dirección de Oviedo por 30 € por reserva. Fuera de Oviedo la entrega se presupuesta aparte. También puedes recogerla gratis en nuestro local.</p></details>
+        <details><summary data-i18n="faq.q8">¿Y si quiero alquilar más de 4 días?</summary><p data-i18n="faq.a8">Para 5 días o más no calculamos el precio automáticamente: envías la solicitud sin tarjeta y te preparamos una oferta personalizada.</p></details>
+        <details><summary data-i18n="faq.q9">¿Necesito experiencia previa?</summary><p data-i18n="faq.a9">No hace falta. Nuestras bicis están pensadas para todos los niveles, desde principiantes y familias hasta grupos avanzados. El casco va incluido; el resto de tu equipación la pones tú. Si quieres usar tus propios pedales, avísanos al reservar.</p></details>
+        <details><summary data-i18n="faq.q10">¿Qué pasa si llueve o la bici se estropea?</summary><p data-i18n="faq.a10">Si el tiempo te hace cambiar de plan, aplican las condiciones de cancelación. Si la bici tiene un problema mecánico durante el alquiler, escríbenos por WhatsApp y te ayudamos a resolverlo.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="banda banda--cta" aria-labelledby="banda2-t">
+    <img class="banda__img banda__img--cima" src="img/fotos/cima-montana-1920.webp" srcset="img/fotos/cima-montana-960.webp 960w, img/fotos/cima-montana-1920.webp 1920w" sizes="100vw" alt="" data-i18n-attr="alt:foto.cima" width="1920" height="887" loading="lazy" decoding="async">
+    <div class="wrap banda__in">
+      <h2 id="banda2-t" class="banda__t" data-i18n="banda2.t">Tu aventura empieza en Oviedo</h2>
+      <p class="banda__d" data-i18n="banda2.d">Reserva en cuatro pasos y recoge tu bici lista para rodar.</p>
+      <a class="btn btn--primario btn--lg" href="#reservar" data-i18n="banda.cta">Reservar mi bici</a>
+    </div>
+  </section>
+
+  <section class="sec" id="contacto" aria-labelledby="con-t">
+    <div class="wrap contacto">
+      <div class="contacto__datos">
+        <p class="eyebrow" data-i18n="con.eyebrow">Contacto</p>
+        <h2 id="con-t" data-i18n="con.titulo">¿Dudas? Escríbenos</h2>
+        <p data-i18n="con.lead">Te respondemos lo antes posible. Por WhatsApp suele ser lo más rápido.</p>
+        <ul class="con-lista">
+          <li><a class="con-link" href="https://wa.me/34624151273" rel="noopener"><span data-i18n="con.wa">WhatsApp</span><b>+34 624 15 12 73</b></a></li>
+          <li><a class="con-link" href="tel:+34624151273"><span data-i18n="con.tel">Teléfono</span><b>+34 624 15 12 73</b></a></li>
+          <li><a class="con-link" href="mailto:info@naranco.es"><span data-i18n="con.email">Email</span><b>info@naranco.es</b></a></li>
+          <li><div class="con-link"><span data-i18n="con.dir">Dirección</span><b data-i18n="con.dir.v">C/ Melquiades Álvarez 19, 33003 Oviedo</b></div></li>
+        </ul>
+        <p class="nota" data-i18n="con.lugar">Oviedo, Asturias · recogida en el local o entrega en tu hotel.</p>
+      </div>
+      <form class="form-con" id="form-consulta" novalidate>
+        <h3 data-i18n="con.form.titulo">Envíanos una consulta</h3>
+        <div class="campo"><label for="c-motivo" data-i18n="con.motivo">Motivo</label><select id="c-motivo" name="motivo" required></select></div>
+        <div class="fila2">
+          <div class="campo"><label for="c-tipo" data-i18n="con.tipo">Tipo de bici</label><select id="c-tipo" name="tipo"></select></div>
+          <div class="campo"><label for="c-talla" data-i18n="con.talla">Talla</label><select id="c-talla" name="talla"></select></div>
+        </div>
+        <div class="fila2">
+          <div class="campo"><label for="c-desde" data-i18n="con.desde">Desde</label><input id="c-desde" name="desde" type="date"></div>
+          <div class="campo"><label for="c-hasta" data-i18n="con.hasta">Hasta</label><input id="c-hasta" name="hasta" type="date"></div>
+        </div>
+        <div class="campo"><label for="c-mensaje" data-i18n="con.mensaje">Mensaje</label><textarea id="c-mensaje" name="mensaje" rows="4" required></textarea></div>
+        <div class="fila2">
+          <div class="campo"><label for="c-nombre" data-i18n="con.nombre">Nombre</label><input id="c-nombre" name="nombre" autocomplete="name" required></div>
+          <div class="campo"><label for="c-contacto" data-i18n="con.contacto">Teléfono o email</label><input id="c-contacto" name="contacto" autocomplete="email" required></div>
+        </div>
+        <p class="error" id="c-error" role="alert" hidden></p>
+        <button class="btn btn--primario btn--lg btn--block" type="submit" data-i18n="con.enviar">Enviar consulta</button>
+        <div class="ok-caja" id="c-ok" hidden tabindex="-1" role="status"><b data-i18n="con.ok.t">Consulta enviada</b><p data-i18n="con.ok.d">Gracias. Te contestaremos lo antes posible por el medio de contacto que nos has dejado.</p></div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="wrap pie__in">
+    <div class="pie__marca">
+      <img src="img/marca/logo-blanco-2lineas.png" alt="Nar&amp;Co" width="314" height="312" class="pie__logo" loading="lazy">
+      <p class="pie__lema" data-i18n="pie.lema">Servicio de alquiler de bicicletas en Asturias</p>
+    </div>
+    <div class="pie__col">
+      <h2 class="pie__h" data-i18n="pie.contacto">Contacto</h2>
+      <ul class="pie__lista">
+        <li><a href="tel:+34624151273">+34 624 15 12 73</a></li>
+        <li><a href="https://wa.me/34624151273" rel="noopener">WhatsApp</a></li>
+        <li><a href="mailto:info@naranco.es">info@naranco.es</a></li>
+        <li data-i18n="con.dir.v">C/ Melquiades Álvarez 19, 33003 Oviedo</li>
+      </ul>
+    </div>
+    <nav class="pie__col" aria-labelledby="pie-legal-t">
+      <h2 class="pie__h" id="pie-legal-t" data-i18n="pie.legalt">Información legal</h2>
+      <ul class="pie__lista">
+        <li><a href="#" data-i18n="pie.aviso">Aviso legal</a></li>
+        <li><a href="#" data-i18n="pie.privacidad">Privacidad</a></li>
+        <li><a href="#" data-i18n="pie.cookies">Cookies</a></li>
+      </ul>
+    </nav>
+  </div>
+  <p class="wrap pie__c" data-i18n="pie.derechos">© 2026 Nar&amp;Co. Todos los derechos reservados.</p>
+</footer>
+
+<script src="datos.js"></script>
+<script src="i18n.js"></script>
+<script src="web.js"></script>
+<script src="reserva.js"></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel de Mateo · Nar&amp;Co</title>
+<meta name="theme-color" content="#212121">
+<link rel="icon" href="../img/marca/favicon.png" type="image/png">
+<link rel="stylesheet" href="../css/naranco.css">
+<link rel="stylesheet" href="panel.css">
+</head>
+<body class="panel">
+<a class="saltar" href="#contenido">Ir al contenido</a>
+
+<header class="p-cab">
+  <div class="wrap p-cab__in">
+    <a class="p-cab__logo" href="./" aria-label="Nar&amp;Co · Panel"><img src="../img/marca/logo-blanco.png" alt="Nar&amp;Co" width="448" height="132"></a>
+    <span class="p-cab__t">Panel de Mateo</span>
+    <span class="p-cab__links"><a href="../">Ver la web</a><a href="../salir">Salir</a></span>
+  </div>
+</header>
+
+<nav class="p-tabs" aria-label="Secciones del panel">
+  <div class="wrap p-tabs__in" role="tablist" aria-label="Secciones del panel">
+    <button type="button" role="tab" id="pest-solicitudes" data-tab="solicitudes" aria-controls="tab-solicitudes" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg><span>Solicitudes</span><b class="cuenta" id="cuenta-pend" hidden>0</b></button>
+    <button type="button" role="tab" id="pest-calendario" data-tab="calendario" aria-controls="tab-calendario" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v15H4zM4 10h16M8 3v4M16 3v4"/></svg><span>Calendario</span></button>
+    <button type="button" role="tab" id="pest-stock" data-tab="stock" aria-controls="tab-stock" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="16" r="3.5"/><circle cx="18" cy="16" r="3.5"/><path d="M6 16l4-8h5l3 8M10 8l3 8"/></svg><span>Stock</span></button>
+    <button type="button" role="tab" id="pest-precios" data-tab="precios" aria-controls="tab-precios" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12l9-9h9v9l-9 9zM16 8h.01"/></svg><span>Precios</span></button>
+    <button type="button" role="tab" id="pest-metricas" data-tab="metricas" aria-controls="tab-metricas" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg><span>Métricas</span></button>
+  </div>
+</nav>
+
+<main id="contenido" class="wrap p-main" tabindex="-1">
+  <section id="tab-solicitudes" role="tabpanel" aria-labelledby="pest-solicitudes"></section>
+  <section id="tab-calendario" role="tabpanel" aria-labelledby="pest-calendario" hidden></section>
+  <section id="tab-stock" role="tabpanel" aria-labelledby="pest-stock" hidden></section>
+  <section id="tab-precios" role="tabpanel" aria-labelledby="pest-precios" hidden></section>
+  <section id="tab-metricas" role="tabpanel" aria-labelledby="pest-metricas" hidden></section>
+</main>
+
+<footer class="p-pie">
+  <div class="wrap p-pie__in">
+    <p>Demo privada: los pagos y avisos son simulados. En la demo los cambios se guardan solo en este navegador.</p>
+    <button type="button" class="p-reset" id="btn-reset">Restablecer datos de ejemplo</button>
+  </div>
+</footer>
+
+<div class="hoja" id="hoja" role="alertdialog" aria-modal="false" aria-labelledby="hoja-t" aria-describedby="hoja-d" hidden>
+  <p class="hoja__t" id="hoja-t"></p>
+  <p class="hoja__d" id="hoja-d"></p>
+  <div class="hoja__b">
+    <button type="button" class="btn btn--borde" id="hoja-no">Cancelar</button>
+    <button type="button" class="btn btn--primario" id="hoja-si">Aceptar</button>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="../datos.js"></script>
+<script src="panel.js"></script>
+</body>
+</html>
