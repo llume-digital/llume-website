@@ -948,9 +948,7 @@ html:has(dialog[open]) { overflow-y: hidden; }
 .team-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .team-card { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
 .team-photo { aspect-ratio: 4 / 4.3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; background: radial-gradient(circle at 75% 20%,rgba(242,192,138,.18),transparent 42%), linear-gradient(155deg,#1c222d,#101014 70%); border-bottom: 1px solid var(--line); }
-.team-photo > span { display: grid; place-items: center; width: 96px; height: 96px; border: 1px solid rgba(242,192,138,.4); border-radius: 50%; color: var(--amber); font-size: 48px; font-weight: 300; }
-.team-photo small { color: var(--muted); font: 400 10px var(--mono); letter-spacing: .13em; text-transform: uppercase; }
-.team-photo small { max-width: 100%; padding: 0 8px; text-align: center; overflow-wrap: anywhere; }
+.team-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 35%; }
 .team-card-info { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px; }
 .team-card-info h3 { font-size: 21px; }
 .team-card-info a { color: var(--amber); font-size: 12px; text-align: right; }
@@ -960,8 +958,6 @@ html:has(dialog[open]) { overflow-y: hidden; }
   .team-grid { grid-template-columns: 1fr; }
   .team-card { display: grid; grid-template-columns: 38% 1fr; }
   .team-photo { aspect-ratio: 1; min-height: 170px; }
-  .team-photo > span { width: 68px; height: 68px; font-size: 34px; }
-  .team-photo small { font-size: 8px; letter-spacing: .08em; }
   .team-card-info { flex-direction: column; align-items: flex-start; justify-content: center; }
   .team-card-info a { text-align: left; }
 }
