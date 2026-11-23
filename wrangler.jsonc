@@ -1,8 +1,14 @@
 {
   "name": "llume-website",
   "compatibility_date": "2026-09-01",
-  // Vista previa de cada rama/PR en Workers Builds (`npx wrangler preview`); vacío usa la misma config
-  "previews": {},
+  // Vista previa de cada rama/PR en Workers Builds (`npx wrangler preview`). Hereda la config salvo las variables y
+  // los bindings, que no se heredan: las que haga falta en las vistas previas se repiten aquí.
+  "previews": {
+    "vars": {
+      // Misma clave que en producción para probar la demo privada de Nar&Co en la vista previa
+      "NARANCO_CLAVE_SHA256": "aa214ce3978168d4428912e5e8daeb0bb993b686fee644ee3a33fb21913bc81f"
+    }
+  },
   // Solo atiende las rutas de assets.run_worker_first; el resto lo sirve Cloudflare directamente desde public/
   "main": "src/worker.js",
   // Solo se publica public/; los .md de la raíz quedan fuera de la web
@@ -11,7 +17,7 @@
     "binding": "ASSETS",
     // Rutas inexistentes muestran public/404.html con estado 404
     "not_found_handling": "404-page",
-    "run_worker_first": ["/lopita/horarios/nube/*"]
+    "run_worker_first": ["/lopita/horarios/nube/*", "/naranco", "/naranco/*"]
   },
   // Base de datos compartida de la app de horarios de Lopita (ver src/worker.js)
   "durable_objects": {
@@ -23,6 +29,8 @@
     "LOPITA_CLAVE_SHA256": "6ee72bf395616d1c96c79e8a64811a73c3bec78b9dde0389db5b8e618cb9bb8d",
     // Canal de Slack donde la app de horarios anuncia cada horario publicado. El token del bot NO va aquí: es un
     // secreto (`npx wrangler secret put SLACK_BOT_TOKEN`); mientras no exista, la app trabaja en modo simulación.
-    "SLACK_CHANNEL": "#horarios"
+    "SLACK_CHANNEL": "#horarios",
+    // sha256 de la clave de la demo privada de Nar&Co en /naranco/ (la clave no está en el repo, ver src/worker.js)
+    "NARANCO_CLAVE_SHA256": "aa214ce3978168d4428912e5e8daeb0bb993b686fee644ee3a33fb21913bc81f"
   }
 }

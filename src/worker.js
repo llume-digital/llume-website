@@ -15,6 +15,12 @@
 // /lopita/horarios/nube/slack/<método>: relevo hacia la API de Slack (con la clave). El token del bot no puede estar en
 // la app (cualquiera que la abra lo vería), así que está aquí como secreto SLACK_BOT_TOKEN y el canal en SLACK_CHANNEL.
 // Solo deja pasar los métodos que usa la app. Sin token responde {ok:false, error:"sin_token"} y la app simula.
+//
+// /naranco/*: demo privada de la web de Nar&Co. Todo pasa por aquí y solo se sirve con la clave:
+//   · POST /naranco/acceso con el campo «clave» (formulario de la pantalla de acceso), o
+//   · un enlace con ?clave=… en cualquier ruta de /naranco/ (se quita de la dirección al entrar).
+// Con la clave buena se guarda una cookie HttpOnly limitada a /naranco durante 30 días; /naranco/salir la borra.
+// Solo se guarda el sha256 de la clave (NARANCO_CLAVE_SHA256); la cookie lleva la clave y se comprueba igual.
 import { DurableObject } from 'cloudflare:workers';
 
 const RUTA_DB = '/lopita/horarios/nube/db';
@@ -172,9 +178,110 @@ async function relevoSlack(request, env, metodo) {
   return json(datos);
 }
 
+// ── Demo privada de Nar&Co ─────────────────────────────────────────────────────────────────────────────────────────
+const NARANCO = '/naranco';
+const NARANCO_COOKIE = 'naranco_clave';
+const NARANCO_DIAS = 30;
+
+function leerCookie(request, nombre) {
+  for (const parte of (request.headers.get('Cookie') || '').split(';')) {
+    const i = parte.indexOf('=');
+    if (i > 0 && parte.slice(0, i).trim() === nombre) {
+      try { return decodeURIComponent(parte.slice(i + 1).trim()); } catch { return ''; }
+    }
+  }
+  return '';
+}
+
+async function claveNarancoValida(clave, env) {
+  if (!clave || clave.length > 200 || !env.NARANCO_CLAVE_SHA256) return false;
+  return iguales(await sha256(clave), env.NARANCO_CLAVE_SHA256);
+}
+
+const cookieNaranco = (valor, segundos) =>
+  `${NARANCO_COOKIE}=${encodeURIComponent(valor)}; Path=${NARANCO}; Max-Age=${segundos}; HttpOnly; Secure; SameSite=Lax`;
+
+// Solo se vuelve a rutas de la propia demo (evita redirecciones abiertas)
+function destinoNaranco(texto) {
+  if (typeof texto !== 'string' || !(texto === NARANCO || texto.startsWith(`${NARANCO}/`)) || texto.startsWith('//')) return `${NARANCO}/`;
+  return texto;
+}
+
+const escHtml = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
+function pantallaAcceso(destino, error) {
+  const html = `<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><title>Nar&amp;Co · Acceso a la demo</title>
+<style>
+:root{--bg:#f2f2f2;--ink:#212121;--muted:#6b6b6b;--verde:#00b485;--line:#d6d6d6}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
+.caja{width:100%;max-width:380px;background:#fff;border:1px solid var(--line);padding:32px 24px}
+.logo{font-weight:700;font-size:28px;letter-spacing:.04em;margin:0 0 4px}.logo span{color:var(--verde)}
+p{color:var(--muted);margin:0 0 24px;line-height:1.5;font-size:15px}
+label{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+input{width:100%;font:inherit;font-size:16px;padding:12px;border:1px solid var(--ink);background:#fff;color:var(--ink);border-radius:0}
+input:focus{outline:2px solid var(--verde);outline-offset:1px}
+button{margin-top:16px;width:100%;font:inherit;font-weight:600;font-size:16px;padding:14px;border:0;border-radius:0;background:var(--ink);color:#fff;cursor:pointer}
+button:hover{background:#00372a}.error{color:#b3261e;font-size:14px;margin:12px 0 0}
+</style></head><body><main><form class="caja" method="post" action="${NARANCO}/acceso">
+<h1 class="logo">NAR<span>&amp;</span>CO</h1>
+<p>Demo privada de la nueva web. Introduce la clave para entrar.<br><span lang="en">Private demo: enter the access key.</span></p>
+<label for="clave">Clave · Key</label>
+<input id="clave" name="clave" type="password" autocomplete="current-password" required autofocus>
+<input type="hidden" name="destino" value="${escHtml(destino)}">
+${error ? '<p class="error" role="alert">Clave incorrecta. Inténtalo de nuevo.</p>' : ''}
+<button type="submit">Entrar</button>
+</form></main></body></html>`;
+  return responder(html, 401, {
+    'Content-Type': 'text/html; charset=utf-8',
+    'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
+    'Referrer-Policy': 'no-referrer',
+  });
+}
+
+const redirigir = (destino, cookie) =>
+  responder(null, 303, { Location: destino, ...(cookie ? { 'Set-Cookie': cookie } : {}) });
+
+async function demoNaranco(request, env, url) {
+  // Formulario de acceso
+  if (url.pathname === `${NARANCO}/acceso`) {
+    if (request.method !== 'POST') return redirigir(`${NARANCO}/`);
+    let datos;
+    try { datos = await request.formData(); } catch { return pantallaAcceso(`${NARANCO}/`, true); }
+    const clave = String(datos.get('clave') || '');
+    const destino = destinoNaranco(String(datos.get('destino') || ''));
+    if (await claveNarancoValida(clave, env)) return redirigir(destino, cookieNaranco(clave, NARANCO_DIAS * 86400));
+    return pantallaAcceso(destino, true);
+  }
+  if (url.pathname === `${NARANCO}/salir`) return redirigir(`${NARANCO}/`, cookieNaranco('', 0));
+
+  // Enlace con la clave: guarda la cookie y la quita de la dirección
+  const claveEnlace = url.searchParams.get('clave');
+  if (claveEnlace !== null) {
+    url.searchParams.delete('clave');
+    const limpia = destinoNaranco(url.pathname) + (url.search || '');
+    if (await claveNarancoValida(claveEnlace, env)) return redirigir(limpia, cookieNaranco(claveEnlace, NARANCO_DIAS * 86400));
+    return pantallaAcceso(limpia, true);
+  }
+
+  if (!(await claveNarancoValida(leerCookie(request, NARANCO_COOKIE), env))) {
+    if (request.method !== 'GET' && request.method !== 'HEAD') return responder('Acceso restringido', 401);
+    return pantallaAcceso(destinoNaranco(url.pathname + url.search), false);
+  }
+
+  const r = await env.ASSETS.fetch(request);
+  const res = new Response(r.body, r);
+  res.headers.set('Cache-Control', 'private, no-cache');
+  res.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  return res;
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === NARANCO || url.pathname.startsWith(`${NARANCO}/`)) return demoNaranco(request, env, url);
     if (url.pathname === RUTA_DB) return baseDeDatos(request, env);
     if (url.pathname === RUTA_CAL) return subirCalendarios(request, env);
     if (url.pathname.startsWith(`${RUTA_CAL}/`)) return leerCalendario(request, env, url.pathname.slice(RUTA_CAL.length + 1));
