@@ -73,9 +73,10 @@ p { margin: 0 0 1em; }
 .cab__nav a { color: var(--texto); text-decoration: none; font-weight: 500; padding: 14px 4px; border-bottom: 1px solid var(--linea); }
 .cab__nav a:hover { color: var(--verde-texto); }
 .cab__acc { display: flex; align-items: center; gap: 8px; }
-.cab__idioma { font: inherit; font-size: .8rem; font-weight: 600; background: transparent; color: var(--texto); border: 1px solid var(--texto); min-height: 40px; padding: 0 10px; cursor: pointer; display: inline-flex; gap: 6px; }
-.cab__idioma span { opacity: .55; }
-.cab__idioma span.on { opacity: 1; color: var(--verde-texto); }
+.cab__idioma { font: inherit; font-size: .78rem; font-weight: 600; letter-spacing: .04em; line-height: 1; background: transparent; color: var(--texto); border: 1px solid var(--texto); height: 40px; padding: 0; margin: 0; cursor: pointer; display: inline-flex; align-items: stretch; box-sizing: border-box; }
+.cab__idioma span { display: flex; align-items: center; justify-content: center; min-width: 34px; padding: 0 6px; color: var(--texto); opacity: .6; transition: background .15s, color .15s, opacity .15s; }
+.cab__idioma span.on { opacity: 1; background: var(--texto); color: #fff; }
+.cab__idioma:hover span:not(.on) { opacity: 1; }
 .cab__burger { width: 44px; height: 44px; background: transparent; border: 0; cursor: pointer; display: inline-flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; padding: 0; }
 .cab__burger span { width: 22px; height: 2px; background: var(--texto); transition: transform .2s, opacity .2s; }
 .cab.abierto .cab__burger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
