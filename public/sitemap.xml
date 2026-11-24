@@ -312,28 +312,4 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/training"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/formacao"/>
   </url>
-  <url>
-    <loc>https://llumedigital.com/preguntas</loc>
-    <lastmod>2026-10-15</lastmod>
-    <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/preguntas"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/preguntas"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/faq"/>
-    <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/perguntas"/>
-  </url>
-  <url>
-    <loc>https://llumedigital.com/en/faq</loc>
-    <lastmod>2026-10-15</lastmod>
-    <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/preguntas"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/preguntas"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/faq"/>
-    <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/perguntas"/>
-  </url>
-  <url>
-    <loc>https://llumedigital.com/pt/perguntas</loc>
-    <lastmod>2026-10-15</lastmod>
-    <xhtml:link rel="alternate" hreflang="es" href="https://llumedigital.com/preguntas"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://llumedigital.com/preguntas"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://llumedigital.com/en/faq"/>
-    <xhtml:link rel="alternate" hreflang="pt" href="https://llumedigital.com/pt/perguntas"/>
-  </url>
 </urlset>

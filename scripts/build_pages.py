@@ -1,8 +1,8 @@
-"""Generate the Training and FAQ pages in Spanish, English and Portuguese.
+"""Generate the training pages in Spanish, English and Portuguese.
 
     python3 scripts/build_pages.py
 
-Content lives in TRAINING and FAQ below.
+Content lives in TRAINING below.
 """
 import html
 import json
@@ -15,122 +15,13 @@ BASE = "https://llumedigital.com"
 BEACON = """  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "067b84e48590464ea55b033a36a010bc"}'></script>"""
 
 SITE = {
-    "es": {"lang": "es", "home": "/", "talk": "Hablemos", "back": "Volver a la web", "train": "formacion", "faq": "preguntas",
+    "es": {"lang": "es", "home": "/", "talk": "Hablemos", "back": "Volver a la web", "train": "formacion",
            "legal": ("/aviso-legal", "Aviso legal", "/privacidad", "Privacidad"), "og": "es_ES"},
-    "en": {"lang": "en", "home": "/en/", "talk": "Let\'s talk", "back": "Back to the website", "train": "en/training", "faq": "en/faq",
+    "en": {"lang": "en", "home": "/en/", "talk": "Let\'s talk", "back": "Back to the website", "train": "en/training",
            "legal": ("/en/legal-notice", "Legal notice", "/en/privacy", "Privacy"), "og": "en_GB"},
-    "pt": {"lang": "pt-PT", "home": "/pt/", "talk": "Vamos falar", "back": "Voltar ao site", "train": "pt/formacao", "faq": "pt/perguntas",
+    "pt": {"lang": "pt-PT", "home": "/pt/", "talk": "Vamos falar", "back": "Voltar ao site", "train": "pt/formacao",
            "legal": ("/pt/aviso-legal", "Aviso legal", "/pt/privacidade", "Privacidade"), "og": "pt_PT"},
 }
-
-FAQ = {'es': {'eyebrow': 'Preguntas frecuentes',
-        'h2': 'Antes de empezar,<br>conviene tenerlo claro.',
-        'help': '<p class="faq-help-q">¿Tienes una pregunta concreta?</p>\n'
-                '          <p>Cuéntanos el contexto y te orientamos sobre el siguiente paso.</p>\n'
-                '          <div class="faq-help-actions"><a class="btn btn-light btn-sm" '
-                'href="#contacto">Hablemos <span aria-hidden="true">→</span></a><a class="btn btn-ghost btn-sm" '
-                'href="mailto:info@llumedigital.com">Escríbenos</a></div>',
-        'items': [('¿En qué puede ayudar llume a mi empresa?',
-                   'Analizamos tareas y procesos para proponer soluciones de automatización, integración de '
-                   'herramientas, migración a la nube, aplicaciones a medida o visión artificial. La '
-                   'recomendación depende del problema y de las herramientas que ya utilizas.'),
-                  ('¿Cómo empezamos?',
-                   'Puedes pedir una primera conversación de 30 minutos, gratuita y sin compromiso. Nos explicas '
-                   'el reto y valoramos si podemos ayudarte. Si hay encaje, preparamos una propuesta con alcance, '
-                   'entregables, calendario y precio antes de empezar.'),
-                  ('¿Cuánto cuesta y cuánto tarda un proyecto?',
-                   'Depende de su alcance, complejidad e integraciones. La propuesta concreta el precio y el '
-                   'calendario; no damos un plazo o ahorro estándar que sirva para todos los proyectos.'),
-                  ('¿Necesito conocimientos técnicos?',
-                   'No. Empezamos por cómo trabaja tu equipo y explicamos las opciones en lenguaje claro. Si una '
-                   'solución requiere cambios en tus sistemas, concretamos antes qué accesos y decisiones hacen '
-                   'falta.'),
-                  ('¿Qué recibimos al terminar?',
-                   'Los entregables, documentación, formación y soporte se detallan en la propuesta. También '
-                   'dejamos acordado qué incluye el mantenimiento y qué gastos recurrentes, como licencias o '
-                   'alojamiento, dependen de terceros.'),
-                  ('¿De quién es el código y qué pasa con las licencias?',
-                   'La propuesta y el contrato deben especificar la titularidad y entrega del desarrollo, así '
-                   'como las licencias de componentes o servicios de terceros. Lo dejamos claro antes de iniciar '
-                   'el trabajo.'),
-                  ('¿Cómo se gestionan nuestros datos?',
-                   'Antes de acceder a datos del proyecto, acordamos qué información es necesaria, quién puede '
-                   'acceder y qué servicios externos intervienen. Las condiciones aplicables y los canales para '
-                   'ejercer derechos están en la Política de privacidad.'),
-                  ('¿Ofrecéis formación para equipos?',
-                   'Sí. Podemos preparar formación práctica sobre herramientas digitales e IA, adaptada a las '
-                   'tareas y al nivel del equipo. El formato, contenido y duración se concretan en la '
-                   'propuesta.')]},
- 'en': {'eyebrow': 'Frequently asked questions',
-        'h2': 'Before we start,<br>let’s make it clear.',
-        'help': '<p class="faq-help-q">Have a specific question?</p>\n'
-                '          <p>Tell us a little about the context and we’ll suggest a useful next step.</p>\n'
-                '          <div class="faq-help-actions"><a class="btn btn-light btn-sm" href="#contacto">Let’s '
-                'talk <span aria-hidden="true">→</span></a><a class="btn btn-ghost btn-sm" '
-                'href="mailto:info@llumedigital.com">Email us</a></div>',
-        'items': [('How can llume help my company?',
-                   'We look at tasks and processes and may suggest automation, tool integration, cloud migration, '
-                   'custom applications or computer vision. The right approach depends on the problem and the '
-                   'tools you already use.'),
-                  ('How do we get started?',
-                   'You can request a free, no-obligation 30-minute introductory call. Tell us about the '
-                   'challenge and we’ll assess whether we can help. If there is a fit, we’ll prepare a proposal '
-                   'with scope, deliverables, timeline and price before work begins.'),
-                  ('How much does a project cost and how long does it take?',
-                   'It depends on scope, complexity and integrations. The proposal sets out the price and '
-                   'timeline; we do not promise a standard schedule or saving for every project.'),
-                  ('Do I need technical skills?',
-                   'No. We start with how your team works and explain the options in plain language. If a '
-                   'solution requires changes to your systems, we agree in advance what access and decisions are '
-                   'needed.'),
-                  ('What do we receive at the end?',
-                   'Deliverables, documentation, training and support are described in the proposal. We also '
-                   'clarify maintenance and any recurring costs, such as third-party licences or hosting.'),
-                  ('Who owns the code, and what about licences?',
-                   'The proposal and contract should set out ownership and handover of the work, along with '
-                   'licences for third-party components or services. We clarify this before starting.'),
-                  ('How do you handle our data?',
-                   'Before accessing project data, we agree what information is needed, who can access it and '
-                   'which external services are involved. Applicable terms and ways to exercise your rights are '
-                   'described in the Privacy Policy.'),
-                  ('Do you offer team training?',
-                   'Yes. We can prepare practical training on digital tools and AI, tailored to your team’s tasks '
-                   'and experience. Format, content and duration are agreed in the proposal.')]},
- 'pt': {'eyebrow': 'Perguntas frequentes',
-        'h2': 'Antes de começar,<br>vale a pena esclarecer.',
-        'help': '<p class="faq-help-q">Tem uma pergunta concreta?</p>\n'
-                '          <p>Conte-nos o contexto e ajudamos a definir o próximo passo.</p>\n'
-                '          <div class="faq-help-actions"><a class="btn btn-light btn-sm" href="#contacto">Vamos '
-                'falar <span aria-hidden="true">→</span></a><a class="btn btn-ghost btn-sm" '
-                'href="mailto:info@llumedigital.com">Escreva-nos</a></div>',
-        'items': [('Como pode a llume ajudar a minha empresa?',
-                   'Analisamos tarefas e processos para propor soluções de automação, integração de ferramentas, '
-                   'migração para a cloud, aplicações à medida ou visão artificial. A recomendação depende do '
-                   'problema e das ferramentas que já utiliza.'),
-                  ('Como começamos?',
-                   'Pode pedir uma primeira conversa de 30 minutos, gratuita e sem compromisso. Explique-nos o '
-                   'desafio e avaliamos se podemos ajudar. Se fizer sentido, preparamos uma proposta com âmbito, '
-                   'entregáveis, calendário e preço antes de começar.'),
-                  ('Quanto custa e quanto tempo demora um projeto?',
-                   'Depende do âmbito, da complexidade e das integrações. A proposta especifica o preço e o '
-                   'calendário; não prometemos um prazo ou uma poupança padrão para todos os projetos.'),
-                  ('Preciso de conhecimentos técnicos?',
-                   'Não. Começamos por perceber como trabalha a sua equipa e explicamos as opções com clareza. Se '
-                   'a solução exigir alterações nos seus sistemas, combinamos previamente os acessos e as '
-                   'decisões necessárias.'),
-                  ('O que recebemos no final?',
-                   'Os entregáveis, a documentação, a formação e o suporte ficam descritos na proposta. Também '
-                   'clarificamos a manutenção e os custos recorrentes, como licenças ou alojamento de terceiros.'),
-                  ('A quem pertence o código e como funcionam as licenças?',
-                   'A proposta e o contrato devem definir a titularidade e a entrega do desenvolvimento, bem como '
-                   'as licenças de componentes ou serviços de terceiros. Clarificamos tudo antes de começar.'),
-                  ('Como tratam os nossos dados?',
-                   'Antes de aceder aos dados do projeto, combinamos que informação é necessária, quem pode '
-                   'aceder e que serviços externos são utilizados. As condições aplicáveis e os meios para '
-                   'exercer os seus direitos estão na Política de privacidade.'),
-                  ('Fazem formação para equipas?',
-                   'Sim. Podemos preparar formação prática sobre ferramentas digitais e IA, adaptada às tarefas e '
-                   'à experiência da equipa. O formato, o conteúdo e a duração são definidos na proposta.')]}}
 
 TRAINING = {
     "es": {
@@ -277,7 +168,7 @@ def calculator(code):
 def head(code, title, desc, slug, schema):
     S = SITE[code]
     url = f"{BASE}/{slug}"
-    alternates = "\n".join(f'  <link rel="alternate" hreflang="{k}" href="{BASE}/{v[slug_key(slug)]}">' for k, v in SITE.items())
+    alternates = "\n".join(f'  <link rel="alternate" hreflang="{k}" href="{BASE}/{v["train"]}">' for k, v in SITE.items())
     return f"""<!doctype html>
 <html lang="{S['lang']}" class="no-webgl">
 <head>
@@ -309,10 +200,6 @@ def head(code, title, desc, slug, schema):
     <a href="{S['home']}#contacto" class="btn btn-light btn-sm">{S['talk']} <span aria-hidden="true">→</span></a>
   </header>
 """
-
-
-def slug_key(slug):
-    return "train" if any(slug == v["train"] for v in SITE.values()) else "faq"
 
 
 def foot(code):
@@ -376,33 +263,6 @@ def training(code):
 """ + foot(code)
 
 
-def faq_page(code):
-    F, S = FAQ[code], SITE[code]
-    title = {"es": "Preguntas frecuentes", "en": "Frequently asked questions", "pt": "Perguntas frequentes"}[code]
-    desc = {"es": "Qué soluciones ofrecemos, cómo empezamos, precios y plazos, entregables, titularidad del código y gestión de datos.",
-            "en": "What we do, how to get started, project pricing and timelines, deliverables, ownership and data handling.",
-            "pt": "O que fazemos, como começar, preços e prazos, entregáveis, titularidade do código e tratamento de dados."}[code]
-    def txt(x):
-        import re
-        return html.unescape(re.sub(r"<[^>]+>", "", x)).strip()
-    schema = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
-        {"@type": "Question", "name": txt(q), "acceptedAnswer": {"@type": "Answer", "text": txt(a)}} for q, a in F["items"]]}
-    items = "".join(f'\n        <details name="faq"><summary>{q}</summary><p>{a}</p></details>' for q, a in F["items"])
-    help_html = F["help"].replace(' href="#contacto"', f' href="{S["home"]}#contacto"')
-    return head(code, title, desc, S["faq"], schema) + f"""  <main id="main-content" tabindex="-1" class="wrap section faq-section faq-page">
-    <div class="faq-intro">
-      <p class="eyebrow">{F['eyebrow']}</p>
-      <h1>{F['h2']}</h1>
-      <div class="faq-help">
-        {help_html}
-      </div>
-    </div>
-    <div class="faq">{items}
-    </div>
-  </main>
-""" + foot(code)
-
-
 def check_balance(page, name):
     import re
     for tag in ("div", "section", "ul", "ol", "main", "details", "article"):
@@ -413,7 +273,7 @@ def check_balance(page, name):
 
 def main():
     for code, S in SITE.items():
-        for slug, render in ((S["train"], training), (S["faq"], faq_page)):
+        for slug, render in ((S["train"], training),):
             out = PUBLIC / f"{slug}.html"
             out.parent.mkdir(parents=True, exist_ok=True)
             page = render(code)

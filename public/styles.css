@@ -273,6 +273,15 @@ input::placeholder, textarea::placeholder { color: #a39c92; opacity: 1; }
 .foot-cols a:hover { color: var(--amber); }
 .foot-bottom { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 56px 0 28px; font-size: 12px; color: var(--muted); }
 .foot-bottom a:hover { color: var(--amber); }
+.footer-simple { padding-top: 0; }
+.footer-simple .foot-top { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 34px 0; }
+.foot-brand { display: inline-flex; align-items: center; gap: 10px; font-size: 23px; font-weight: 600; letter-spacing: -.04em; }
+.foot-nav, .footer-simple .foot-bottom nav { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; }
+.foot-nav a { color: #d8d2c9; font-size: 14px; }
+.foot-nav a:hover { color: var(--amber); }
+.footer-simple .foot-bottom { border-top: 1px solid var(--line); padding: 22px 0 28px; }
+.footer-simple .foot-bottom nav a { color: var(--muted); }
+.footer-simple .foot-bottom nav a:hover { color: var(--amber); }
 
 /* REVEAL */
 .reveal.reveal-pending { opacity: 0; transform: translateY(24px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
@@ -932,9 +941,6 @@ html:has(dialog[open]) { overflow-y: hidden; }
 .nf-other a { color: var(--amber); text-decoration: underline; text-underline-offset: 3px; }
 .quote figcaption a span { display: inline; }
 
-.quote-rotating { transition: opacity .55s ease, filter .55s ease; min-height: 4.5em; }
-.quote-rotating.is-fading { opacity: 0; filter: blur(8px); }
-@media (prefers-reduced-motion: reduce) { .quote-rotating { transition: none; } }
 
 /* About: clear rhythm between the introduction, service grid, team and CTA. */
 .about-page > h2 { margin-top: clamp(72px, 9vw, 108px); margin-bottom: 16px; max-width: 720px; }

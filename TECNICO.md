@@ -62,7 +62,7 @@ La portada tiene 9 bloques:
 | `#formacion` | Formación en IA en 3 sesiones (conocer la empresa + 2 talleres de 3 h) y guía final; independiente de la herramienta. Programa completo en `/formacion` |
 | `#contacto` | "¿Qué pasa en la primera llamada?", formulario de llamada y primera capa de protección de datos |
 
-"Nosotros" tiene página propia: `/nosotros`, `/en/about` y `/pt/sobre-nos`. Formación completa en `/formacion` (`/en/training`, `/pt/formacao`) y preguntas frecuentes en `/preguntas` (`/en/faq`, `/pt/perguntas`), generadas con `scripts/build_pages.py`.
+"Nosotros" tiene página propia: `/nosotros`, `/en/about` y `/pt/sobre-nos`. Formación completa en `/formacion` (`/en/training`, `/pt/formacao`), generada con `scripts/build_pages.py`.
 
 ### Casos de éxito
 
@@ -112,9 +112,9 @@ LinkedIn: el pie de las tres portadas enlaza a la página de empresa y el `Profe
 ## 9. SEO
 
 - Títulos con la palabra clave al principio, `meta robots` con vista previa grande de imágenes, `canonical` y `hreflang` en todas las páginas.
-- Datos estructurados: en las portadas, un `@graph` con `WebSite`, `ProfessionalService` (con el catálogo de servicios sacado de las tarjetas de Soluciones) y `FAQPage` (sacado de las propias preguntas de la página). En casos, `Article` y `BreadcrumbList`.
+- Datos estructurados: en las portadas, un `@graph` con `WebSite` y `ProfessionalService` (con el catálogo de servicios sacado de las tarjetas de Soluciones). En casos, `Article` y `BreadcrumbList`.
 - `sitemap.xml` con todas las URLs y sus alternativas por idioma; `llms.txt` para asistentes de IA.
-- Enlazado interno entre portadas, servicios, preguntas frecuentes y páginas de casos.
+- Enlazado interno entre portadas, servicios y páginas de casos.
 - Pendiente (necesita la cuenta de Google): dar de alta el dominio en Google Search Console y enviar el sitemap.
 
 ## 10. Prototipos para clientes
