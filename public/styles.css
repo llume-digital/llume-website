@@ -279,6 +279,10 @@ input::placeholder, textarea::placeholder { color: #a39c92; opacity: 1; }
 .foot-nav, .footer-simple .foot-bottom nav { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; }
 .foot-nav a { color: #d8d2c9; font-size: 14px; }
 .foot-nav a:hover { color: var(--amber); }
+.foot-social { display: flex; flex-wrap: wrap; gap: 10px; }
+.foot-social a { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; color: #d8d2c9; font-size: 13px; }
+.foot-social a:hover { border-color: rgba(242,192,138,.5); color: var(--text); }
+.foot-social svg { width: 17px; height: 17px; fill: currentColor; }
 .footer-simple .foot-bottom { border-top: 1px solid var(--line); padding: 22px 0 28px; }
 .footer-simple .foot-bottom nav a { color: var(--muted); }
 .footer-simple .foot-bottom nav a:hover { color: var(--amber); }
