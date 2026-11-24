@@ -14,11 +14,14 @@
 .p-cab__t { font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--neon); font-weight: 600; flex: 1; }
 .p-cab__links { display: flex; gap: 18px; font-size: .88rem; }
 .p-cab__links a { color: var(--blanco); text-underline-offset: 3px; display: inline-flex; align-items: center; min-height: 44px; }
-@media (max-width: 420px) { .p-cab__t { display: none; } .p-cab__links { margin-left: auto; } }
+@media (max-width: 420px) { .p-cab__t { display: none; } .p-cab__links { margin-left: auto; gap: 12px; font-size: .84rem; } }
+.cuenta--cab { position: static; margin-left: 4px; }
+.p-cab__links a.activo { color: var(--neon); }
 
 /* pestañas: barra inferior fija en móvil, superior en escritorio */
 .p-tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: var(--blanco); border-top: 2px solid var(--texto); padding-bottom: env(safe-area-inset-bottom); }
 .p-tabs__in { width: 100%; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.p-tabs__extra { display: none !important; }
 .p-tabs button { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: var(--tabs-h); padding: 6px 2px; font: inherit; font-size: .7rem; font-weight: 600; color: var(--gris-3); background: transparent; border: 0; border-top: 4px solid transparent; margin-top: -2px; cursor: pointer; }
 .p-tabs button svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: square; stroke-linejoin: miter; }
 .p-tabs button[aria-selected="true"] { color: var(--texto); border-top-color: var(--verde); background: var(--verde-claro); }
@@ -32,13 +35,15 @@
   .p-tabs button[aria-selected="true"] { border-bottom-color: var(--verde); background: transparent; }
   .p-tabs button svg { width: 20px; height: 20px; }
   .cuenta { position: static; margin-left: 2px; }
+  .p-tabs__extra { display: flex !important; }
+  .p-tabs button { padding: 0 16px; }
 }
 
 .p-main { padding-block: 20px 8px; outline: none; }
 .p-main section { min-width: 0; }
 .p-sub { color: var(--gris-3); font-size: .92rem; margin: -.3em 0 1em; }
 .p-bloque { margin-bottom: 32px; }
-.p-bloque__cab { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.p-bloque__cab { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
 .vacio { background: var(--blanco); padding: 22px; color: var(--gris-3); border-left: 4px solid var(--gris-2); }
 .vacio b { color: var(--texto); }
 .num { font-variant-numeric: tabular-nums; }
@@ -238,3 +243,49 @@
 .toast.on { opacity: 1; transform: translate(-50%, 0); }
 .toast--aviso { border-left-color: var(--aviso-fondo); }
 .toast--err { border-left-color: var(--error); }
+
+/* ---------- comentarios ---------- */
+.com-filtros { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.com-filtros .num { opacity: .7; font-weight: 500; }
+.com-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.com { background: var(--blanco); box-shadow: var(--sombra); border-left: 5px solid var(--aviso); padding: 14px 16px; min-width: 0; }
+.com--en_curso { border-left-color: var(--texto); }
+.com--hecho { border-left-color: var(--verde); }
+.com--descartado { border-left-color: var(--gris-2); opacity: .75; }
+.com__cab { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 6px; }
+.com__meta { font-size: .82rem; color: var(--gris-3); }
+.com__meta b { color: var(--texto); }
+.com__donde { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--verde-texto); font-weight: 600; margin: 0 0 4px; }
+.com__texto { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0 0 10px; }
+.com__resp { background: var(--verde-claro); border-left: 3px solid var(--verde); padding: 8px 12px; margin-bottom: 10px; font-size: .92rem; }
+.com__resp b { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; }
+.com__resp p { margin: 2px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.com__pie { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; }
+.com__pie .campo { margin: 0; flex: 0 1 200px; }
+.com__form { margin-top: 12px; }
+.com__acc { display: flex; gap: 8px; justify-content: flex-end; }
+.prio--alta { background: var(--texto); color: var(--blanco); }
+.prio--media { background: var(--verde-claro); color: var(--verde-osc); }
+.prio--baja { background: var(--gris-1); color: var(--gris-3); }
+
+/* ---------- guía ---------- */
+.guia { max-width: 820px; }
+.guia__intro { background: var(--texto); color: var(--blanco); padding: 22px 20px; border-left: 6px solid var(--neon); margin-bottom: 28px; }
+.guia__intro h2 { font-size: 1.6rem; }
+.guia__nota { background: rgba(255, 255, 255, .08); padding: 12px 14px; font-size: .93rem; margin: 0; }
+.guia__bloque { margin-bottom: 32px; }
+.guia__cab { display: flex; align-items: center; gap: 12px; justify-content: space-between; }
+.guia__barra { height: 8px; background: var(--gris-1); margin: 0 0 12px; }
+.guia__barra i { display: block; height: 100%; background: var(--verde); transition: width .3s; }
+.guia__pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.guia__pasos li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; background: var(--blanco); padding: 4px 14px; border-left: 4px solid var(--gris-2); }
+.guia__pasos li.hecho { border-left-color: var(--verde); }
+.guia__pasos li.hecho span { color: var(--gris-3); text-decoration: line-through; }
+.guia__pasos .chk { margin: 8px 0; flex: 1 1 260px; }
+.guia__secs { display: grid; gap: 8px; }
+.guia__sec { background: var(--blanco); border-left: 4px solid var(--verde); }
+.guia__sec summary { cursor: pointer; padding: 14px 16px; font-weight: 600; font-size: 1.05rem; }
+.guia__sec p { padding: 0 16px; }
+.guia__truco { background: var(--verde-claro); margin: 0 16px 16px; padding: 10px 12px !important; font-size: .93rem; }
+.guia__lista { padding-left: 1.2em; }
+.guia__lista li { margin-bottom: .5em; }

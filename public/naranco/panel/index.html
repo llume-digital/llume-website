@@ -17,7 +17,7 @@
   <div class="wrap p-cab__in">
     <a class="p-cab__logo" href="./" aria-label="Nar&amp;Co · Panel"><img src="../img/marca/logo-blanco.png" alt="Nar&amp;Co" width="448" height="132"></a>
     <span class="p-cab__t">Panel de Mateo</span>
-    <span class="p-cab__links"><a href="../">Ver la web</a><a href="../salir">Salir</a></span>
+    <span class="p-cab__links"><a href="#guia">Guía</a><a href="#comentarios">Comentarios<b class="cuenta cuenta--cab" id="cuenta-com-cab" hidden>0</b></a><a href="../">Ver la web</a><a href="../salir">Salir</a></span>
   </div>
 </header>
 
@@ -28,6 +28,8 @@
     <button type="button" role="tab" id="pest-stock" data-tab="stock" aria-controls="tab-stock" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="16" r="3.5"/><circle cx="18" cy="16" r="3.5"/><path d="M6 16l4-8h5l3 8M10 8l3 8"/></svg><span>Stock</span></button>
     <button type="button" role="tab" id="pest-precios" data-tab="precios" aria-controls="tab-precios" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12l9-9h9v9l-9 9zM16 8h.01"/></svg><span>Precios</span></button>
     <button type="button" role="tab" id="pest-metricas" data-tab="metricas" aria-controls="tab-metricas" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg><span>Métricas</span></button>
+    <button type="button" class="p-tabs__extra" role="tab" id="pest-comentarios" data-tab="comentarios" aria-controls="tab-comentarios" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v12H9l-5 4zM8 9h8M8 12h5"/></svg><span>Comentarios</span><b class="cuenta" id="cuenta-com" hidden>0</b></button>
+    <button type="button" class="p-tabs__extra" role="tab" id="pest-guia" data-tab="guia" aria-controls="tab-guia" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01"/></svg><span>Guía</span></button>
   </div>
 </nav>
 
@@ -37,11 +39,13 @@
   <section id="tab-stock" role="tabpanel" aria-labelledby="pest-stock" hidden></section>
   <section id="tab-precios" role="tabpanel" aria-labelledby="pest-precios" hidden></section>
   <section id="tab-metricas" role="tabpanel" aria-labelledby="pest-metricas" hidden></section>
+  <section id="tab-comentarios" role="tabpanel" aria-labelledby="pest-comentarios" hidden></section>
+  <section id="tab-guia" role="tabpanel" aria-labelledby="pest-guia" hidden></section>
 </main>
 
 <footer class="p-pie">
   <div class="wrap p-pie__in">
-    <p>Demo privada: los pagos y avisos son simulados. En la demo los cambios se guardan solo en este navegador.</p>
+    <p>Demo privada: los pagos y avisos son simulados. Los cambios se guardan solo en este navegador, salvo los comentarios, que nos llegan.</p>
     <button type="button" class="p-reset" id="btn-reset">Restablecer datos de ejemplo</button>
   </div>
 </footer>
@@ -57,6 +61,8 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="../datos.js"></script>
+<script src="../comentar.js"></script>
+<script src="guia.js"></script>
 <script src="panel.js"></script>
 </body>
 </html>
