@@ -21,6 +21,14 @@
 //   · un enlace con ?clave=… en cualquier ruta de /naranco/ (se quita de la dirección al entrar).
 // Con la clave buena se guarda una cookie HttpOnly limitada a /naranco durante 30 días; /naranco/salir la borra.
 // Solo se guarda el sha256 de la clave (NARANCO_CLAVE_SHA256); la cookie lleva la clave y se comprueba igual.
+//
+// /naranco/api/comentarios: comentarios que Mateo deja sobre la demo (botón «Comentar» de la web y pestaña del panel).
+// Solo con la cookie de la demo. Se guardan en otra instancia del mismo Durable Object («naranco-comentarios»),
+// separada de los datos de Lopita:
+//   GET   → {comentarios: [...]} del más nuevo al más antiguo
+//   POST  {texto, donde, prioridad, autor, url} → crea uno (estado «nuevo»)
+//   PATCH ?id=<n> {estado?, respuesta?} → cambia el estado o deja una respuesta
+// Las vistas previas no tienen el Durable Object: responde 503 y la página guarda en el navegador.
 import { DurableObject } from 'cloudflare:workers';
 
 const RUTA_DB = '/lopita/horarios/nube/db';
@@ -74,6 +82,35 @@ export class LopitaDatos extends DurableObject {
   leerCalendario(token) {
     const fila = this.sql.exec('SELECT ics FROM calendarios WHERE token = ?', token).toArray()[0];
     return fila ? fila.ics : null;
+  }
+
+  // ---- comentarios de la demo de Nar&Co (solo en la instancia «naranco-comentarios») ----
+  tablaComentarios() {
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS comentarios (id INTEGER PRIMARY KEY AUTOINCREMENT, creado TEXT NOT NULL,
+      actualizado TEXT NOT NULL, autor TEXT NOT NULL, donde TEXT NOT NULL, prioridad TEXT NOT NULL, texto TEXT NOT NULL,
+      url TEXT NOT NULL, estado TEXT NOT NULL, respuesta TEXT NOT NULL)`);
+  }
+
+  listarComentarios() {
+    this.tablaComentarios();
+    return this.sql.exec('SELECT * FROM comentarios ORDER BY id DESC LIMIT 500').toArray();
+  }
+
+  crearComentario(c) {
+    this.tablaComentarios();
+    const n = this.sql.exec('SELECT COUNT(*) AS n FROM comentarios').toArray()[0].n;
+    if (n >= 2000) return null;
+    const ahora = new Date().toISOString();
+    return this.sql.exec(`INSERT INTO comentarios (creado, actualizado, autor, donde, prioridad, texto, url, estado, respuesta)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 'nuevo', '') RETURNING *`, ahora, ahora, c.autor, c.donde, c.prioridad, c.texto, c.url).toArray()[0];
+  }
+
+  cambiarComentario(id, cambios) {
+    this.tablaComentarios();
+    const fila = this.sql.exec('SELECT * FROM comentarios WHERE id = ?', id).toArray()[0];
+    if (!fila) return null;
+    return this.sql.exec('UPDATE comentarios SET estado = ?, respuesta = ?, actualizado = ? WHERE id = ? RETURNING *',
+      cambios.estado ?? fila.estado, cambios.respuesta ?? fila.respuesta, new Date().toISOString(), id).toArray()[0];
   }
 
   version() {
@@ -244,6 +281,42 @@ ${error ? '<p class="error" role="alert">Clave incorrecta. Inténtalo de nuevo.<
 const redirigir = (destino, cookie) =>
   responder(null, 303, { Location: destino, ...(cookie ? { 'Set-Cookie': cookie } : {}) });
 
+const ESTADOS_COMENTARIO = new Set(['nuevo', 'en_curso', 'hecho', 'descartado']);
+const PRIORIDADES = new Set(['imprescindible', 'me_gustaria', 'mas_adelante']);
+const textoLimpio = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+
+async function comentariosNaranco(request, env, url) {
+  const json = (datos, estado = 200) => responder(JSON.stringify(datos), estado, { 'Content-Type': 'application/json; charset=utf-8' });
+  if (!env.LOPITA_DATOS) return json({ error: 'sin_almacen' }, 503);
+  const almacen = env.LOPITA_DATOS.get(env.LOPITA_DATOS.idFromName('naranco-comentarios'));
+  if (request.method === 'GET') return json({ comentarios: await almacen.listarComentarios() });
+  if (request.method !== 'POST' && request.method !== 'PATCH') return responder(null, 405, { Allow: 'GET, POST, PATCH' });
+  // Misma web: rechaza envíos desde otros orígenes
+  const origen = request.headers.get('Origin');
+  if (origen && origen !== url.origin) return json({ error: 'origen' }, 403);
+  const texto = await request.text();
+  if (texto.length > 20000) return json({ error: 'tamaño' }, 413);
+  let d;
+  try { d = JSON.parse(texto); } catch { return json({ error: 'json' }, 400); }
+  if (!d || typeof d !== 'object') return json({ error: 'formato' }, 400);
+  if (request.method === 'POST') {
+    const c = {
+      texto: textoLimpio(d.texto, 4000), donde: textoLimpio(d.donde, 120) || 'General', autor: textoLimpio(d.autor, 60) || 'Mateo',
+      prioridad: PRIORIDADES.has(d.prioridad) ? d.prioridad : 'me_gustaria', url: textoLimpio(d.url, 300),
+    };
+    if (!c.texto) return json({ error: 'vacio' }, 400);
+    const fila = await almacen.crearComentario(c);
+    return fila ? json({ comentario: fila }, 201) : json({ error: 'lleno' }, 507);
+  }
+  const id = Number(url.searchParams.get('id'));
+  if (!Number.isInteger(id) || id < 1) return json({ error: 'id' }, 400);
+  const cambios = {};
+  if (d.estado !== undefined) { if (!ESTADOS_COMENTARIO.has(d.estado)) return json({ error: 'estado' }, 400); cambios.estado = d.estado; }
+  if (d.respuesta !== undefined) cambios.respuesta = textoLimpio(d.respuesta, 4000);
+  const fila = await almacen.cambiarComentario(id, cambios);
+  return fila ? json({ comentario: fila }) : json({ error: 'no_existe' }, 404);
+}
+
 async function demoNaranco(request, env, url) {
   // Formulario de acceso
   if (url.pathname === `${NARANCO}/acceso`) {
@@ -270,6 +343,8 @@ async function demoNaranco(request, env, url) {
     if (request.method !== 'GET' && request.method !== 'HEAD') return responder('Acceso restringido', 401);
     return pantallaAcceso(destinoNaranco(url.pathname + url.search), false);
   }
+
+  if (url.pathname === `${NARANCO}/api/comentarios`) return comentariosNaranco(request, env, url);
 
   const r = await env.ASSETS.fetch(request);
   const res = new Response(r.body, r);

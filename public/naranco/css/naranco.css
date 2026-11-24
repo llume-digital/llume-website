@@ -375,3 +375,25 @@ textarea { resize: vertical; }
   .banda::after { display: none; }
   .banda__in { padding-block: 24px 72px; }
 }
+
+/* ---------- comentarios sobre la demo (comentar.js) ---------- */
+.nc-com-tab { position: fixed; right: 0; top: 50%; z-index: 70; transform: translateY(-50%); writing-mode: vertical-rl; rotate: 180deg; padding: 16px 9px; font: inherit; font-size: .85rem; font-weight: 600; letter-spacing: .06em; color: var(--texto); background: var(--neon); border: 2px solid var(--texto); border-right: 0; cursor: pointer; box-shadow: 0 6px 20px rgba(0, 0, 0, .18); }
+.nc-com-tab:hover { background: var(--verde); }
+.nc-com { width: min(520px, calc(100% - 24px)); max-height: calc(100dvh - 24px); padding: 0; border: 2px solid var(--texto); border-top: 6px solid var(--verde); background: var(--blanco); color: var(--texto); box-shadow: 0 16px 48px rgba(0, 0, 0, .3); }
+.nc-com::backdrop { background: rgba(20, 20, 20, .55); }
+.nc-com__f, .nc-com__ok { padding: 18px; }
+.nc-com__cab { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.nc-com__cab h2 { font-size: 1.3rem; margin: 0; }
+.nc-com__x { width: 44px; height: 44px; font: inherit; font-size: 1.6rem; line-height: 1; background: transparent; border: 0; cursor: pointer; color: var(--texto); }
+.nc-com__ayuda { color: var(--gris-3); font-size: .9rem; margin: .4em 0 1em; }
+.nc-com .campo { margin-bottom: 12px; }
+.nc-com label, .nc-com legend { font-weight: 600; font-size: .88rem; }
+.nc-com input:not([type=radio]), .nc-com textarea, .nc-com select { border-color: var(--texto); }
+.nc-com__prio { border: 0; margin: 0 0 12px; padding: 0; }
+.nc-com__prio label { display: flex; align-items: center; gap: 8px; min-height: 36px; font-weight: 400; font-size: .95rem; }
+.nc-com__prio input { width: 20px; height: 20px; min-height: 20px; padding: 0; flex: none; accent-color: var(--verde-osc); appearance: auto; -webkit-appearance: radio; }
+.nc-com__err { color: var(--error); font-weight: 600; }
+.nc-com__acc { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; margin-top: 6px; }
+.nc-com__ok b { font-size: 1.3rem; display: block; margin-bottom: .4em; }
+.nc-com__ok:focus { outline: none; }
+@media print { .nc-com-tab { display: none; } }

@@ -6,8 +6,9 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const ACTIVAS = ['pendiente', 'confirmada'];
-  const TABS = ['solicitudes', 'calendario', 'stock', 'precios', 'metricas'];
-  const S = { tab: 'solicitudes', hFiltro: 'todos', hBusca: '', hMax: 15, mes: null, dia: null, per: '30', consMax: 8, consNuevas: false, borrador: null };
+  const TABS = ['solicitudes', 'calendario', 'stock', 'precios', 'metricas', 'comentarios', 'guia'];
+  const NOMBRES = { solicitudes: 'Solicitudes', calendario: 'Calendario', stock: 'Stock', precios: 'Precios', metricas: 'Métricas', comentarios: 'Comentarios', guia: 'Guía' };
+  const S = { comFiltro: 'abiertos', comLista: null, comError: false, tab: 'solicitudes', hFiltro: 'todos', hBusca: '', hMax: 15, mes: null, dia: null, per: '30', consMax: 8, consNuevas: false, borrador: null };
   { const h = new Date(NC.hoy); h.setDate(1); S.mes = h; }
 
   // ---------- utilidades ----------
@@ -84,12 +85,15 @@
     S.tab = tab;
     $$('[role=tab]').forEach(b => { const on = b.dataset.tab === tab; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; });
     TABS.forEach(t => { $('#tab-' + t).hidden = t !== tab; });
+    document.body.dataset.donde = NOMBRES[tab];
+    $$('.p-cab__links a[href^="#"]').forEach(l => l.classList.toggle('activo', l.getAttribute('href') === '#' + tab));
+    if (tab === 'guia') try { localStorage.setItem('naranco_guia_vista', '1'); } catch { }
     try { history.replaceState(null, '', '#' + tab); } catch { }
     render();
     if (foco) $('#pest-' + tab).focus();
     window.scrollTo(0, 0);
   }
-  function render() { cuenta(); ({ solicitudes: rSolicitudes, calendario: rCalendario, stock: rStock, precios: rPrecios, metricas: rMetricas })[S.tab](); }
+  function render() { cuenta(); ({ solicitudes: rSolicitudes, calendario: rCalendario, stock: rStock, precios: rPrecios, metricas: rMetricas, comentarios: rComentarios, guia: rGuia })[S.tab](); }
 
   // =====================================================================
   // 1. SOLICITUDES
@@ -480,6 +484,61 @@
   }
 
   // =====================================================================
+  // 6. COMENTARIOS (se guardan en el servidor: los ve también Miguel)
+  // =====================================================================
+  const C = window.NCComentarios;
+  const FILTROS_COM = [['abiertos', 'Abiertos'], ['todos', 'Todos'], ['hecho', 'Hechos'], ['descartado', 'Descartados']];
+  const BADGE_COM = { nuevo: 'badge--pend', en_curso: '', hecho: 'badge--ok', descartado: 'badge--err' };
+  const BADGE_PRIO = { imprescindible: 'prio--alta', me_gustaria: 'prio--media', mas_adelante: 'prio--baja' };
+  const fechaHora = iso => new Date(iso).toLocaleString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).replace('.', '');
+  async function cargarComentarios() {
+    try { S.comLista = await C.listar(); S.comError = false; } catch { S.comError = true; if (!S.comLista) S.comLista = []; }
+    cuentaCom(); if (S.tab === 'comentarios') rComentarios();
+  }
+  function cuentaCom() {
+    const n = (S.comLista || []).filter(c => c.estado === 'nuevo').length, b = $('#cuenta-com');
+    b.textContent = n; b.hidden = !n;
+    const bc = $('#cuenta-com-cab'); bc.textContent = n; bc.hidden = !n;
+  }
+  function rComentarios() {
+    const l = S.comLista, pend = C.pendientesLocales();
+    const ver = (l || []).filter(c => S.comFiltro === 'todos' ? true : S.comFiltro === 'abiertos' ? ['nuevo', 'en_curso'].includes(c.estado) : c.estado === S.comFiltro);
+    const cuantos = k => (l || []).filter(c => k === 'todos' || (k === 'abiertos' ? ['nuevo', 'en_curso'].includes(c.estado) : c.estado === k)).length;
+    $('#tab-comentarios').innerHTML = `
+      <div class="p-bloque__cab"><h2>Comentarios sobre la web</h2><button type="button" class="btn btn--primario btn--sm" data-acc="comentar">+ Nuevo comentario</button></div>
+      <p class="p-sub">Todo lo que quieras cambiar, añadir o quitar, en la web o en este panel. Lo vemos los dos y te contestamos aquí mismo.</p>
+      ${S.comError ? `<div class="aviso aviso--err" role="alert"><b>No se pueden cargar los comentarios ahora.</b> ${pend ? `Tienes ${pend} guardado${pend === 1 ? '' : 's'} en este navegador que se enviará${pend === 1 ? '' : 'n'} solo en cuanto haya conexión.` : 'Prueba a recargar en un momento.'}</div>` : ''}
+      <div class="com-filtros" role="group" aria-label="Filtrar comentarios">${FILTROS_COM.map(([k, t]) => `<button type="button" class="btn btn--sm ${S.comFiltro === k ? 'btn--primario' : 'btn--borde'}" data-comf="${k}" aria-pressed="${S.comFiltro === k}">${t} <span class="num">${cuantos(k)}</span></button>`).join('')}
+        ${l && l.length ? '<button type="button" class="btn btn--borde btn--sm" data-acc="com-copiar">Copiar lista</button>' : ''}</div>
+      ${l === null ? '<p class="vacio">Cargando comentarios…</p>' : ver.length ? `<ul class="com-lista">${ver.map(c => `<li class="com com--${e(c.estado)}">
+        <div class="com__cab"><span class="badge ${BADGE_PRIO[c.prioridad] || ''}">${e(C.PRIORIDADES[c.prioridad] || c.prioridad)}</span><span class="com__meta"><b>${e(c.autor)}</b> · ${e(fechaHora(c.creado))} · #${e(c.id)}</span></div>
+        <p class="com__donde">${e(c.donde)}</p>
+        <p class="com__texto">${e(c.texto)}</p>
+        ${c.respuesta ? `<div class="com__resp"><b>Respuesta</b><p>${e(c.respuesta)}</p></div>` : ''}
+        <div class="com__pie">
+          <div class="campo"><label for="com-est-${e(c.id)}">Estado</label><select id="com-est-${e(c.id)}" data-com-estado="${e(c.id)}">${Object.entries(C.ESTADOS).map(([k, v]) => `<option value="${k}"${c.estado === k ? ' selected' : ''}>${v}</option>`).join('')}</select></div>
+          <button type="button" class="btn btn--borde btn--sm" data-acc="com-responder" data-id="${e(c.id)}">${c.respuesta ? 'Editar respuesta' : 'Responder'}</button>
+        </div>
+        <div class="com__form" id="com-form-${e(c.id)}" hidden><div class="campo"><label for="com-resp-${e(c.id)}">Respuesta</label><textarea id="com-resp-${e(c.id)}" rows="3" maxlength="4000">${e(c.respuesta)}</textarea></div>
+          <div class="com__acc"><button type="button" class="btn btn--borde btn--sm" data-acc="com-cancelar" data-id="${e(c.id)}">Cancelar</button><button type="button" class="btn btn--primario btn--sm" data-acc="com-guardar" data-id="${e(c.id)}">Guardar respuesta</button></div></div>
+      </li>`).join('')}</ul>` : `<div class="vacio"><b>${(l || []).length ? 'No hay comentarios con este filtro.' : 'Aún no hay comentarios.'}</b> Usa el botón «Comentar» del borde derecho desde cualquier página de la web o del panel.</div>`}`;
+  }
+  async function accionCom(id, cambios, txt) {
+    try { await C.cambiar(id, cambios); aviso(txt); await cargarComentarios(); }
+    catch { aviso('No se ha podido guardar. Prueba otra vez en un momento.', 'aviso'); }
+  }
+  async function copiarCom() {
+    const l = (S.comLista || []).filter(c => ['nuevo', 'en_curso'].includes(c.estado));
+    const txt = l.map(c => `#${c.id} [${C.PRIORIDADES[c.prioridad] || c.prioridad}] ${c.donde}\n${c.texto}${c.respuesta ? `\n→ ${c.respuesta}` : ''}`).join('\n\n');
+    try { await navigator.clipboard.writeText(txt || 'Sin comentarios abiertos.'); aviso(`${l.length} comentarios abiertos copiados.`); } catch { aviso('No se ha podido copiar.', 'aviso'); }
+  }
+
+  // =====================================================================
+  // 7. GUÍA
+  // =====================================================================
+  function rGuia() { $('#tab-guia').innerHTML = NCGuia.html(); }
+
+  // =====================================================================
   // eventos
   // =====================================================================
   document.addEventListener('click', ev => {
@@ -491,6 +550,8 @@
       rCalendario(); const bt = $(`[data-dia="${S.dia}"]`); if (bt) bt.focus({ preventScroll: true });
       if (innerWidth < 900) $('#dia-det').scrollIntoView({ behavior: 'smooth', block: 'start' }); return;
     }
+    const ir = ev.target.closest('[data-ir]'); if (ir) return mostrar(ir.dataset.ir);
+    const cf = ev.target.closest('[data-comf]'); if (cf) { S.comFiltro = cf.dataset.comf; rComentarios(); $(`[data-comf="${S.comFiltro}"]`).focus(); return; }
     const b = ev.target.closest('[data-acc]'); if (!b) return;
     const a = b.dataset.acc;
     if (['confirmar', 'rechazar', 'respondido', 'no-respondido'].includes(a)) accionReserva(a, b.dataset.id);
@@ -504,10 +565,16 @@
     else if (a === 'precios-descartar') { S.borrador = null; rPrecios(); aviso('Cambios descartados.'); }
     else if (a === 'atendida') { NC.cambiarConsulta(b.dataset.id, 'atendida'); rMetricas(); aviso('Consulta marcada como atendida.'); }
     else if (a === 'cons-mas') { S.consMax += 8; rMetricas(); }
+    else if (a === 'comentar') C.abrir();
+    else if (a === 'com-copiar') copiarCom();
+    else if (a === 'com-responder' || a === 'com-cancelar') { const fm = $('#com-form-' + b.dataset.id); fm.hidden = a === 'com-cancelar'; if (!fm.hidden) $('#com-resp-' + b.dataset.id).focus(); }
+    else if (a === 'com-guardar') accionCom(b.dataset.id, { respuesta: $('#com-resp-' + b.dataset.id).value.trim() }, 'Respuesta guardada.');
   });
   document.addEventListener('change', ev => {
     if (ev.target.id === 'h-estado') { S.hFiltro = ev.target.value; S.hMax = 15; $('#hist-lista').innerHTML = htmlHist(); }
     else if (ev.target.id === 'cons-nuevas') { S.consNuevas = ev.target.checked; S.consMax = 8; rMetricas(); $('#cons-nuevas').focus(); }
+    else if (ev.target.dataset.comEstado) accionCom(ev.target.dataset.comEstado, { estado: ev.target.value }, `Comentario #${ev.target.dataset.comEstado}: ${C.ESTADOS[ev.target.value]}.`);
+    else if (ev.target.dataset.paso) { NCGuia.marcar(ev.target.dataset.paso, ev.target.checked); rGuia(); $(`[data-paso="${ev.target.dataset.paso}"]`).focus(); }
     else if (/^p-inc-\d+$/.test(ev.target.id)) { const i = ev.target.id.slice(6), pr = document.getElementById('p-ex-' + i); if (pr) { pr.disabled = ev.target.checked; if (ev.target.checked) pr.value = 0; } }
   });
   document.addEventListener('input', ev => { if (ev.target.id === 'h-busca') { S.hBusca = ev.target.value; S.hMax = 15; $('#hist-lista').innerHTML = htmlHist(); } });
@@ -531,5 +598,9 @@
   window.addEventListener('resize', () => { clearTimeout(tR); tR = setTimeout(() => { if (innerWidth !== anchoPrev) { anchoPrev = innerWidth; if (S.tab === 'metricas') pintar(); } }, 150); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (S.tab === 'metricas') pintar(); });
 
-  mostrar((location.hash || '').slice(1) || 'solicitudes');
+  window.addEventListener('hashchange', () => { const t = location.hash.slice(1); if (TABS.includes(t) && t !== S.tab) mostrar(t); });
+  window.addEventListener('nc-comentarios', () => { cargarComentarios(); });
+  let vista = false; try { vista = !!localStorage.getItem('naranco_guia_vista'); } catch { }
+  mostrar((location.hash || '').slice(1) || (vista ? 'solicitudes' : 'guia'));
+  cargarComentarios();
 })();
