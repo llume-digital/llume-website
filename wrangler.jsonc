@@ -6,7 +6,9 @@
   "previews": {
     "vars": {
       // Misma clave que en producción para probar la demo privada de Nar&Co en la vista previa
-      "NARANCO_CLAVE_SHA256": "aa214ce3978168d4428912e5e8daeb0bb993b686fee644ee3a33fb21913bc81f"
+      "NARANCO_CLAVE_SHA256": "aa214ce3978168d4428912e5e8daeb0bb993b686fee644ee3a33fb21913bc81f",
+      // Ídem para el prototipo privado del panel de BioAsturias
+      "BIOASTURIAS_CLAVE_SHA256": "49d7e1890e3ffa94d4ce4500b885a566448b3bc32cf78920262f25d36ff6dc54"
     }
   },
   // Solo atiende las rutas de assets.run_worker_first; el resto lo sirve Cloudflare directamente desde public/
@@ -17,7 +19,7 @@
     "binding": "ASSETS",
     // Rutas inexistentes muestran public/404.html con estado 404
     "not_found_handling": "404-page",
-    "run_worker_first": ["/lopita/horarios/nube/*", "/naranco", "/naranco/*"]
+    "run_worker_first": ["/lopita/horarios/nube/*", "/naranco", "/naranco/*", "/bioasturias", "/bioasturias/*"]
   },
   // Base de datos compartida de la app de horarios de Lopita (ver src/worker.js)
   "durable_objects": {
@@ -31,6 +33,8 @@
     // secreto (`npx wrangler secret put SLACK_BOT_TOKEN`); mientras no exista, la app trabaja en modo simulación.
     "SLACK_CHANNEL": "#horarios",
     // sha256 de la clave de la demo privada de Nar&Co en /naranco/ (la clave no está en el repo, ver src/worker.js)
-    "NARANCO_CLAVE_SHA256": "aa214ce3978168d4428912e5e8daeb0bb993b686fee644ee3a33fb21913bc81f"
+    "NARANCO_CLAVE_SHA256": "aa214ce3978168d4428912e5e8daeb0bb993b686fee644ee3a33fb21913bc81f",
+    // sha256 de la clave del prototipo privado del panel de BioAsturias en /bioasturias/ (la clave no está en el repo)
+    "BIOASTURIAS_CLAVE_SHA256": "49d7e1890e3ffa94d4ce4500b885a566448b3bc32cf78920262f25d36ff6dc54"
   }
 }

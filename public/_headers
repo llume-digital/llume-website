@@ -48,3 +48,7 @@
 /naranco/*
   X-Robots-Tag: noindex, nofollow
   Cache-Control: no-cache
+
+/bioasturias/*
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-cache
