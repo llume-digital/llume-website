@@ -52,8 +52,10 @@
         <div class="acciones" style="align-self:center"><button type="button" class="btn btn--primario btn--sm" data-acc="det-aceptar" data-id="${esc(d.id)}">Aceptar</button><button type="button" class="btn btn--borde btn--sm" data-acc="det-editar" data-id="${esc(d.id)}">Editar</button><button type="button" class="btn btn--borde btn--sm" data-acc="det-descartar" data-id="${esc(d.id)}" aria-label="Descartar a ${esc(d.nombre)} ${esc(d.apellidos)}">Descartar</button></div></div>`; }).join('')}</div></details>`;
   }
   function renderLista() {
-    return `<div class="cab-pagina"><div><h1>CRM</h1><p>Entidades, personas y categorías: la fuente de verdad de tus contactos y de tus envíos.</p></div>
+    const sync = BA.ui('odooSync', '');
+    return `<div class="cab-pagina"><div><h1>CRM</h1><p>Tus contactos: las <b>entidades</b> (empresas socias, universidades, instituciones) y las <b>personas</b> de cada una, con sus categorías y el historial de lo que habéis hablado. Es la base de datos de la que salen los envíos.</p></div>
       <div class="acciones"><button type="button" class="btn btn--primario" data-acc="contacto-nuevo">${U.ic('mas2', 'ic--sm')} Nuevo contacto</button><button type="button" class="btn btn--borde" data-acc="entidad-nueva">Nueva entidad</button><button type="button" class="btn btn--borde" data-acc="etiquetas">Gestionar etiquetas</button></div></div>
+      <div class="odoo-sync" role="note">${U.ic('odoo')}<div><b>Importado de Odoo (Contactos)</b><span class="peq suave">Entidades y personas vienen de Odoo; el panel añade las categorías, el contacto principal y el historial. ${sync ? 'Última sincronización: ' + esc(sync) + '.' : 'Última sincronización: hoy a las 06:00.'} Prototipo: datos de ejemplo.</span></div><button type="button" class="btn btn--borde btn--sm" data-acc="odoo-sync">Sincronizar con Odoo</button></div>
       ${detectadosHtml()}
       <div class="barra-crm"><div class="buscador"><label class="solo-lectores" for="crm-q">Buscar contactos y entidades</label>${U.ic('buscar')}<input id="crm-q" type="search" placeholder="Buscar por nombre, cargo, correo o entidad" value="${esc(crm.q)}" data-inp="crm-q" autocomplete="off"></div>
         <div class="conmutador" role="group" aria-label="Qué mostrar">${[['contactos', 'Contactos'], ['entidades', 'Entidades']].map(([k, t]) => `<button type="button" data-acc="crm-vista" data-k="${k}" aria-pressed="${crm.vista === k}">${t}</button>`).join('')}</div>
@@ -125,6 +127,7 @@
         <section class="tarjeta"><h2>Historial de comunicaciones</h2>${historial(coms)}</section></div></div>`;
   }
   const noExiste = () => `<div class="vacio"><b>No encontramos esa ficha</b><a href="#/crm">Volver al CRM</a></div>`;
+  BA.acc['odoo-sync'] = () => { BA.setUi('odooSync', 'hoy a las ' + U.hora(new Date())); BA.refrescar(); BA.toast('Sincronización con Odoo simulada: sin cambios.'); };
   BA.rutas.crm = { titulo: 'CRM', render: a => { crm.verTodasCom = a[0] ? crm.verTodasCom : false; return a[0] === 'e' ? fichaEntidad(a[1]) : a[0] === 'c' ? fichaContacto(a[1]) : renderLista(); } };
   BA.acc.principal = el => { const c = BA.contacto(el.dataset.id); BA.parchear('contactos', c.id, { principal: !c.principal }); BA.refrescar(); BA.toast(c.principal ? `${c.nombre} ya no es contacto principal.` : `${c.nombre} es ahora contacto principal.`); };
   BA.acc['enviar-a'] = el => { BA.mod.envios.preparar(el.dataset.ids.split(','), BA.filtro.nuevo()); BA.irA('#/envios'); };

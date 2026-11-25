@@ -16,11 +16,16 @@ window.BA_DATOS = (() => {
   const rng = (() => { let a = 20261125; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; })();
   const azar = lista => lista[Math.floor(rng() * lista.length)];
 
-  const AREAS = ['Socios', 'Proyectos', 'Eventos', 'Comunicación', 'Administración', 'Internacional'];
+  // Áreas de trabajo de Mateo (reunión del 25-11) más «Internacional», que ya usaba el prototipo para la misión a México
+  const AREAS = ['Proyectos', 'I+D', 'Socios', 'Eventos', 'Administración', 'Propuestas comerciales', 'Comunicación', 'Internacional'];
   const PROYECTOS = {
     'Captación de socios': 'Socios', 'Plan estratégico': 'Proyectos', 'Mentoring científicos': 'Proyectos', 'Bioincubadora': 'Proyectos',
     'Rediseño web y marca': 'Comunicación', 'Facturación y cuotas': 'Administración', 'Asamblea': 'Administración',
     'Misión México': 'Internacional', 'Talento Bio': 'Eventos', 'Healthtech Madrid': 'Eventos',
+  };
+  // Subproyectos (p. ej. Bioincubadora › Entregable 1); se pueden crear más desde cada tarea
+  const SUBPROYECTOS = {
+    'Bioincubadora': ['Entregable 1', 'Local'], 'Plan estratégico': ['Entrevistas', 'Documento final'], 'Misión México': ['Agenda', 'Viaje'],
   };
 
   const CATEGORIAS = [
@@ -313,7 +318,13 @@ fhv|Alba|Tolivia Cuesta|Gestora de innovación||`;
       T('t23', 'Solicitar a Hacienda el certificado de la fundación', 'Facturación y cuotas', 10, 'baja', 'porhacer', null, 'Administración'),
       T('t24', 'Actualizar la lista de socios tras los cambios de contacto', 'Captación de socios', 3, 'baja', 'porhacer', 'i-bfn-contacto', 'Socios'),
       T('t25', 'Preparar la nota de prensa del evento Healthtech', 'Healthtech Madrid', 12, 'baja', 'porhacer', null, 'Comunicación'),
+      T('t26', 'Redactar las conclusiones del informe de viabilidad', 'Bioincubadora', 0, 'alta', 'porhacer'),
+      T('t27', 'Cerrar el anexo económico del informe de viabilidad', 'Bioincubadora', 0, 'alta', 'porhacer'),
     ];
+    const SUB_T = { t13: 'Entregable 1', t26: 'Entregable 1', t27: 'Entregable 1', t01: 'Documento final', t11: 'Entrevistas', t12: 'Entrevistas', t19: 'Entrevistas', t04: 'Agenda', t18: 'Agenda', t10: 'Viaje' };
+    // Tipo de acción (matriz Hacer / Llamar / Ir / Contestar). «Ir» = desplazarse: visitas, reuniones presenciales, eventos.
+    const ACC_T = { t02: 'contestar', t04: 'llamar', t05: 'ir', t08: 'contestar', t09: 'llamar', t11: 'ir', t12: 'ir', t14: 'ir', t20: 'llamar', t22: 'ir' };
+    tareas.forEach(t => { t.sub = SUB_T[t.id] || ''; t.accion = ACC_T[t.id] || 'hacer'; });
 
     // ---- comunicaciones (historial) ----
     const comms = [];
@@ -429,11 +440,56 @@ fhv|Alba|Tolivia Cuesta|Gestora de innovación||`;
       { id: 'onedrive', nombre: 'OneDrive', familia: 'Microsoft', cuenta: 'mateo@bioasturias.example', estado: 'conectada', ultima: 'hoy 06:00', elementos: 1215, lee: ['Carpetas de proyectos (Plan estratégico, Bioincubadora, Mentoring)', 'Documentos modificados desde la última sincronización', 'Comentarios y menciones en documentos'] },
       { id: 'gdrive', nombre: 'Google Drive', familia: 'Google', cuenta: 'mateo.bioasturias@gmail.example', estado: 'conectada', ultima: 'hoy 06:00', elementos: 640, lee: ['Carpetas compartidas con empresas y socios', 'Hojas de cálculo de seguimiento', 'Documentos compartidos contigo'] },
       { id: 'gmail', nombre: 'Gmail', familia: 'Google', cuenta: '', estado: 'disponible', ultima: '—', elementos: 0, lee: ['Bandeja de entrada y enviados de la cuenta de Google', 'Etiquetas y conversaciones sin respuesta'] },
-      { id: 'odoo', nombre: 'Odoo', familia: 'Facturación', cuenta: 'bioasturias.odoo.example', estado: 'conectada', ultima: 'hoy 06:00', elementos: 428, lee: ['Facturas emitidas y su estado de cobro', 'Facturas de proveedores por aprobar o pagar', 'Pagos recibidos', 'Solo lectura: Odoo sigue siendo el sistema de facturación y contabilidad'] },
+      { id: 'odoo', nombre: 'Odoo', familia: 'Facturación', cuenta: 'bioasturias.odoo.example', estado: 'conectada', ultima: 'hoy 06:00', elementos: 428, lee: ['Contactos: empresas y personas, que se importan al CRM', 'Facturas emitidas y su estado de cobro', 'Facturas de proveedores por aprobar o pagar', 'Pagos recibidos', 'Solo lectura: Odoo sigue siendo el sistema de facturación y contabilidad'] },
       { id: 'calendario', nombre: 'Calendario', familia: 'Microsoft', cuenta: 'mateo@bioasturias.example', estado: 'conectada', ultima: 'hoy 06:00', elementos: 92, lee: ['Reuniones de hoy y de la semana', 'Invitaciones nuevas, cambios y cancelaciones', 'Asistentes y enlaces de videollamada'] },
     ];
 
-    return { entidades, contactos, items, agenda, tareas, comms, plantillas, envios, dudas, detectados, fuentes, categorias: CATEGORIAS, areas: AREAS, proyectos: PROYECTOS,
+    // ---- cerebro: memoria (base de datos) que leen y escriben Claude, la lectura diaria y el panel ----
+    // tipo: nota (un dato) | pendiente (algo por hacer o por cumplir, con fecha opcional)
+    // fuente: claude | lectura (lectura automática de las 06:00) | panel
+    const M = (id, tipo, fuente, dias, h, texto, sobre, o = {}) => ({ id, tipo, fuente, fecha: atras(dias, h), texto, sobre, vence: o.v !== undefined ? dl(o.v) : null, estado: o.estado || 'abierta', autor: fuente === 'claude' ? 'Claude (Mateo)' : fuente === 'lectura' ? 'Lectura diaria' : 'Mateo' });
+    const memoria = [
+      M('mem01', 'pendiente', 'claude', 0, '08:12', 'Mandar a Lucía Anes la tabla de cuotas de pleno derecho después de la visita a Mirador Cardiotech.', { tipo: 'entidad', id: 'e-mir' }, { v: 2 }),
+      M('mem02', 'nota', 'claude', 0, '08:10', 'Mirador Cardiotech duda entre pleno derecho y adherido; lo que más le interesa es la misión a México.', { tipo: 'entidad', id: 'e-mir' }),
+      M('mem03', 'pendiente', 'lectura', 0, '06:00', 'El informe de viabilidad de la Bioincubadora se entrega hoy: faltan las conclusiones y el anexo económico.', { tipo: 'proyecto', id: 'Bioincubadora' }, { v: 0 }),
+      M('mem04', 'pendiente', 'claude', 1, '17:40', 'Confirmar a Rodrigo Piñera fechas para la visita técnica al local con el arquitecto.', { tipo: 'proyecto', id: 'Bioincubadora' }, { v: 3 }),
+      M('mem05', 'nota', 'claude', 2, '12:30', 'Ribera Biomateriales viaja a México con dos personas si se confirman las fechas antes de fin de mes.', { tipo: 'entidad', id: 'e-rib' }),
+      M('mem06', 'pendiente', 'claude', 2, '12:32', 'Cerrar con las empresas la agenda definitiva de la misión a México.', { tipo: 'proyecto', id: 'Misión México' }, { v: 5 }),
+      M('mem07', 'nota', 'lectura', 1, '06:00', 'Quimera Agroalimentaria tiene la cuota del segundo semestre sin pagar (Odoo).', { tipo: 'entidad', id: 'e-qui' }),
+      M('mem08', 'pendiente', 'claude', 3, '10:05', 'Asamblea General: enviar convocatoria y orden del día con 10 días de antelación.', { tipo: 'proyecto', id: 'Asamblea' }, { v: 6 }),
+      M('mem09', 'nota', 'claude', 4, '16:20', 'Para el plan estratégico quedan dos entrevistas: Tomás Roces y Alejandro Montes.', { tipo: 'proyecto', id: 'Plan estratégico' }),
+      M('mem10', 'pendiente', 'claude', 5, '09:45', 'Pedir al Estudio Faro el presupuesto por fases del rediseño (marca, web y guía).', { tipo: 'proyecto', id: 'Rediseño web y marca' }, { v: 8 }),
+      M('mem11', 'nota', 'panel', 6, '18:05', 'Healthtech Madrid: la Fundación Hospitalaria puede presentar dos pilotos de salud digital.', { tipo: 'proyecto', id: 'Healthtech Madrid' }),
+      M('mem12', 'pendiente', 'claude', 7, '11:00', 'Justificación del mentoring: plazo de la Agencia para la documentación final.', { tipo: 'proyecto', id: 'Mentoring científicos' }, { v: 10 }),
+      M('mem13', 'pendiente', 'claude', 9, '13:15', 'Reservar sala para la feria Talento Bio.', { tipo: 'proyecto', id: 'Talento Bio' }, { estado: 'cerrada' }),
+      M('mem14', 'nota', 'claude', 12, '10:30', 'Cuenca Verde prefiere la cuota de adherido el primer año.', { tipo: 'entidad', id: 'e-cve' }, { estado: 'sustituida' }),
+    ];
+    // Fichas «estado actual»: un texto corto por proyecto que Claude reescribe entero (la versión anterior se guarda)
+    const F = (proyecto, dias, h, texto, versiones) => ({ id: 'f-' + slug(proyecto), proyecto, fecha: atras(dias, h), texto, versiones, autor: 'Claude (Mateo)' });
+    const fichas = [
+      F('Bioincubadora', 0, '08:20', 'Informe de viabilidad v3 con entrega hoy al comité; faltan conclusiones y anexo económico. El Ayuntamiento ofrece la planta baja del edificio; pendiente fijar la visita técnica con el arquitecto. Comité hoy a las 16:30.', 4),
+      F('Misión México', 2, '12:40', 'Agenda provisional enviada a las empresas. Ribera confirma dos personas si se cierran fechas este mes. Falta asignar la factura de vuelos al proyecto en Odoo.', 3),
+      F('Plan estratégico', 4, '16:25', 'Capítulo de retos en revisión. Quedan dos entrevistas (Tomás Roces y Alejandro Montes). Elena Ablanedo propone dos huecos para la suya.', 6),
+      F('Captación de socios', 0, '08:15', 'Mirador Cardiotech: visita hoy, duda entre pleno derecho y adherido. Ladera Genómica propone visita la semana que viene. Cuenca Verde espera la comparativa de cuotas.', 2),
+    ];
+    // Registro de accesos al conector: quién usó qué herramienta y cuándo
+    const R = (dias, h, quien, herramienta, detalle) => ({ fecha: atras(dias, h), quien, herramienta, detalle });
+    const registro = [
+      R(0, '08:20', 'Claude (Mateo)', 'reescribir_estado', 'Bioincubadora'),
+      R(0, '08:15', 'Claude (Mateo)', 'reescribir_estado', 'Captación de socios'),
+      R(0, '08:12', 'Claude (Mateo)', 'apuntar', 'Pendiente sobre Mirador Cardiotech'),
+      R(0, '08:10', 'Claude (Mateo)', 'contexto_entidad', 'Mirador Cardiotech'),
+      R(0, '08:02', 'Claude (Mateo)', 'brief_de_hoy', ''),
+      R(0, '06:00', 'Lectura diaria', 'leer_fuentes', 'Outlook, OneDrive, Google Drive, Odoo y calendario'),
+      R(1, '17:40', 'Claude (Mateo)', 'apuntar', 'Pendiente sobre la Bioincubadora'),
+      R(1, '17:35', 'Claude (Mateo)', 'buscar', '«local Bioincubadora»'),
+    ];
+    const conector = { url: 'https://panel.bioasturias.example/mcp', asistentes: [
+      { nombre: 'Claude', quien: 'Mateo', estado: 'conectado', ultimo: atras(0, '08:20') },
+      { nombre: 'ChatGPT', quien: '', estado: 'sin conectar', ultimo: null },
+    ] };
+
+    return { entidades, contactos, items, agenda, tareas, comms, plantillas, envios, dudas, detectados, fuentes, memoria, fichas, registro, conector, categorias: CATEGORIAS, areas: AREAS, proyectos: PROYECTOS, subproyectos: SUBPROYECTOS,
       ventana: { ini: ini.toISOString(), fin: fin.toISOString() } };
   }
   return { base };

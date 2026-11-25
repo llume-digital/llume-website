@@ -9,10 +9,22 @@
   function proximaLectura() { const d = U.esLab(BA.hoy) && BA.ahora.getHours() < 6 ? BA.hoy : U.sigLab(BA.hoy); return `${U.fechaLarga(d)}, 06:00`; }
   function renderFuentes() {
     const l = BA.lista('fuentes'), ok = l.filter(f => f.estado === 'conectada');
+    const asis = BA.B.conector.asistentes;
     return `<div class="cab-pagina"><div><h1>Fuentes conectadas</h1><p>De dónde lee el cerebro. Funciona igual con Microsoft y con Google, y se pueden añadir más.</p></div>
       <button type="button" class="btn btn--primario" data-acc="fuente-anadir">${U.ic('mas2', 'ic--sm')} Añadir fuente</button></div>
       <div class="kpis"><div class="kpi"><b>${ok.length}</b><span>fuentes conectadas</span></div><div class="kpi"><b>${ok.reduce((n, f) => n + f.elementos, 0).toLocaleString('es-ES')}</b><span>elementos leídos</span></div><div class="kpi"><b>06:00</b><span>lectura diaria, de lunes a viernes</span></div><div class="kpi"><b style="font-size:1.05rem">${proximaLectura()}</b><span>próxima lectura</span></div></div>
-      <div class="aviso aviso--info" role="note">Estado simulado: en este prototipo ninguna fuente está realmente conectada. Odoo se queda como sistema de facturación y contabilidad; el panel solo lo lee.</div>
+      <section class="tarjeta por-que" aria-labelledby="pq-t"><h2 id="pq-t">Para qué se conectan</h2>
+        <ol class="por-que__pasos"><li><b>Tus fuentes</b><span>Cada madrugada se leen tus correos, documentos, facturas y reuniones.</span></li>
+          <li><b>El cerebro</b><span>Lo importante se guarda en su base de datos: pendientes, notas, plazos y el estado de cada proyecto.</span></li>
+          <li><b>El asistente de IA (LLM)</b><span>Claude lee el cerebro a través del conector y es quien hace funcionar el panel: prepara el brief, ordena tus tareas en la matriz, redacta respuestas y te avisa de lo que se te puede olvidar.</span></li></ol>
+        <p class="peq suave">Sin fuentes conectadas, el cerebro está vacío y el asistente no tiene con qué trabajar.</p></section>
+      <div class="cab-seccion" style="margin-top:26px"><h2>Asistentes de IA</h2><span class="peq suave">Los LLM que usan el cerebro a través del conector</span></div>
+      <div class="fuentes-rejilla" style="margin-bottom:26px">${asis.map(a => { const on = a.estado === 'conectado';
+        return `<article class="tarjeta fuente-tarjeta"><div class="fuente-tarjeta__cab"><span class="llm-sello" aria-hidden="true">${esc(a.nombre[0])}</span><div style="flex:1"><h2 style="margin:0">${esc(a.nombre)}</h2><span class="peq suave">${on ? 'Conectado por ' + esc(a.quien) + ' · último uso ' + U.cuando(a.ultimo) : 'Sin conectar'}</span></div><span class="estado ${on ? '' : 'estado--no'}">${on ? 'Conectado' : 'Disponible'}</span></div>
+          <p class="peq" style="margin:0">${on ? 'Lee y escribe en el cerebro con la cuenta de quien lo conectó. Cada uso queda en el registro.' : 'Se conecta con la misma dirección del conector MCP.'}</p>
+          <div class="acciones" style="margin-top:auto"><a class="btn btn--borde btn--sm" href="#/cerebro">Ver el conector</a></div></article>`; }).join('')}</div>
+      <div class="cab-seccion"><h2>Fuentes de datos</h2><span class="peq suave">Estado simulado: en este prototipo ninguna fuente está conectada de verdad</span></div>
+      <p class="peq suave" style="margin:-6px 0 14px">Odoo se queda como sistema de facturación y contabilidad, y también es de donde se importan los contactos del CRM; el panel solo lo lee.</p>
       <div class="fuentes-rejilla">${l.map(f => { const x = BA.FUENTES[f.id], on = f.estado === 'conectada';
         return `<article class="tarjeta fuente-tarjeta fuente--${esc(f.id)}"><div class="fuente-tarjeta__cab">${U.ic(x[1])}<div style="flex:1"><h2 style="margin:0">${esc(f.nombre)}</h2><span class="peq suave">${esc(f.familia)}${f.cuenta ? ' · ' + esc(f.cuenta) : ''}</span></div><span class="estado ${on ? '' : 'estado--no'}">${on ? 'Conectada' : 'Disponible'}</span></div>
           ${on ? `<p class="peq" style="margin:0"><b>Última lectura:</b> ${esc(f.ultima)} · ${f.elementos.toLocaleString('es-ES')} elementos</p>` : '<p class="peq suave" style="margin:0">Sin conectar. Mismo funcionamiento que sus equivalentes.</p>'}

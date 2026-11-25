@@ -26,7 +26,116 @@
   ];
   const orden = (a, b) => (a.vence || '9') < (b.vence || '9') ? -1 : (a.vence || '9') > (b.vence || '9') ? 1 : b.llegada.localeCompare(a.llegada);
 
-  BA.mod.brief = { pendientes: () => activos().length, activos, agendaHoy, seccion, orden, SECCIONES, GRUPO_TXT };
+  // Prioridades del día: primero lo que vence, luego lo que lleva más tiempo sin respuesta
+  const diasDesde = t => Math.max(0, Math.round((BA.hoy - U.dia(U.iso(new Date(t)))) / 864e5));
+  function puntos(i) {
+    const n = i.vence ? U.difDias(i.vence) : null, d = diasDesde(i.llegada);
+    if (n !== null && n <= 0) return 100 - n;
+    if (i.grupo === 'sin_responder') return 60 + Math.min(d, 10) * 3 + (n !== null && n <= 7 ? 8 - n : 0);
+    if (n !== null && n <= 7) return 50 - n * 3;
+    if (i.grupo === 'esperando') return 30 + Math.min(d, 10) * 2;
+    return 10;
+  }
+  function motivo(i) {
+    if (i.vence && U.difDias(i.vence) <= 1) return U.venceTxt(i.vence);
+    if (i.grupo === 'sin_responder') return 'Sin responder · te escribió ' + U.hace(i.llegada);
+    if (i.grupo === 'esperando') return 'Esperas respuesta · ' + U.hace(i.llegada);
+    return i.vence ? U.venceTxt(i.vence) : GRUPO_TXT[i.grupo];
+  }
+  const prioridades = (n = 5) => activos().sort((a, b) => puntos(b) - puntos(a) || orden(a, b)).slice(0, n);
+
+  BA.mod.brief = { pendientes: () => activos().length, activos, agendaHoy, seccion, orden, SECCIONES, GRUPO_TXT, prioridades, motivo };
+
+  // ---------- matriz Hacer / Llamar / Ir / Contestar ----------
+  // Cada tarea, aviso o reunión cae en una casilla según lo que hay que hacer. «Ir» = desplazarse (visitas, reuniones presenciales, eventos).
+  const ACCIONES = [['hacer', 'Hacer', 'tarea'], ['llamar', 'Llamar', 'llamada'], ['ir', 'Ir', 'ir'], ['contestar', 'Contestar', 'enviado']];
+  const accionItem = i => i.accion || (i.grupo === 'sin_responder' ? 'contestar' : 'hacer');
+  const accionAgenda = a => /videollamada|online|teams|meet|zoom/i.test(a.lugar) ? null : /tel[eé]fono|llamada/i.test(a.lugar) ? 'llamar' : 'ir';
+  // Urgente: tiene fecha límite hoy o ya vencida, o es una cita de hoy. Importante: prioridad alta o entre tus 5 prioridades.
+  function elementosHoy() {
+    const top = new Set(prioridades().map(i => i.id)), l = [];
+    for (const t of BA.lista('tareas').filter(t => t.estado !== 'hecho' && t.fecha && t.fecha <= BA.hoyISO))
+      l.push({ k: 'tarea', id: t.id, acc: t.accion || 'hacer', titulo: t.titulo, sub: [t.proyecto && t.proyecto + (t.sub ? ' › ' + t.sub : ''), U.difDias(t.fecha) < 0 ? 'Vencida ' + U.diaCorto(U.dia(t.fecha)) : 'Para hoy'].filter(Boolean).join(' · '), urg: true, imp: t.prioridad === 'alta', orden: '1' + t.fecha });
+    for (const i of activos().filter(i => seccion(i) === 'hoy' || i.grupo === 'sin_responder'))
+      l.push({ k: 'item', id: i.id, acc: accionItem(i), titulo: i.titulo, sub: [quien(i), motivo(i)].filter(Boolean).join(' · '), urg: !!(i.vence && U.difDias(i.vence) <= 0), imp: top.has(i.id), orden: '2' + (i.vence || '9') + i.llegada });
+    for (const a of agendaHoy()) { const acc = accionAgenda(a); if (acc) l.push({ k: 'agenda', id: a.id, acc, titulo: a.titulo, sub: `${a.ini}–${a.fin} · ${a.lugar}`, urg: true, imp: false, orden: '0' + a.ini }); }
+    const peso = x => (x.urg ? 0 : 2) + (x.imp ? 0 : 1);
+    return l.sort((a, b) => peso(a) - peso(b) || a.orden.localeCompare(b.orden));
+  }
+  const marcas = x => `${x.urg ? '<span class="marca-u">Urgente</span>' : ''}${x.imp ? '<span class="marca-i">Importante</span>' : ''}`;
+  function celdaFila(x) {
+    const acc = x.k === 'tarea' ? `data-acc="tarea-editar" data-id="${esc(x.id)}"` : x.k === 'item' ? `data-acc="item-ver" data-id="${esc(x.id)}"` : 'data-acc="agenda-ver"';
+    return `<li draggable="${x.k !== 'agenda'}" data-mk="${x.k}" data-mid="${esc(x.id)}"><button type="button" class="celda__fila" ${acc} data-foco="m-${esc(x.id)}"><span class="celda__t">${esc(x.titulo)}</span><small>${esc(x.sub)}</small>${x.urg || x.imp ? `<span class="celda__marcas">${marcas(x)}</span>` : ''}</button></li>`;
+  }
+  function matriz(l, titulo, sub) {
+    return `<section class="matriz-bloque" aria-labelledby="mx-t"><div class="cab-seccion"><h2 id="mx-t">${titulo}</h2><span class="peq suave">${sub}</span></div>
+      <div class="matriz">${ACCIONES.map(([k, t, ic]) => { const c = l.filter(x => x.acc === k);
+        return `<section class="celda celda--${k}" data-acc-celda="${k}" aria-label="${t}"><div class="celda__cab">${U.ic(ic)}<h3>${t}</h3><span class="celda__n">${c.length}</span></div>
+          ${c.length ? `<ul class="celda__lista">${c.map(celdaFila).join('')}</ul>` : '<p class="peq suave celda__vacia">Nada por aquí.</p>'}</section>`; }).join('')}</div>
+      <p class="peq suave">Arrastra un elemento a otra casilla si no está donde toca.</p></section>`;
+  }
+  BA.matriz = { ACCIONES, html: matriz, marcas };
+  BA.acc['agenda-ver'] = () => {};
+  // arrastrar entre casillas (tareas y avisos)
+  let mArr = null;
+  document.addEventListener('dragstart', e => { const li = e.target.closest && e.target.closest('[data-mk]'); if (!li) return; mArr = { k: li.dataset.mk, id: li.dataset.mid }; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', li.dataset.mid); li.classList.add('arrastrando'); });
+  document.addEventListener('dragend', () => { mArr = null; U.$$('.celda.sobre, [data-mk].arrastrando').forEach(x => x.classList.remove('sobre', 'arrastrando')); });
+  document.addEventListener('dragover', e => { const c = e.target.closest && e.target.closest('[data-acc-celda]'); if (c && mArr) { e.preventDefault(); U.$$('.celda.sobre').forEach(x => x !== c && x.classList.remove('sobre')); c.classList.add('sobre'); } });
+  document.addEventListener('drop', e => { const c = e.target.closest && e.target.closest('[data-acc-celda]'); if (!c || !mArr) return; e.preventDefault();
+    const { k, id } = mArr, acc = c.dataset.accCelda, txt = ACCIONES.find(a => a[0] === acc)[1]; mArr = null;
+    BA.parchear(k === 'tarea' ? 'tareas' : 'items', id, { accion: acc }); BA.refrescar(); BA.toast(`Movido a «${txt}».`); });
+
+  // ---------- lo que viene (a futuro): tareas, plazos y pendientes que recuerda el cerebro ----------
+  function loQueViene(dias = 7) {
+    const lim = U.iso(U.addD(BA.hoy, dias)), l = [];
+    for (const t of BA.lista('tareas').filter(t => t.estado !== 'hecho' && t.fecha && t.fecha > BA.hoyISO && t.fecha <= lim)) l.push({ f: t.fecha, t: t.titulo, o: 'Tarea', acc: `data-acc="tarea-editar" data-id="${esc(t.id)}"`, imp: t.prioridad === 'alta' });
+    for (const i of activos().filter(i => i.vence && i.vence > BA.hoyISO && i.vence <= lim)) l.push({ f: i.vence, t: i.titulo, o: 'Plazo', acc: `data-acc="item-ver" data-id="${esc(i.id)}"`, imp: false });
+    for (const m of BA.mod.cerebro.pendientesMem().filter(m => m.vence && m.vence > BA.hoyISO && m.vence <= lim)) l.push({ f: m.vence, t: m.texto, o: 'Cerebro', acc: 'data-acc="ir-cerebro"', imp: false });
+    l.sort((a, b) => a.f.localeCompare(b.f));
+    const dias_ = [...new Set(l.map(x => x.f))];
+    return `<section class="tarjeta viene" aria-labelledby="vi-t"><div class="cab-seccion"><h2 id="vi-t">Lo que viene</h2><span class="peq suave">Próximos 7 días: tareas, plazos y lo que el cerebro recuerda</span></div>
+      ${l.length ? dias_.map(f => { const n = U.difDias(f); return `<div class="viene__dia"><b>${n === 1 ? 'Mañana' : U.diaCorto(U.dia(f))}</b><ul>${l.filter(x => x.f === f).map(x => `<li><button type="button" class="viene__fila" ${x.acc}><span class="chip ${x.o === 'Cerebro' ? 'chip--claude' : ''}">${x.o}</span><span>${esc(x.t)}</span>${x.imp ? '<span class="marca-i">Importante</span>' : ''}</button></li>`).join('')}</ul></div>`; }).join('')
+        : '<p class="suave">Nada con fecha en los próximos 7 días.</p>'}</section>`;
+  }
+  BA.acc['ir-cerebro'] = () => BA.irA('#/cerebro');
+
+  // ---------- agenda visual ----------
+  const aMin = h => { const [a, b] = h.split(':').map(Number); return a * 60 + b; };
+  function agendaVisual(ag) {
+    if (!ag.length) return `<p class="suave">${BA.hoy.getDay() % 6 === 0 ? 'Fin de semana: sin reuniones.' : 'Sin reuniones hoy.'}</p>`;
+    const ini = Math.min(8 * 60, ...ag.map(a => aMin(a.ini))), fin = Math.max(19 * 60, ...ag.map(a => aMin(a.fin))), px = 1.05, horas = [];
+    for (let h = Math.ceil(ini / 60); h * 60 <= fin; h++) horas.push(h);
+    const ahora = BA.ahora.getHours() * 60 + BA.ahora.getMinutes();
+    return `<div class="dia" style="height:${(fin - ini) * px}px">${horas.map(h => `<span class="dia__h" style="top:${(h * 60 - ini) * px}px">${String(h).padStart(2, '0')}:00</span>`).join('')}
+      ${ahora > ini && ahora < fin ? `<span class="dia__ahora" style="top:${(ahora - ini) * px}px" aria-label="Ahora"></span>` : ''}
+      ${ag.map((a, k) => { const acc = accionAgenda(a); return `<div class="dia__ev dia__ev--${acc || 'video'}" style="top:${(aMin(a.ini) - ini) * px}px;height:${Math.max(26, (aMin(a.fin) - aMin(a.ini)) * px - 3)}px"><b>${esc(a.titulo)}</b><small>${a.ini}–${a.fin} · ${esc(a.lugar)}</small></div>`; }).join('')}</div>
+      <p class="peq suave dia__ley"><span class="dia__pt dia__pt--ir"></span>Presencial <span class="dia__pt dia__pt--llamar"></span>Teléfono <span class="dia__pt dia__pt--video"></span>Videollamada</p>`;
+  }
+
+  // ---------- respuesta sugerida y prompt para Claude ----------
+  const nombreDe = i => { const c = i.contactoId && BA.contacto(i.contactoId); return c ? c.nombre : (i.externo || ''); };
+  const asuntoLimpio = i => i.titulo.replace(/^Re:\s*/i, '');
+  function borrador(i) {
+    const cuando = i.vence ? `antes del ${U.fechaLarga(U.dia(i.vence))}` : 'en los próximos días';
+    return `Hola${nombreDe(i) ? ' ' + nombreDe(i) : ''}:\n\nGracias por tu correo sobre «${asuntoLimpio(i)}». Lo reviso y te contesto con detalle ${cuando}.\n\nUn saludo,\nMateo`;
+  }
+  function fichaCorreo(i) {
+    const c = i.contactoId && BA.contacto(i.contactoId), e = i.entidadId && BA.entidad(i.entidadId);
+    return [`De: ${c ? BA.nombreC(c) + (c.cargo ? ', ' + c.cargo : '') : i.externo}${e ? ' (' + e.nombre + ')' : ''}`, `Asunto: ${i.titulo}`, `Recibido: ${U.fechaCompleta(i.llegada)}`,
+      i.proyecto ? `Proyecto: ${i.proyecto}` : '', `Correo:\n\"\"\"\n${i.extracto}\n\"\"\"`].filter(Boolean).join('\n');
+  }
+  const promptUno = i => `Redacta una respuesta en español a este correo, en tono cordial, cercano y breve, y fírmala como Mateo (BioAsturias). Si te falta algún dato para contestar, pregúntamelo antes de redactar.\n\n${fichaCorreo(i)}`;
+  const promptTodos = l => `Tengo ${l.length} correos sin responder. Redacta una respuesta para cada uno, en español, en tono cordial, cercano y breve, firmada como Mateo (BioAsturias). Numera las respuestas igual que los correos y, si te falta algún dato en alguno, dímelo en lugar de inventarlo.\n\n${l.map((i, k) => `--- Correo ${k + 1} ---\n${fichaCorreo(i)}`).join('\n\n')}`;
+  async function copiar(txt, msg) {
+    try { await navigator.clipboard.writeText(txt); }
+    catch { const t = document.createElement('textarea'); t.value = txt; t.setAttribute('readonly', ''); t.style.position = 'fixed'; t.style.opacity = '0'; document.body.append(t); t.select(); try { document.execCommand('copy'); } catch { } t.remove(); }
+    BA.toast(msg);
+  }
+  BA.copiar = copiar;
+  const sinResponder = () => activos().filter(i => i.grupo === 'sin_responder').sort((a, b) => puntos(b) - puntos(a));
+  BA.acc['copiar-borrador'] = el => { const t = document.getElementById('borr-' + el.dataset.id); copiar(t ? t.value : borrador(BA.get('items', el.dataset.id)), 'Respuesta copiada. Pégala en Outlook.'); };
+  BA.acc['copiar-prompt'] = el => copiar(promptUno(BA.get('items', el.dataset.id)), 'Prompt copiado. Pégalo en Claude.');
+  BA.acc['copiar-prompt-todos'] = () => { const l = sinResponder(); if (l.length) copiar(promptTodos(l), `Prompt con ${U.plural(l.length, 'correo', 'correos')} copiado. Pégalo en Claude.`); };
 
   // ---------- filas ----------
   function quien(i) {
@@ -62,7 +171,7 @@
     const secs = SECCIONES.map(([k, t, d, cl]) => [k, t, d, cl, act.filter(i => seccion(i) === k).sort(orden)]);
     const posp = visibles().filter(i => i.estado === 'abierto' && pospuesto(i));
     const resu = visibles().filter(i => ['hecho', 'descartado', 'tarea'].includes(i.estado));
-    const dudas = BA.mod.cerebro.dudasAbiertas(), det = BA.contadores().crm;
+    const dudas = BA.mod.cerebro.dudas(), det = BA.contadores().crm, top = prioridades(), hoyL = elementosHoy();
     return `
       <div class="cab-pagina"><div><p class="antetitulo">${U.fechaLarga(BA.hoy)}</p><h1>${saludo()}, Mateo.</h1>
         <p>Última lectura de tus fuentes: hoy a las 06:00 (Outlook, OneDrive, Google Drive, Odoo y calendario). <a href="#/fuentes">Ver fuentes</a></p></div>
@@ -76,19 +185,22 @@
         <div class="kpi"><b>${ag.length}</b><span>${ag.length === 1 ? 'reunión hoy' : 'reuniones hoy'}</span></div>
       </div>
       <div class="brief-rejilla"><div>
+        ${top.length ? `<section class="prioridades" aria-labelledby="prio-t"><div class="prioridades__cab"><h2 id="prio-t">${top.length === 1 ? 'Tu prioridad de hoy' : `Tus ${top.length} prioridades de hoy`}</h2><span class="peq">Primero lo que vence; después, lo que más tiempo lleva esperando</span></div>
+          <ol class="prioridades__lista">${top.map((i, k) => `<li><button type="button" class="prio" data-acc="item-ver" data-id="${esc(i.id)}" data-foco="p-${esc(i.id)}"><span class="prio__n" aria-hidden="true">${k + 1}</span><span class="prio__t"><b>${esc(i.titulo)}</b><small>${esc([quien(i), motivo(i)].filter(Boolean).join(' · '))}</small></span>${U.fuente(i.fuente)}</button></li>`).join('')}</ol></section>` : ''}
+        ${matriz(hoyL, 'Qué hacer hoy', 'Tareas, avisos y citas de hoy por tipo de acción')}
+        ${loQueViene()}
+        <h2 class="titulo-bloque">Todo lo pendiente del brief</h2>
         <div class="acciones" style="margin-bottom:12px"><button type="button" class="btn btn--primario" data-acc="repasar"${act.length ? '' : ' disabled'}>Repasar uno a uno${act.length ? ` (${act.length})` : ''}</button>
-          <span class="suave peq">Ve tarjeta a tarjeta y decide: hecho, tarea, posponer o descartar.</span></div>
+          ${sinResp ? `<button type="button" class="btn btn--borde" data-acc="copiar-prompt-todos" title="Copia un texto con todos los correos sin responder para pegarlo en Claude">Responder con Claude (${sinResp})</button>` : ''}</div>
         ${act.length ? secs.filter(s => s[4].length).map(([k, t, d, cl, l]) => `<details class="grupo ${cl}" open><summary><span>${t}</span><span class="cuenta">${l.length}</span><small>${d}</small></summary>${l.map(i => fila(i)).join('')}</details>`).join('')
           : `<div class="vacio"><b>Día tranquilo: no hay nada pendiente</b>Desde el viernes por la tarde no ha llegado nada que necesite tu atención y no esperas respuesta de nadie. Buen momento para avanzar en los proyectos.</div>`}
         ${posp.length ? `<details class="grupo"><summary><span>Pospuestos</span><span class="cuenta">${posp.length}</span><small>Volverán al brief en su fecha</small></summary>${posp.map(i => `<div class="fila fila--hecha"><button type="button" class="fila__main" data-acc="item-ver" data-id="${esc(i.id)}"><span class="fila__t">${esc(i.titulo)}</span><span class="fila__q">Vuelve el ${U.diaCorto(U.dia(i.posponerHasta))}</span></button><div class="fila__acc"><button type="button" class="btn btn--borde btn--sm" data-acc="item-reabrir" data-id="${esc(i.id)}">Traer a hoy</button></div></div>`).join('')}</details>` : ''}
         ${resu.length ? `<details class="grupo"><summary><span>Resueltos</span><span class="cuenta">${resu.length}</span><small>Hechos, descartados y convertidos en tarea</small></summary>${resu.map(i => fila(i, { resuelto: true })).join('')}</details>` : ''}
       </div>
       <aside aria-label="Agenda y avisos">
-        <section class="tarjeta" style="margin-bottom:14px"><h2>Agenda de hoy</h2>
-          ${ag.length ? `<ul class="agenda">${ag.map(a => `<li><time>${a.ini}</time><div><b>${esc(a.titulo)}</b><small>${a.ini}–${a.fin} · ${esc(a.lugar)}</small><small>Con ${esc(a.con)}</small></div></li>`).join('')}</ul>`
-            : `<p class="suave">${BA.hoy.getDay() % 6 === 0 ? 'Fin de semana: sin reuniones.' : 'Sin reuniones hoy.'}</p>`}</section>
-        <section class="tarjeta tarjeta--ia" style="margin-bottom:14px"><h2>El cerebro te pregunta</h2>
-          <p>${dudas ? `Tiene <b>${dudas}</b> ${dudas === 1 ? 'duda' : 'dudas'} sobre cosas que no ha podido deducir de tus correos.` : 'No tiene ninguna duda abierta.'}</p><a class="btn btn--borde btn--sm" href="#/cerebro">Responder dudas</a></section>
+        <section class="tarjeta" style="margin-bottom:14px"><div class="cab-seccion" style="margin-bottom:10px"><h2>Agenda de hoy</h2><span class="peq suave">${U.plural(ag.length, 'cita', 'citas')}</span></div>${agendaVisual(ag)}</section>
+        <section class="tarjeta" style="margin-bottom:14px"><h2>El cerebro te pregunta</h2><p class="peq suave">Lo que no ha podido deducir de tus fuentes. Tu respuesta se guarda en su memoria.</p>
+          ${dudas.length ? dudas.map(BA.mod.cerebro.dudaHtml).join('') : '<p class="suave">No tiene ninguna duda abierta.</p>'}</section>
         <section class="tarjeta"><h2>Contactos nuevos</h2>
           <p>${det ? `Hay <b>${det}</b> ${det === 1 ? 'persona' : 'personas'} en tus correos que aún no están en el CRM.` : 'No hay contactos pendientes de revisar.'}</p><a class="btn btn--borde btn--sm" href="#/crm">Revisar en el CRM</a></section>
       </aside></div>`;
@@ -115,6 +227,9 @@
       <dl class="meta-lista">${meta.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}${i.proyecto ? `<dt>Proyecto</dt><dd>${esc(i.proyecto)}</dd>` : ''}${i.area ? `<dt>Área</dt><dd>${esc(i.area)}</dd>` : ''}${i.tareaId ? `<dt>Tarea</dt><dd><a href="#/tareas" data-acc="drawer-cerrar">Ver en el tablero</a></dd>` : ''}</dl>
       <b class="peq">${ETQ_EXTRACTO[i.fuente] || 'Extracto'}</b><blockquote class="citado">${esc(i.extracto)}</blockquote>
       <p class="peq suave">En este prototipo el extracto es de ejemplo. Con la fuente conectada verías aquí el contenido real y un enlace para abrirlo en ${esc(BA.FUENTES[i.fuente] ? BA.FUENTES[i.fuente][0] : 'su origen')}.</p>
+      ${i.grupo === 'sin_responder' && !resuelto ? `<div class="sugerida"><label class="peq" for="borr-${esc(i.id)}"><b>Respuesta sugerida</b></label><textarea id="borr-${esc(i.id)}" rows="7">${esc(borrador(i))}</textarea>
+        <div class="acciones"><button type="button" class="btn btn--borde btn--sm" data-acc="copiar-borrador" data-id="${esc(i.id)}">Copiar respuesta</button><button type="button" class="btn btn--borde btn--sm" data-acc="copiar-prompt" data-id="${esc(i.id)}">Copiar prompt para Claude</button></div>
+        <p class="peq suave">Prototipo: el borrador es una plantilla. El prompt sí lleva el correo, quién lo envía y el proyecto, para que Claude redacte la respuesta completa.</p></div>` : ''}
       <div class="acciones" style="margin-top:14px">${resuelto ? `<button type="button" class="btn btn--primario" data-acc="item-reabrir" data-id="${esc(i.id)}">Volver al brief</button>` : `
         <button type="button" class="btn btn--primario" data-acc="item-hecho" data-id="${esc(i.id)}">${U.ic('hecho', 'ic--sm')} Hecho</button>
         <button type="button" class="btn btn--borde" data-acc="item-tarea" data-id="${esc(i.id)}">${U.ic('tarea', 'ic--sm')} Convertir en tarea</button>
@@ -149,7 +264,7 @@
     const n = i.vence ? U.difDias(i.vence) : 99;
     const verbo = { sin_responder: 'Responder: ', esperando: 'Reclamar respuesta: ', novedad: 'Revisar: ' }[i.grupo] || '';
     const t = BA.nuevo('tareas', { id: U.uid('t'), titulo: verbo + i.titulo.replace(/^Re:\s*/i, ''), proyecto: i.proyecto || '', area: i.area || 'Proyectos',
-      fecha: i.vence || U.iso(U.sigLab(BA.hoy)), prioridad: n <= 1 ? 'alta' : n <= 7 ? 'media' : 'baja', estado: 'porhacer', origenId: i.id, notas: '' });
+      fecha: i.vence || U.iso(U.sigLab(BA.hoy)), prioridad: n <= 1 ? 'alta' : n <= 7 ? 'media' : 'baja', estado: 'porhacer', origenId: i.id, notas: '', sub: '', accion: accionItem(i) });
     BA.parchear('items', i.id, { estado: 'tarea', tareaId: t.id });
     return t;
   }
@@ -171,9 +286,10 @@
     const i = BA.get('items', el.dataset.id);
     const r = await BA.dialogo({ titulo: 'Categorizar', html: `<p><b>${esc(i.titulo)}</b></p>
       <div class="campo"><label for="cz-proy">Proyecto</label><select id="cz-proy" name="proyecto" data-chg="cz-proy"><option value="">Sin proyecto</option>${PROYECTOS.map(p => `<option${i.proyecto === p ? ' selected' : ''}>${esc(p)}</option>`).join('')}</select></div>
-      <div class="campo"><label for="cz-area">Área</label><select id="cz-area" name="area"><option value="">Sin área</option>${AREAS.map(a => `<option${i.area === a ? ' selected' : ''}>${a}</option>`).join('')}</select></div>` });
+      <div class="campo"><label for="cz-area">Área</label><select id="cz-area" name="area"><option value="">Sin área</option>${AREAS.map(a => `<option${i.area === a ? ' selected' : ''}>${a}</option>`).join('')}</select></div>
+      <div class="campo"><label for="cz-acc">Qué hay que hacer</label><select id="cz-acc" name="accion">${ACCIONES.map(([k, t]) => `<option value="${k}"${accionItem(i) === k ? ' selected' : ''}>${t}</option>`).join('')}</select></div>` });
     if (!r) return;
-    BA.cambiar('items', i.id, { proyecto: r.fd.get('proyecto'), area: r.fd.get('area') }, 'Categoría guardada.');
+    BA.cambiar('items', i.id, { proyecto: r.fd.get('proyecto'), area: r.fd.get('area'), accion: r.fd.get('accion') }, 'Categoría guardada.');
   };
   BA.chg['cz-proy'] = el => { const a = BA.B.proyectos[el.value]; if (a) el.closest('dialog').querySelector('#cz-area').value = a; };
 

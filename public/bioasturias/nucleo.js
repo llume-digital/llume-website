@@ -186,7 +186,7 @@
     ['cerebro', 'Cerebro', 'cerebro'], ['fuentes', 'Fuentes', 'fuentes'], ['funcionalidades', 'Funcionalidades', 'func'], ['comentarios', 'Comentarios', 'coment'],
   ];
   BA.contadores = () => ({ brief: BA.mod.brief ? BA.mod.brief.pendientes() : 0, crm: BA.lista('detectados').filter(d => !(BA.S.ui.detectadosHechos || []).includes(d.id)).length,
-    cerebro: BA.mod.cerebro ? BA.mod.cerebro.dudasAbiertas() : 0, comentarios: BA.comNuevos || 0 });
+    comentarios: BA.comNuevos || 0 });
   BA.mod = {};
   function pintarNav(actual) {
     const c = BA.contadores();
