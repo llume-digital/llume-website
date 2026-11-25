@@ -254,17 +254,19 @@ button:hover{background:#00372a}.error{color:#b3261e;font-size:14px;margin:12px 
     comentarios: 'bioasturias-comentarios',
     pantalla: {
       titulo: 'BioAsturias · Acceso al prototipo',
-      estilo: `:root{--bg:#f4f1ec;--ink:#1d2b2b;--muted:#5d6b6a;--acento:#0f7b78;--line:#d3cdc3}
-*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+      estilo: `:root{--bg:#f5f5f7;--ink:#1d1d1f;--muted:#6e6e73;--acento:#0a7d74;--relleno:rgba(118,118,128,.1)}
+*{box-sizing:border-box}html,body{margin:0;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;letter-spacing:-.006em}
+body{background:radial-gradient(900px 520px at 85% -10%,rgba(10,125,116,.12),transparent 62%),radial-gradient(760px 520px at 10% 110%,rgba(10,102,216,.07),transparent 62%),var(--bg)}
 main{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
-.caja{width:100%;max-width:380px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:32px 24px}
-.logo{font-weight:700;font-size:24px;margin:0 0 4px}.logo span{color:var(--acento)}
-p{color:var(--muted);margin:0 0 24px;line-height:1.5;font-size:15px}
-label{display:block;font-size:14px;font-weight:600;margin-bottom:8px}
-input{width:100%;font:inherit;font-size:16px;padding:12px;border:1px solid #6d7b7a;background:#fff;color:var(--ink);border-radius:6px}
-input:focus{outline:3px solid var(--acento);outline-offset:1px}
-button{margin-top:16px;width:100%;font:inherit;font-weight:600;font-size:16px;padding:14px;border:0;border-radius:6px;background:var(--acento);color:#fff;cursor:pointer}
-button:hover{background:#0a5e5c}.error{color:#b3261e;font-size:14px;margin:12px 0 0}`,
+.caja{width:100%;max-width:380px;background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(30px);-webkit-backdrop-filter:saturate(180%) blur(30px);border:1px solid rgba(255,255,255,.8);border-radius:24px;padding:36px 28px 30px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 24px 60px rgba(0,0,0,.08)}
+.logo{font-weight:700;font-size:24px;letter-spacing:-.025em;margin:0 0 6px}.logo span{color:var(--acento)}
+.logo::before{content:"";display:block;width:44px;height:44px;border-radius:12px;margin-bottom:18px;background:linear-gradient(155deg,#17a397,#08645d);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 16px rgba(8,100,93,.28)}
+p{color:var(--muted);margin:0 0 24px;line-height:1.5;font-size:14px}
+label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px}
+input{width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1px solid transparent;background:var(--relleno);color:var(--ink);border-radius:12px;transition:.15s}
+input:focus{outline:none;background:#fff;border-color:rgba(10,125,116,.5);box-shadow:0 0 0 4px rgba(10,125,116,.14)}
+button{margin-top:16px;width:100%;font:inherit;font-weight:600;font-size:15px;padding:13px;border:0;border-radius:999px;background:var(--acento);color:#fff;cursor:pointer;box-shadow:0 6px 18px rgba(10,125,116,.26);transition:.15s}
+button:hover{background:#075d56}button:focus-visible{outline:3px solid rgba(10,125,116,.45);outline-offset:2px}.error{color:#e0362c;font-size:13.5px;margin:12px 0 0}`,
       logo: 'Bio<span>Asturias</span> · Panel',
       texto: 'Prototipo privado del panel de trabajo. Introduce la clave para entrar.',
       etiqueta: 'Clave',

@@ -64,7 +64,7 @@
     const resu = visibles().filter(i => ['hecho', 'descartado', 'tarea'].includes(i.estado));
     const dudas = BA.mod.cerebro.dudasAbiertas(), det = BA.contadores().crm;
     return `
-      <div class="cab-pagina"><div><h1>${saludo()}, Mateo · ${U.fechaLarga(BA.hoy)}</h1>
+      <div class="cab-pagina"><div><p class="antetitulo">${U.fechaLarga(BA.hoy)}</p><h1>${saludo()}, Mateo.</h1>
         <p>Última lectura de tus fuentes: hoy a las 06:00 (Outlook, OneDrive, Google Drive, Odoo y calendario). <a href="#/fuentes">Ver fuentes</a></p></div>
         <div class="acciones"><div class="conmutador" role="group" aria-label="Día de demostración">
           ${[['tranquilo', 'Día tranquilo (0)'], ['normal', `Día normal (${cn.normal})`], ['cargado', `Día cargado (${cn.cargado})`]].map(([k, t]) => `<button type="button" data-acc="modo" data-modo="${k}" aria-pressed="${m === k}">${t}</button>`).join('')}</div></div></div>
@@ -87,7 +87,7 @@
         <section class="tarjeta" style="margin-bottom:14px"><h2>Agenda de hoy</h2>
           ${ag.length ? `<ul class="agenda">${ag.map(a => `<li><time>${a.ini}</time><div><b>${esc(a.titulo)}</b><small>${a.ini}–${a.fin} · ${esc(a.lugar)}</small><small>Con ${esc(a.con)}</small></div></li>`).join('')}</ul>`
             : `<p class="suave">${BA.hoy.getDay() % 6 === 0 ? 'Fin de semana: sin reuniones.' : 'Sin reuniones hoy.'}</p>`}</section>
-        <section class="tarjeta" style="margin-bottom:14px"><h2>El cerebro te pregunta</h2>
+        <section class="tarjeta tarjeta--ia" style="margin-bottom:14px"><h2>El cerebro te pregunta</h2>
           <p>${dudas ? `Tiene <b>${dudas}</b> ${dudas === 1 ? 'duda' : 'dudas'} sobre cosas que no ha podido deducir de tus correos.` : 'No tiene ninguna duda abierta.'}</p><a class="btn btn--borde btn--sm" href="#/cerebro">Responder dudas</a></section>
         <section class="tarjeta"><h2>Contactos nuevos</h2>
           <p>${det ? `Hay <b>${det}</b> ${det === 1 ? 'persona' : 'personas'} en tus correos que aún no están en el CRM.` : 'No hay contactos pendientes de revisar.'}</p><a class="btn btn--borde btn--sm" href="#/crm">Revisar en el CRM</a></section>
