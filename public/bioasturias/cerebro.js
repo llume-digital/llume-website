@@ -9,7 +9,6 @@
   const sobreTxt = x => x.tipo === 'entidad' ? ((BA.entidad(x.id) || {}).nombre || '') : x.tipo === 'contacto' ? (BA.contacto(x.id) ? BA.nombreC(BA.contacto(x.id)) : '') : x.id;
   // Pendientes con fecha que el cerebro recuerda (para «Lo que viene» del Brief)
   const pendientesMem = () => BA.lista('memoria').filter(m => m.tipo === 'pendiente' && m.estado === 'abierta');
-  let filtroMem = 'abiertas';
 
   // ---------- dudas ----------
   function dudaHtml(d) {
@@ -36,45 +35,38 @@
 
   BA.mod.cerebro = { dudasAbiertas: () => BA.lista('dudas').filter(abierta).length, dudas: () => BA.lista('dudas').filter(abierta), dudaHtml, pendientesMem, sobreTxt };
 
-  // ---------- página ----------
-  const HERRAMIENTAS = [
-    ['brief_de_hoy', 'Lo que tienes hoy: matriz, agenda, urgentes y pendientes'], ['contexto_entidad', 'Todo sobre una empresa o institución: contactos, historial, cuotas y notas'],
-    ['contexto_proyecto', 'Estado de un proyecto: ficha, tareas, avisos y personas implicadas'], ['buscar', 'Busca en correos, documentos, notas y pendientes'],
-    ['apuntar', 'Guarda una nota o un pendiente (con fecha si la tiene)'], ['corregir', 'Sustituye una entrada que ya no es cierta; la vieja queda en el historial'],
-    ['cerrar', 'Da por cumplido un pendiente, sin borrarlo'], ['reescribir_estado', 'Reescribe la ficha «estado actual» de un proyecto'],
-  ];
-  function filaMem(m) {
-    const f = FUENTE_MEM[m.fuente] || [m.fuente, ''], venc = m.vence && m.estado === 'abierta' ? U.difDias(m.vence) : null;
-    return `<li class="mem${m.estado !== 'abierta' ? ' mem--cerrada' : ''}"><span class="mem__tipo mem__tipo--${m.tipo}" aria-hidden="true"></span><div class="mem__c">
-      <p>${esc(m.texto)}</p><span class="fila__meta"><span class="chip ${f[1]}">${esc(f[0])}</span><span>${U.cuando(m.fecha)}</span>${m.sobre ? `<span class="chip chip--etiqueta">${esc(sobreTxt(m.sobre))}</span>` : ''}
-      ${venc !== null ? `<span class="badge ${venc <= 0 ? 'badge--hoy' : 'badge--sem'}">${U.venceTxt(m.vence)}</span>` : ''}${m.estado === 'cerrada' ? '<span class="chip">Cumplido</span>' : m.estado === 'sustituida' ? '<span class="chip">Sustituida</span>' : ''}</span></div></li>`;
+  // ---------- página: notas agrupadas, con buscador y filtro por categoría ----------
+  const CATS = [['correo', 'Correos', 'outlook'], ['documento', 'Documentos', 'onedrive'], ['factura', 'Facturas', 'odoo'], ['reunion', 'Reuniones y llamadas', 'reunion']];
+  const catDe = m => m.cat === 'llamada' ? 'reunion' : m.cat;
+  const fm = { q: '', cat: '', cumplidas: false };
+  function grupos() {
+    const fichas = BA.lista('fichas'), q = U.norm(fm.q.trim());
+    const l = BA.lista('memoria').filter(m => (fm.cumplidas || m.estado === 'abierta') && (!fm.cat || catDe(m) === fm.cat)
+      && (!q || q.split(/\s+/).every(w => U.norm(m.texto + ' ' + (m.sobre ? sobreTxt(m.sobre) : '')).includes(w))));
+    const g = new Map();
+    for (const m of l.sort((a, b) => b.fecha.localeCompare(a.fecha))) { const k = m.sobre ? sobreTxt(m.sobre) : 'General'; if (!g.has(k)) g.set(k, { nombre: k, tipo: m.sobre ? m.sobre.tipo : '', l: [] }); g.get(k).l.push(m); }
+    return [...g.values()].map(x => ({ ...x, ficha: fichas.find(f => f.proyecto === x.nombre) }));
   }
+  function filaMem(m) {
+    const f = FUENTE_MEM[m.fuente] || [m.fuente, ''], venc = m.vence && m.estado === 'abierta' ? U.difDias(m.vence) : null, c = CATS.find(x => x[0] === catDe(m));
+    return `<li class="mem${m.estado !== 'abierta' ? ' mem--cerrada' : ''}"><span class="mem__ic" title="${c ? c[1] : ''}">${U.ic(c ? c[2] : 'otra', 'ic--sm')}</span><div class="mem__c">
+      <p>${esc(m.texto)}</p><span class="fila__meta">${m.tipo === 'pendiente' ? '<span class="chip chip--pend">Pendiente</span>' : ''}${venc !== null ? `<span class="badge ${venc <= 0 ? 'badge--hoy' : 'badge--sem'}">${U.venceTxt(m.vence)}</span>` : ''}
+      <span>${U.cuando(m.fecha)} · ${esc(f[0])}</span>${m.estado === 'cerrada' ? '<span class="chip">Cumplido</span>' : m.estado === 'sustituida' ? '<span class="chip">Sustituida</span>' : ''}</span></div></li>`;
+  }
+  const resultados = () => { const gs = grupos(); return gs.length ? gs.map(g => `<section class="mem-grupo"><div class="mem-grupo__cab"><h2>${esc(g.nombre)}</h2><span class="peq suave">${g.tipo === 'entidad' ? 'Entidad' : g.tipo === 'proyecto' ? 'Proyecto' : ''} · ${U.plural(g.l.length, 'nota', 'notas')}</span></div>
+      ${g.ficha ? `<p class="mem-grupo__estado"><b>Estado actual:</b> ${esc(g.ficha.texto)}</p>` : ''}<ul class="mem-lista">${g.l.map(filaMem).join('')}</ul></section>`).join('')
+    : '<div class="vacio"><b>No hay notas con ese filtro</b>Prueba con otra palabra o quita la categoría.</div>'; };
   function render() {
-    const mem = BA.lista('memoria').slice().sort((a, b) => b.fecha.localeCompare(a.fecha)), fichas = BA.lista('fichas'), reg = BA.B.registro, con = BA.B.conector;
-    const ab = mem.filter(m => m.estado === 'abierta'), pend = ab.filter(m => m.tipo === 'pendiente');
-    const vis = filtroMem === 'abiertas' ? ab : filtroMem === 'pendientes' ? pend : filtroMem === 'notas' ? ab.filter(m => m.tipo === 'nota') : mem.filter(m => m.estado !== 'abierta');
-    const fuentesOk = BA.lista('fuentes').filter(f => f.estado === 'conectada');
-    return `<div class="cab-pagina"><div><h1>Cerebro</h1><p>La memoria del panel: una base de datos propia donde se guarda lo que llega de tus fuentes y lo que Claude apunta. No tienes que hacer nada aquí: Claude la consulta y la actualiza a través del conector.</p></div></div>
-      <div class="flujo" role="img" aria-label="Las fuentes alimentan el cerebro; Claude lo lee y lo escribe a través del conector MCP">
-        <div class="flujo__paso"><b>${fuentesOk.length} fuentes</b><small>${esc(fuentesOk.map(f => f.nombre).join(', '))}</small></div><span class="flujo__flecha" aria-hidden="true">→</span>
-        <div class="flujo__paso flujo__paso--cerebro"><b>Cerebro</b><small>Base de datos: ${U.plural(ab.length, 'entrada abierta', 'entradas abiertas')} y ${U.plural(fichas.length, 'ficha', 'fichas')}</small></div><span class="flujo__flecha" aria-hidden="true">⇄</span>
-        <div class="flujo__paso"><b>Conector MCP</b><small>Acceso con tu cuenta; cada uso queda registrado</small></div><span class="flujo__flecha" aria-hidden="true">⇄</span>
-        <div class="flujo__paso flujo__paso--llm"><b>Claude</b><small>El asistente que lee, razona y escribe</small></div></div>
-      <div class="kpis"><div class="kpi"><b>${ab.length}</b><span>entradas abiertas</span></div><div class="kpi"><b>${pend.length}</b><span>pendientes que recuerda</span></div><div class="kpi"><b>${fichas.length}</b><span>fichas de estado</span></div><div class="kpi"><b>${U.hora(reg[0].fecha)}</b><span>última escritura (${esc(reg[0].quien)})</span></div></div>
-      <div class="cuadro-ficha"><section aria-labelledby="mem-t"><div class="cab-seccion"><h2 id="mem-t">Memoria</h2>
-          <div class="conmutador" role="group" aria-label="Filtrar la memoria">${[['abiertas', 'Abiertas'], ['pendientes', 'Pendientes'], ['notas', 'Notas'], ['historial', 'Historial']].map(([k, t]) => `<button type="button" data-acc="mem-filtro" data-k="${k}" aria-pressed="${filtroMem === k}">${t}</button>`).join('')}</div></div>
-        <ul class="mem-lista">${vis.map(filaMem).join('') || '<li class="vacio">Nada por aquí.</li>'}</ul>
-        <p class="peq suave">Nada se borra ni se edita en silencio: corregir crea una entrada nueva y la anterior queda como sustituida; cumplir un pendiente lo cierra.</p>
-        <div class="cab-seccion" style="margin-top:28px"><h2>Fichas de estado</h2><span class="peq suave">Cómo está cada proyecto ahora; Claude las reescribe enteras</span></div>
-        <div class="fichas">${fichas.map(f => `<article class="tarjeta ficha-estado"><h3>${esc(f.proyecto)}</h3><p>${esc(f.texto)}</p><span class="peq suave">${esc(f.autor)} · ${U.cuando(f.fecha)} · ${U.plural(f.versiones, 'versión guardada', 'versiones guardadas')}</span></article>`).join('')}</div></section>
-      <aside aria-label="Conector"><section class="tarjeta" style="margin-bottom:14px"><h2>Conector MCP</h2><p class="peq suave">La dirección que se añade en Claude (o en otro asistente) para que use el cerebro. Cada persona entra con su cuenta.</p>
-          <div class="conector-url"><code>${esc(con.url)}</code><button type="button" class="btn btn--borde btn--sm" data-acc="mcp-copiar">Copiar</button></div>
-          <ul class="lista-simple">${con.asistentes.map(a => `<li><span><b>${esc(a.nombre)}</b>${a.quien ? ` <span class="peq suave">· ${esc(a.quien)}</span>` : ''}<br><span class="peq suave">${a.ultimo ? 'Último uso ' + U.cuando(a.ultimo) : 'Sin conectar'}</span></span><span class="estado ${a.estado === 'conectado' ? '' : 'estado--no'}">${a.estado === 'conectado' ? 'Conectado' : 'Disponible'}</span></li>`).join('')}</ul>
-          <p class="peq suave">Prototipo: la dirección es de ejemplo y no hay ningún asistente conectado de verdad.</p></section>
-        <section class="tarjeta" style="margin-bottom:14px"><h2>Qué puede hacer Claude</h2><ul class="herramientas">${HERRAMIENTAS.map(([k, t]) => `<li><code>${k}</code><span>${t}</span></li>`).join('')}</ul></section>
-        <section class="tarjeta"><h2>Registro de accesos</h2><ul class="registro">${reg.map(r => `<li><span class="peq suave">${U.cuando(r.fecha)}</span><span><b>${esc(r.quien)}</b> · <code>${esc(r.herramienta)}</code>${r.detalle ? ` <span class="suave">${esc(r.detalle)}</span>` : ''}</span></li>`).join('')}</ul></section></aside></div>`;
+    const ab = BA.lista('memoria').filter(m => m.estado === 'abierta');
+    return `<div class="cab-pagina"><div><h1>Cerebro</h1><p>Lo que el panel sabe: notas y pendientes que guarda de tus correos, documentos, facturas y reuniones. Se llena solo; aquí solo lo consultas.</p></div></div>
+      <div class="mem-barra"><div class="buscador"><label class="solo-lectores" for="mem-q">Buscar en el cerebro</label>${U.ic('buscar')}<input id="mem-q" type="search" placeholder="Buscar: Mirador, cuota, México…" value="${esc(fm.q)}" data-inp="mem-q" autocomplete="off"></div>
+        <div class="mem-cats" role="group" aria-label="Filtrar por categoría">${[['', 'Todo', ab.length], ...CATS.map(([k, t]) => [k, t, ab.filter(m => catDe(m) === k).length]).filter(x => x[2])].map(([k, t, n]) => `<button type="button" class="filtro-chip" data-acc="mem-cat" data-k="${k}" aria-pressed="${fm.cat === k}">${t} <span>${n}</span></button>`).join('')}</div>
+        <label class="lab-check peq"><input type="checkbox" data-chg="mem-cumplidas"${fm.cumplidas ? ' checked' : ''}> Ver también cumplidas y sustituidas</label></div>
+      <div id="mem-res">${resultados()}</div>
+      <p class="peq suave">Nada se borra: lo corregido queda como «sustituida» y lo cumplido como «cumplido». El conector con Claude está en <a href="#/fuentes">Fuentes</a>.</p>`;
   }
   BA.rutas.cerebro = { titulo: 'Cerebro', render };
-  BA.acc['mem-filtro'] = el => { filtroMem = el.dataset.k; BA.refrescar(); };
-  BA.acc['mcp-copiar'] = () => BA.copiar(BA.B.conector.url, 'Dirección del conector copiada.');
+  BA.inp['mem-q'] = el => { fm.q = el.value; const r = U.$('#mem-res'); if (r) r.innerHTML = resultados(); };
+  BA.acc['mem-cat'] = el => { fm.cat = el.dataset.k; BA.refrescar(); };
+  BA.chg['mem-cumplidas'] = el => { fm.cumplidas = el.checked; BA.refrescar(); };
 })();

@@ -166,7 +166,7 @@ fhv|Alba|Tolivia Cuesta|Gestora de innovación||`;
         id, nivel, fuente, grupo, titulo, proyecto: proyecto || '', area: o.area || PROYECTOS[proyecto] || '', extracto,
         contactoId: null, entidadId: null, externo: '', meta: o.meta || [], estado: o.estado || 'abierto',
         llegada: o.f !== undefined ? enVentana(o.f) : atras(o.l ?? 1, o.h || '10:15'),
-        vence: o.v !== undefined ? dl(o.v) : null, tareaId: o.tarea || null, dir: o.dir || (fuente === 'outlook' ? 'in' : fuente),
+        vence: o.v !== undefined ? dl(o.v) : null, tareaId: o.tarea || null, ...(o.u ? { urgente: true } : {}), dir: o.dir || (fuente === 'outlook' ? 'in' : fuente),
       };
       if (quien) {
         if (quien[0] === '!') it.externo = quien.slice(1);
@@ -196,7 +196,7 @@ fhv|Alba|Tolivia Cuesta|Gestora de innovación||`;
     I('i-env-mir', 2, 'outlook', 'esperando', 'Propuesta de asociación enviada a Mirador Cardiotech', 'Lucía Anes', 'Captación de socios',
       'Enviado por ti: «Hola Lucía, adjunto la propuesta de asociación con las cuotas y servicios. Si quieres, la comentamos en una visita. Un saludo, Mateo». Sin respuesta desde hace 6 días.', { dir: 'out', l: 6, h: '11:20', meta: [['Adjuntos', 'Propuesta asociación BioAsturias.pdf']] });
     I('i-env-faro', 2, 'outlook', 'esperando', 'Presupuesto del rediseño web y branding', '!Estudio Faro Creativo', 'Rediseño web y marca',
-      'Enviado por ti: «Os paso el briefing y las referencias. ¿Podéis mandarme un presupuesto por fases (marca, web y guía de estilo)?». Sin respuesta desde hace 5 días.', { dir: 'out', l: 5, h: '09:50', meta: [['Para', 'hola@estudiofaro.example']] });
+      'Enviado por ti: «Os paso el briefing y las referencias. ¿Podéis mandarme un presupuesto por fases (marca, web y guía de estilo)?». Sin respuesta desde hace 5 días.', { dir: 'out', l: 5, h: '09:50', u: true, meta: [['Para', 'hola@estudiofaro.example']] });
     I('i-env-fhv', 2, 'outlook', 'esperando', 'Pilotos de salud digital con la Fundación Hospitalaria', 'Ramón Valdés', 'Healthtech Madrid',
       'Enviado por ti: «Ramón, ¿te encaja que presentemos en Madrid los dos pilotos de salud digital del hospital? Necesitaríamos tu visto bueno y un contacto de comunicación».', { dir: 'out', l: 4, h: '16:10' });
     I('i-env-ari', 2, 'outlook', 'esperando', 'Memoria técnica del mentoring enviada a la Agencia', 'Marina Prado', 'Mentoring científicos',
@@ -447,7 +447,8 @@ fhv|Alba|Tolivia Cuesta|Gestora de innovación||`;
     // ---- cerebro: memoria (base de datos) que leen y escriben Claude, la lectura diaria y el panel ----
     // tipo: nota (un dato) | pendiente (algo por hacer o por cumplir, con fecha opcional)
     // fuente: claude | lectura (lectura automática de las 06:00) | panel
-    const M = (id, tipo, fuente, dias, h, texto, sobre, o = {}) => ({ id, tipo, fuente, fecha: atras(dias, h), texto, sobre, vence: o.v !== undefined ? dl(o.v) : null, estado: o.estado || 'abierta', autor: fuente === 'claude' ? 'Claude (Mateo)' : fuente === 'lectura' ? 'Lectura diaria' : 'Mateo' });
+    const CAT_M = {"mem01": "correo", "mem02": "reunion", "mem03": "documento", "mem04": "correo", "mem05": "correo", "mem06": "reunion", "mem07": "factura", "mem08": "documento", "mem09": "reunion", "mem10": "correo", "mem11": "reunion", "mem12": "documento", "mem13": "reunion", "mem14": "llamada"};
+    const M = (id, tipo, fuente, dias, h, texto, sobre, o = {}) => ({ id, tipo, cat: CAT_M[id] || 'otro', fuente, fecha: atras(dias, h), texto, sobre, vence: o.v !== undefined ? dl(o.v) : null, estado: o.estado || 'abierta', autor: fuente === 'claude' ? 'Claude (Mateo)' : fuente === 'lectura' ? 'Lectura diaria' : 'Mateo' });
     const memoria = [
       M('mem01', 'pendiente', 'claude', 0, '08:12', 'Mandar a Lucía Anes la tabla de cuotas de pleno derecho después de la visita a Mirador Cardiotech.', { tipo: 'entidad', id: 'e-mir' }, { v: 2 }),
       M('mem02', 'nota', 'claude', 0, '08:10', 'Mirador Cardiotech duda entre pleno derecho y adherido; lo que más le interesa es la misión a México.', { tipo: 'entidad', id: 'e-mir' }),

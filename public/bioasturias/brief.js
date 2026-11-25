@@ -43,29 +43,35 @@
     return i.vence ? U.venceTxt(i.vence) : GRUPO_TXT[i.grupo];
   }
   const prioridades = (n = 5) => activos().sort((a, b) => puntos(b) - puntos(a) || orden(a, b)).slice(0, n);
+  // Urgente: las 5 que calcula el panel (salvo las que Mateo quite) más todas las que Mateo marque a mano, sin límite
+  const urgentes = () => { const man = activos().filter(i => i.urgente === true);
+    const auto = activos().filter(i => i.urgente !== false && i.urgente !== true).sort((a, b) => puntos(b) - puntos(a) || orden(a, b)).slice(0, 5);
+    return [...man, ...auto].sort((a, b) => puntos(b) - puntos(a)); };
+  const esUrgente = i => urgentes().some(x => x.id === i.id);
+  // Cómo hacerlo y si Claude lo puede hacer entero (100 % automatizable) o necesita a Mateo
+  function ayuda(i) {
+    const q = quien(i).split(' · ')[0];
+    if (i.grupo === 'sin_responder') return { auto: false, porque: 'Claude redacta la respuesta con lo que sabe el cerebro, pero qué contestar lo decides tú.', pasos: [`Claude lee el correo y tu historial con ${q || 'esta persona'}.`, 'Te propone una respuesta.', 'La revisas, ajustas lo que haga falta y la envías.'] };
+    if (i.grupo === 'esperando') return { auto: true, porque: 'Es un recordatorio: Claude lo puede escribir y enviar sin que hagas nada.', pasos: ['Claude comprueba que sigue sin respuesta.', `Escribe a ${q || 'la otra persona'} un recordatorio breve.`, 'Te avisa cuando contesten.'] };
+    if (i.fuente === 'odoo') return { auto: false, porque: 'Hay dinero de por medio: Claude lo prepara, pero lo validas tú.', pasos: ['Claude revisa el estado en Odoo.', 'Prepara el recordatorio de pago o el apunte.', 'Lo validas y se envía.'] };
+    if (i.fuente === 'onedrive' || i.fuente === 'gdrive') return i.vence
+      ? { auto: false, porque: 'Hay que escribir contenido que decides tú; Claude te deja un borrador.', pasos: ['Claude abre el documento y ve qué falta.', 'Te propone un borrador de lo que falta.', 'Lo revisas y lo terminas.'] }
+      : { auto: true, porque: 'Solo hay que ponerse al día: Claude lee el documento y te lo resume.', pasos: ['Claude abre el documento.', 'Te resume qué ha cambiado y si te afecta.'] };
+    if (i.fuente === 'calendario') return { auto: true, porque: 'Claude puede contestar la invitación mirando tu agenda.', pasos: ['Claude mira tu agenda.', 'Acepta o propone otro hueco.'] };
+    return { auto: false, porque: 'Necesita una decisión tuya.', pasos: ['Claude reúne el contexto.', 'Te propone qué hacer.', 'Decides tú.'] };
+  }
 
-  BA.mod.brief = { pendientes: () => activos().length, activos, agendaHoy, seccion, orden, SECCIONES, GRUPO_TXT, prioridades, motivo };
+  BA.mod.brief = { pendientes: () => activos().length, activos, agendaHoy, seccion, orden, SECCIONES, GRUPO_TXT, prioridades, urgentes, motivo };
 
   // ---------- matriz Hacer / Llamar / Ir / Contestar ----------
   // Cada tarea, aviso o reunión cae en una casilla según lo que hay que hacer. «Ir» = desplazarse (visitas, reuniones presenciales, eventos).
   const ACCIONES = [['hacer', 'Hacer', 'tarea'], ['llamar', 'Llamar', 'llamada'], ['ir', 'Ir', 'ir'], ['contestar', 'Contestar', 'enviado']];
   const accionItem = i => i.accion || (i.grupo === 'sin_responder' ? 'contestar' : 'hacer');
   const accionAgenda = a => /videollamada|online|teams|meet|zoom/i.test(a.lugar) ? null : /tel[eé]fono|llamada/i.test(a.lugar) ? 'llamar' : 'ir';
-  // Urgente: tiene fecha límite hoy o ya vencida, o es una cita de hoy. Importante: prioridad alta o entre tus 5 prioridades.
-  function elementosHoy() {
-    const top = new Set(prioridades().map(i => i.id)), l = [];
-    for (const t of BA.lista('tareas').filter(t => t.estado !== 'hecho' && t.fecha && t.fecha <= BA.hoyISO))
-      l.push({ k: 'tarea', id: t.id, acc: t.accion || 'hacer', titulo: t.titulo, sub: [t.proyecto && t.proyecto + (t.sub ? ' › ' + t.sub : ''), U.difDias(t.fecha) < 0 ? 'Vencida ' + U.diaCorto(U.dia(t.fecha)) : 'Para hoy'].filter(Boolean).join(' · '), urg: true, imp: t.prioridad === 'alta', orden: '1' + t.fecha });
-    for (const i of activos().filter(i => seccion(i) === 'hoy' || i.grupo === 'sin_responder'))
-      l.push({ k: 'item', id: i.id, acc: accionItem(i), titulo: i.titulo, sub: [quien(i), motivo(i)].filter(Boolean).join(' · '), urg: !!(i.vence && U.difDias(i.vence) <= 0), imp: top.has(i.id), orden: '2' + (i.vence || '9') + i.llegada });
-    for (const a of agendaHoy()) { const acc = accionAgenda(a); if (acc) l.push({ k: 'agenda', id: a.id, acc, titulo: a.titulo, sub: `${a.ini}–${a.fin} · ${a.lugar}`, urg: true, imp: false, orden: '0' + a.ini }); }
-    const peso = x => (x.urg ? 0 : 2) + (x.imp ? 0 : 1);
-    return l.sort((a, b) => peso(a) - peso(b) || a.orden.localeCompare(b.orden));
-  }
   const marcas = x => `${x.urg ? '<span class="marca-u">Urgente</span>' : ''}${x.imp ? '<span class="marca-i">Importante</span>' : ''}`;
   function celdaFila(x) {
     const acc = x.k === 'tarea' ? `data-acc="tarea-editar" data-id="${esc(x.id)}"` : x.k === 'item' ? `data-acc="item-ver" data-id="${esc(x.id)}"` : 'data-acc="agenda-ver"';
-    return `<li draggable="${x.k !== 'agenda'}" data-mk="${x.k}" data-mid="${esc(x.id)}"><button type="button" class="celda__fila" ${acc} data-foco="m-${esc(x.id)}"><span class="celda__t">${esc(x.titulo)}</span><small>${esc(x.sub)}</small>${x.urg || x.imp ? `<span class="celda__marcas">${marcas(x)}</span>` : ''}</button></li>`;
+    return `<li draggable="${x.k !== 'agenda'}" data-mk="${x.k}" data-mid="${esc(x.id)}"${x.chk ? ' class="con-chk"' : ''}>${x.chk || ''}<button type="button" class="celda__fila" ${acc} data-foco="m-${esc(x.id)}"><span class="celda__t">${esc(x.titulo)}</span><small>${esc(x.sub)}</small>${x.urg || x.imp ? `<span class="celda__marcas">${marcas(x)}</span>` : ''}</button></li>`;
   }
   function matriz(l, titulo, sub) {
     return `<section class="matriz-bloque" aria-labelledby="mx-t"><div class="cab-seccion"><h2 id="mx-t">${titulo}</h2><span class="peq suave">${sub}</span></div>
@@ -125,6 +131,8 @@
       i.proyecto ? `Proyecto: ${i.proyecto}` : '', `Correo:\n\"\"\"\n${i.extracto}\n\"\"\"`].filter(Boolean).join('\n');
   }
   const promptUno = i => `Redacta una respuesta en español a este correo, en tono cordial, cercano y breve, y fírmala como Mateo (BioAsturias). Si te falta algún dato para contestar, pregúntamelo antes de redactar.\n\n${fichaCorreo(i)}`;
+  const promptItem = i => i.fuente === 'outlook' && i.grupo !== 'esperando' ? promptUno(i)
+    : `Ayúdame con esto y, si puedes hacerlo tú entero, hazlo; si no, dime qué tengo que decidir yo.\n\nAsunto: ${i.titulo}\nOrigen: ${(BA.FUENTES[i.fuente] || [i.fuente])[0]} · ${U.fechaCompleta(i.llegada)}${quien(i) ? '\nCon: ' + quien(i) : ''}${i.proyecto ? '\nProyecto: ' + i.proyecto : ''}${i.vence ? '\nPlazo: ' + U.venceTxt(i.vence) : ''}\nContexto:\n\"\"\"\n${i.extracto}\n\"\"\"`;
   const promptTodos = l => `Tengo ${l.length} correos sin responder. Redacta una respuesta para cada uno, en español, en tono cordial, cercano y breve, firmada como Mateo (BioAsturias). Numera las respuestas igual que los correos y, si te falta algún dato en alguno, dímelo en lugar de inventarlo.\n\n${l.map((i, k) => `--- Correo ${k + 1} ---\n${fichaCorreo(i)}`).join('\n\n')}`;
   async function copiar(txt, msg) {
     try { await navigator.clipboard.writeText(txt); }
@@ -134,7 +142,10 @@
   BA.copiar = copiar;
   const sinResponder = () => activos().filter(i => i.grupo === 'sin_responder').sort((a, b) => puntos(b) - puntos(a));
   BA.acc['copiar-borrador'] = el => { const t = document.getElementById('borr-' + el.dataset.id); copiar(t ? t.value : borrador(BA.get('items', el.dataset.id)), 'Respuesta copiada. Pégala en Outlook.'); };
-  BA.acc['copiar-prompt'] = el => copiar(promptUno(BA.get('items', el.dataset.id)), 'Prompt copiado. Pégalo en Claude.');
+  BA.acc['copiar-prompt'] = el => copiar(promptItem(BA.get('items', el.dataset.id)), 'Prompt copiado. Pégalo en Claude.');
+  // Con Claude conectado a la app, lo automatizable lo hace él y lo deja marcado como listo (aquí, simulado)
+  BA.acc['claude-hacer'] = el => BA.cambiar('items', el.dataset.id, { estado: 'hecho', hechoPor: 'claude' }, 'Claude lo ha hecho y lo ha marcado como listo (simulado).');
+  BA.acc['item-urgente'] = el => { const i = BA.get('items', el.dataset.id), u = esUrgente(i); BA.cambiar('items', i.id, { urgente: !u }, u ? 'Quitado de urgente.' : 'Marcado como urgente.'); };
   BA.acc['copiar-prompt-todos'] = () => { const l = sinResponder(); if (l.length) copiar(promptTodos(l), `Prompt con ${U.plural(l.length, 'correo', 'correos')} copiado. Pégalo en Claude.`); };
 
   // ---------- filas ----------
@@ -146,9 +157,9 @@
   function fila(i, r = {}) {
     const venc = i.vence ? `<span class="badge ${U.difDias(i.vence) <= 0 ? 'badge--hoy' : 'badge--sem'}">${U.venceTxt(i.vence)}</span>` : '';
     const acc = r.resuelto ? `<button type="button" class="btn btn--borde btn--sm" data-acc="item-reabrir" data-id="${esc(i.id)}">${i.estado === 'tarea' ? 'Reabrir' : 'Volver al brief'}</button>`
-      : `${icon('item-hecho', 'hecho', 'Marcar como hecho', i)}${icon('item-tarea', 'tarea', 'Convertir en tarea', i)}${icon('item-categorizar', 'etiqueta', 'Categorizar', i)}${icon('item-posponer', 'reloj', 'Posponer', i)}${icon('item-descartar', 'papelera', 'Descartar', i)}`;
+      : `${icon('item-urgente', 'urgente', esUrgente(i) ? 'Quitar de urgente' : 'Marcar como urgente', i)}${icon('item-hecho', 'hecho', 'Marcar como hecho', i)}${icon('item-tarea', 'tarea', 'Convertir en tarea', i)}${icon('item-categorizar', 'etiqueta', 'Categorizar', i)}${icon('item-posponer', 'reloj', 'Posponer', i)}${icon('item-descartar', 'papelera', 'Descartar', i)}`;
     return `<div class="fila${r.resuelto ? ' fila--hecha' : ''}"><button type="button" class="fila__main" data-acc="item-ver" data-id="${esc(i.id)}" data-foco="v-${esc(i.id)}">
-      <span class="fila__meta">${U.fuente(i.fuente)}<span>${U.cuando(i.llegada)}</span>${venc}<span class="chip">${GRUPO_TXT[i.grupo]}</span></span>
+      <span class="fila__meta">${U.fuente(i.fuente)}<span>${U.cuando(i.llegada)}</span>${venc}<span class="chip">${GRUPO_TXT[i.grupo]}</span>${i.hechoPor === 'claude' && i.estado === 'hecho' ? '<span class="chip chip--claude">Hecho por Claude</span>' : ''}</span>
       <span class="fila__t">${esc(i.titulo)}</span><span class="fila__q">${esc(quien(i))}</span>
       ${i.proyecto || i.area ? `<span class="fila__tags">${i.proyecto ? `<span class="chip chip--etiqueta">${esc(i.proyecto)}</span>` : ''}${i.area ? `<span class="chip">${esc(i.area)}</span>` : ''}</span>` : ''}
     </button><div class="fila__acc">${acc}</div></div>`;
@@ -164,30 +175,26 @@
   }
   function render() {
     const act = activos(), ag = agendaHoy(), m = modo();
-    const nuevos = act.filter(i => i.llegada >= BA.B.ventana.ini).length;
     const sinResp = act.filter(i => i.grupo === 'sin_responder').length;
-    const vHoy = act.filter(i => i.vence && U.difDias(i.vence) <= 0).length;
     const cn = { tranquilo: 0, normal: BA.lista('items').filter(i => i.nivel <= 2 && i.estado === 'abierto' && !pospuesto(i)).length, cargado: BA.lista('items').filter(i => i.estado === 'abierto' && !pospuesto(i)).length };
     const secs = SECCIONES.map(([k, t, d, cl]) => [k, t, d, cl, act.filter(i => seccion(i) === k).sort(orden)]);
     const posp = visibles().filter(i => i.estado === 'abierto' && pospuesto(i));
     const resu = visibles().filter(i => ['hecho', 'descartado', 'tarea'].includes(i.estado));
-    const dudas = BA.mod.cerebro.dudas(), det = BA.contadores().crm, top = prioridades(), hoyL = elementosHoy();
+    const dudas = BA.mod.cerebro.dudas(), det = BA.contadores().crm, top = urgentes();
     return `
-      <div class="cab-pagina"><div><p class="antetitulo">${U.fechaLarga(BA.hoy)}</p><h1>${saludo()}, Mateo.</h1>
-        <p>Última lectura de tus fuentes: hoy a las 06:00 (Outlook, OneDrive, Google Drive, Odoo y calendario). <a href="#/fuentes">Ver fuentes</a></p></div>
-        <div class="acciones"><div class="conmutador" role="group" aria-label="Día de demostración">
-          ${[['tranquilo', 'Día tranquilo (0)'], ['normal', `Día normal (${cn.normal})`], ['cargado', `Día cargado (${cn.cargado})`]].map(([k, t]) => `<button type="button" data-acc="modo" data-modo="${k}" aria-pressed="${m === k}">${t}</button>`).join('')}</div></div></div>
+      <div class="cab-pagina cab-brief"><h1>${saludo()}, Mateo.</h1>
+        <div class="cab-brief__der"><p class="fecha-hoy">${U.fechaLarga(BA.hoy)}</p>
+          <div class="demo-dia" role="group" aria-label="Simulación del volumen del día (solo para la demo)"><span class="peq suave" title="Solo para la demo: simula un día con 0, unos 25 o unos 50 avisos">Demo</span><div class="conmutador">
+          ${[['tranquilo', 'Tranquilo'], ['normal', 'Normal'], ['cargado', 'Cargado']].map(([k, t]) => `<button type="button" data-acc="modo" data-modo="${k}" aria-pressed="${m === k}" title="Día ${t.toLowerCase()} (${cn[k]} avisos)">${t}</button>`).join('')}</div></div></div></div>
       ${avisoDia()}
-      <div class="kpis" role="group" aria-label="Resumen en cifras">
-        <div class="kpi"><b>${nuevos}</b><span>nuevos desde ${BA.hoy.getDay() === 1 ? 'el viernes por la tarde' : 'ayer por la tarde'}</span></div>
-        <div class="kpi${sinResp ? ' kpi--alerta' : ''}"><b>${sinResp}</b><span>pendientes de responder</span></div>
-        <div class="kpi${vHoy ? ' kpi--alerta' : ''}"><b>${vHoy}</b><span>vencen hoy</span></div>
-        <div class="kpi"><b>${ag.length}</b><span>${ag.length === 1 ? 'reunión hoy' : 'reuniones hoy'}</span></div>
-      </div>
       <div class="brief-rejilla"><div>
-        ${top.length ? `<section class="prioridades" aria-labelledby="prio-t"><div class="prioridades__cab"><h2 id="prio-t">${top.length === 1 ? 'Tu prioridad de hoy' : `Tus ${top.length} prioridades de hoy`}</h2><span class="peq">Primero lo que vence; después, lo que más tiempo lleva esperando</span></div>
-          <ol class="prioridades__lista">${top.map((i, k) => `<li><button type="button" class="prio" data-acc="item-ver" data-id="${esc(i.id)}" data-foco="p-${esc(i.id)}"><span class="prio__n" aria-hidden="true">${k + 1}</span><span class="prio__t"><b>${esc(i.titulo)}</b><small>${esc([quien(i), motivo(i)].filter(Boolean).join(' · '))}</small></span>${U.fuente(i.fuente)}</button></li>`).join('')}</ol></section>` : ''}
-        ${matriz(hoyL, 'Qué hacer hoy', 'Tareas, avisos y citas de hoy por tipo de acción')}
+        ${top.length ? `<section class="prioridades" aria-labelledby="prio-t"><div class="prioridades__cab"><h2 id="prio-t">Urgente hoy</h2><span class="peq">Pulsa cada una para ver cómo hacerla. Marca o quita urgentes con ${U.ic('urgente', 'ic--sm')} en la lista de abajo.</span></div>
+          <ol class="prioridades__lista">${top.map((i, k) => { const a = ayuda(i);
+            return `<li><details class="prio-d"><summary class="prio"><span class="prio__n" aria-hidden="true">${k + 1}</span><span class="prio__t"><b>${esc(i.titulo)}</b><small>${esc([quien(i), motivo(i)].filter(Boolean).join(' · '))}</small></span><span class="prio__auto ${a.auto ? 'si' : ''}">${a.auto ? '✓ Automatizable' : 'Necesita tu decisión'}</span></summary>
+              <div class="prio__cuerpo"><div class="prio__auto-l ${a.auto ? 'si' : ''}"><b>${a.auto ? '✓ 100 % automatizable' : '✗ No es 100 % automatizable'}</b><span>${esc(a.porque)}</span></div>
+                <b class="peq">Cómo hacerlo con Claude</b><ol class="prio__pasos">${a.pasos.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
+                <div class="acciones">${a.auto ? `<button type="button" class="btn btn--blanco btn--sm" data-acc="claude-hacer" data-id="${esc(i.id)}">Que lo haga Claude</button><button type="button" class="btn btn--vidrio btn--sm" data-acc="copiar-prompt" data-id="${esc(i.id)}">Copiar prompt</button>`
+                  : `<button type="button" class="btn btn--blanco btn--sm" data-acc="copiar-prompt" data-id="${esc(i.id)}">Hacerlo con Claude · copiar prompt</button>`}<button type="button" class="btn btn--vidrio btn--sm" data-acc="item-ver" data-id="${esc(i.id)}">Ver el original</button><button type="button" class="btn btn--vidrio btn--sm" data-acc="item-urgente" data-id="${esc(i.id)}">Quitar de urgente</button></div></div></details></li>`; }).join('')}</ol></section>` : ''}
         ${loQueViene()}
         <h2 class="titulo-bloque">Todo lo pendiente del brief</h2>
         <div class="acciones" style="margin-bottom:12px"><button type="button" class="btn btn--primario" data-acc="repasar"${act.length ? '' : ' disabled'}>Repasar uno a uno${act.length ? ` (${act.length})` : ''}</button>

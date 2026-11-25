@@ -7,7 +7,7 @@
   const PASOS = ['Destinatarios', 'Mensaje', 'Vista previa', 'Envío'];
   let tab = 'nuevo', detalle = null, campo = null, enCurso = null;
 
-  const borrador = () => ({ paso: 1, f: BA.filtro.nuevo(), q: '', soloManual: false, extra: [], quitados: [], asunto: '', cuerpo: '', plantilla: '', idx: 0, estado: 'edicion', progreso: 0, pruebaOk: false, aviso: '' });
+  const borrador = () => ({ paso: 1, f: BA.filtro.nuevo(), q: '', soloManual: false, extra: [], quitados: [], asunto: '', cuerpo: '', plantilla: '', idx: 0, estado: 'edicion', progreso: 0, pruebaOk: false, aviso: '', programar: false, cuando: '' });
   let d = borrador();
   const enlazar = () => { BA.filtros.envios = { f: d.f, alCambiar: () => BA.refrescar() }; };
   enlazar();
@@ -117,6 +117,8 @@
     if (d.estado === 'enviando') return `<section class="tarjeta" aria-live="polite"><h2>Enviando…</h2><p>Un correo cada vez, uno a uno desde <b>${CUENTA}</b> (Outlook). Cada destinatario recibe un mensaje con su nombre y solo con su nombre.</p>
       <div class="progreso" role="progressbar" aria-valuemin="0" aria-valuemax="${dest.length}" aria-valuenow="${d.progreso}"><i style="width:${dest.length ? d.progreso / dest.length * 100 : 0}%"></i></div>
       <p id="env-prog-txt"><b>${d.progreso} de ${dest.length}</b> · ${d.progreso < dest.length ? 'enviando a ' + esc(BA.nombreC(dest[d.progreso])) : 'terminando'}</p></section>`;
+    if (d.estado === 'programado') return `<section class="tarjeta"><h2>Envío programado</h2><p>Saldrá el <b>${esc(U.fechaCompleta(d.cuando))}</b> a ${U.plural(dest.length, 'persona', 'personas')}, uno a uno desde ${CUENTA}. Hasta entonces puedes cancelarlo desde el historial.</p>
+      <p class="peq suave">Prototipo: no se enviará ningún correo real.</p><div class="acciones"><button type="button" class="btn btn--primario" data-acc="env-ver-historial">Ver programados</button><button type="button" class="btn btn--borde" data-acc="env-nuevo">Preparar otro envío</button></div></section>`;
     if (d.estado === 'enviado') return `<section class="tarjeta"><h2>Envío terminado</h2><p><b>${U.plural(dest.length, 'correo enviado', 'correos enviados')}</b> uno a uno desde ${CUENTA}. Quedan también en tu carpeta Enviados de Outlook y en el historial de cada ficha del CRM.</p>
       <p class="peq suave">Prototipo: no se ha enviado ningún correo real.</p><div class="acciones"><button type="button" class="btn btn--primario" data-acc="env-ver-historial">Ver en el historial</button><button type="button" class="btn btn--borde" data-acc="env-nuevo">Preparar otro envío</button></div></section>`;
     return `<section class="tarjeta"><h2>Resumen</h2><dl class="meta-lista"><dt>Desde</dt><dd>${CUENTA} (tu cuenta de Outlook)</dd><dt>Destinatarios</dt><dd>${dest.length} · ${esc(d.soloManual ? 'elegidos a mano' : BA.filtro.resumen(d.f))}</dd><dt>Asunto</dt><dd>${esc(d.asunto)}</dd><dt>Forma de envío</dt><dd>Un correo individual por persona, sin copia oculta ni newsletter</dd></dl>
@@ -124,9 +126,15 @@
       <h3>1. Prueba</h3><p>Recibirás en tu correo el mensaje tal como lo vería ${dest[0] ? esc(BA.nombreC(dest[d.idx] || dest[0])) : 'el primer destinatario'}, para ver cómo queda en tu bandeja. No sale a nadie más.</p>
       <button type="button" class="btn btn--borde" data-acc="env-prueba">Enviarme una prueba solo a mí</button> ${d.pruebaOk ? `<span class="badge badge--ok" role="status">Prueba enviada a ${CUENTA}</span>` : ''}
       <h3 style="margin-top:18px">2. Envío</h3><p>Se enviará un correo por persona, con su nombre, desde tu propia cuenta. Aparecerán en Enviados.</p>
-      <button type="button" class="btn btn--primario" data-acc="env-enviar"${dest.length ? '' : ' disabled'}>Enviar a ${U.plural(dest.length, 'persona', 'personas')}, uno a uno</button></section>
+      <div class="conmutador" role="group" aria-label="Cuándo enviar" style="margin-bottom:12px">${[[false, 'Enviar ahora'], [true, 'Programar']].map(([k, t]) => `<button type="button" data-acc="env-modo" data-m="${k}" aria-pressed="${d.programar === k}">${t}</button>`).join('')}</div>
+      ${d.programar ? `<div class="campo" style="max-width:280px"><label for="env-cuando">Fecha y hora del envío</label><input id="env-cuando" type="datetime-local" data-inp="env-cuando" min="${aLocal(new Date())}" value="${esc(d.cuando || porDefecto())}"></div>
+        <button type="button" class="btn btn--primario" data-acc="env-programar"${dest.length ? '' : ' disabled'}>Programar el envío a ${U.plural(dest.length, 'persona', 'personas')}</button>`
+        : `<button type="button" class="btn btn--primario" data-acc="env-enviar"${dest.length ? '' : ' disabled'}>Enviar a ${U.plural(dest.length, 'persona', 'personas')}, uno a uno</button>`}</section>
       <div class="acciones" style="margin-top:14px"><button type="button" class="btn btn--borde" data-acc="env-paso" data-p="3">Atrás</button></div>`;
   }
+  const p2 = n => String(n).padStart(2, '0');
+  const aLocal = f => `${f.getFullYear()}-${p2(f.getMonth() + 1)}-${p2(f.getDate())}T${p2(f.getHours())}:${p2(f.getMinutes())}`;
+  const porDefecto = () => { const f = U.sigLab(BA.hoy); f.setHours(9, 0, 0, 0); return aLocal(f); };
   function nuevo() {
     return `${cabecera()}${[paso1, paso2, paso3, paso4][d.paso - 1]()}`;
   }
@@ -136,8 +144,11 @@
   const pct = (a, b) => b ? Math.round(a / b * 100) + ' %' : '—';
   function historial() {
     if (detalle) return detalleEnvio(BA.get('envios', detalle));
-    const l = BA.lista('envios').slice().sort((a, b) => b.fecha.localeCompare(a.fecha));
-    return `${comparativa(l)}<h2 style="margin:26px 0 12px">Todos los envíos</h2><div class="tabla-wrap"><table class="tabla"><thead><tr><th scope="col">Fecha</th><th scope="col">Asunto</th><th scope="col">Destinatarios</th><th scope="col" class="num">Enviados</th><th scope="col" class="num">Clics en enlaces</th><th scope="col" class="num">Respuestas</th><th></th></tr></thead><tbody>
+    const todos = BA.lista('envios'), prog = todos.filter(e => e.programado).sort((a, b) => a.fecha.localeCompare(b.fecha));
+    const l = todos.filter(e => !e.programado).sort((a, b) => b.fecha.localeCompare(a.fecha));
+    return `${prog.length ? `<section class="tarjeta" style="margin-bottom:18px" aria-labelledby="prog-t"><div class="cab-seccion"><h2 id="prog-t">Programados</h2><span class="peq suave">Saldrán solos en su fecha</span></div>
+      <ul class="lista-simple">${prog.map(e => `<li><span><b>${esc(e.asunto)}</b><br><span class="peq suave">${esc(U.fechaCompleta(e.fecha))} · ${U.plural(e.destinatarios.length, 'destinatario', 'destinatarios')} · ${esc(e.filtroTexto)}</span></span><button type="button" class="btn btn--borde btn--sm" data-acc="env-cancelar" data-id="${esc(e.id)}">Cancelar</button></li>`).join('')}</ul></section>` : ''}
+      ${comparativa(l)}<h2 style="margin:26px 0 12px">Todos los envíos</h2><div class="tabla-wrap"><table class="tabla"><thead><tr><th scope="col">Fecha</th><th scope="col">Asunto</th><th scope="col">Destinatarios</th><th scope="col" class="num">Enviados</th><th scope="col" class="num">Clics en enlaces</th><th scope="col" class="num">Respuestas</th><th></th></tr></thead><tbody>
       ${l.map(e => { const t = tot(e); return `<tr><td>${U.diaCorto(new Date(e.fecha))}</td><td><b>${esc(e.asunto)}</b></td><td>${esc(e.filtroTexto)}</td><td class="num">${t.env}</td><td class="num">${t.clic} (${pct(t.clic, t.env)})</td><td class="num">${t.resp} (${pct(t.resp, t.env)})</td><td><button type="button" class="btn btn--borde btn--sm" data-acc="env-detalle" data-id="${esc(e.id)}" aria-label="Ver detalle de ${esc(e.asunto)}">Detalle</button></td></tr>`; }).join('')}</tbody></table></div>
       <p class="peq suave" style="margin-top:8px">Métricas simuladas: en este prototipo los clics y las respuestas son de ejemplo.</p>`;
   }
@@ -255,6 +266,17 @@
     for (const c of dest) BA.nuevo('comms', { id: U.uid('m'), fecha: ahora.toISOString(), tipo: 'envio-masivo', asunto: rellenar(d.asunto, c, false), resumen: 'Envío personalizado «' + d.asunto.trim() + '».', proyecto: '', contactoId: c.id, entidadId: c.entidadId, fuente: 'envios', envioId: id });
     d.estado = 'enviado'; d.enviadoId = id; if (BA.rutas && location.hash.startsWith('#/envios')) repintar(); BA.toast('Envío terminado.');
   }
+  BA.acc['env-modo'] = el => { d.programar = el.dataset.m === 'true'; if (d.programar && !d.cuando) d.cuando = porDefecto(); repintar(); };
+  BA.inp['env-cuando'] = el => { d.cuando = el.value; };
+  BA.acc['env-programar'] = () => {
+    const dest = destinatarios(), f = new Date(d.cuando);
+    if (!d.cuando || isNaN(f) || f <= new Date()) { BA.toast('Elige una fecha y hora futuras.'); return; }
+    const id = U.uid('env-');
+    BA.nuevo('envios', { id, fecha: f.toISOString(), programado: true, asunto: d.asunto.trim(), plantillaId: d.plantilla, cuerpo: d.cuerpo, filtroTexto: d.soloManual ? 'Elegidos a mano' : BA.filtro.resumen(d.f) + (d.extra.length ? ` (+${d.extra.length} a mano)` : ''),
+      destinatarios: dest.map(c => ({ contactoId: c.id, estado: 'programado', clics: 0, respondio: false, respuestaEn: null })), simulado: true });
+    d.estado = 'programado'; d.enviadoId = null; repintar(); BA.toast('Envío programado.');
+  };
+  BA.acc['env-cancelar'] = async el => { const e = BA.get('envios', el.dataset.id); if (!(await BA.confirmar('Cancelar el envío', `«${esc(e.asunto)}» no se enviará. ¿Seguro?`, 'Cancelar el envío'))) return; BA.borrar('envios', e.id); BA.refrescar(); BA.toast('Envío programado cancelado.'); };
   BA.acc['env-ver-historial'] = () => { tab = 'historial'; detalle = d.enviadoId; d = borrador(); enlazar(); repintar(); };
   BA.acc['env-nuevo'] = () => { d = borrador(); enlazar(); repintar(); };
   BA.acc['env-detalle'] = el => { detalle = el.dataset.id; repintar(); window.scrollTo(0, 0); };
