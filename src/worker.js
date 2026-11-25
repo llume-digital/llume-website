@@ -22,6 +22,9 @@
 // Con la clave buena se guarda una cookie HttpOnly limitada a /naranco durante 30 días; /naranco/salir la borra.
 // Solo se guarda el sha256 de la clave (NARANCO_CLAVE_SHA256); la cookie lleva la clave y se comprueba igual.
 //
+// /bioasturias/*: prototipo privado del panel de BioAsturias, con la misma lógica que /naranco (cookie `bioasturias_clave`,
+// variable BIOASTURIAS_CLAVE_SHA256, comentarios en la instancia «bioasturias-comentarios»). Ver DEMOS más abajo.
+//
 // /naranco/api/comentarios: comentarios que Mateo deja sobre la demo (botón «Comentar» de la web y pestaña del panel).
 // Solo con la cookie de la demo. Se guardan en otra instancia del mismo Durable Object («naranco-comentarios»),
 // separada de los datos de Lopita:
@@ -215,10 +218,59 @@ async function relevoSlack(request, env, metodo) {
   return json(datos);
 }
 
-// ── Demo privada de Nar&Co ─────────────────────────────────────────────────────────────────────────────────────────
-const NARANCO = '/naranco';
-const NARANCO_COOKIE = 'naranco_clave';
-const NARANCO_DIAS = 30;
+// ── Demos privadas con clave (Nar&Co y BioAsturias) ────────────────────────────────────────────────────────────────
+// Cada demo se describe con un objeto de configuración (ruta, cookie, variable con el sha256 de la clave, pantalla de
+// acceso e instancia del Durable Object para los comentarios); la lógica es la misma para todas.
+const DIAS_COOKIE = 30;
+
+const DEMOS = {
+  naranco: {
+    base: '/naranco',
+    cookie: 'naranco_clave',
+    claveVar: 'NARANCO_CLAVE_SHA256',
+    comentarios: 'naranco-comentarios',
+    pantalla: {
+      titulo: 'Nar&amp;Co · Acceso a la demo',
+      estilo: `:root{--bg:#f2f2f2;--ink:#212121;--muted:#6b6b6b;--verde:#00b485;--line:#d6d6d6}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
+.caja{width:100%;max-width:380px;background:#fff;border:1px solid var(--line);padding:32px 24px}
+.logo{font-weight:700;font-size:28px;letter-spacing:.04em;margin:0 0 4px}.logo span{color:var(--verde)}
+p{color:var(--muted);margin:0 0 24px;line-height:1.5;font-size:15px}
+label{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+input{width:100%;font:inherit;font-size:16px;padding:12px;border:1px solid var(--ink);background:#fff;color:var(--ink);border-radius:0}
+input:focus{outline:2px solid var(--verde);outline-offset:1px}
+button{margin-top:16px;width:100%;font:inherit;font-weight:600;font-size:16px;padding:14px;border:0;border-radius:0;background:var(--ink);color:#fff;cursor:pointer}
+button:hover{background:#00372a}.error{color:#b3261e;font-size:14px;margin:12px 0 0}`,
+      logo: 'NAR<span>&amp;</span>CO',
+      texto: 'Demo privada de la nueva web. Introduce la clave para entrar.<br><span lang="en">Private demo: enter the access key.</span>',
+      etiqueta: 'Clave · Key',
+    },
+  },
+  bioasturias: {
+    base: '/bioasturias',
+    cookie: 'bioasturias_clave',
+    claveVar: 'BIOASTURIAS_CLAVE_SHA256',
+    comentarios: 'bioasturias-comentarios',
+    pantalla: {
+      titulo: 'BioAsturias · Acceso al prototipo',
+      estilo: `:root{--bg:#f4f1ec;--ink:#1d2b2b;--muted:#5d6b6a;--acento:#0f7b78;--line:#d3cdc3}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
+.caja{width:100%;max-width:380px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:32px 24px}
+.logo{font-weight:700;font-size:24px;margin:0 0 4px}.logo span{color:var(--acento)}
+p{color:var(--muted);margin:0 0 24px;line-height:1.5;font-size:15px}
+label{display:block;font-size:14px;font-weight:600;margin-bottom:8px}
+input{width:100%;font:inherit;font-size:16px;padding:12px;border:1px solid #6d7b7a;background:#fff;color:var(--ink);border-radius:6px}
+input:focus{outline:3px solid var(--acento);outline-offset:1px}
+button{margin-top:16px;width:100%;font:inherit;font-weight:600;font-size:16px;padding:14px;border:0;border-radius:6px;background:var(--acento);color:#fff;cursor:pointer}
+button:hover{background:#0a5e5c}.error{color:#b3261e;font-size:14px;margin:12px 0 0}`,
+      logo: 'Bio<span>Asturias</span> · Panel',
+      texto: 'Prototipo privado del panel de trabajo. Introduce la clave para entrar.',
+      etiqueta: 'Clave',
+    },
+  },
+};
 
 function leerCookie(request, nombre) {
   for (const parte of (request.headers.get('Cookie') || '').split(';')) {
@@ -230,42 +282,34 @@ function leerCookie(request, nombre) {
   return '';
 }
 
-async function claveNarancoValida(clave, env) {
-  if (!clave || clave.length > 200 || !env.NARANCO_CLAVE_SHA256) return false;
-  return iguales(await sha256(clave), env.NARANCO_CLAVE_SHA256);
+async function claveDemoValida(demo, clave, env) {
+  const hash = env[demo.claveVar];
+  if (!clave || clave.length > 200 || !hash) return false;
+  return iguales(await sha256(clave), hash);
 }
 
-const cookieNaranco = (valor, segundos) =>
-  `${NARANCO_COOKIE}=${encodeURIComponent(valor)}; Path=${NARANCO}; Max-Age=${segundos}; HttpOnly; Secure; SameSite=Lax`;
+const cookieDemo = (demo, valor, segundos) =>
+  `${demo.cookie}=${encodeURIComponent(valor)}; Path=${demo.base}; Max-Age=${segundos}; HttpOnly; Secure; SameSite=Lax`;
 
 // Solo se vuelve a rutas de la propia demo (evita redirecciones abiertas)
-function destinoNaranco(texto) {
-  if (typeof texto !== 'string' || !(texto === NARANCO || texto.startsWith(`${NARANCO}/`)) || texto.startsWith('//')) return `${NARANCO}/`;
+function destinoDemo(demo, texto) {
+  if (typeof texto !== 'string' || !(texto === demo.base || texto.startsWith(`${demo.base}/`)) || texto.startsWith('//')) return `${demo.base}/`;
   return texto;
 }
 
 const escHtml = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-function pantallaAcceso(destino, error) {
+function pantallaAcceso(demo, destino, error) {
+  const p = demo.pantalla;
   const html = `<!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex, nofollow"><title>Nar&amp;Co · Acceso a la demo</title>
+<meta name="robots" content="noindex, nofollow"><title>${p.titulo}</title>
 <style>
-:root{--bg:#f2f2f2;--ink:#212121;--muted:#6b6b6b;--verde:#00b485;--line:#d6d6d6}
-*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
-main{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
-.caja{width:100%;max-width:380px;background:#fff;border:1px solid var(--line);padding:32px 24px}
-.logo{font-weight:700;font-size:28px;letter-spacing:.04em;margin:0 0 4px}.logo span{color:var(--verde)}
-p{color:var(--muted);margin:0 0 24px;line-height:1.5;font-size:15px}
-label{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
-input{width:100%;font:inherit;font-size:16px;padding:12px;border:1px solid var(--ink);background:#fff;color:var(--ink);border-radius:0}
-input:focus{outline:2px solid var(--verde);outline-offset:1px}
-button{margin-top:16px;width:100%;font:inherit;font-weight:600;font-size:16px;padding:14px;border:0;border-radius:0;background:var(--ink);color:#fff;cursor:pointer}
-button:hover{background:#00372a}.error{color:#b3261e;font-size:14px;margin:12px 0 0}
-</style></head><body><main><form class="caja" method="post" action="${NARANCO}/acceso">
-<h1 class="logo">NAR<span>&amp;</span>CO</h1>
-<p>Demo privada de la nueva web. Introduce la clave para entrar.<br><span lang="en">Private demo: enter the access key.</span></p>
-<label for="clave">Clave · Key</label>
+${p.estilo}
+</style></head><body><main><form class="caja" method="post" action="${demo.base}/acceso">
+<h1 class="logo">${p.logo}</h1>
+<p>${p.texto}</p>
+<label for="clave">${p.etiqueta}</label>
 <input id="clave" name="clave" type="password" autocomplete="current-password" required autofocus>
 <input type="hidden" name="destino" value="${escHtml(destino)}">
 ${error ? '<p class="error" role="alert">Clave incorrecta. Inténtalo de nuevo.</p>' : ''}
@@ -285,10 +329,10 @@ const ESTADOS_COMENTARIO = new Set(['nuevo', 'en_curso', 'hecho', 'descartado'])
 const PRIORIDADES = new Set(['imprescindible', 'me_gustaria', 'mas_adelante']);
 const textoLimpio = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 
-async function comentariosNaranco(request, env, url) {
+async function comentariosDemo(demo, request, env, url) {
   const json = (datos, estado = 200) => responder(JSON.stringify(datos), estado, { 'Content-Type': 'application/json; charset=utf-8' });
   if (!env.LOPITA_DATOS) return json({ error: 'sin_almacen' }, 503);
-  const almacen = env.LOPITA_DATOS.get(env.LOPITA_DATOS.idFromName('naranco-comentarios'));
+  const almacen = env.LOPITA_DATOS.get(env.LOPITA_DATOS.idFromName(demo.comentarios));
   if (request.method === 'GET') return json({ comentarios: await almacen.listarComentarios() });
   if (request.method !== 'POST' && request.method !== 'PATCH') return responder(null, 405, { Allow: 'GET, POST, PATCH' });
   // Misma web: rechaza envíos desde otros orígenes
@@ -317,34 +361,34 @@ async function comentariosNaranco(request, env, url) {
   return fila ? json({ comentario: fila }) : json({ error: 'no_existe' }, 404);
 }
 
-async function demoNaranco(request, env, url) {
+async function demoPrivada(demo, request, env, url) {
   // Formulario de acceso
-  if (url.pathname === `${NARANCO}/acceso`) {
-    if (request.method !== 'POST') return redirigir(`${NARANCO}/`);
+  if (url.pathname === `${demo.base}/acceso`) {
+    if (request.method !== 'POST') return redirigir(`${demo.base}/`);
     let datos;
-    try { datos = await request.formData(); } catch { return pantallaAcceso(`${NARANCO}/`, true); }
+    try { datos = await request.formData(); } catch { return pantallaAcceso(demo, `${demo.base}/`, true); }
     const clave = String(datos.get('clave') || '');
-    const destino = destinoNaranco(String(datos.get('destino') || ''));
-    if (await claveNarancoValida(clave, env)) return redirigir(destino, cookieNaranco(clave, NARANCO_DIAS * 86400));
-    return pantallaAcceso(destino, true);
+    const destino = destinoDemo(demo, String(datos.get('destino') || ''));
+    if (await claveDemoValida(demo, clave, env)) return redirigir(destino, cookieDemo(demo, clave, DIAS_COOKIE * 86400));
+    return pantallaAcceso(demo, destino, true);
   }
-  if (url.pathname === `${NARANCO}/salir`) return redirigir(`${NARANCO}/`, cookieNaranco('', 0));
+  if (url.pathname === `${demo.base}/salir`) return redirigir(`${demo.base}/`, cookieDemo(demo, '', 0));
 
   // Enlace con la clave: guarda la cookie y la quita de la dirección
   const claveEnlace = url.searchParams.get('clave');
   if (claveEnlace !== null) {
     url.searchParams.delete('clave');
-    const limpia = destinoNaranco(url.pathname) + (url.search || '');
-    if (await claveNarancoValida(claveEnlace, env)) return redirigir(limpia, cookieNaranco(claveEnlace, NARANCO_DIAS * 86400));
-    return pantallaAcceso(limpia, true);
+    const limpia = destinoDemo(demo, url.pathname) + (url.search || '');
+    if (await claveDemoValida(demo, claveEnlace, env)) return redirigir(limpia, cookieDemo(demo, claveEnlace, DIAS_COOKIE * 86400));
+    return pantallaAcceso(demo, limpia, true);
   }
 
-  if (!(await claveNarancoValida(leerCookie(request, NARANCO_COOKIE), env))) {
+  if (!(await claveDemoValida(demo, leerCookie(request, demo.cookie), env))) {
     if (request.method !== 'GET' && request.method !== 'HEAD') return responder('Acceso restringido', 401);
-    return pantallaAcceso(destinoNaranco(url.pathname + url.search), false);
+    return pantallaAcceso(demo, destinoDemo(demo, url.pathname + url.search), false);
   }
 
-  if (url.pathname === `${NARANCO}/api/comentarios`) return comentariosNaranco(request, env, url);
+  if (url.pathname === `${demo.base}/api/comentarios`) return comentariosDemo(demo, request, env, url);
 
   const r = await env.ASSETS.fetch(request);
   const res = new Response(r.body, r);
@@ -353,10 +397,14 @@ async function demoNaranco(request, env, url) {
   return res;
 }
 
+const rutaDeDemo = (ruta, demo) => ruta === demo.base || ruta.startsWith(`${demo.base}/`);
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (url.pathname === NARANCO || url.pathname.startsWith(`${NARANCO}/`)) return demoNaranco(request, env, url);
+    for (const demo of Object.values(DEMOS)) {
+      if (rutaDeDemo(url.pathname, demo)) return demoPrivada(demo, request, env, url);
+    }
     if (url.pathname === RUTA_DB) return baseDeDatos(request, env);
     if (url.pathname === RUTA_CAL) return subirCalendarios(request, env);
     if (url.pathname.startsWith(`${RUTA_CAL}/`)) return leerCalendario(request, env, url.pathname.slice(RUTA_CAL.length + 1));
