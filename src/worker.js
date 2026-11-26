@@ -34,8 +34,11 @@
 // Las vistas previas no tienen el Durable Object: responde 503 y la página guarda en el navegador.
 //
 // /admin/*: panel interno de llume con la pestaña «Cerebro» (notas y pendientes del equipo en D1). Ver src/admin.js.
+// /mcp, /oauth/*, /.well-known/oauth-*: conector MCP del Cerebro con OAuth 2.1. Ver src/mcp.js y src/oauth.js.
 import { DurableObject } from 'cloudflare:workers';
 import { esRutaAdmin, panelAdmin } from './admin.js';
+import { RUTA_AUTORIZAR, autorizar, esRutaMetadatos, metadatos, registro, token } from './oauth.js';
+import { mcp } from './mcp.js';
 
 const RUTA_DB = '/lopita/horarios/nube/db';
 const RUTA_CAL = '/lopita/horarios/nube/cal';
@@ -406,6 +409,11 @@ const rutaDeDemo = (ruta, demo) => ruta === demo.base || ruta.startsWith(`${demo
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === '/mcp') return mcp(request, env);
+    if (esRutaMetadatos(url.pathname)) return metadatos(request, url);
+    if (url.pathname === '/oauth/registro') return registro(request, env);
+    if (url.pathname === '/oauth/token') return token(request, env);
+    if (url.pathname === RUTA_AUTORIZAR) return autorizar(request, env);
     if (esRutaAdmin(url.pathname)) return panelAdmin(request, env);
     for (const demo of Object.values(DEMOS)) {
       if (rutaDeDemo(url.pathname, demo)) return demoPrivada(demo, request, env, url);

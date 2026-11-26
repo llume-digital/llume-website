@@ -84,3 +84,20 @@ dialog form { margin-top: 16px; }
 @media (max-width: 560px) {
   .fila { flex-direction: column; align-items: stretch; }
 }
+
+.pestanas a { cursor: pointer; }
+.tarjeta h2 { margin: 0 0 8px; font-size: 18px; }
+.tarjeta p { color: var(--muted); margin: 0 0 12px; }
+.pasos h3 { font-size: 15px; margin: 16px 0 6px; color: var(--amber); }
+.pasos h3:first-child { margin-top: 0; }
+.pasos ol { margin: 0; padding-left: 20px; color: var(--muted); }
+.pasos li { margin-bottom: 6px; }
+.pasos strong, .tarjeta p strong { color: var(--text); font-weight: 500; }
+code { font-family: "Geist Mono", ui-monospace, monospace; font-size: 13px; background: rgba(255,255,255,.07); padding: 2px 6px; border-radius: 6px; overflow-wrap: anywhere; }
+.fila input[readonly] { font-family: "Geist Mono", ui-monospace, monospace; font-size: 13px; }
+label .fila { margin-top: 6px; }
+.aviso { border-color: rgba(242,192,138,.5); }
+.filtro-auditoria { display: block; max-width: 260px; margin-bottom: 12px; color: var(--muted); font-size: 13px; }
+.auditoria .entrada { padding: 10px 14px; }
+.auditoria code { font-size: 12px; }
+.mal { color: var(--rojo); }

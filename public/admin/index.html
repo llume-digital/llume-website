@@ -13,12 +13,15 @@
 <header class="cabecera">
   <a class="marca" href="/admin/">llume<span>.</span> panel</a>
   <nav class="pestanas" aria-label="Secciones del panel">
-    <a href="/admin/" aria-current="page">Cerebro</a>
+    <a href="#cerebro" data-pestana="cerebro" aria-current="page">Cerebro</a>
+    <a href="#conectar" data-pestana="conectar">Conectar</a>
+    <a href="#accesos" data-pestana="accesos">Accesos</a>
+    <a href="#equipo" data-pestana="equipo">Equipo</a>
   </nav>
   <div class="yo"><span id="yo"></span> · <a href="/admin/salir">Salir</a></div>
 </header>
 
-<main id="cerebro">
+<main id="cerebro" class="pestana">
   <nav class="vistas" aria-label="Vistas del cerebro">
     <button type="button" data-vista="mios" aria-pressed="true">Mis pendientes <span id="n-mios" class="contador suave"></span></button>
     <button type="button" data-vista="activas" aria-pressed="false">Activas <span id="n-activas" class="contador suave"></span></button>
@@ -99,6 +102,62 @@
     <p class="error" id="cliente-error" role="alert"></p>
     <ul id="lista-clientes" class="lista"></ul>
   </section>
+</main>
+
+<main id="conectar" class="pestana" hidden>
+  <div class="tarjeta">
+    <h2>Conecta tu asistente al Cerebro</h2>
+    <p>Así tu Claude o tu ChatGPT podrá leer y apuntar notas y pendientes en tu nombre. Cada persona conecta el suyo:
+      lo que escriba el asistente quedará firmado por ti. Nada se puede borrar y puedes revocar el acceso en la pestaña Accesos.</p>
+    <label>Dirección del conector
+      <span class="fila"><input id="url-mcp" readonly><button type="button" id="copiar-mcp" class="primario">Copiar</button></span>
+    </label>
+  </div>
+  <div class="tarjeta pasos">
+    <h3>Claude (web, escritorio y móvil)</h3>
+    <ol>
+      <li>En claude.ai, abre <strong>Ajustes → Conectores</strong> y pulsa <strong>Añadir conector personalizado</strong>.
+        En los planes Team y Enterprise, primero lo añade un propietario de la organización y después cada uno pulsa <strong>Conectar</strong>.</li>
+      <li>Nombre: <strong>Cerebro de llume</strong>. URL: la dirección de arriba. Deja vacíos los campos avanzados de OAuth.</li>
+      <li>Pulsa <strong>Conectar</strong>: se abrirá esta web. Entra con tu nombre y contraseña si hace falta y pulsa <strong>Permitir</strong>.</li>
+      <li>En cada conversación, activa el conector en el menú de herramientas. Prueba: «¿Qué pendientes tengo en el Cerebro?».</li>
+    </ol>
+    <h3>Claude Code</h3>
+    <ol>
+      <li>En la terminal: <code id="cmd-claude-code"></code></li>
+      <li>Dentro de Claude Code, escribe <code>/mcp</code>, elige <strong>cerebro-llume</strong> y autentícate: se abre el navegador para pulsar <strong>Permitir</strong>.</li>
+    </ol>
+    <h3>ChatGPT</h3>
+    <ol>
+      <li>En ChatGPT, abre <strong>Ajustes → Aplicaciones y conectores</strong> y crea un conector nuevo (si no aparece la opción, activa el <strong>modo desarrollador</strong> en los ajustes avanzados; depende del plan).</li>
+      <li>URL del servidor MCP: la dirección de arriba. Autenticación: <strong>OAuth</strong>.</li>
+      <li>Al conectar se abrirá esta web: entra y pulsa <strong>Permitir</strong>.</li>
+    </ol>
+  </div>
+</main>
+
+<main id="accesos" class="pestana" hidden>
+  <h2 class="subtitulo">Conexiones</h2>
+  <p class="ayuda">Cada asistente que alguien ha autorizado. Revocar corta el acceso al momento; para volver a usarlo hay que conectarlo otra vez.</p>
+  <p class="error" id="accesos-error" role="alert"></p>
+  <ul id="lista-conexiones" class="lista"></ul>
+  <h2 class="subtitulo">Actividad del conector (últimas 200 llamadas)</h2>
+  <label class="filtro-auditoria">Persona <select id="auditoria-persona"></select></label>
+  <ul id="lista-auditoria" class="lista auditoria"></ul>
+</main>
+
+<main id="equipo" class="pestana" hidden>
+  <p class="ayuda">Todas las personas del equipo pueden invitar, desactivar y revocar. Para que alguien elija o restablezca su contraseña, genera un enlace de invitación y pásaselo por un canal privado: solo sirve una vez y caduca en 48 horas.</p>
+  <form id="form-persona" class="tarjeta fila">
+    <label class="crece">Nueva persona <input name="nombre" maxlength="40" required placeholder="nombre"></label>
+    <button type="submit" class="primario">Añadir</button>
+  </form>
+  <p class="error" id="equipo-error" role="alert"></p>
+  <div id="invitacion-generada" class="tarjeta aviso" hidden>
+    <p>Enlace de invitación para <strong id="invitacion-nombre"></strong> (un solo uso, caduca en 48 h). No se volverá a mostrar:</p>
+    <span class="fila"><input id="invitacion-enlace" readonly><button type="button" id="copiar-invitacion" class="primario">Copiar</button></span>
+  </div>
+  <ul id="lista-equipo" class="lista"></ul>
 </main>
 
 <dialog id="dlg-versiones">

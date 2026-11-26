@@ -1,4 +1,4 @@
-// Panel interno de llume · pestaña Cerebro. Habla con la API de src/admin.js (/admin/api/...).
+// Panel interno de llume · pestañas Cerebro, Conectar, Accesos y Equipo. Habla con la API de src/admin.js (/admin/api/...).
 // Todo el texto de usuario se pinta con textContent (nunca innerHTML).
 const API = '/admin/api/';
 const $ = (s) => document.querySelector(s);
@@ -257,7 +257,7 @@ function pintarClientes() {
 
 async function recargarSesion() {
   const s = await llamar('sesion');
-  Object.assign(estado, { yo: s.yo, personas: s.personas, clientes: s.clientes });
+  Object.assign(estado, { yo: s.yo, personas: s.personas, clientes: s.clientes, mcp: s.mcp });
   rellenarSelects();
   pintarClientes();
 }
@@ -298,6 +298,131 @@ function cambiarVista(vista) {
   if (vista === 'estado') cargarEstado();
 }
 
+// ── Conectar ──────────────────────────────────────────────────────────────────────────────────────────────────────
+async function copiar(input, boton) {
+  try { await navigator.clipboard.writeText(input.value); } catch { input.select(); return; }
+  const antes = boton.textContent;
+  boton.textContent = 'Copiado';
+  setTimeout(() => { boton.textContent = antes; }, 1500);
+}
+
+function pintarConectar() {
+  $('#url-mcp').value = estado.mcp;
+  $('#cmd-claude-code').textContent = `claude mcp add --transport http cerebro-llume ${estado.mcp}`;
+}
+
+// ── Accesos ───────────────────────────────────────────────────────────────────────────────────────────────────────
+const fechaSeg = (s) => (s ? fechaCorta(new Date(s * 1000).toISOString()) : '—');
+
+async function cargarAccesos() {
+  $('#accesos-error').textContent = '';
+  let conexiones;
+  let ahoraSeg;
+  try { ({ conexiones, ahora: ahoraSeg } = await llamar('conexiones')); } catch (err) { $('#accesos-error').textContent = err.message; return; }
+  const filas = conexiones.map((c) => {
+    const caducada = !c.revocada && c.refresh_caduca < ahoraSeg;
+    const estadoTxt = c.revocada ? `Revocada por ${nombrePersona(c.revocada_por)} · ${fechaSeg(c.revocada)}` : caducada ? 'Caducada (60 días sin renovar)' : 'Activa';
+    return el('li', { class: `entrada ${c.revocada || caducada ? 'cerrada' : ''}` },
+      el('div', { class: 'fila' },
+        el('div', { class: 'crece' },
+          el('strong', {}, `${nombrePersona(c.persona_id)} · ${c.cliente}`),
+          el('div', { class: 'meta' },
+            el('span', {}, estadoTxt),
+            el('span', {}, `Conectada: ${fechaSeg(c.creada)}`),
+            el('span', {}, `Último uso: ${fechaSeg(c.ultimo_uso)}`),
+          ),
+        ),
+        !c.revocada && !caducada ? el('button', { type: 'button', class: 'mini', onclick: () => revocar(c) }, 'Revocar') : null,
+      ));
+  });
+  $('#lista-conexiones').replaceChildren(...(filas.length ? filas : [el('li', { class: 'vacio' }, 'Nadie ha conectado todavía un asistente.')]));
+  await cargarAuditoria();
+}
+
+async function revocar(c) {
+  if (!confirm(`¿Revocar el acceso de ${c.cliente} (${nombrePersona(c.persona_id)})? Dejará de funcionar al momento.`)) return;
+  try { await llamar(`conexiones/${c.id}/revocar`, { method: 'POST' }); } catch (err) { $('#accesos-error').textContent = err.message; }
+  await cargarAccesos();
+}
+
+async function cargarAuditoria() {
+  const persona = $('#auditoria-persona').value;
+  const { auditoria } = await llamar(`auditoria${persona ? `?persona=${persona}` : ''}`);
+  const filas = auditoria.map((a) => el('li', { class: 'entrada' },
+    el('div', { class: 'meta' },
+      el('span', {}, fechaSeg(a.creado)),
+      el('span', {}, nombrePersona(a.persona_id)),
+      el('span', {}, a.cliente || ''),
+      el('strong', {}, a.herramienta),
+      a.ok ? null : el('span', { class: 'mal' }, `Error: ${a.error}`),
+    ),
+    a.argumentos !== '{}' ? el('code', {}, a.argumentos) : null,
+  ));
+  $('#lista-auditoria').replaceChildren(...(filas.length ? filas : [el('li', { class: 'vacio' }, 'Sin actividad.')]));
+}
+
+// ── Equipo ────────────────────────────────────────────────────────────────────────────────────────────────────────
+async function cargarEquipo() {
+  $('#equipo-error').textContent = '';
+  let equipo;
+  try { ({ equipo } = await llamar('equipo')); } catch (err) { $('#equipo-error').textContent = err.message; return; }
+  $('#lista-equipo').replaceChildren(...equipo.map((p) => el('li', { class: `entrada ${p.activa ? '' : 'cerrada'}` },
+    el('div', { class: 'fila' },
+      el('div', { class: 'crece' },
+        el('strong', {}, p.nombre, p.id === estado.yo.id ? ' (tú)' : ''),
+        el('div', { class: 'meta' },
+          el('span', {}, !p.activa ? 'Desactivada' : p.tiene_clave ? 'Cuenta activa' : 'Sin contraseña todavía'),
+          p.invitacion_caduca ? el('span', {}, `Invitación pendiente hasta ${fechaSeg(p.invitacion_caduca)}`) : null,
+        ),
+      ),
+      p.activa ? el('button', { type: 'button', class: 'mini', onclick: () => invitar(p) }, p.tiene_clave ? 'Enlace para restablecer contraseña' : 'Enlace de invitación') : null,
+      p.id !== estado.yo.id ? el('button', { type: 'button', class: 'mini', onclick: () => activarPersona(p, !p.activa) }, p.activa ? 'Desactivar' : 'Reactivar') : null,
+    ))));
+}
+
+async function invitar(p) {
+  if (p.tiene_clave && !confirm(`${p.nombre} ya tiene contraseña. Si usa este enlace, la cambiará y se cerrarán sus sesiones en el panel. ¿Generar el enlace?`)) return;
+  $('#equipo-error').textContent = '';
+  let r;
+  try { r = await llamar(`equipo/${p.id}/invitacion`, { method: 'POST' }); } catch (err) { $('#equipo-error').textContent = err.message; return; }
+  $('#invitacion-nombre').textContent = p.nombre;
+  $('#invitacion-enlace').value = r.enlace;
+  $('#invitacion-generada').hidden = false;
+  await cargarEquipo();
+}
+
+async function activarPersona(p, activa) {
+  if (!activa && !confirm(`¿Desactivar a ${p.nombre}? Se cerrarán sus sesiones y se revocarán sus asistentes conectados. Sus notas se conservan.`)) return;
+  $('#equipo-error').textContent = '';
+  try { await llamar(`equipo/${p.id}`, { method: 'PATCH', body: { activa } }); } catch (err) { $('#equipo-error').textContent = err.message; return; }
+  await Promise.all([cargarEquipo(), recargarSesion()]);
+}
+
+async function crearPersona(ev) {
+  ev.preventDefault();
+  $('#equipo-error').textContent = '';
+  try { await llamar('equipo', { method: 'POST', body: { nombre: ev.target.nombre.value } }); } catch (err) { $('#equipo-error').textContent = err.message; return; }
+  ev.target.reset();
+  await Promise.all([cargarEquipo(), recargarSesion()]);
+}
+
+// ── Pestañas ──────────────────────────────────────────────────────────────────────────────────────────────────────
+const PESTANAS = ['cerebro', 'conectar', 'accesos', 'equipo'];
+
+function cambiarPestana(nombre) {
+  if (!PESTANAS.includes(nombre)) nombre = 'cerebro';
+  for (const a of document.querySelectorAll('.pestanas a')) {
+    if (a.dataset.pestana === nombre) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  }
+  for (const id of PESTANAS) $(`#${id}`).hidden = id !== nombre;
+  if (nombre === 'conectar') pintarConectar();
+  if (nombre === 'accesos') {
+    opciones($('#auditoria-persona'), estado.personas, { vacio: 'Todas' });
+    cargarAccesos();
+  }
+  if (nombre === 'equipo') { $('#invitacion-generada').hidden = true; cargarEquipo(); }
+}
+
 async function iniciar() {
   await recargarSesion();
   $('#yo').textContent = `Hola, ${estado.yo.nombre}`;
@@ -314,6 +439,12 @@ async function iniciar() {
   $('#estado-texto').addEventListener('input', (ev) => { $('#estado-cuenta').textContent = ev.target.value.length; });
   $('#estado-guardar').addEventListener('click', guardarEstado);
   $('#form-cliente').addEventListener('submit', crearCliente);
+  $('#copiar-mcp').addEventListener('click', () => copiar($('#url-mcp'), $('#copiar-mcp')));
+  $('#copiar-invitacion').addEventListener('click', () => copiar($('#invitacion-enlace'), $('#copiar-invitacion')));
+  $('#auditoria-persona').addEventListener('change', cargarAuditoria);
+  $('#form-persona').addEventListener('submit', crearPersona);
+  addEventListener('hashchange', () => cambiarPestana(location.hash.slice(1)));
+  cambiarPestana(location.hash.slice(1));
   cambiarVista(estado.vista);
   await Promise.all([cargarEtiquetas(), contarContadores()]);
 }
