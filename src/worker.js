@@ -32,7 +32,10 @@
 //   POST  {texto, donde, prioridad, autor, url} → crea uno (estado «nuevo»)
 //   PATCH ?id=<n> {estado?, respuesta?} → cambia el estado o deja una respuesta
 // Las vistas previas no tienen el Durable Object: responde 503 y la página guarda en el navegador.
+//
+// /admin/*: panel interno de llume con la pestaña «Cerebro» (notas y pendientes del equipo en D1). Ver src/admin.js.
 import { DurableObject } from 'cloudflare:workers';
+import { esRutaAdmin, panelAdmin } from './admin.js';
 
 const RUTA_DB = '/lopita/horarios/nube/db';
 const RUTA_CAL = '/lopita/horarios/nube/cal';
@@ -403,6 +406,7 @@ const rutaDeDemo = (ruta, demo) => ruta === demo.base || ruta.startsWith(`${demo
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (esRutaAdmin(url.pathname)) return panelAdmin(request, env);
     for (const demo of Object.values(DEMOS)) {
       if (rutaDeDemo(url.pathname, demo)) return demoPrivada(demo, request, env, url);
     }

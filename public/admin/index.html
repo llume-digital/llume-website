@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>llume · Panel</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/admin/admin.css">
+<script type="module" src="/admin/admin.js"></script>
+</head>
+<body>
+<header class="cabecera">
+  <a class="marca" href="/admin/">llume<span>.</span> panel</a>
+  <nav class="pestanas" aria-label="Secciones del panel">
+    <a href="/admin/" aria-current="page">Cerebro</a>
+  </nav>
+  <div class="yo"><span id="yo"></span> · <a href="/admin/salir">Salir</a></div>
+</header>
+
+<main id="cerebro">
+  <nav class="vistas" aria-label="Vistas del cerebro">
+    <button type="button" data-vista="mios" aria-pressed="true">Mis pendientes <span id="n-mios" class="contador suave"></span></button>
+    <button type="button" data-vista="activas" aria-pressed="false">Activas <span id="n-activas" class="contador suave"></span></button>
+    <button type="button" data-vista="hechas" aria-pressed="false">Hechas <span id="n-hechas" class="contador suave"></span></button>
+    <button type="button" data-vista="todo" aria-pressed="false">Todo</button>
+    <button type="button" data-vista="revision" aria-pressed="false">Revisión <span id="n-revision" class="contador"></span></button>
+    <button type="button" data-vista="estado" aria-pressed="false">Estado actual</button>
+    <button type="button" data-vista="clientes" aria-pressed="false">Clientes</button>
+  </nav>
+
+  <section id="sec-lista">
+    <div class="barra">
+      <button type="button" id="btn-nueva" class="primario">+ Nueva</button>
+      <form id="filtros" class="filtros" role="search">
+        <select name="tipo" aria-label="Tipo"><option value="">Todo tipo</option><option value="pendiente">Pendientes</option><option value="nota">Notas</option></select>
+        <select name="cliente" aria-label="Cliente"></select>
+        <select name="responsable" aria-label="Responsable"></select>
+        <select name="etiqueta" aria-label="Etiqueta"></select>
+        <input name="q" type="search" placeholder="Buscar en el texto" aria-label="Buscar">
+      </form>
+    </div>
+
+    <form id="form-entrada" class="tarjeta formulario" hidden>
+      <h2 id="form-titulo">Nueva entrada</h2>
+      <fieldset class="tipo">
+        <legend>Tipo</legend>
+        <label><input type="radio" name="tipo" value="pendiente" checked> Pendiente</label>
+        <label><input type="radio" name="tipo" value="nota"> Nota</label>
+      </fieldset>
+      <label>Texto <span class="ayuda">Una sola cosa por nota.</span>
+        <textarea name="texto" rows="4" maxlength="2000" required></textarea>
+        <span class="ayuda"><span id="cuenta">0</span>/2000</span>
+      </label>
+      <div class="rejilla">
+        <label>Cliente <select name="cliente_id"></select></label>
+        <label>Sobre la persona <select name="persona_id"></select></label>
+        <label class="solo-pendiente">Responsable <select name="responsable_id"></select></label>
+        <label>Fecha límite <input type="date" name="vence"></label>
+      </div>
+      <label>Etiquetas <span class="ayuda">Separadas por comas. Reutiliza las que ya existen.</span>
+        <input name="etiquetas" list="lista-etiquetas" autocomplete="off">
+      </label>
+      <datalist id="lista-etiquetas"></datalist>
+      <label>Enlaces <span class="ayuda">Uno por línea.</span>
+        <textarea name="enlaces" rows="2"></textarea>
+      </label>
+      <p class="error" id="form-error" role="alert"></p>
+      <div class="acciones">
+        <button type="submit" class="primario">Guardar</button>
+        <button type="button" id="form-cancelar">Cancelar</button>
+      </div>
+    </form>
+
+    <p id="aviso-revision" class="ayuda" hidden></p>
+    <ul id="lista" class="lista"></ul>
+    <p id="vacio" class="vacio" hidden>No hay nada aquí.</p>
+  </section>
+
+  <section id="sec-estado" hidden>
+    <div class="tarjeta">
+      <label>Sujeto <select id="estado-sujeto"></select></label>
+      <label>Estado actual <span class="ayuda">La foto de ahora, breve y sin historia. Al guardar, el anterior queda en el historial.</span>
+        <textarea id="estado-texto" rows="8" maxlength="4000"></textarea>
+        <span class="ayuda"><span id="estado-cuenta">0</span>/4000 · <span id="estado-meta"></span></span>
+      </label>
+      <p class="error" id="estado-error" role="alert"></p>
+      <div class="acciones"><button type="button" id="estado-guardar" class="primario">Guardar estado</button></div>
+    </div>
+    <h2 class="subtitulo">Historial</h2>
+    <ul id="estado-historial" class="lista"></ul>
+  </section>
+
+  <section id="sec-clientes" hidden>
+    <form id="form-cliente" class="tarjeta fila">
+      <label class="crece">Nuevo cliente <input name="nombre" maxlength="80" required></label>
+      <button type="submit" class="primario">Añadir</button>
+    </form>
+    <p class="error" id="cliente-error" role="alert"></p>
+    <ul id="lista-clientes" class="lista"></ul>
+  </section>
+</main>
+
+<dialog id="dlg-versiones">
+  <h2>Versiones</h2>
+  <ul id="versiones" class="lista"></ul>
+  <form method="dialog"><button class="primario">Cerrar</button></form>
+</dialog>
+</body>
+</html>

@@ -2,3 +2,4 @@
 .claude/
 .wrangler/
 __pycache__/
+.dev.vars

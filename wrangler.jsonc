@@ -19,13 +19,18 @@
     "binding": "ASSETS",
     // Rutas inexistentes muestran public/404.html con estado 404
     "not_found_handling": "404-page",
-    "run_worker_first": ["/lopita/horarios/nube/*", "/naranco", "/naranco/*", "/bioasturias", "/bioasturias/*"]
+    "run_worker_first": ["/lopita/horarios/nube/*", "/naranco", "/naranco/*", "/bioasturias", "/bioasturias/*", "/admin", "/admin/*"]
   },
   // Base de datos compartida de la app de horarios de Lopita (ver src/worker.js)
   "durable_objects": {
     "bindings": [{ "name": "LOPITA_DATOS", "class_name": "LopitaDatos" }]
   },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["LopitaDatos"] }],
+  // Base de datos del panel /admin (Cerebro). Esquema en migrations/. La clave del panel NO va aquí: es el secreto
+  // ADMIN_CLAVE (`npx wrangler secret put ADMIN_CLAVE`; en local, en .dev.vars). Sin DB o sin clave, /admin responde 503.
+  // Cada migración nueva de migrations/ se aplica a mano ANTES de subir el código que la usa:
+  // `npx wrangler d1 migrations apply llume-cerebro --remote`.
+  "d1_databases": [{ "binding": "DB", "database_name": "llume-cerebro", "database_id": "e4b4a46d-a04f-4ffe-9bb7-46302ea2af24", "migrations_dir": "migrations" }],
   "vars": {
     // sha256 de la clave de acceso a los datos de Lopita (la clave no está en el repo)
     "LOPITA_CLAVE_SHA256": "6ee72bf395616d1c96c79e8a64811a73c3bec78b9dde0389db5b8e618cb9bb8d",
